@@ -13,7 +13,7 @@ public class Person {
     @Column(name = "nick_name")
     private String name;
 
-    @Column(name = "old", length = 3)
+    @Column(name = "old")
     private Integer age;
 
     @Column(nullable = false)
