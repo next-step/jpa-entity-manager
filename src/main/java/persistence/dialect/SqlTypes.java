@@ -1,4 +1,4 @@
-package persistence;
+package persistence.dialect;
 
 import java.sql.Types;
 
