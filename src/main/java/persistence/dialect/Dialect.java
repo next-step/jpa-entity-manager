@@ -4,7 +4,7 @@ import static java.sql.Types.*;
 
 public abstract class Dialect {
 
-    protected String columnType(int sqlTypeCode) {
+    public String columnType(int sqlTypeCode) {
         return switch (sqlTypeCode) {
             case INTEGER -> "integer";
             case BIGINT -> "bigint";
@@ -13,10 +13,16 @@ public abstract class Dialect {
         };
     }
 
-    protected String castColumnType(String template, Long size) {
+    public String castColumnType(String template, Long size) {
         DdlType ddlType = new DdlType(template);
         return ddlType.getTypeName(size);
     }
 
-    abstract String getNativeIdentifierGeneratorStrategy();
+    public String getCreateTableString() {
+        return "create table";
+    }
+
+    public abstract String getNativeIdentifierGeneratorStrategy();
+
+    public abstract String getPrimaryKeyStrategy(String name);
 }
