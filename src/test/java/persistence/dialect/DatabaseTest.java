@@ -1,7 +1,6 @@
 package persistence.dialect;
 
 import org.junit.jupiter.api.Test;
-import persistence.SqlTypes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
