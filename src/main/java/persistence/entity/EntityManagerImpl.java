@@ -20,14 +20,14 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T find(Class<T> clazz, Long id) {
         EntityKey key = new EntityKey<>(clazz, id);
         if (!context.hasEntity(key)) {
-            Object object = jdbcTemplate.query(
+            Object entity = jdbcTemplate.query(
                     dml.getFindByIdQuery(
                             Person.class, id
                     ),
                     new RowMapperImpl<>(clazz)
             ).get(0);
-            context.persistEntity(object);
-            return (T) object;
+            context.persistEntity(entity);
+            return (T) entity;
         }
         return context.findEntity(new EntityKey<>(clazz, id));
     }

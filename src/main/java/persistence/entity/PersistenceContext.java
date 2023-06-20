@@ -5,7 +5,7 @@ public interface PersistenceContext {
 
     <T> T findEntity(EntityKey<T> key);
 
-    void persistEntity(Object object);
+    void persistEntity(Object entity);
 
-    void removeEntity(Object object);
+    void removeEntity(Object entity);
 }
