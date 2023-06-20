@@ -37,7 +37,11 @@ public class Application {
                     ddl.getCreateQuery(Person.class)
             );
 
-            em.persist(PersonFixture.createPerson());
+            Person person = PersonFixture.createPerson();
+            em.persist(person);
+            em.persist(person.setName("Changed Name"));
+
+
             Person entity = em.find(Person.class, 1L);
             em.remove(entity);
 
