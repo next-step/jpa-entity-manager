@@ -33,6 +33,10 @@ public class EntityKey<T> {
         this.idHash = Objects.hash(id);
     }
 
+    public Class<T> getEntityClass() {
+        return clazz;
+    }
+
     public Object getEntityId() {
         return id;
     }

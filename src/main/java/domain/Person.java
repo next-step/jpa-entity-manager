@@ -41,4 +41,9 @@ public class Person {
     public Long getId() {
         return id;
     }
+
+    public Person setName(String name) {
+        this.name = name;
+        return this;
+    }
 }
