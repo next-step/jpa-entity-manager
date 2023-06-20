@@ -4,6 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import domain.PersonFixture;
+import domain.PersonNotFoundException;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,8 @@ public class Application {
             em.persist(person.setName("Changed Name"));
 
 
-            Person entity = em.find(Person.class, 1L);
+            Person entity = em.find(Person.class, 1L)
+                    .orElseThrow(() -> new PersonNotFoundException());
             em.remove(entity);
 
             jdbcTemplate.execute(

@@ -1,7 +1,9 @@
 package persistence.entity;
 
+import java.util.Optional;
+
 public interface EntityManager {
-    <T> T find(Class<T> clazz, Object id);
+    <T> Optional<T> find(Class<T> clazz, Object id);
 
     void persist(Object entity);
 
