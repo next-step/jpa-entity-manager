@@ -11,16 +11,16 @@ import java.util.List;
 public final class H2InsertQuery {
     private H2InsertQuery() {}
 
-    public static String build(Object object) {
-        final Class<?> clazz = object.getClass();
-        final List<Field> columnFields = ColumnFields.forInsert(clazz);
+    public static String build(Object entity) {
+        final Class<?> clazz = entity.getClass();
+        final List<Field> columnFields = ColumnFields.forUpsert(clazz);
         return new StringBuilder()
                 .append("INSERT INTO ")
                 .append(TableName.build(clazz))
                 .append(" (")
                 .append(ColumnNames.build(columnFields))
                 .append(")")
-                .append(ColumnValues.build(object, columnFields))
+                .append(ColumnValues.build(entity, columnFields))
                 .toString();
     }
 }

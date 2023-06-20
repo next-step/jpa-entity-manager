@@ -17,12 +17,12 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void persistEntity(Object object) {
-        context.put(new EntityKey(object), object);
+    public void persistEntity(Object entity) {
+        context.put(new EntityKey(entity), entity);
     }
 
     @Override
-    public void removeEntity(Object object) {
-        context.remove(new EntityKey(object));
+    public void removeEntity(Object entity) {
+        context.remove(new EntityKey(entity));
     }
 }

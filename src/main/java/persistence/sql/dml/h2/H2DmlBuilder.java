@@ -10,8 +10,8 @@ public final class H2DmlBuilder implements DmlBuilder {
     }
 
     @Override
-    public String getInsertQuery(Object object) {
-        return H2InsertQuery.build(object);
+    public String getInsertQuery(Object entity) {
+        return H2InsertQuery.build(entity);
     }
 
     @Override
@@ -27,6 +27,11 @@ public final class H2DmlBuilder implements DmlBuilder {
     @Override
     public String getDeleteByIdQuery(Class<?> clazz, Object id) {
         return H2DeleteByIdQuery.build(clazz, id);
+    }
+
+    @Override
+    public String getUpdateQuery(Object entity) {
+        return H2UpdateQuery.build(entity);
     }
 
     private static class SingletonHelper {

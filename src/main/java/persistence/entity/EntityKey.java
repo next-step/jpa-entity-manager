@@ -28,7 +28,7 @@ public class EntityKey<T> {
         try {
             this.id = field.get(object);
         } catch (IllegalAccessException e) {
-            throw new IllegalFieldAccessException();
+            throw new IllegalFieldAccessException(e);
         }
         this.idHash = Objects.hash(id);
     }

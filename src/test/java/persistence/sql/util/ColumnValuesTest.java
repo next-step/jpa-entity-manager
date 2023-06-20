@@ -14,7 +14,7 @@ class ColumnValuesTest {
     void filterTransient() {
         assertThat(ColumnValues.build(
                 PersonFixture.createPerson(),
-                ColumnFields.forInsert(Person.class)
+                ColumnFields.forUpsert(Person.class)
         )).isEqualTo(" VALUES ('고정완', 30, 'ghojeong@email.com')");
     }
 }
