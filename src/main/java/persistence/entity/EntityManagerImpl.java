@@ -5,6 +5,7 @@ import jdbc.RowMapperImpl;
 import persistence.sql.dml.DmlBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext context;
@@ -18,26 +19,14 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object id) {
+    public <T> Optional<T> find(Class<T> clazz, Object id) {
         EntityKey<T> key = new EntityKey<>(clazz, id);
         if (!context.hasEntity(key)) {
             return findFromDB(key);
         }
-        return context.findEntity(new EntityKey<>(clazz, id));
-    }
-
-    public <T> T findFromDB(EntityKey<T> key) {
-        Class<T> clazz = key.getEntityClass();
-        List<T> entities = jdbcTemplate.query(
-                dml.getFindByIdQuery(clazz, key.getEntityId()),
-                new RowMapperImpl<>(clazz)
+        return Optional.of(
+                context.findEntity(new EntityKey<>(clazz, id))
         );
-        if (entities.isEmpty()) {
-            return null;
-        }
-        Object entity = entities.get(0);
-        context.persistEntity(entity);
-        return (T) entity;
     }
 
     @Override
@@ -62,10 +51,24 @@ public class EntityManagerImpl implements EntityManager {
         context.removeEntity(entity);
     }
 
+    public <T> Optional<T> findFromDB(EntityKey<T> key) {
+        Class<T> clazz = key.getEntityClass();
+        List<T> entities = jdbcTemplate.query(
+                dml.getFindByIdQuery(clazz, key.getEntityId()),
+                new RowMapperImpl<>(clazz)
+        );
+        if (entities.isEmpty()) {
+            return Optional.empty();
+        }
+        Object entity = entities.get(0);
+        context.persistEntity(entity);
+        return Optional.of((T) entity);
+    }
+
     private boolean hasEntity(Object entity) {
         return find(
                 entity.getClass(),
                 new EntityKey(entity).getEntityId()
-        ) != null;
+        ).isPresent();
     }
 }
