@@ -1,6 +1,7 @@
 package persistence.sql.ddl;
 
 import org.junit.jupiter.api.Test;
+import persistence.sql.ddl.h2.H2SelectQueryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
