@@ -7,7 +7,7 @@ import persistence.sql.ddl.h2.H2SelectQueryBuilder;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class EntityManagerImplTest extends DatabaseTest {
@@ -20,6 +20,27 @@ class EntityManagerImplTest extends DatabaseTest {
         Person actual = entityManager.find(Person.class, 1L);
 
         assertNotNull(actual);
+    }
+
+    @Test
+    void persist() throws IllegalAccessException {
+        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), jdbcTemplate);
+        Person person = new Person(1L, "slow", 20, "email@email.com", 1);
+
+        entityManager.persist(person);
+
+        assertNotNull(entityManager.find(Person.class, 1L));
+    }
+
+    @Test
+    void remove() throws IllegalAccessException {
+        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), jdbcTemplate);
+        Person person = new Person(1L, "slow", 20, "email@email.com", 1);
+        entityManager.persist(person);
+
+        entityManager.remove(person);
+
+        assertFalse(entityManager.contains(person));
     }
 
 }
