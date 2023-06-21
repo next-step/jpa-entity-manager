@@ -12,12 +12,12 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T> T findEntity(EntityKey<T> key) {
+    public <T> T getEntity(EntityKey<T> key) {
         return (T) context.get(key);
     }
 
     @Override
-    public void persistEntity(Object entity) {
+    public void addEntity(Object entity) {
         context.put(new EntityKey(entity), entity);
     }
 

@@ -25,7 +25,7 @@ public class EntityManagerImpl implements EntityManager {
             return findFromDB(key);
         }
         return Optional.of(
-                context.findEntity(new EntityKey<>(clazz, id))
+                context.getEntity(new EntityKey<>(clazz, id))
         );
     }
 
@@ -35,7 +35,7 @@ public class EntityManagerImpl implements EntityManager {
                 ? dml.getUpdateQuery(entity)
                 : dml.getInsertQuery(entity);
         jdbcTemplate.execute(query);
-        context.persistEntity(entity);
+        context.addEntity(entity);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class EntityManagerImpl implements EntityManager {
             return Optional.empty();
         }
         Object entity = entities.get(0);
-        context.persistEntity(entity);
+        context.addEntity(entity);
         return Optional.of((T) entity);
     }
 

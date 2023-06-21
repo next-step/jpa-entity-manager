@@ -19,7 +19,7 @@ class StatefulPersistenceContextTest {
 
     @Test
     void persistEntity() {
-        context.persistEntity(person);
+        context.addEntity(person);
         assertThat(
                 context.hasEntity(new EntityKey(person))
         ).isTrue();
@@ -27,15 +27,15 @@ class StatefulPersistenceContextTest {
 
     @Test
     void findEntity() {
-        context.persistEntity(person);
+        context.addEntity(person);
         assertThat(
-                person == context.findEntity(new EntityKey(person))
+                person == context.getEntity(new EntityKey(person))
         ).isTrue();
     }
 
     @Test
     void removeEntity() {
-        context.persistEntity(person);
+        context.addEntity(person);
         context.removeEntity(person);
         assertThat(
                 context.hasEntity(new EntityKey(person))
