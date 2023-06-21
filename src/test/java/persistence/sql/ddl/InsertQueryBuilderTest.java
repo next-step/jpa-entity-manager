@@ -17,5 +17,4 @@ class InsertQueryBuilderTest {
 
         assertThat(actual).isEqualTo("insert into Person (nick_name,old,email) values ('slow','20','email@email.com')");
     }
-
 }

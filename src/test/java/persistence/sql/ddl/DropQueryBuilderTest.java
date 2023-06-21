@@ -12,7 +12,7 @@ class DropQueryBuilderTest {
     void dropTable() {
         DropQueryBuilder dropQueryBuilder = new H2DropQueryBuilder();
 
-        String actual = dropQueryBuilder.createInsertBuild(Person.class);
+        String actual = dropQueryBuilder.createQueryBuild(Person.class);
 
         assertThat(actual).isEqualTo("drop table Person");
     }
