@@ -17,7 +17,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     @Override
     public Object removeEntity(EntityKey key) {
-        return null;
+        return entitiesByKey.remove(key);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     @Override
     public boolean containsEntity(EntityKey key) {
-        return false;
+        return entitiesByKey.containsKey(key);
     }
 
     @Override

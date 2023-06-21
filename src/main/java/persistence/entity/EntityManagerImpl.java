@@ -43,10 +43,44 @@ public class EntityManagerImpl implements EntityManager {
         return clazz.cast(persistenceContext.getEntity(entityKey));
     }
 
+    @Override
+    public void persist(Object entity) throws IllegalAccessException {
+        Class<?> clazz = entity.getClass();
+        Object key = getKey(entity);
+        EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
+
+        persistenceContext.addEntity(entityKey, entity);
+    }
+
+    @Override
+    public void remove(Object entity) throws IllegalAccessException {
+        Class<?> clazz = entity.getClass();
+        Object key = getKey(entity);
+        EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
+
+        persistenceContext.removeEntity(entityKey);
+    }
+
+
+    @Override
+    public boolean contains(Object entity) throws IllegalAccessException {
+        Class<?> clazz = entity.getClass();
+        Object key = getKey(entity);
+
+        return persistenceContext.containsEntity(EntityKey.of((Long) key, clazz.getSimpleName()));
+    }
+
     private Field unique(Field[] field) {
         return Arrays.stream(field)
-                .filter(it -> it.getAnnotation(Id.class) != null)
+                .filter(it -> it.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
+    }
+
+    private Object getKey(Object entity) throws IllegalAccessException {
+        Field keyField = unique(entity.getClass().getDeclaredFields());
+        keyField.setAccessible(true);
+        Object key = keyField.get(entity);
+        return key;
     }
 }
