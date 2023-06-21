@@ -36,13 +36,4 @@ class SelectQueryBuilderTest extends DatabaseTest {
                 () -> assertNotNull(queryForObject(actual))
         );
     }
-
-    private void insertDb() {
-        InsertQueryBuilder insertQueryBuilder = new H2InsertQueryBuilder();
-
-        Person person = new Person("slow", 20, "email@email.com", 1);
-
-        String query = insertQueryBuilder.createInsertBuild(person);
-        execute(query);
-    }
 }

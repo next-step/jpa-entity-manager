@@ -8,16 +8,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import persistence.sql.ddl.CreateDdlBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
+import persistence.sql.ddl.InsertQueryBuilder;
 import persistence.sql.ddl.ReflectiveRowMapper;
 import persistence.sql.ddl.h2.H2CreateDdlBuilder;
 import persistence.sql.ddl.h2.H2DropQueryBuilder;
+import persistence.sql.ddl.h2.H2InsertQueryBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class DatabaseTest {
-    DatabaseServer server;
-    JdbcTemplate jdbcTemplate;
+    private DatabaseServer server;
+    protected JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void beforeEach() throws SQLException {
@@ -51,5 +53,14 @@ public class DatabaseTest {
     protected List<Person> query(String sql) {
         ReflectiveRowMapper<Person> mapper = new ReflectiveRowMapper<>(Person.class);
         return jdbcTemplate.query(sql, mapper);
+    }
+
+    protected void insertDb() {
+        InsertQueryBuilder insertQueryBuilder = new H2InsertQueryBuilder();
+
+        Person person = new Person("slow", 20, "email@email.com", 1);
+
+        String query = insertQueryBuilder.createInsertBuild(person);
+        execute(query);
     }
 }
