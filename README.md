@@ -12,5 +12,5 @@
 1. 1단계 - Entity
 
 - [X] 요구사항1 - find
-- [ ] 요구사항2 - persist (insert)
-- [ ] 요구사항3 - remove (delete)
+- [X] 요구사항2 - persist (insert)
+- [X] 요구사항3 - remove (delete)
