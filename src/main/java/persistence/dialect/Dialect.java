@@ -1,6 +1,8 @@
 package persistence.dialect;
 
-import static java.sql.Types.*;
+import static java.sql.Types.INTEGER;
+import static java.sql.Types.BIGINT;
+import static java.sql.Types.VARCHAR;
 
 public abstract class Dialect {
 

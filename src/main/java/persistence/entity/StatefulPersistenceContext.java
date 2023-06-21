@@ -14,7 +14,6 @@ public class StatefulPersistenceContext implements PersistenceContext {
         this(new HashMap<>());
     }
 
-
     @Override
     public Object removeEntity(EntityKey key) {
         return entitiesByKey.remove(key);

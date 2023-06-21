@@ -7,7 +7,6 @@ public class TypeJavaClassMappings {
 
     private final ConcurrentHashMap<Class<?>, Integer> javaClassToJdbcTypeCodeMap;
 
-
     public TypeJavaClassMappings() {
         this.javaClassToJdbcTypeCodeMap = buildJavaClassToJdbcTypeCodeMappings();
     }
