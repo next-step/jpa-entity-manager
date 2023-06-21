@@ -15,9 +15,9 @@ class ColumnNamesTest {
     void names() throws NoSuchFieldException {
         // given
         Class<PersonV3> personV3Class = PersonV3.class;
-        ColumnNames columnNames = new ColumnNames(List.of(
-                new ColumnName(personV3Class.getDeclaredField("id")),
-                new ColumnName(personV3Class.getDeclaredField("name"))
+        ColumnNames columnNames = ColumnNames.of(List.of(
+                personV3Class.getDeclaredField("id"),
+                personV3Class.getDeclaredField("name")
         ));
 
         // when

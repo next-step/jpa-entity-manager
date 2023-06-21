@@ -31,7 +31,7 @@ public class DmlColumn {
     }
 
     private static ColumnName getColumnName(Field field) {
-        return new ColumnName(field);
+        return ColumnName.of(field);
     }
 
     private static ColumnValue getColumnValue(Field field, Object entity) {

@@ -42,7 +42,7 @@ public class RowMapperImpl<T> implements RowMapper<T> {
 
         field.setAccessible(true);
         try {
-            String columnName = new ColumnName(field).name();
+            String columnName = ColumnName.of(field).name();
             field.set(entity, resultSet.getObject(columnName));
         } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);

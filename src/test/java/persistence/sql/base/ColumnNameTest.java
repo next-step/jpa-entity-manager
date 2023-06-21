@@ -17,7 +17,7 @@ class ColumnNameTest {
         ColumnName id = ColumnName.id(PersonV3.class);
 
         Field idField = PersonV3.class.getDeclaredField("id");
-        assertThat(id).isEqualTo(new ColumnName(idField));
+        assertThat(id).isEqualTo(ColumnName.of(idField));
     }
 
     @Test
@@ -25,7 +25,7 @@ class ColumnNameTest {
     public void columnName() throws NoSuchFieldException {
         Class<PersonV3> clazz = PersonV3.class;
         ColumnName id = ColumnName.id(clazz);
-        ColumnName name = new ColumnName(clazz.getDeclaredField("name"));
+        ColumnName name = ColumnName.of(clazz.getDeclaredField("name"));
 
         assertAll(
                 () -> assertThat(id.name()).isEqualTo("id"),

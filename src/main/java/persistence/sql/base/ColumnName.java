@@ -11,11 +11,7 @@ public class ColumnName {
     private final Field field;
     private final Column column;
 
-    public ColumnName(Field field) {
-        this(field, field.getAnnotation(Column.class));
-    }
-
-    public ColumnName(Field field, Column column) {
+    private ColumnName(Field field, Column column) {
         this.field = field;
         this.column = column;
     }
@@ -26,8 +22,12 @@ public class ColumnName {
         return Arrays.stream(declaredFields)
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
-                .map(ColumnName::new)
+                .map(ColumnName::of)
                 .orElseThrow(() -> new IllegalArgumentException("@Id 어노테이션이 선언된 필드가 존재하지 않습니다."));
+    }
+
+    public static ColumnName of(Field field) {
+        return new ColumnName(field, field.getAnnotation(Column.class));
     }
 
     public String name() {
