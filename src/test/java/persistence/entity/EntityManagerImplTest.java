@@ -3,6 +3,7 @@ package persistence.entity;
 import domain.Person;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
+import persistence.sql.ddl.h2.H2DeleteQueryBuilder;
 import persistence.sql.ddl.h2.H2SelectQueryBuilder;
 
 import java.sql.SQLException;
@@ -15,7 +16,7 @@ class EntityManagerImplTest extends DatabaseTest {
     @Test
     void find() throws SQLException {
         insertDb();
-        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
 
         Person actual = entityManager.find(Person.class, 1L);
 
@@ -24,7 +25,7 @@ class EntityManagerImplTest extends DatabaseTest {
 
     @Test
     void persist() throws IllegalAccessException {
-        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
         Person person = new Person(1L, "slow", 20, "email@email.com", 1);
 
         entityManager.persist(person);
@@ -34,7 +35,7 @@ class EntityManagerImplTest extends DatabaseTest {
 
     @Test
     void remove() throws IllegalAccessException {
-        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
         Person person = new Person(1L, "slow", 20, "email@email.com", 1);
         entityManager.persist(person);
 

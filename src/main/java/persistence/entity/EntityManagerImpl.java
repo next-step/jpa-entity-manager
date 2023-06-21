@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
+import persistence.sql.ddl.DeleteQueryBuilder;
 import persistence.sql.ddl.ReflectiveRowMapper;
 import persistence.sql.ddl.SelectQueryBuilder;
 
@@ -11,16 +12,18 @@ import java.util.Arrays;
 public class EntityManagerImpl implements EntityManager {
     private final transient StatefulPersistenceContext persistenceContext;
     private final SelectQueryBuilder selectQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
     private final JdbcTemplate jdbcTemplate;
 
-    private EntityManagerImpl(StatefulPersistenceContext persistenceContext, SelectQueryBuilder selectQueryBuilder, JdbcTemplate jdbcTemplate) {
+    private EntityManagerImpl(StatefulPersistenceContext persistenceContext, SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, JdbcTemplate jdbcTemplate) {
         this.persistenceContext = persistenceContext;
         this.selectQueryBuilder = selectQueryBuilder;
+        this.deleteQueryBuilder = deleteQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public EntityManagerImpl(SelectQueryBuilder selectQueryBuilder, JdbcTemplate jdbcTemplate) {
-        this(initStatefulPersistenceContext(), selectQueryBuilder, jdbcTemplate);
+    public EntityManagerImpl(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, JdbcTemplate jdbcTemplate) {
+        this(initStatefulPersistenceContext(), selectQueryBuilder, deleteQueryBuilder, jdbcTemplate);
     }
 
     private static StatefulPersistenceContext initStatefulPersistenceContext() {
@@ -58,6 +61,7 @@ public class EntityManagerImpl implements EntityManager {
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
+        jdbcTemplate.execute(deleteQueryBuilder.delete(clazz.getSimpleName(), unique(entity.getClass().getDeclaredFields()).getName(), key.toString()));
         persistenceContext.removeEntity(entityKey);
     }
 
@@ -80,7 +84,6 @@ public class EntityManagerImpl implements EntityManager {
     private Object getKey(Object entity) throws IllegalAccessException {
         Field keyField = unique(entity.getClass().getDeclaredFields());
         keyField.setAccessible(true);
-        Object key = keyField.get(entity);
-        return key;
+        return keyField.get(entity);
     }
 }
