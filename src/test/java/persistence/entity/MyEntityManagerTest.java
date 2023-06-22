@@ -79,8 +79,28 @@ class MyEntityManagerTest {
                 () -> assertThat(person.getAge()).isEqualTo(jeongwon.getAge()),
                 () -> assertThat(person.getId()).isEqualTo(jeongwon.getId()),
                 () -> assertThat(person.getEmail()).isEqualTo(jeongwon.getEmail()),
-                () -> assertThat(person.getIndex()).isNull()
+                () -> assertThat(person.getIndex()).isEqualTo(jeongwon.getIndex())
         );
+    }
+
+    @DisplayName("entityManager 의 delete 메서드 테스트")
+    @Test
+    void deleteTest() {
+        final Person jeongwon = new Person(
+                1L,
+                "정원",
+                15,
+                "a@a.com",
+                1
+        );
+
+        final MyEntityManager myEntityManager = new MyEntityManager(jdbcTemplate);
+        myEntityManager.persist(jeongwon);
+
+        final Person person = myEntityManager.find(Person.class, 1L);
+
+        myEntityManager.remove(person);
+        assertThat(myEntityManager.find(Person.class, 1L)).isNull();
     }
 
     private void createTable() {

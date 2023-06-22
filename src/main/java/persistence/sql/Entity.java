@@ -23,6 +23,10 @@ public class Entity {
         this.columns = new Columns(clazz);
     }
 
+    public Object getEntity() {
+        return entity;
+    }
+
     public Map<String, String> valuesByField() {
         Map<String, String> values = new LinkedHashMap<>();
 

@@ -38,7 +38,7 @@ public class MyEntityManager implements EntityManager {
         if (instance == null) {
             return null;
         }
-        session.put(clazz, id, instance);
+        session.put(clazz, instance);
         return (T) instance;
     }
 
@@ -48,6 +48,14 @@ public class MyEntityManager implements EntityManager {
         final DmlQueryBuilder<?> dmlQueryBuilder = new DmlQueryBuilder<>(clazz);
         final String sql = dmlQueryBuilder.insert(entity);
         jdbcTemplate.execute(sql);
+        session.put(entity.getClass(), entity);
+    }
+
+    @Override
+    public void remove(Object entity) {
+        final String deleteSql = new DmlQueryBuilder<>(entity.getClass()).delete(entity);
+        jdbcTemplate.execute(deleteSql);
+        session.remove(entity);
     }
 
 

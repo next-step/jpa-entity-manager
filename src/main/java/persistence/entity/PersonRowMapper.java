@@ -8,7 +8,9 @@ import java.sql.SQLException;
 public class PersonRowMapper implements RowMapper<Person> {
     @Override
     public Person mapRow(ResultSet resultSet) throws SQLException {
-        resultSet.next();
+        if (!resultSet.next()) {
+            return null;
+        }
         return new Person(
                 resultSet.getLong("id"),
                 resultSet.getString("nick_name"),
