@@ -56,7 +56,6 @@ class EntityManagerTest {
     void persist() {
         // given
         Person person = createPerson();
-        insert(person);
 
         // when
         entityManager.persist(person);
