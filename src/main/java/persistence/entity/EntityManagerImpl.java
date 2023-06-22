@@ -51,7 +51,7 @@ public class EntityManagerImpl implements EntityManager {
         context.removeEntity(entity);
     }
 
-    public <T> Optional<T> findFromDB(EntityKey<T> key) {
+    private <T> Optional<T> findFromDB(EntityKey<T> key) {
         Class<T> clazz = key.getEntityClass();
         List<T> entities = jdbcTemplate.query(
                 dml.getFindByIdQuery(clazz, key.getEntityId()),
