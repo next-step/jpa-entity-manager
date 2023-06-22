@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SelectQueryBuilderTest {
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(PersonV3.class);
+    private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
     @Test
     @DisplayName("findAll 쿼리를 반환한다")
     public void findAll() {
-        String query = selectQueryBuilder.findAll();
+        String query = selectQueryBuilder.findAll(PersonV3.class);
 
         assertThat(query).isEqualTo("select id, nick_name, old, email from users");
     }
@@ -20,7 +20,7 @@ class SelectQueryBuilderTest {
     @Test
     @DisplayName("findById 쿼리를 반환한다")
     void findByIdSql() {
-        String query = selectQueryBuilder.findById(1L);
+        String query = selectQueryBuilder.findById(PersonV3.class, 1L);
 
         assertThat(query).isEqualTo("select id, nick_name, old, email from users where id=1");
     }

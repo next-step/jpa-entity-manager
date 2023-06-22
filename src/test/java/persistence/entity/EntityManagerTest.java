@@ -4,6 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,13 +29,19 @@ class EntityManagerTest {
         server = new H2();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityManager = new BasicEntityManger(jdbcTemplate);
+
+        createTable(Person.class);
+    }
+
+    @AfterEach
+    void clear() {
+        dropTable(Person.class);
     }
 
     @Test
     @DisplayName("엔티티를 조회한다")
     void find() {
         // given
-        createTable(Person.class);
         insert(createPerson());
 
         // when
@@ -48,7 +55,6 @@ class EntityManagerTest {
     @DisplayName("엔티티를 저장한다")
     void persist() {
         // given
-        createTable(Person.class);
         Person person = createPerson();
         insert(person);
 
@@ -64,7 +70,6 @@ class EntityManagerTest {
     @DisplayName("엔티티를 삭제한다")
     void remove() {
         // given
-        createTable(Person.class);
         insert(createPerson());
         Person person = select(Person.class, 1L);
 
@@ -82,14 +87,20 @@ class EntityManagerTest {
         jdbcTemplate.execute(createQuery);
     }
 
+    private void dropTable(Class<?> clazz) {
+        DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(clazz);
+        String dropQuery = ddlQueryBuilder.drop();
+        jdbcTemplate.execute(dropQuery);
+    }
+
     private void insert(Object object) {
         String insertQuery = InsertQueryBuilder.INSTANCE.insert(object);
         jdbcTemplate.execute(insertQuery);
     }
 
     private <T> T select(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        String findByIdQuery = selectQueryBuilder.findById(id);
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
+        String findByIdQuery = selectQueryBuilder.findById(clazz, id);
         return jdbcTemplate.queryForObject(findByIdQuery, new RowMapperImpl<>(clazz));
     }
 }

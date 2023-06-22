@@ -37,9 +37,10 @@ public class Application {
 
     private static void queryTest(DatabaseServer server) throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-        RowMapper<Person> rowMapper = new RowMapperImpl<>(Person.class);
+        Class<Person> personClass = Person.class;
+        RowMapper<Person> rowMapper = new RowMapperImpl<>(personClass);
 
-        DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(Person.class);
+        DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(personClass);
         String createQuery = ddlQueryBuilder.create();
         jdbcTemplate.execute(createQuery);
 
@@ -48,12 +49,12 @@ public class Application {
         String insertQuery = insertQueryBuilder.insert(person);
         jdbcTemplate.execute(insertQuery);
 
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(person.getClass());
-        String findAllQuery = selectQueryBuilder.findAll();
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
+        String findAllQuery = selectQueryBuilder.findAll(personClass);
         List<Person> persons = jdbcTemplate.query(findAllQuery, rowMapper);
         logger.info("조회 데이터 수: " + persons.size());
 
-        String findByIdQuery = selectQueryBuilder.findById(persons.get(0).getId());
+        String findByIdQuery = selectQueryBuilder.findById(personClass, persons.get(0).getId());
         Person savedPerson = jdbcTemplate.queryForObject(findByIdQuery, rowMapper);
         logger.info("저장된 Person.id: " + savedPerson.getId());
 

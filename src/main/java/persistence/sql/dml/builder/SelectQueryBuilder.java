@@ -7,19 +7,18 @@ import persistence.sql.dml.column.DmlColumn;
 import static persistence.sql.dml.statement.QueryStatement.selectFrom;
 
 public class SelectQueryBuilder {
-    private final Class<?> clazz;
+    public static final SelectQueryBuilder INSTANCE = new SelectQueryBuilder();
 
-    public SelectQueryBuilder(Class<?> clazz) {
-        this.clazz = clazz;
+    private SelectQueryBuilder() {
     }
 
-    public String findAll() {
+    public String findAll(Class<?> clazz) {
         return selectFrom(clazz).query();
     }
 
-    public String findById(Object value) {
+    public String findById(Class<?> clazz, Object id) {
         return selectFrom(clazz)
-                .where(new DmlColumn(ColumnName.id(clazz), new ColumnValue(value)))
+                .where(new DmlColumn(ColumnName.id(clazz), new ColumnValue(id)))
                 .query();
     }
 }
