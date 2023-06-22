@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Session {
-    private final Map<Id, Entity<?>> entities = new ConcurrentHashMap<>();
+    private final Map<Id, Entity> entities = new ConcurrentHashMap<>();
     public <T> T get(Class<T> entityClass, Object id) {
-        final Entity<?> entity = entities.get(new Id(entityClass, id));
+        final Entity entity = entities.get(new Id(entityClass, id));
         if (entity == null) {
             return null;
         }
@@ -17,6 +17,6 @@ public class Session {
     }
 
     public <T> void put(Class<T> clazz, Long id, Object instance) {
-        entities.put(new Id(clazz, id), new Entity<>(instance));
+        entities.put(new Id(clazz, id), new Entity(instance));
     }
 }

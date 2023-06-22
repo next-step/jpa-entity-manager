@@ -5,14 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Entity<T> {
+public class Entity {
     protected static final String SINGLE_QUOTE = "'";
-    private final T entity;
+    private final Object entity;
     private final String name;
     private final Id id;
     private final Columns columns;
 
-    public Entity(T entity) {
+    public Entity(Object entity) {
         if (entity == null) {
             throw new IllegalStateException("Entity is not set");
         }
@@ -37,7 +37,7 @@ public class Entity<T> {
                 .toList();
     }
 
-    private String convertValue(T entity, Field field) {
+    private String convertValue(Object entity, Field field) {
         try {
             field.setAccessible(true);
             final Object value = field.get(entity);

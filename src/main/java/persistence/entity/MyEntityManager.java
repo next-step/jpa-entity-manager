@@ -41,4 +41,14 @@ public class MyEntityManager implements EntityManager {
         session.put(clazz, id, instance);
         return (T) instance;
     }
+
+    @Override
+    public void persist(Object entity) {
+        final Class<?> clazz = entity.getClass();
+        final DmlQueryBuilder<?> dmlQueryBuilder = new DmlQueryBuilder<>(clazz);
+        final String sql = dmlQueryBuilder.insert(entity);
+        jdbcTemplate.execute(sql);
+    }
+
+
 }

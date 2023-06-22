@@ -15,9 +15,9 @@ public class DmlQueryBuilder<T> extends QueryBuilder {
         super(entity);
     }
 
-    public String insert(T instance) {
+    public String insert(Object instance) {
         final String tableName = getTableName();
-        final Entity<T> target = new Entity<>(instance);
+        final Entity target = new Entity(instance);
         return String.format(
                 INSERT_QUERY,
                 tableName,
