@@ -72,4 +72,16 @@ class EntityManagerTest {
         });
     }
 
+    @DisplayName("단일 엔티티를 제거한다.")
+    @Test
+    void remove() {
+        entityManager.persist(new Person("jack", 20, "jack@abc.com"));
+        Person person = entityManager.find(Person.class, 1L);
+        assertThat(person).isNotNull();
+
+        entityManager.remove(person);
+        person = entityManager.find(Person.class, 1L);
+        assertThat(person).isNull();
+    }
+
 }
