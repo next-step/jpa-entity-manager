@@ -51,6 +51,17 @@ public class EntityManagerImpl implements EntityManager {
         context.removeEntity(entity);
     }
 
+    @Override
+    public void dirtyCheck(Object entity) {
+        Object snapshot = context.getCachedDatabaseSnapshot(
+                new EntityKey<>(entity)
+        );
+        if (!snapshot.equals(entity)) {
+            merge(entity);
+        }
+        detach(entity);
+    }
+
     private <T> Optional<T> findFromDB(EntityKey<T> key) {
         Class<T> clazz = key.getEntityClass();
         List<T> entities = jdbcTemplate.query(
@@ -60,9 +71,22 @@ public class EntityManagerImpl implements EntityManager {
         if (entities.isEmpty()) {
             return Optional.empty();
         }
-        Object entity = entities.get(0);
+        T entity = entities.get(0);
         context.addEntity(entity);
-        return Optional.of((T) entity);
+        return Optional.of(context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
+        ));
+    }
+
+    private void merge(Object entity) {
+        persist(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
+        );
+    }
+
+    private void detach(Object entity) {
+        context.removeEntity(entity);
     }
 
     private boolean hasEntity(Object entity) {

@@ -8,4 +8,6 @@ public interface EntityManager {
     void persist(Object entity);
 
     void remove(Object entity);
+
+    void dirtyCheck(Object entity);
 }
