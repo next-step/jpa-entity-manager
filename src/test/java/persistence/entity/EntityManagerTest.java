@@ -16,7 +16,6 @@ import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityManagerTest {
 
@@ -59,6 +58,22 @@ class EntityManagerTest {
         // then
         Person result = select(Person.class, 1L);
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("엔티티를 삭제한다")
+    void remove() {
+        // given
+        createTable(Person.class);
+        insert(createPerson());
+        Person person = select(Person.class, 1L);
+
+        // when
+        entityManager.remove(person);
+
+        // then
+        Person result = select(Person.class, 1L);
+        assertThat(result).isNull();
     }
 
     private void createTable(Class<?> clazz) {

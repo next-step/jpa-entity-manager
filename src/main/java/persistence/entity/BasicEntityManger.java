@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
+import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
@@ -26,4 +27,10 @@ public class BasicEntityManger implements EntityManager {
         jdbcTemplate.execute(insertQuery);
     }
 
+    @Override
+    public void remove(Object entity) {
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
+        String deleteQuery = deleteQueryBuilder.delete(entity);
+        jdbcTemplate.execute(deleteQuery);
+    }
 }
