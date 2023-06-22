@@ -56,4 +56,20 @@ class EntityManagerTest {
         });
     }
 
+    @DisplayName("단일 엔티티를 저장한다.")
+    @Test
+    void persist() {
+        entityManager.persist(new Person("jack", 20, "jack@abc.com"));
+
+        Person person = entityManager.find(Person.class, 1L);
+
+        assertAll("단일 Person 엔티티 조회", () -> {
+            assertThat(person.getId()).isEqualTo(1L);
+            assertThat(person.getName()).isEqualTo("jack");
+            assertThat(person.getAge()).isEqualTo(20);
+            assertThat(person.getEmail()).isEqualTo("jack@abc.com");
+            assertThat(person.getIndex()).isNull();
+        });
+    }
+
 }

@@ -18,4 +18,11 @@ public class EntityManagerImpl implements EntityManager {
         String query = generator.generateFindByIdQuery(id);
         return jdbcTemplate.queryForObject(query, new EntityRowMapper<>(clazz));
     }
+
+    @Override
+    public void persist(Object entity) {
+        DmlGenerator generator = new DmlGenerator(entity.getClass());
+        String query = generator.generateInsertQuery(entity);
+        jdbcTemplate.execute(query);
+    }
 }
