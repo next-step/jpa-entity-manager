@@ -10,7 +10,7 @@ public abstract class QueryBuilder {
     protected final Id id;
     protected final Columns columns;
 
-    protected QueryBuilder(Class<?> clazz) {
+    protected <T> QueryBuilder(Class<T> clazz) {
         if (clazz == null) {
             throw new IllegalStateException("Entity is not set");
         }

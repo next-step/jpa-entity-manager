@@ -19,7 +19,7 @@ public class Entity<T> {
         this.entity = entity;
         final Class<?> clazz = entity.getClass();
         this.name = EntityUtils.getName(clazz);
-        this.id = new Id(clazz, entity);
+        this.id = new Id(entity.getClass());
         this.columns = new Columns(clazz);
     }
 
