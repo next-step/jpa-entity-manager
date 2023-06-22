@@ -3,17 +3,20 @@ package persistence.entity;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
+import jdbc.RowMapperImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.model.Person;
 import persistence.sql.ddl.builder.DdlQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
+import persistence.sql.dml.builder.SelectQueryBuilder;
 
 import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityManagerTest {
 
@@ -33,15 +36,29 @@ class EntityManagerTest {
     void find() {
         // given
         createTable(Person.class);
-
-        Person person = createPerson();
-        insert(person);
+        insert(createPerson());
 
         // when
         Person result = entityManager.find(Person.class, 1L);
 
         // then
-        assertThat(result.getName()).isEqualTo(person.getName());
+        assertThat(result.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("엔티티를 저장한다")
+    void persist() {
+        // given
+        createTable(Person.class);
+        Person person = createPerson();
+        insert(person);
+
+        // when
+        entityManager.persist(person);
+
+        // then
+        Person result = select(Person.class, 1L);
+        assertThat(result).isNotNull();
     }
 
     private void createTable(Class<?> clazz) {
@@ -53,5 +70,11 @@ class EntityManagerTest {
     private void insert(Object object) {
         String insertQuery = InsertQueryBuilder.INSTANCE.insert(object);
         jdbcTemplate.execute(insertQuery);
+    }
+
+    private <T> T select(Class<T> clazz, Long id) {
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
+        String findByIdQuery = selectQueryBuilder.findById(id);
+        return jdbcTemplate.queryForObject(findByIdQuery, new RowMapperImpl<>(clazz));
     }
 }

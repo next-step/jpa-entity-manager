@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
+import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
 public class BasicEntityManger implements EntityManager {
@@ -17,4 +18,12 @@ public class BasicEntityManger implements EntityManager {
         String selectQuery = selectQueryBuilder.findById(id);
         return jdbcTemplate.queryForObject(selectQuery, new RowMapperImpl<>(clazz));
     }
+
+    @Override
+    public void persist(Object entity) {
+        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.INSTANCE;
+        String insertQuery = insertQueryBuilder.insert(entity);
+        jdbcTemplate.execute(insertQuery);
+    }
+
 }
