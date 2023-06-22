@@ -14,7 +14,7 @@ class ColumnFieldsTest {
 
     @Test
     @DisplayName("Transient 어노테이션이 붙은 field 는 제거해야 한다.")
-    void filterTransient() {
+    void forQuery() {
         assertThat(
                 ColumnFields.forQuery(Person.class)
                         .stream()
@@ -26,15 +26,28 @@ class ColumnFieldsTest {
     }
 
     @Test
-    @DisplayName("Insert Query 에서는 Id 어노테이션이 붙은 field 를 제거한다.")
-    void filterId() {
+    @DisplayName("Upsert Query 에서는 Id 어노테이션이 붙은 field 를 제거한다.")
+    void forUpsert() {
         assertThat(
-                ColumnFields.forInsert(Person.class)
+                ColumnFields.forUpsert(Person.class)
                         .stream()
                         .map(Field::getName)
                         .collect(Collectors.toList())
         ).containsExactlyInAnyOrder(
                 "name", "age", "email"
+        );
+    }
+
+    @Test
+    @DisplayName("식별을 위해 Id 어노테이션이 붙은 field 를 추출한다.")
+    void forId() {
+        assertThat(
+                ColumnFields.forId(Person.class)
+                        .stream()
+                        .map(Field::getName)
+                        .collect(Collectors.toList())
+        ).containsExactlyInAnyOrder(
+                "id"
         );
     }
 }

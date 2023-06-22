@@ -18,10 +18,17 @@ public final class ColumnFields {
                 ).collect(Collectors.toList());
     }
 
-    public static List<Field> forInsert(Class<?> clazz) {
+    public static List<Field> forUpsert(Class<?> clazz) {
         return forQuery(clazz).stream()
                 .filter(
                         field -> !field.isAnnotationPresent(Id.class)
+                ).collect(Collectors.toList());
+    }
+
+    public static List<Field> forId(Class<?> clazz) {
+        return forQuery(clazz).stream()
+                .filter(
+                        field -> field.isAnnotationPresent(Id.class)
                 ).collect(Collectors.toList());
     }
 }
