@@ -30,12 +30,16 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void persist(Object entity) {
+    public void persist(Persistable entity) {
         final String query = hasEntity(entity)
                 ? dml.getUpdateQuery(entity)
                 : dml.getInsertQuery(entity);
         jdbcTemplate.execute(query);
         context.addEntity(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity),
+                entity.clone()
+        );
     }
 
     @Override
@@ -52,7 +56,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void dirtyCheck(Object entity) {
+    public void dirtyCheck(Persistable entity) {
         Object snapshot = context.getCachedDatabaseSnapshot(
                 new EntityKey<>(entity)
         );
@@ -78,7 +82,7 @@ public class EntityManagerImpl implements EntityManager {
         ));
     }
 
-    private void merge(Object entity) {
+    private void merge(Persistable entity) {
         persist(entity);
         context.getDatabaseSnapshot(
                 new EntityKey<>(entity), entity

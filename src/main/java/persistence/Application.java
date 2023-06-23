@@ -30,8 +30,7 @@ public class Application {
             final DmlBuilder dml = dialect.getDml();
             final EntityManager em = new EntityManagerImpl(
                     new StatefulPersistenceContext(),
-                    jdbcTemplate,
-                    dml
+                    jdbcTemplate, dml
             );
 
             jdbcTemplate.execute(
@@ -40,7 +39,8 @@ public class Application {
 
             Person person = PersonFixture.createPerson();
             em.persist(person);
-            em.persist(person.setName("Changed Name"));
+            person.setName("Changed Name");
+            em.dirtyCheck(person);
 
 
             Person entity = em.find(Person.class, 1L)
