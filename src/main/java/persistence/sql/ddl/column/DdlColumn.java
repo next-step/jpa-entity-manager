@@ -51,7 +51,7 @@ public class DdlColumn {
         return new DdlColumn(
                 field,
                 field.getAnnotation(Column.class),
-                new ColumnName(field),
+                ColumnName.of(field),
                 new H2Dialect(),
                 List.of(new ColumnOptionStrategy(), new IdOptionStrategy())
         );

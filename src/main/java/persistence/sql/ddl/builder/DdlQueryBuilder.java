@@ -14,7 +14,7 @@ public class DdlQueryBuilder {
         this(tableClazz, new ColumnBuilder(DdlColumn.ofList(tableClazz)));
     }
 
-    public DdlQueryBuilder(Class<?> tableClazz, ColumnBuilder ddlColumnBuilder) {
+    private DdlQueryBuilder(Class<?> tableClazz, ColumnBuilder ddlColumnBuilder) {
         this.tableName = new TableName(tableClazz);
         this.ddlColumnBuilder = ddlColumnBuilder;
     }

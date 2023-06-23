@@ -9,13 +9,13 @@ public class ColumnNames {
     private static final String DELIMITER = ", ";
     private final List<ColumnName> columnNames;
 
-    public ColumnNames(List<ColumnName> columnNames) {
+    private ColumnNames(List<ColumnName> columnNames) {
         this.columnNames = Collections.unmodifiableList(columnNames);
     }
 
     public static ColumnNames of(List<Field> fields) {
         return fields.stream()
-                .map(ColumnName::new)
+                .map(ColumnName::of)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), ColumnNames::new));
     }
 
