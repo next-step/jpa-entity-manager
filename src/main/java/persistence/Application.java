@@ -6,9 +6,15 @@ import domain.Person;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.ddl.CreateTableBuilder;
-import persistence.ddl.DeleteTableBuilder;
-import persistence.ddl.InsertBuilder;
+import persistence.sql.ddl.CreateDdlBuilder;
+import persistence.sql.ddl.InsertQueryBuilder;
+import persistence.sql.ddl.ReflectiveRowMapper;
+import persistence.sql.ddl.SelectQueryBuilder;
+import persistence.sql.ddl.h2.H2CreateDdlBuilder;
+import persistence.sql.ddl.h2.H2InsertQueryBuilder;
+import persistence.sql.ddl.h2.H2SelectQueryBuilder;
+
+import java.util.List;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -21,22 +27,15 @@ public class Application {
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-            EntityReflectionManager entityReflectionManager = new EntityReflectionManager(Person.class);
-            Table table = entityReflectionManager.table();
-            Columns columns = entityReflectionManager.columns();
+            CreateDdlBuilder createDdlBuilder = new H2CreateDdlBuilder();
+            jdbcTemplate.execute(createDdlBuilder.createTableBuild(Person.class));
 
-            CreateTableBuilder createTableBuilder = new CreateTableBuilder(table, columns);
+            Person person = new Person("slow", 20, "email@email.com", 1);
+            InsertQueryBuilder insertQueryBuilder = new H2InsertQueryBuilder();
+            jdbcTemplate.execute(insertQueryBuilder.createInsertBuild(person));
 
-            Person person = new Person("slow", 3, "slow@email.com");
-            ColumnMap columnsMap = entityReflectionManager.columnValueMap(person);
-            InsertBuilder insertBuilder = new InsertBuilder(entityReflectionManager.table(), columnsMap);
-
-
-            DeleteTableBuilder deleteTableBuilder = new DeleteTableBuilder(table);
-
-            jdbcTemplate.execute(createTableBuilder.query());
-            jdbcTemplate.execute(insertBuilder.query());
-            jdbcTemplate.execute(deleteTableBuilder.query());
+            SelectQueryBuilder selectQueryBuilder = new H2SelectQueryBuilder();
+            List<Person> persons = jdbcTemplate.query("SELECT * FROM PERSON".toUpperCase(), new ReflectiveRowMapper<>(Person.class));
 
             server.stop();
         } catch (Exception e) {
