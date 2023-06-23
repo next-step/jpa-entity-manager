@@ -34,9 +34,6 @@ public class Application {
             InsertQueryBuilder insertQueryBuilder = new H2InsertQueryBuilder();
             jdbcTemplate.execute(insertQueryBuilder.createInsertBuild(person));
 
-            SelectQueryBuilder selectQueryBuilder = new H2SelectQueryBuilder();
-            List<Person> persons = jdbcTemplate.query("SELECT * FROM PERSON".toUpperCase(), new ReflectiveRowMapper<>(Person.class));
-
             server.stop();
         } catch (Exception e) {
             logger.error("Error occurred", e);
