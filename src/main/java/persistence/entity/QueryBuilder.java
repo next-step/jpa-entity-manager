@@ -3,6 +3,7 @@ package persistence.entity;
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.sql.ddl.DeleteQueryBuilder;
+import persistence.sql.ddl.InsertQueryBuilder;
 import persistence.sql.ddl.ReflectiveRowMapper;
 import persistence.sql.ddl.SelectQueryBuilder;
 
@@ -12,11 +13,13 @@ import java.util.Arrays;
 public class QueryBuilder {
     private final SelectQueryBuilder selectQueryBuilder;
     private final DeleteQueryBuilder deleteQueryBuilder;
+    private final InsertQueryBuilder insertQueryBuilder;
     private final JdbcTemplate jdbcTemplate;
 
-    protected QueryBuilder(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, JdbcTemplate jdbcTemplate) {
+    protected QueryBuilder(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, InsertQueryBuilder insertQueryBuilder, JdbcTemplate jdbcTemplate) {
         this.selectQueryBuilder = selectQueryBuilder;
         this.deleteQueryBuilder = deleteQueryBuilder;
+        this.insertQueryBuilder = insertQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -31,10 +34,15 @@ public class QueryBuilder {
         jdbcTemplate.execute(deleteQueryBuilder.delete(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), key.toString()));
     }
 
+    public void save(Object entity) {
+        insertQueryBuilder.createInsertBuild(entity);
+    }
+
     private Field unique(Field[] field) {
         return Arrays.stream(field)
                 .filter(it -> it.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
     }
+
 }

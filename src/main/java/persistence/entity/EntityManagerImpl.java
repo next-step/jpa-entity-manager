@@ -41,7 +41,18 @@ public class EntityManagerImpl implements EntityManager {
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
+        Object object = cachedEntity(entityKey);
+
+        if (object.equals(entity)) {
+            return;
+        }
+
+        queryBuilder.save(entity);
         persistenceContext.addEntity(entityKey, entity);
+    }
+
+    private Object cachedEntity(EntityKey entityKey) {
+        return persistenceContext.getCachedDatabaseSnapshot(entityKey);
     }
 
     @Override

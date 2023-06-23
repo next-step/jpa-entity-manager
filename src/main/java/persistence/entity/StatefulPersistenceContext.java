@@ -18,6 +18,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     @Override
     public Object removeEntity(EntityKey key) {
+        removeCache(key);
         return entitiesByKey.remove(key);
     }
 
@@ -34,6 +35,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
     @Override
     public void addEntity(EntityKey key, Object entity) {
         entitiesByKey.put(key, entity);
+        addCache(entity, key);
     }
 
     @Override
@@ -44,22 +46,30 @@ public class StatefulPersistenceContext implements PersistenceContext {
             return cached;
         }
 
-        entitySnapshotsByKey.put(entityKey, entity);
+        addCache(entity, entityKey);
         return entity;
     }
 
     @Override
-    public Object getCachedDatabaseSnapshot(EntityKey entityKey) {
-        Object snapshot = getCached(entityKey);
+    public Object getCachedDatabaseSnapshot(EntityKey key) {
+        Object snapshot = getCached(key);
 
         if (snapshot == null) {
-            throw new IllegalArgumentException("not found for " + entityKey);
+            return NO_ROW;
         }
 
         return snapshot;
     }
 
-    private Object getCached(EntityKey entityKey) {
-        return entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(entityKey);
+    private void removeCache(EntityKey key) {
+        entitySnapshotsByKey.remove(key);
+    }
+
+    private void addCache(Object entity, EntityKey key) {
+        entitySnapshotsByKey.put(key, entity);
+    }
+
+    private Object getCached(EntityKey key) {
+        return entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(key);
     }
 }

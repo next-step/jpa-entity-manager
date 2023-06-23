@@ -1,6 +1,8 @@
 package persistence.entity;
 
 public interface PersistenceContext {
+    Object NO_ROW = new SnapshotObject("NO_ROW");
+
     Object removeEntity(EntityKey key);
 
     Object getEntity(EntityKey key);
