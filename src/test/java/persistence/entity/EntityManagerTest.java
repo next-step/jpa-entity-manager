@@ -9,7 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.Person;
 import persistence.sql.ddl.SchemaGenerator;
-import persistence.sql.dml.DmlGenerator;
+import persistence.sql.dml.DeleteQueryBuilder;
+import persistence.sql.dml.DmlQueryBuilder;
+import persistence.sql.dml.InsertQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -17,7 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class EntityManagerTest {
 
     private final SchemaGenerator schemaGenerator = new SchemaGenerator(Person.class);
-    private final DmlGenerator dmlGenerator = new DmlGenerator(Person.class);
+    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
+    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(Person.class);
+    private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(Person.class);
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
     private EntityManager entityManager;
@@ -43,7 +48,7 @@ class EntityManagerTest {
     @DisplayName("식별자로 단일 엔티티틀 조회한다.")
     @Test
     void find() {
-        jdbcTemplate.execute(dmlGenerator.generateInsertQuery(new Person("jack", 20, "jack@abc.com")));
+        jdbcTemplate.execute(insertQueryBuilder.build(new Person("jack", 20, "jack@abc.com")));
 
         Person person = entityManager.find(Person.class, 1L);
 

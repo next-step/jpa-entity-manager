@@ -4,7 +4,9 @@ import jakarta.persistence.Id;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.ddl.exception.NoIdentifierException;
-import persistence.sql.dml.DmlGenerator;
+import persistence.sql.dml.DeleteQueryBuilder;
+import persistence.sql.dml.InsertQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -19,23 +21,23 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        DmlGenerator generator = new DmlGenerator(clazz);
-        String query = generator.generateFindByIdQuery(id);
+        SelectQueryBuilder builder = new SelectQueryBuilder(clazz);
+        String query = builder.buildFindByIdQuery(id);
         return jdbcTemplate.queryForObject(query, new EntityRowMapper<>(clazz));
     }
 
     @Override
     public void persist(Object entity) {
-        DmlGenerator generator = new DmlGenerator(entity.getClass());
-        String query = generator.generateInsertQuery(entity);
+        InsertQueryBuilder builder = new InsertQueryBuilder(entity.getClass());
+        String query = builder.build(entity);
         jdbcTemplate.execute(query);
     }
 
     @Override
     public void remove(Object entity) {
         Long id = findPrimaryKey(entity);
-        DmlGenerator generator = new DmlGenerator(entity.getClass());
-        String query = generator.generateDeleteByIdQuery(id);
+        DeleteQueryBuilder builder = new DeleteQueryBuilder(entity.getClass());
+        String query = builder.buildDeleteByIdQuery(id);
         jdbcTemplate.execute(query);
     }
 
