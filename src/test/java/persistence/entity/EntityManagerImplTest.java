@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import domain.Person;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
 import persistence.sql.ddl.h2.H2DeleteQueryBuilder;
@@ -12,11 +13,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 class EntityManagerImplTest extends DatabaseTest {
+    private QueryBuilder queryBuilder;
+
+    @BeforeEach
+    public void beforeEach() throws SQLException {
+        super.beforeEach();
+        queryBuilder = new QueryBuilder(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
+    }
 
     @Test
     void find() throws SQLException {
         insertDb();
-        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(queryBuilder);
 
         Person actual = entityManager.find(Person.class, 1L);
 
@@ -25,7 +33,7 @@ class EntityManagerImplTest extends DatabaseTest {
 
     @Test
     void persist() throws IllegalAccessException {
-        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(queryBuilder);
         Person person = new Person(1L, "slow", 20, "email@email.com", 1);
 
         entityManager.persist(person);
@@ -35,7 +43,7 @@ class EntityManagerImplTest extends DatabaseTest {
 
     @Test
     void remove() throws IllegalAccessException {
-        EntityManager entityManager = new EntityManagerImpl(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(queryBuilder);
         Person person = new Person(1L, "slow", 20, "email@email.com", 1);
         entityManager.persist(person);
 
