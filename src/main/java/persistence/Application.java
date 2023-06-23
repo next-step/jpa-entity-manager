@@ -8,13 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.sql.ddl.CreateDdlBuilder;
 import persistence.sql.ddl.InsertQueryBuilder;
-import persistence.sql.ddl.ReflectiveRowMapper;
-import persistence.sql.ddl.SelectQueryBuilder;
 import persistence.sql.ddl.h2.H2CreateDdlBuilder;
 import persistence.sql.ddl.h2.H2InsertQueryBuilder;
-import persistence.sql.ddl.h2.H2SelectQueryBuilder;
-
-import java.util.List;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
