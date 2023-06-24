@@ -3,6 +3,7 @@ package persistence.sql.ddl.column;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import persistence.common.Fields;
 import persistence.sql.base.ColumnName;
 import persistence.sql.ddl.column.option.ColumnOptionStrategy;
 import persistence.sql.ddl.column.option.IdOptionStrategy;
@@ -13,7 +14,6 @@ import persistence.sql.ddl.column.type.H2Dialect;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,27 +58,13 @@ public class DdlColumn {
     }
 
     public static List<DdlColumn> ofList(Class<?> clazz) {
-        Field[] declaredFields = clazz.getDeclaredFields();
+        Fields fields = Fields.of(clazz);
         List<Field> columnFields = new ArrayList<>();
-        columnFields.add(getIdField(declaredFields));
-        columnFields.addAll(getBasicFields(declaredFields));
+        columnFields.add(fields.getField(Id.class));
+        columnFields.addAll(fields.getFields(Id.class, Transient.class));
 
         return columnFields.stream()
                 .map(DdlColumn::of)
-                .collect(Collectors.toList());
-    }
-
-    private static Field getIdField(Field[] declaredFields) {
-        return Arrays.stream(declaredFields)
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("@Id 어노테이션이 선언된 필드가 존재하지 않습니다."));
-    }
-
-    private static List<Field> getBasicFields(Field[] declaredFields) {
-        return Arrays.stream(declaredFields)
-                .filter(field -> !field.isAnnotationPresent(Id.class))
-                .filter(filed -> !filed.isAnnotationPresent(Transient.class))
                 .collect(Collectors.toList());
     }
 

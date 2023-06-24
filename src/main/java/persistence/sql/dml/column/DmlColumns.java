@@ -2,9 +2,9 @@ package persistence.sql.dml.column;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import persistence.common.Fields;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -20,12 +20,10 @@ public class DmlColumns {
     }
 
     public static DmlColumns of(Object object) {
-        List<Field> fields = Arrays.stream(object.getClass().getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Id.class))
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
-                .collect(Collectors.toList());
+        Fields fields = Fields.of(object.getClass());
+        List<Field> dmlFields = fields.getFields(Id.class, Transient.class);
 
-        List<DmlColumn> columns = fields.stream()
+        List<DmlColumn> columns = dmlFields.stream()
                 .map(field -> new DmlColumn(field, object))
                 .collect(Collectors.toList());
 

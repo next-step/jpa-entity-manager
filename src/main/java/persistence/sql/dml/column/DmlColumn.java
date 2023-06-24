@@ -1,6 +1,7 @@
 package persistence.sql.dml.column;
 
 import jakarta.persistence.Id;
+import persistence.common.Fields;
 import persistence.sql.base.ColumnName;
 
 import java.lang.reflect.Field;
@@ -21,13 +22,10 @@ public class DmlColumn {
     }
 
     public static DmlColumn id(Class<?> clazz, Object entity) {
-        Field[] declaredFields = clazz.getDeclaredFields();
+        Fields fields = Fields.of(clazz);
+        Field idField = fields.getField(Id.class);
 
-        return Arrays.stream(declaredFields)
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .map(field -> new DmlColumn(field, entity))
-                .orElseThrow(() -> new IllegalArgumentException("@Id 어노테이션이 선언된 필드가 존재하지 않습니다."));
+        return new DmlColumn(idField, entity);
     }
 
     private static ColumnName getColumnName(Field field) {

@@ -2,9 +2,9 @@ package persistence.sql.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import persistence.common.Fields;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class ColumnName {
@@ -17,13 +17,10 @@ public class ColumnName {
     }
 
     public static ColumnName id(Class<?> clazz) {
-        Field[] declaredFields = clazz.getDeclaredFields();
+        Fields fields = Fields.of(clazz);
+        Field idField = fields.getField(Id.class);
 
-        return Arrays.stream(declaredFields)
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .map(ColumnName::of)
-                .orElseThrow(() -> new IllegalArgumentException("@Id 어노테이션이 선언된 필드가 존재하지 않습니다."));
+        return ColumnName.of(idField);
     }
 
     public static ColumnName of(Field field) {
