@@ -41,18 +41,14 @@ public class EntityManagerImpl implements EntityManager {
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
-        Object object = cachedEntity(entityKey);
+        Object cacheEntity = persistenceContext.getCachedDatabaseSnapshot(entityKey);
 
-        if (object.equals(entity)) {
+        if (cacheEntity.equals(entity)) {
             return;
         }
 
         queryBuilder.save(entity);
         persistenceContext.addEntity(entityKey, entity);
-    }
-
-    private Object cachedEntity(EntityKey entityKey) {
-        return persistenceContext.getCachedDatabaseSnapshot(entityKey);
     }
 
     @Override
@@ -64,7 +60,6 @@ public class EntityManagerImpl implements EntityManager {
         queryBuilder.delete(clazz, (Long) key);
         persistenceContext.removeEntity(entityKey);
     }
-
 
     @Override
     public boolean contains(Object entity) throws IllegalAccessException {

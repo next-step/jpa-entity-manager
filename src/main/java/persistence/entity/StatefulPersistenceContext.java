@@ -69,7 +69,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
         entitySnapshotsByKey.put(key, entity);
     }
 
-    private Object getCached(EntityKey key) {
+    public Object getCached(EntityKey key) {
         return entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(key);
     }
 }
