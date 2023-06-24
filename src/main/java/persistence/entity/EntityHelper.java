@@ -7,16 +7,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-public class Persistable {
-    @Override
-    public Object clone() {
+public final class EntityHelper {
+    private EntityHelper() {}
+
+    public static Object clone(Object object) {
         try {
-            Class clazz = getClass();
+            Class clazz = object.getClass();
             Field[] fields = clazz.getDeclaredFields();
             Object cloned = clazz.getConstructor().newInstance();
             for (Field field : fields) {
                 field.setAccessible(true);
-                field.set(cloned, field.get(this));
+                field.set(cloned, field.get(object));
             }
             return cloned;
         } catch (NoSuchMethodException
@@ -27,17 +28,16 @@ public class Persistable {
         }
     }
 
-    @Override
-    public boolean equals(Object object) {
-        return Arrays.stream(getClass().getDeclaredFields())
-                .allMatch(field -> equals(object, field));
+    public static boolean equals(Object object1, Object object2) {
+        return Arrays.stream(object1.getClass().getDeclaredFields())
+                .allMatch(field -> equals(object1, object2, field));
     }
 
-    private boolean equals(Object object, Field field) {
+    private static boolean equals(Object object1, Object object2, Field field) {
         try {
             field.setAccessible(true);
-            return field.get(object)
-                    .equals(field.get(this));
+            return field.get(object1)
+                    .equals(field.get(object2));
         } catch (IllegalAccessException e) {
             throw new IllegalFieldAccessException(e);
         }

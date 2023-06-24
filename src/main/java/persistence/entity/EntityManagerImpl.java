@@ -30,7 +30,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void persist(Persistable entity) {
+    public void persist(Object entity) {
         final String query = hasEntity(entity)
                 ? dml.getUpdateQuery(entity)
                 : dml.getInsertQuery(entity);
@@ -38,7 +38,7 @@ public class EntityManagerImpl implements EntityManager {
         context.addEntity(entity);
         context.getDatabaseSnapshot(
                 new EntityKey<>(entity),
-                entity.clone()
+                EntityHelper.clone(entity)
         );
     }
 
@@ -56,11 +56,11 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void dirtyCheck(Persistable entity) {
+    public void dirtyCheck(Object entity) {
         Object snapshot = context.getCachedDatabaseSnapshot(
                 new EntityKey<>(entity)
         );
-        if (!snapshot.equals(entity)) {
+        if (!EntityHelper.equals(snapshot, entity)) {
             merge(entity);
         }
         detach(entity);
@@ -82,7 +82,7 @@ public class EntityManagerImpl implements EntityManager {
         ));
     }
 
-    private void merge(Persistable entity) {
+    private void merge(Object entity) {
         persist(entity);
         context.getDatabaseSnapshot(
                 new EntityKey<>(entity), entity

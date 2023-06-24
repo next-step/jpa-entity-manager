@@ -7,11 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import persistence.entity.Persistable;
 
 @Table(name = "users")
 @Entity
-public class Person extends Persistable {
+public class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

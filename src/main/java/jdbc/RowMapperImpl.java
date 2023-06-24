@@ -18,14 +18,14 @@ public class RowMapperImpl<T> implements RowMapper<T> {
     public T mapRow(ResultSet resultSet) {
         try {
             final T object = clazz.getDeclaredConstructor().newInstance();
-            ColumnFields.forQuery(clazz).stream().forEach(
-                    field -> setField(
-                            field, object, resultSet
-                    )
-            );
+            for (Field field : ColumnFields.forQuery(clazz)) {
+                setField(field, object, resultSet);
+            }
             return object;
-        } catch (InstantiationException | NoSuchMethodException | IllegalAccessException |
-                 InvocationTargetException e) {
+        } catch (InstantiationException
+                 | NoSuchMethodException
+                 | IllegalAccessException
+                 | InvocationTargetException e) {
             throw new RowMapException(e);
         }
     }
