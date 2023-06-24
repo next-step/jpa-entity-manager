@@ -1,7 +1,10 @@
 package persistence.entity;
 
+import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
+import persistence.common.AccessibleField;
+import persistence.common.Fields;
 import persistence.context.BasicPersistentContext;
 import persistence.context.PersistenceContext;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
@@ -50,8 +53,7 @@ public class BasicEntityManger implements EntityManager {
     }
 
     private void addPersistentContextEntity(Object entity, Object savedEntity) {
-        EntityFields entityFields = EntityFields.of(entity.getClass());
-        EntityField idField = entityFields.getId();
+        AccessibleField idField = getAccessibleField(entity);
         Object idFieldValue = idField.getValue(savedEntity);
         idField.setValue(entity, idFieldValue);
         persistenceContext.addEntity((Long) idFieldValue, entity);
@@ -65,7 +67,12 @@ public class BasicEntityManger implements EntityManager {
     }
 
     private void removePersistentContextEntity(Object entity) {
-        EntityField idField = EntityFields.of(entity.getClass()).getId();
+        AccessibleField idField = getAccessibleField(entity);
         persistenceContext.removeEntity((Long) idField.getValue(entity));
+    }
+
+    private static AccessibleField getAccessibleField(Object entity) {
+        Fields fields = Fields.of(entity.getClass());
+        return fields.getAccessibleField(Id.class);
     }
 }

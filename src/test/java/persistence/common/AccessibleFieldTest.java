@@ -1,20 +1,21 @@
-package persistence.entity;
+package persistence.common;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.common.AccessibleField;
 import persistence.model.Person;
 
 import static fixture.PersonFixtures.createPerson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EntityFieldTest {
+class AccessibleFieldTest {
 
     @Test
     @DisplayName("필드 값을 설정한다")
     void setFieldValue() throws NoSuchFieldException {
         // given
         Person person = createPerson();
-        EntityField field = new EntityField(person.getClass().getDeclaredField("id"));
+        AccessibleField field = new AccessibleField(person.getClass().getDeclaredField("id"));
 
         // when
         field.setValue(person, 1111L);
@@ -28,7 +29,7 @@ class EntityFieldTest {
     void getFieldValue() throws NoSuchFieldException {
         // given
         Person person = createPerson();
-        EntityField field = new EntityField(person.getClass().getDeclaredField("name"));
+        AccessibleField field = new AccessibleField(person.getClass().getDeclaredField("name"));
 
         // when
         Object result = field.getValue(person);

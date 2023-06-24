@@ -1,19 +1,17 @@
-package persistence.entity;
+package persistence.common;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public class EntityField {
+public class AccessibleField {
     private final Field field;
 
-    public EntityField(Field field) {
+    public AccessibleField(Field field) {
+        field.setAccessible(true);
         this.field = field;
     }
 
     public void setValue(Object entity, Object value) {
-        field.setAccessible(true);
-
         try {
             field.set(entity, value);
         } catch (IllegalAccessException e) {
@@ -22,8 +20,6 @@ public class EntityField {
     }
 
     public Object getValue(Object entity) {
-        field.setAccessible(true);
-
         try {
             return field.get(entity);
         } catch (IllegalAccessException e) {
@@ -31,15 +27,11 @@ public class EntityField {
         }
     }
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        return field.isAnnotationPresent(annotationClass);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EntityField field1 = (EntityField) o;
+        AccessibleField field1 = (AccessibleField) o;
         return Objects.equals(field, field1.field);
     }
 
