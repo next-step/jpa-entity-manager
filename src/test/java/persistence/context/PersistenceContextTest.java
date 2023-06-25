@@ -34,7 +34,6 @@ class PersistenceContextTest {
         // given
         Person person = createPerson();
         persistenceContext.addEntity(1L, person);
-        Object persistedEntity = persistenceContext.getEntity(1L);
 
         // when
         persistenceContext.removeEntity(1L);
@@ -42,5 +41,19 @@ class PersistenceContextTest {
         // then
         Object result = persistenceContext.getEntity(1L);
         assertThat(result).isEqualTo(null);
+    }
+
+    @Test
+    @DisplayName("Entity 에 대한 스냅샷을 생성하고 조회한다")
+    void snapshot() {
+        // given
+        Person person = createPerson();
+
+        // when
+        persistenceContext.getDatabaseSnapshot(1L, person);
+        Person snapshot = (Person) persistenceContext.getCachedDatabaseSnapshot(1L);
+
+        // then
+        assertThat(snapshot.getName()).isEqualTo(person.getName());
     }
 }
