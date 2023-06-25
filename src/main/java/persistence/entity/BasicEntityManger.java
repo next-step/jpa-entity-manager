@@ -37,6 +37,7 @@ public class BasicEntityManger implements EntityManager {
         String selectQuery = selectQueryBuilder.findById(clazz, id);
         T selectedEntity = jdbcTemplate.queryForObject(selectQuery, new RowMapperImpl<>(clazz));
         persistenceContext.addEntity(id, selectedEntity);
+        persistenceContext.getDatabaseSnapshot(id, selectPersistentContextEntity(clazz, id));
         return selectedEntity;
     }
 
