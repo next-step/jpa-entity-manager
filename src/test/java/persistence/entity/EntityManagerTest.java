@@ -56,7 +56,6 @@ class EntityManagerTest {
     void persist() {
         // given
         Person person = createPerson();
-        insert(person);
 
         // when
         entityManager.persist(person);
@@ -79,6 +78,20 @@ class EntityManagerTest {
         // then
         Person result = select(Person.class, 1L);
         assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("1차 캐싱을 확인한다")
+    void firstLevelCache() {
+        // given
+        Person person = createPerson();
+        entityManager.persist(person);
+
+        // when
+        Person result = entityManager.find(Person.class, 1L);
+
+        // then
+        assertThat(result == person).isTrue();
     }
 
     private void createTable(Class<?> clazz) {

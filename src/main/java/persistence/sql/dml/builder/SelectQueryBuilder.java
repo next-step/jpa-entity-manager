@@ -21,4 +21,10 @@ public class SelectQueryBuilder {
                 .where(new DmlColumn(ColumnName.id(clazz), new ColumnValue(id)))
                 .query();
     }
+
+    public String findFirst(Class<?> clazz) {
+        return selectFrom(clazz)
+                .first()
+                .query();
+    }
 }

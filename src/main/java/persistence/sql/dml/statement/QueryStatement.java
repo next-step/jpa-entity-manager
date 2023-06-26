@@ -13,10 +13,6 @@ import java.util.stream.Collectors;
 public class QueryStatement {
     private final StringBuilder queryBuilder;
 
-    public QueryStatement(String query) {
-        this.queryBuilder = new StringBuilder(query);
-    }
-
     public QueryStatement(StringBuilder queryBuilder) {
         this.queryBuilder = queryBuilder;
     }
@@ -46,6 +42,11 @@ public class QueryStatement {
     public QueryStatement where(DmlColumn dmlColumn) {
         queryBuilder.append(" where ");
         queryBuilder.append(String.format("%s=%s", dmlColumn.name(), dmlColumn.value()));
+        return this;
+    }
+
+    public QueryStatement first() {
+        queryBuilder.append(" order by id desc limit 1");
         return this;
     }
 
