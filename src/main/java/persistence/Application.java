@@ -5,6 +5,8 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.MyEntityManager;
+import persistence.entity.Person;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -16,6 +18,8 @@ public class Application {
             server.start();
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+            final MyEntityManager myEntityManager = new MyEntityManager(jdbcTemplate);
+            myEntityManager.find(Person.class, 1L);
 
             server.stop();
         } catch (Exception e) {

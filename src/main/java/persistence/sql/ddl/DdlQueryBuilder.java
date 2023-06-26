@@ -25,6 +25,11 @@ public class DdlQueryBuilder extends QueryBuilder {
         return String.format(CREATE_TABLE, tableName, allColumns);
     }
 
+    public String dropTable() {
+        final String tableName = getTableName();
+        return String.format("drop table %s;", tableName);
+    }
+
     private String addConstraint() {
         return " constraint pk_" +
                 getTableName().toLowerCase() +

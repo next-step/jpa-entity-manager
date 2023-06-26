@@ -17,7 +17,19 @@ public class Id {
         }
     }
 
-    public Id(Class<?> clazz) {
+    public <T> Id(Class<T> clazz, Object value) {
+        final Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(jakarta.persistence.Id.class)) {
+                this.name = getColumnName(field);
+                this.value = value;
+                return;
+            }
+        }
+        throw new IllegalArgumentException("No id column found");
+    }
+
+    public <T> Id(Class<T> clazz) {
         final Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(jakarta.persistence.Id.class)) {
@@ -29,12 +41,13 @@ public class Id {
         throw new IllegalArgumentException("No id column found");
     }
 
-    public <T> Id(Class<?> clazz, T entity) {
+    public <T> Id(T instance) {
+        final Class<?> clazz = instance.getClass();
         final Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(jakarta.persistence.Id.class)) {
                 this.name = getColumnName(field);
-                this.value = getValue(entity, field);
+                this.value = getValue(instance, field);
                 return;
             }
         }
