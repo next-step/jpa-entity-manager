@@ -1,29 +1,21 @@
 package persistence.entity;
 
 import jakarta.persistence.Id;
-import jdbc.JdbcTemplate;
-import persistence.sql.ddl.DeleteQueryBuilder;
-import persistence.sql.ddl.ReflectiveRowMapper;
-import persistence.sql.ddl.SelectQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class EntityManagerImpl implements EntityManager {
     private final transient StatefulPersistenceContext persistenceContext;
-    private final SelectQueryBuilder selectQueryBuilder;
-    private final DeleteQueryBuilder deleteQueryBuilder;
-    private final JdbcTemplate jdbcTemplate;
+    private final QueryBuilder queryBuilder;
 
-    private EntityManagerImpl(StatefulPersistenceContext persistenceContext, SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, JdbcTemplate jdbcTemplate) {
+    private EntityManagerImpl(StatefulPersistenceContext persistenceContext, QueryBuilder queryBuilder) {
         this.persistenceContext = persistenceContext;
-        this.selectQueryBuilder = selectQueryBuilder;
-        this.deleteQueryBuilder = deleteQueryBuilder;
-        this.jdbcTemplate = jdbcTemplate;
+        this.queryBuilder = queryBuilder;
     }
 
-    public EntityManagerImpl(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, JdbcTemplate jdbcTemplate) {
-        this(initStatefulPersistenceContext(), selectQueryBuilder, deleteQueryBuilder, jdbcTemplate);
+    public EntityManagerImpl(QueryBuilder queryBuilder) {
+        this(initStatefulPersistenceContext(), queryBuilder);
     }
 
     private static StatefulPersistenceContext initStatefulPersistenceContext() {
@@ -37,10 +29,7 @@ public class EntityManagerImpl implements EntityManager {
             return clazz.cast(persistenceContext.getEntity(entityKey));
         }
 
-        String sql = selectQueryBuilder.findById(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), String.valueOf(key));
-        ReflectiveRowMapper<T> mapper = new ReflectiveRowMapper<>(clazz);
-
-        Object object = jdbcTemplate.queryForObject(sql, mapper);
+        Object object = queryBuilder.findById(clazz, key);
         persistenceContext.addEntity(entityKey, object);
 
         return clazz.cast(persistenceContext.getEntity(entityKey));
@@ -52,6 +41,13 @@ public class EntityManagerImpl implements EntityManager {
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
+        Object cacheEntity = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+
+        if (cacheEntity.equals(entity)) {
+            return;
+        }
+
+        queryBuilder.save(entity);
         persistenceContext.addEntity(entityKey, entity);
     }
 
@@ -61,10 +57,9 @@ public class EntityManagerImpl implements EntityManager {
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
-        jdbcTemplate.execute(deleteQueryBuilder.delete(clazz.getSimpleName(), unique(entity.getClass().getDeclaredFields()).getName(), key.toString()));
+        queryBuilder.delete(clazz, (Long) key);
         persistenceContext.removeEntity(entityKey);
     }
-
 
     @Override
     public boolean contains(Object entity) throws IllegalAccessException {

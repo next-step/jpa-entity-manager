@@ -21,8 +21,9 @@ public class DatabaseTest {
     private DatabaseServer server;
     protected JdbcTemplate jdbcTemplate;
 
+
     @BeforeEach
-    void beforeEach() throws SQLException {
+    public void beforeEach() throws SQLException {
         server = new H2();
         server.start();
 

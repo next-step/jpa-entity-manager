@@ -9,8 +9,14 @@
 
 # week2
 
-1. 1단계 - Entity
+1단계
 
 - [X] 요구사항1 - find
 - [X] 요구사항2 - persist (insert)
 - [X] 요구사항3 - remove (delete)
+  2단계
+- [X] 요구사항1 - PersistenceContext 구현체를 만들어 보자
+- [X] 요구사항2 - 1차 캐싱 적용
+  3단계
+- [X] 요구사항1 - snapshot 만들기
+- [X] 요구사항2 - 더티체킹 구현
