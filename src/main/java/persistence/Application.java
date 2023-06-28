@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.BasicEntityManger;
 import persistence.entity.EntityManager;
-import persistence.model.Person;
+import model.Person;
 import persistence.sql.ddl.builder.DdlQueryBuilder;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;

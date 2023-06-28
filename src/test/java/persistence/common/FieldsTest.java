@@ -3,7 +3,7 @@ package persistence.common;
 import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.model.Person;
+import model.Person;
 
 import java.lang.reflect.Field;
 import java.util.List;

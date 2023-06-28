@@ -2,9 +2,8 @@ package persistence.sql.dml.builder;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.model.Person;
+import model.Person;
 
-import static fixture.PersonFixtures.createPerson;
 import static fixture.PersonFixtures.savedPerson;
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -7,13 +7,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.model.Person;
+import model.Person;
 
 import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
 import static fixture.TableFixtures.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityManagerTest {

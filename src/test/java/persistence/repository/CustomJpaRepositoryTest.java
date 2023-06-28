@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.BasicEntityManger;
-import persistence.model.Person;
+import model.Person;
 
 import java.sql.SQLException;
 

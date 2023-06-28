@@ -1,6 +1,6 @@
 package fixture;
 
-import persistence.model.Person;
+import model.Person;
 
 public class PersonFixtures {
     public static Person createPerson() {
