@@ -9,14 +9,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PersistenceContextTest {
 
-    private final PersistenceContext persistenceContext = new PersistenceContextImpl();
     private static final Long PERSON_JACK_ID = 1L;
     private static final Person PERSON_JACK = new Person(PERSON_JACK_ID, "jack", 20, "jack@abc.com");
 
+    private PersistenceContext persistenceContext;
+
     @BeforeEach
     void init() {
+        persistenceContext = new PersistenceContextImpl();
         persistenceContext.addEntity(PERSON_JACK_ID, PERSON_JACK);
     }
+
 
     @DisplayName("영속성 컨텍스트에서 엔티티를 조회한다.")
     @Test
