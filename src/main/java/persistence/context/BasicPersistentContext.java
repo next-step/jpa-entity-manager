@@ -1,5 +1,6 @@
 package persistence.context;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,11 +21,31 @@ public class BasicPersistentContext implements PersistenceContext {
     @Override
     public void removeEntity(Long id) {
         entityByKey.remove(id);
+        entitySnapShotByKey.remove(id);
     }
 
     @Override
     public Object getDatabaseSnapshot(Long id, Object entity) {
-        return entitySnapShotByKey.put(id, entity);
+        return entitySnapShotByKey.put(id, copyObject(entity));
+    }
+
+    public static <T> T copyObject(T source) {
+        Class<?> clazz = source.getClass();
+        T copy;
+        copy = null;
+        try {
+            copy = (T) clazz.newInstance();
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object value = field.get(source);
+                field.set(copy, value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return copy;
     }
 
     @Override

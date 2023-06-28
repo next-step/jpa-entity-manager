@@ -13,6 +13,7 @@ import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
 import static fixture.TableFixtures.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityManagerTest {
@@ -89,5 +90,21 @@ class EntityManagerTest {
 
         // then
         assertThat(result == person).isTrue();
+    }
+
+    @Test
+    @DisplayName("원본 엔티티와 비교하여 변경사항이 있을 경우 엔티티를 업데이트한다")
+    void merge() {
+        // given
+        Person person = createPerson();
+        entityManager.persist(person);
+
+        // when
+        person.changeName("lee");
+        entityManager.merge(person);
+
+        // then
+        Person selectedPerson = entityManager.find(Person.class, person.getId());
+        assertThat(selectedPerson.getName()).isEqualTo("lee");
     }
 }

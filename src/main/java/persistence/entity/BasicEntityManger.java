@@ -10,6 +10,8 @@ import persistence.context.PersistenceContext;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
+import persistence.sql.dml.builder.UpdateQueryBuilder;
+import persistence.sql.dml.column.DmlColumns;
 
 public class BasicEntityManger implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -17,6 +19,7 @@ public class BasicEntityManger implements EntityManager {
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
     private final InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.INSTANCE;
     private final DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
+    private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
 
     public BasicEntityManger(JdbcTemplate jdbcTemplate) {
         this.persistenceContext = new BasicPersistentContext();
@@ -30,14 +33,14 @@ public class BasicEntityManger implements EntityManager {
             return (T) entity;
         }
 
-        return selectPersistentContextEntity(clazz, id);
-    }
-
-    private <T> T selectPersistentContextEntity(Class<T> clazz, Long id) {
         String selectQuery = selectQueryBuilder.findById(clazz, id);
         T selectedEntity = jdbcTemplate.queryForObject(selectQuery, new RowMapperImpl<>(clazz));
+        if (selectedEntity == null) {
+            return null;
+        }
+
         persistenceContext.addEntity(id, selectedEntity);
-        persistenceContext.getDatabaseSnapshot(id, selectPersistentContextEntity(clazz, id));
+        persistenceContext.getDatabaseSnapshot(id, selectedEntity);
         return selectedEntity;
     }
 
@@ -45,19 +48,19 @@ public class BasicEntityManger implements EntityManager {
     public void persist(Object entity) {
         String insertQuery = insertQueryBuilder.insert(entity);
         jdbcTemplate.execute(insertQuery);
-        addPersistentContextEntity(entity, getSavedEntity(entity));
+
+        Long id = setGeneratedId(entity);
+        persistenceContext.addEntity(id, entity);
+        persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
-    private Object getSavedEntity(Object entity) {
+    private Long setGeneratedId(Object entity) {
         String selectLastSavedQuery = selectQueryBuilder.findFirst(entity.getClass());
-        return jdbcTemplate.queryForObject(selectLastSavedQuery, new RowMapperImpl<>(entity.getClass()));
-    }
-
-    private void addPersistentContextEntity(Object entity, Object savedEntity) {
+        Object savedEntity = jdbcTemplate.queryForObject(selectLastSavedQuery, new RowMapperImpl<>(entity.getClass()));
         AccessibleField idField = getAccessibleField(entity);
-        Object idFieldValue = idField.getValue(savedEntity);
+        Long idFieldValue = (Long) idField.getValue(savedEntity);
         idField.setValue(entity, idFieldValue);
-        persistenceContext.addEntity((Long) idFieldValue, entity);
+        return idFieldValue;
     }
 
     @Override
@@ -65,6 +68,38 @@ public class BasicEntityManger implements EntityManager {
         String deleteQuery = deleteQueryBuilder.delete(entity);
         jdbcTemplate.execute(deleteQuery);
         removePersistentContextEntity(entity);
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        AccessibleField accessibleIdField = getAccessibleField(entity);
+        Long id = (Long) accessibleIdField.getValue(entity);
+        T originEntity = originEntity(entity.getClass(), id);
+
+        if (hasUpdatedField(originEntity, entity)) {
+            String updateQuery = updateQueryBuilder.update(entity);
+            jdbcTemplate.execute(updateQuery);
+            persistenceContext.getDatabaseSnapshot(id, entity);
+        }
+
+        return entity;
+    }
+
+    private <T> T originEntity(Class<?> clazz, Long id) {
+        Object snapshot = persistenceContext.getCachedDatabaseSnapshot(id);
+
+        if (snapshot != null) {
+            return (T) snapshot;
+        }
+
+        return (T) find(clazz, id);
+    }
+
+    private <T> boolean hasUpdatedField(T snapShot, T entity) {
+        DmlColumns snapShotEntityColumns = DmlColumns.of(snapShot);
+        DmlColumns entityColumns = DmlColumns.of(entity);
+
+        return !snapShotEntityColumns.equals(entityColumns);
     }
 
     private void removePersistentContextEntity(Object entity) {
