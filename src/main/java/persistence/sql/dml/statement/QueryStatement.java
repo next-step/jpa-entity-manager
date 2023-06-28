@@ -39,6 +39,21 @@ public class QueryStatement {
         return new QueryStatement(stringBuilder);
     }
 
+    public static QueryStatement update(Class<?> clazz) {
+        String tableName = new TableName(clazz).getName();
+        StringBuilder stringBuilder = new StringBuilder(String.format("update %s", tableName));
+        return new QueryStatement(stringBuilder);
+    }
+
+    public QueryStatement set(DmlColumn... dmlColumns) {
+        String setValues = Arrays.stream(dmlColumns)
+                .map(dmlColumn -> String.format("%s = %s", dmlColumn.name(), dmlColumn.value()))
+                .collect(Collectors.joining(", "));
+
+        queryBuilder.append(String.format(" set %s", setValues));
+        return this;
+    }
+
     public QueryStatement where(DmlColumn dmlColumn) {
         queryBuilder.append(" where ");
         queryBuilder.append(String.format("%s=%s", dmlColumn.name(), dmlColumn.value()));

@@ -42,6 +42,10 @@ public class DmlColumns {
                 .collect(Collectors.joining(DELIMITER));
     }
 
+    public List<DmlColumn> getDmlColumns() {
+        return dmlColumns;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
