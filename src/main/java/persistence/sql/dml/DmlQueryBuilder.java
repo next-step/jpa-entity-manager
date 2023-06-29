@@ -48,10 +48,14 @@ public abstract class DmlQueryBuilder {
     }
 
     protected String whereClause(Long primaryKey) {
-        Field idField = Arrays.stream(entityClass.getDeclaredFields())
+        Field idField = getIdField();
+        return String.format(" WHERE %s = %d", getColumnName(idField), primaryKey);
+    }
+
+    protected Field getIdField() {
+        return Arrays.stream(entityClass.getDeclaredFields())
             .filter(field -> field.isAnnotationPresent(Id.class))
             .findFirst()
             .orElseThrow(() -> new NoIdentifierException(entityClass.getSimpleName()));
-        return String.format(" WHERE %s = %d", getColumnName(idField), primaryKey);
     }
 }
