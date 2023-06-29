@@ -8,6 +8,7 @@ import domain.PersonNotFoundException;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.CustomJpaRepository;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
 import persistence.entity.StatefulPersistenceContext;
@@ -32,15 +33,16 @@ public class Application {
                     new StatefulPersistenceContext(),
                     jdbcTemplate, dml
             );
+            final CustomJpaRepository<Person, Long> jpa = new CustomJpaRepository<>(em);
 
             jdbcTemplate.execute(
                     ddl.getCreateQuery(Person.class)
             );
 
             Person person = PersonFixture.createPerson();
-            em.persist(person);
+            jpa.save(person);
             person.setName("Changed Name");
-            em.dirtyCheck(person);
+            jpa.save(person);
 
 
             Person entity = em.find(Person.class, 1L)

@@ -56,14 +56,24 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void dirtyCheck(Object entity) {
-        Object snapshot = context.getCachedDatabaseSnapshot(
-                new EntityKey<>(entity)
+    public void merge(Object entity) {
+        persist(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
         );
-        if (!EntityHelper.equals(snapshot, entity)) {
-            merge(entity);
-        }
-        detach(entity);
+    }
+
+    @Override
+    public void detach(Object entity) {
+        context.removeEntity(entity);
+    }
+
+    @Override
+    public boolean isDirty(Object entity) {
+        return !hasEntity(entity) || !EntityHelper.equals(
+                entity,
+                context.getCachedDatabaseSnapshot(new EntityKey<>(entity))
+        );
     }
 
     private <T> Optional<T> findFromDB(EntityKey<T> key) {
@@ -80,17 +90,6 @@ public class EntityManagerImpl implements EntityManager {
         return Optional.of(context.getDatabaseSnapshot(
                 new EntityKey<>(entity), entity
         ));
-    }
-
-    private void merge(Object entity) {
-        persist(entity);
-        context.getDatabaseSnapshot(
-                new EntityKey<>(entity), entity
-        );
-    }
-
-    private void detach(Object entity) {
-        context.removeEntity(entity);
     }
 
     private boolean hasEntity(Object entity) {

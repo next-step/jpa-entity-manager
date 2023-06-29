@@ -9,5 +9,9 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    void dirtyCheck(Object entity);
+    void merge(Object entity);
+
+    void detach(Object entity);
+
+    boolean isDirty(Object entity);
 }

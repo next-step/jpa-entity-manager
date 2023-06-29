@@ -72,7 +72,7 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("persist 를 통해 엔티티를 제거할 수 있다.")
+    @DisplayName("remove 를 통해 엔티티를 제거할 수 있다.")
     void remove() {
         entityManager.persist(person);
         entityManager.remove(person);
@@ -85,17 +85,13 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("dirtyCheck 를 통해 상태가 변한 엔티티를 병합 및 영속화 할 수 있다.")
+    @DisplayName("isDirty 를 통해 상태가 변한 엔티티를 확인할 수 있다.")
     void dirtyCheck() {
         final String CHANGED_NAME = "Changed Name";
         entityManager.persist(person);
         person.setName(CHANGED_NAME);
-        entityManager.dirtyCheck(person);
         assertThat(
-                entityManager.find(
-                        person.getClass(),
-                        personId
-                ).get().getName()
-        ).isEqualTo(CHANGED_NAME);
+                entityManager.isDirty(person)
+        ).isTrue();
     }
 }
