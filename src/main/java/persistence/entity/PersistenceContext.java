@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PersistenceContext {
     private final Map<Id, Entity> entities = new ConcurrentHashMap<>();
 
-    public Optional<Object> get(Class<?> entityClass, Object id) {
+    public Optional<Object> getEntity(Class<?> entityClass, Object id) {
         final Entity entity = entities.get(new Id(entityClass, id));
         if (entity == null) {
             return Optional.empty();
@@ -19,12 +19,12 @@ public class PersistenceContext {
         return Optional.of(entity.getEntity());
     }
 
-    public <T> void persist(Object entity) {
+    public void addEntity(Object entity) {
         final Class<?> clazz = entity.getClass();
         entities.put(new Id(clazz, getIdValue(clazz, entity)), new Entity(entity));
     }
 
-    public void remove(Object entity) {
+    public void removeEntity(Object entity) {
         entities.remove(new Id(entity));
     }
 

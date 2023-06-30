@@ -13,7 +13,7 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return persistenceContext.get(clazz, id)
+        return persistenceContext.getEntity(clazz, id)
                 .map(entity -> (T) entity)
                 .orElse((T) entityPersister.load(clazz, id));
     }
@@ -23,7 +23,7 @@ public class MyEntityManager implements EntityManager {
         if (persistenceContext.contains(entity)) {
             return;
         }
-        persistenceContext.persist(entity);
+        persistenceContext.addEntity(entity);
         entityPersister.insert(entity);
     }
 
@@ -32,7 +32,7 @@ public class MyEntityManager implements EntityManager {
         if (!persistenceContext.contains(entity)) {
             return;
         }
-        persistenceContext.remove(entity);
+        persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
     }
 
