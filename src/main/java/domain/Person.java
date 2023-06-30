@@ -39,4 +39,8 @@ public class Person {
         this.email = email;
         this.index = index;
     }
+
+    public void changeEmail(String value) {
+        this.email = value;
+    }
 }
