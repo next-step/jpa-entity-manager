@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class MyEntityManager implements EntityManager {
 
-    private final Session session;
+    private final PersistenceContext persistenceContext;
     private final JdbcTemplate jdbcTemplate;
     private final Map<Class<?> , RowMapper<?>> rowMappers;
 
     public MyEntityManager(JdbcTemplate jdbcTemplate) {
-        this.session = new Session();
+        this.persistenceContext = new PersistenceContext();
         this.jdbcTemplate = jdbcTemplate;
         final HashMap<Class<?>, RowMapper<?>> rowMappers = new HashMap<>();
         rowMappers.put(Person.class, new PersonRowMapper());
@@ -23,7 +23,7 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        final T entity = session.get(clazz, id);
+        final T entity = persistenceContext.get(clazz, id);
         if (entity != null) {
             return entity;
         }
@@ -38,7 +38,7 @@ public class MyEntityManager implements EntityManager {
         if (instance == null) {
             return null;
         }
-        session.put(clazz, instance);
+        persistenceContext.put(clazz, instance);
         return (T) instance;
     }
 
@@ -48,14 +48,14 @@ public class MyEntityManager implements EntityManager {
         final DmlQueryBuilder<?> dmlQueryBuilder = new DmlQueryBuilder<>(clazz);
         final String sql = dmlQueryBuilder.insert(entity);
         jdbcTemplate.execute(sql);
-        session.put(entity.getClass(), entity);
+        persistenceContext.put(entity.getClass(), entity);
     }
 
     @Override
     public void remove(Object entity) {
         final String deleteSql = new DmlQueryBuilder<>(entity.getClass()).delete(entity);
         jdbcTemplate.execute(deleteSql);
-        session.remove(entity);
+        persistenceContext.remove(entity);
     }
 
 

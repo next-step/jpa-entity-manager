@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Session {
+public class PersistenceContext {
     private final Map<Id, Entity> entities = new ConcurrentHashMap<>();
     public <T> T get(Class<T> entityClass, Object id) {
         final Entity entity = entities.get(new Id(entityClass, id));
