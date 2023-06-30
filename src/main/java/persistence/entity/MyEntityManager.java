@@ -6,6 +6,7 @@ import persistence.sql.dml.DmlQueryBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class MyEntityManager implements EntityManager {
 
@@ -23,9 +24,9 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        final T entity = persistenceContext.get(clazz, id);
-        if (entity != null) {
-            return entity;
+        final T t = persistenceContext.get(clazz, id).orElse(null);
+        if (t != null) {
+            return t;
         }
 
         final RowMapper<?> rowMapper = rowMappers.get(clazz);
