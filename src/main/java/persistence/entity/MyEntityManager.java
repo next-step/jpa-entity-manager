@@ -1,21 +1,25 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
+import java.util.Optional;
 
 public class MyEntityManager implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
 
-    public MyEntityManager(JdbcTemplate jdbcTemplate) {
+    public MyEntityManager(EntityPersister entityPersister) {
         this.persistenceContext = new PersistenceContext();
-        this.entityPersister = new MyEntityPersister(jdbcTemplate);
+        this.entityPersister = entityPersister;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return persistenceContext.getEntity(clazz, id)
-                .map(entity -> (T) entity)
-                .orElse((T) entityPersister.load(clazz, id));
+        final T entity = (T) persistenceContext.getEntity(clazz, id);
+        if (entity != null) {
+            return entity;
+        }
+        final T loadedEntity = (T) entityPersister.load(clazz, id);
+        persistenceContext.addEntity(loadedEntity);
+        return loadedEntity;
     }
 
     @Override

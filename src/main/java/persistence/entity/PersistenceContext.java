@@ -5,18 +5,17 @@ import persistence.sql.Id;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceContext {
     private final Map<Id, Entity> entities = new ConcurrentHashMap<>();
 
-    public Optional<Object> getEntity(Class<?> entityClass, Object id) {
+    public Object getEntity(Class<?> entityClass, Object id) {
         final Entity entity = entities.get(new Id(entityClass, id));
         if (entity == null) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(entity.getEntity());
+        return entity.getEntity();
     }
 
     public void addEntity(Object entity) {

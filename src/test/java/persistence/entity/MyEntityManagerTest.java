@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
 
 class MyEntityManagerTest {
     private final DatabaseServer server = new H2();
@@ -47,7 +48,8 @@ class MyEntityManagerTest {
         final String insertSql = dmlQueryBuilder.insert(jeongwon);
         jdbcTemplate.execute(insertSql);
 
-        final MyEntityManager myEntityManager = new MyEntityManager(jdbcTemplate);
+        final EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+        final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
         final Person person = myEntityManager.find(Person.class, 1L);
 
         assertAll(
@@ -57,6 +59,19 @@ class MyEntityManagerTest {
                 () -> assertThat(person.getEmail()).isEqualTo(jeongwon.getEmail()),
                 () -> assertThat(person.getIndex()).isNull()
         );
+    }
+
+    @DisplayName("entityManager 의 findById 메서드 1차 캐시 적용 테스트")
+    @Test
+    void findByIdFirstLevelCacheTest() {
+        final EntityPersister mockEntityPersister = mock(MyEntityPersister.class);
+        final MyEntityManager myEntityManager = new MyEntityManager(mockEntityPersister);
+        myEntityManager.persist(new Person(1L, "정원", 15, "a@a.com", 1));
+
+        myEntityManager.find(Person.class, 1L);
+
+        verify(mockEntityPersister, times(1)).insert(any());
+        verify(mockEntityPersister, times(0)).load(Person.class, 1L);
     }
 
     @DisplayName("entityManager 의 persist 메서드 테스트")
@@ -70,7 +85,8 @@ class MyEntityManagerTest {
                 1
         );
 
-        final MyEntityManager myEntityManager = new MyEntityManager(jdbcTemplate);
+        final EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+        final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
         myEntityManager.persist(jeongwon);
 
         final Person person = myEntityManager.find(Person.class, 1L);
@@ -95,7 +111,8 @@ class MyEntityManagerTest {
                 1
         );
 
-        final MyEntityManager myEntityManager = new MyEntityManager(jdbcTemplate);
+        final EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+        final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
         myEntityManager.persist(jeongwon);
 
         final Person person = myEntityManager.find(Person.class, 1L);
