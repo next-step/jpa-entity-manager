@@ -15,6 +15,7 @@ import persistence.sql.dml.DmlQueryBuilder;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MyEntityManagerTest {
@@ -100,7 +101,9 @@ class MyEntityManagerTest {
         final Person person = myEntityManager.find(Person.class, 1L);
 
         myEntityManager.remove(person);
-        assertThat(myEntityManager.find(Person.class, 1L)).isNull();
+        assertThatThrownBy(() -> myEntityManager.find(Person.class, 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("ObjectNotFoundException");
     }
 
     private void createTable() {

@@ -10,16 +10,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceContext {
     private final Map<Id, Entity> entities = new ConcurrentHashMap<>();
-    public <T> Optional<T> get(Class<T> entityClass, Object id) {
+
+    public Optional<Object> get(Class<?> entityClass, Object id) {
         final Entity entity = entities.get(new Id(entityClass, id));
         if (entity == null) {
             return Optional.empty();
         }
-        return Optional.of((T) entity.getEntity());
+        return Optional.of(entity.getEntity());
     }
 
-    public <T> void put(Class<T> clazz, Object instance) {
-        entities.put(new Id(clazz, getIdValue(clazz, instance)), new Entity(instance));
+    public <T> void persist(Object entity) {
+        final Class<?> clazz = entity.getClass();
+        entities.put(new Id(clazz, getIdValue(clazz, entity)), new Entity(entity));
+    }
+
+    public void remove(Object entity) {
+        entities.remove(new Id(entity));
+    }
+
+    public boolean contains(Object entity) {
+        return entities.containsKey(new Id(entity));
     }
 
     private <T> Object getIdValue(Class<T> clazz, Object instance) {
@@ -34,9 +44,5 @@ public class PersistenceContext {
             }
         }
         throw new IllegalArgumentException("No id column found");
-    }
-
-    public void remove(Object entity) {
-        entities.remove(new Id(entity));
     }
 }
