@@ -11,7 +11,7 @@ public interface PersistenceContext {
 
     void addEntity(EntityKey key, Object entity);
 
-    Object getDatabaseSnapshot(Long id, Object entity);
+    Object getDatabaseSnapshot(Object id, Object entity);
 
     Object getCachedDatabaseSnapshot(EntityKey id);
 }

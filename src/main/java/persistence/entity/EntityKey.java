@@ -3,15 +3,15 @@ package persistence.entity;
 import java.util.Objects;
 
 public class EntityKey {
-    private final Long id;
+    private final Object id;
     private final String name;
 
-    private EntityKey(Long key, String entityName) {
+    private EntityKey(Object key, String entityName) {
         this.id = key;
         this.name = entityName;
     }
 
-    public static EntityKey of(Long key, String entityName) {
+    public static EntityKey of(Object key, String entityName) {
         return new EntityKey(key, entityName);
     }
 

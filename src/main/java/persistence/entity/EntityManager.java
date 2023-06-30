@@ -8,4 +8,6 @@ public interface EntityManager {
     void remove(Object entity) throws IllegalAccessException;
 
     boolean contains(Object entity) throws IllegalAccessException;
+
+    boolean isChanged(Object entity) throws IllegalAccessException;
 }

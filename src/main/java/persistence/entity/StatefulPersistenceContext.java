@@ -39,7 +39,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
+    public Object getDatabaseSnapshot(Object id, Object entity) {
         EntityKey entityKey = EntityKey.of(id, entity.getClass().getSimpleName());
         Object cached = getCached(entityKey);
         if (cached != null) {
