@@ -19,7 +19,8 @@ public class Application {
             server.start();
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-            final MyEntityManager myEntityManager = new MyEntityManager(new MyEntityPersister(jdbcTemplate));
+            final MyEntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+            final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
             myEntityManager.find(Person.class, 1L);
 
             server.stop();

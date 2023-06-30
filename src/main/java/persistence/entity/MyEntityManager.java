@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import java.util.Optional;
+import persistence.sql.Id;
 
 public class MyEntityManager implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -23,12 +23,13 @@ public class MyEntityManager implements EntityManager {
     }
 
     @Override
-    public void persist(Object entity) {
+    public Object persist(Object entity) {
         if (persistenceContext.contains(entity)) {
-            return;
+            return merge(entity);
         }
-        persistenceContext.addEntity(entity);
         entityPersister.insert(entity);
+        persistenceContext.addEntity(entity);
+        return entity;
     }
 
     @Override
@@ -38,6 +39,23 @@ public class MyEntityManager implements EntityManager {
         }
         persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
+    }
+
+    @Override
+    public Object merge(Object entity) {
+        final Object cachedEntity = persistenceContext.getEntity(entity.getClass(), new Id(entity).getValue());
+        if (cachedEntity.equals(entity)) {
+            return cachedEntity;
+        }
+        persistenceContext.removeEntity(cachedEntity);
+        entityPersister.update(entity);
+        persistenceContext.addEntity(entity);
+        return entity;
+    }
+
+    @Override
+    public boolean contains(Object entity) {
+        return persistenceContext.contains(entity);
     }
 
 

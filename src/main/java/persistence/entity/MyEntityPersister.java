@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyEntityPersister implements EntityPersister {
-
     private final Map<Class<?> , RowMapper<?>> rowMappers;
     private final JdbcTemplate jdbcTemplate;
 
@@ -52,7 +51,10 @@ public class MyEntityPersister implements EntityPersister {
 
     @Override
     public void update(Object entity) {
-
+        final Class<?> clazz = entity.getClass();
+        final DmlQueryBuilder<?> dmlQueryBuilder = new DmlQueryBuilder<>(clazz);
+        final String sql = dmlQueryBuilder.update(entity);
+        jdbcTemplate.execute(sql);
     }
 
     @Override

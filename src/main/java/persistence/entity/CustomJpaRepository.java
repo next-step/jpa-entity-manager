@@ -1,5 +1,8 @@
 package persistence.entity;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 public class CustomJpaRepository<T, ID> {
     private final EntityManager entityManager;
 
@@ -8,7 +11,14 @@ public class CustomJpaRepository<T, ID> {
     }
 
     public T save(T t) {
-        // 트랜잭션은 신경 쓰지말고 구현해보자
-        return null;
+        return (T) entityManager.persist(t);
+    }
+
+    public T findById(ID id) {
+        return entityManager.find(getEntityClass(), (Long) id);
+    }
+
+    private Class<T> getEntityClass() {
+        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }

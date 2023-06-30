@@ -48,8 +48,7 @@ class MyEntityManagerTest {
         final String insertSql = dmlQueryBuilder.insert(jeongwon);
         jdbcTemplate.execute(insertSql);
 
-        final EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
-        final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
+        final MyEntityManager myEntityManager = new MyEntityManager(new MyEntityPersister(jdbcTemplate));
         final Person person = myEntityManager.find(Person.class, 1L);
 
         assertAll(
@@ -123,6 +122,55 @@ class MyEntityManagerTest {
                 .hasMessage("ObjectNotFoundException");
     }
 
+    @DisplayName("entityManager 의 contains 메서드 테스트")
+    @Test
+    void containsTest() {
+        final EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+        final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
+        final Person jeongwon = new Person(
+                1L,
+                "정원",
+                15,
+                "a@a.com",
+                1
+        );
+        myEntityManager.persist(jeongwon);
+
+        final Person yohan = new Person(
+                2L,
+                "요한",
+                10,
+                "b@b.com",
+                2
+        );
+
+        assertAll(
+                () -> assertThat(myEntityManager.contains(jeongwon)).isTrue(),
+                () -> assertThat(myEntityManager.contains(yohan)).isFalse()
+        );
+    }
+
+    @DisplayName("entityManager 의 merge 메서드 테스트")
+    @Test
+    void mergeTest() {
+        final EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+        final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
+        final Person jeongwon = new Person(
+                1L,
+                "정원",
+                15,
+                "a@a.com",
+                1
+        );
+        myEntityManager.persist(jeongwon);
+
+        final Person changedJeongwon = jeongwon.changeAge(20);
+        myEntityManager.merge(changedJeongwon);
+
+        final Person person = myEntityManager.find(Person.class, 1L);
+        assertThat(person.getAge()).isEqualTo(20);
+    }
+
     private void createTable() {
         final JavaToSqlColumnParser javaToSqlColumnParser = new JavaToSqlColumnParser(new H2DbDialect());
         final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(javaToSqlColumnParser, Person.class);
@@ -136,5 +184,4 @@ class MyEntityManagerTest {
         final String dropTableSql = ddlQueryBuilder.dropTable();
         jdbcTemplate.execute(dropTableSql);
     }
-
 }

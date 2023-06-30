@@ -46,4 +46,12 @@ class DmlQueryBuilderTest {
         assertThat(deleteByIdSql).isEqualTo("delete from users where id=1");
     }
 
+    @Test
+    void updateTest() {
+        final Person jeongwon = new Person(1L, "정원", 15, "a@a.com", 1);
+        final String updateSql = new DmlQueryBuilder<>(Person.class).update(jeongwon);
+
+        assertThat(updateSql).isEqualTo("update users set id=1,name='정원',age=15,email='a@a.com'where where id=1");
+    }
+
 }
