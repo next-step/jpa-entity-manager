@@ -7,8 +7,11 @@ import persistence.DatabaseTest;
 import persistence.sql.ddl.h2.H2DeleteQueryBuilder;
 import persistence.sql.ddl.h2.H2InsertQueryBuilder;
 import persistence.sql.ddl.h2.H2SelectQueryBuilder;
+import persistence.sql.ddl.h2.H2UpdateQueryBuilder;
 
 import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CustomJpaRepositoryTest extends DatabaseTest {
     private QueryBuilder queryBuilder;
@@ -16,16 +19,22 @@ class CustomJpaRepositoryTest extends DatabaseTest {
     @BeforeEach
     public void beforeEach() throws SQLException {
         super.beforeEach();
-        queryBuilder = new QueryBuilder(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), new H2InsertQueryBuilder(), jdbcTemplate);
+        queryBuilder = new QueryBuilder(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), new H2InsertQueryBuilder(), new H2UpdateQueryBuilder(), jdbcTemplate);
     }
 
     @Test
     void save() throws IllegalAccessException {
-        CustomJpaRepository<Person, Long> customJpaRepository = new CustomJpaRepository<>(new EntityManagerImpl(queryBuilder));
-        Person person = new Person(1L, "slow", 20, "email@email.com", 1);
-        customJpaRepository.save(person);
+        insertDb();
+        CustomJpaRepository<Person, Long> customJpaRepository = new CustomJpaRepository<>(Person.class, new EntityManagerImpl(queryBuilder));
 
-        person.changeEmail("emailNew@email.com");
-        customJpaRepository.save(person);
+        // 1. 영속 컨텍스트 내에서 Entity 를 조회
+        Person persistencePerson = customJpaRepository.findById(1L);
+        persistencePerson.changeEmail("emailNew@email.com");
+
+        customJpaRepository.save(persistencePerson);
+
+        Person persistencePerson2 = customJpaRepository.findById(1L);
+
+        assertEquals(persistencePerson2, persistencePerson);
     }
 }
