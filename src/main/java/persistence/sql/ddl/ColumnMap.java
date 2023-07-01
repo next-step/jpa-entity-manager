@@ -6,7 +6,9 @@ import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ColumnMap {
@@ -25,6 +27,10 @@ public class ColumnMap {
                 .forEach(field -> map.put(columnName(field), getFieldValue(field, object)));
 
         return new ColumnMap(map);
+    }
+
+    public static ColumnMap empty() {
+        return new ColumnMap(new LinkedHashMap<>());
     }
 
     public void add(String name, String value) {
@@ -61,4 +67,7 @@ public class ColumnMap {
         }
     }
 
+    public Collection<Map.Entry<String, String>> entrySet() {
+        return map.entrySet();
+    }
 }

@@ -39,7 +39,19 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) throws IllegalAccessException {
-        Class<?> clazz = entity.getClass();
+        persist(entity.getClass(), entity);
+//        Class<?> clazz = entity.getClass();
+//        Object key = getKey(entity);
+//        EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
+//
+//        queryBuilder.save(entity);
+//        persistenceContext.addEntity(entityKey, entity);
+    }
+
+    @Override
+    public void persist(Class<?> clazz, Object entity) throws IllegalAccessException {
+//        Class<?> clazz = proxy.entityClass();
+//        Object entity = proxy.entity();
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
@@ -68,16 +80,20 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public boolean isChanged(Object entity) throws IllegalAccessException {
         EntityKey entityKey = EntityKey.of(getKey(entity), entity.getClass().getSimpleName());
-        Object cache = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        Object cache = persistenceContext.getCached(entityKey);
         if (cache == NO_ROW) {
             return true;
         }
 
-        Object snapshot = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        Proxy snapshot = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        if (snapshot == null) {
+            return true;
+        }
+        Object snapshotObject = snapshot.entity();
         return Arrays.stream(entity.getClass().getDeclaredFields())
                 .anyMatch(field -> {
                     Object fieldValueCache = getFieldValue(field, cache);
-                    Object fieldValueSnapshot = getFieldValue(field, snapshot);
+                    Object fieldValueSnapshot = getFieldValue(field, snapshotObject);
                     return !fieldValueCache.equals(fieldValueSnapshot);
                 });
     }

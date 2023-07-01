@@ -5,6 +5,8 @@ public interface EntityManager {
 
     void persist(Object entity) throws IllegalAccessException;
 
+    void persist(Class<?> clazz, Object entity) throws IllegalAccessException;
+
     void remove(Object entity) throws IllegalAccessException;
 
     boolean contains(Object entity) throws IllegalAccessException;
