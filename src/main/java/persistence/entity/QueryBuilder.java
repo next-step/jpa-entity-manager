@@ -2,10 +2,7 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
-import persistence.sql.ddl.DeleteQueryBuilder;
-import persistence.sql.ddl.InsertQueryBuilder;
-import persistence.sql.ddl.ReflectiveRowMapper;
-import persistence.sql.ddl.SelectQueryBuilder;
+import persistence.sql.ddl.*;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -14,12 +11,14 @@ public class QueryBuilder {
     private final SelectQueryBuilder selectQueryBuilder;
     private final DeleteQueryBuilder deleteQueryBuilder;
     private final InsertQueryBuilder insertQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
     private final JdbcTemplate jdbcTemplate;
 
-    protected QueryBuilder(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, InsertQueryBuilder insertQueryBuilder, JdbcTemplate jdbcTemplate) {
+    protected QueryBuilder(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, InsertQueryBuilder insertQueryBuilder, UpdateQueryBuilder updateQueryBuilder, JdbcTemplate jdbcTemplate) {
         this.selectQueryBuilder = selectQueryBuilder;
         this.deleteQueryBuilder = deleteQueryBuilder;
         this.insertQueryBuilder = insertQueryBuilder;
+        this.updateQueryBuilder = updateQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -36,6 +35,10 @@ public class QueryBuilder {
 
     public void save(Object entity) {
         insertQueryBuilder.createInsertBuild(entity);
+    }
+
+    public void update(Long key, String tableName, Object entity) {
+        jdbcTemplate.execute(updateQueryBuilder.createUpdateBuild(key, tableName, ColumnMap.of(entity)));
     }
 
     private Field unique(Field[] field) {

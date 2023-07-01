@@ -40,18 +40,10 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Object entity) throws IllegalAccessException {
         persist(entity.getClass(), entity);
-//        Class<?> clazz = entity.getClass();
-//        Object key = getKey(entity);
-//        EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
-//
-//        queryBuilder.save(entity);
-//        persistenceContext.addEntity(entityKey, entity);
     }
 
     @Override
     public void persist(Class<?> clazz, Object entity) throws IllegalAccessException {
-//        Class<?> clazz = proxy.entityClass();
-//        Object entity = proxy.entity();
         Object key = getKey(entity);
         EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
 
@@ -96,6 +88,16 @@ public class EntityManagerImpl implements EntityManager {
                     Object fieldValueSnapshot = getFieldValue(field, snapshotObject);
                     return !fieldValueCache.equals(fieldValueSnapshot);
                 });
+    }
+
+    @Override
+    public void update(Class<?> clazz, Proxy proxy) throws IllegalAccessException {
+        Object entity = proxy.entity();
+        Object key = getKey(entity);
+        EntityKey entityKey = EntityKey.of(getKey(entity), entity.getClass().getSimpleName());
+
+        Proxy changedProxy = proxy.toDirty(persistenceContext.getCachedDatabaseSnapshot(entityKey));
+        queryBuilder.update((Long) key, clazz.getSimpleName(), changedProxy.entity());
     }
 
     private Field unique(Field[] field) {

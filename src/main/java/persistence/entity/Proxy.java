@@ -1,6 +1,8 @@
 package persistence.entity;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Proxy {
     private final Class<?> clazz;
@@ -33,6 +35,36 @@ public class Proxy {
 
     public static boolean isProxy(Object other) {
         return other.getClass().isAssignableFrom(Proxy.class);
+    }
+
+    public Proxy toDirty(Proxy cacheProxy) {
+        Object original = cacheProxy.entity();
+        Map<String, Object> originalValues = new HashMap<>();
+        try {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object originalValue = field.get(original);
+                originalValues.put(field.getName(), originalValue);
+            }
+
+            Proxy dirtyProxy = null;
+            dirtyProxy = new Proxy(clazz, clazz.getDeclaredConstructor().newInstance());
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object originalValue = originalValues.get(field.getName());
+                Object currentValue = field.get(object);
+
+                if (originalValue == null && currentValue != null ||
+                        originalValue != null && !originalValue.equals(currentValue)) {
+                    field.set(dirtyProxy.entity(), currentValue);
+                }
+            }
+
+            return dirtyProxy;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Class<?> entityClass() {

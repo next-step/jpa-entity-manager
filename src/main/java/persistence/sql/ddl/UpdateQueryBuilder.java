@@ -17,6 +17,10 @@ public abstract class UpdateQueryBuilder {
             String column = entry.getKey();
             String value = entry.getValue();
 
+            if (value.equals("null")) {
+                continue;
+            }
+
             if (!isNumeric(value)) {
                 value = "'" + value + "'";
             }

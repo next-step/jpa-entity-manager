@@ -52,14 +52,8 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     @Override
     public Proxy getCachedDatabaseSnapshot(EntityKey key) {
-        Proxy snapshot = entitySnapshotsByKey.get(key);
 
-        if (snapshot == null) {
-//            return NO_ROW;
-            return null;
-        }
-
-        return snapshot;
+        return entitySnapshotsByKey.get(key);
     }
 
     private void removeCache(EntityKey key) {

@@ -17,7 +17,7 @@ public class CustomJpaRepository<T, ID> {
     public T save(T t) throws IllegalAccessException {
         if (entityManager.isChanged(t)) {
             Proxy proxy = Proxy.copyObject(t);
-            entityManager.persist(proxy.entityClass(), proxy.entity());
+            entityManager.update(proxy.entityClass(), proxy);
 
             return t;
         }

@@ -12,4 +12,6 @@ public interface EntityManager {
     boolean contains(Object entity) throws IllegalAccessException;
 
     boolean isChanged(Object entity) throws IllegalAccessException;
+
+    void update(Class<?> clazz, Proxy entity) throws IllegalAccessException;
 }

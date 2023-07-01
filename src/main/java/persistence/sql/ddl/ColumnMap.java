@@ -43,7 +43,13 @@ public class ColumnMap {
 
     public String values() {
         return map.values().stream()
-                .map(value -> "'" + value + "'")
+                .map(value -> {
+                    if (value == null) {
+                        return null;
+                    }
+
+                    return "'" + value + "'";
+                })
                 .collect(Collectors.joining(","));
     }
 
