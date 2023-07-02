@@ -53,6 +53,11 @@ public class Person {
         return index;
     }
 
+    public Person changeAge(int age) {
+        this.age = age;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "Person{" +
@@ -62,5 +67,29 @@ public class Person {
                 ", email='" + email + '\'' +
                 ", index=" + index +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+
+        Person person = (Person) o;
+
+        if (getId() != null ? !getId().equals(person.getId()) : person.getId() != null) return false;
+        if (getName() != null ? !getName().equals(person.getName()) : person.getName() != null) return false;
+        if (getAge() != null ? !getAge().equals(person.getAge()) : person.getAge() != null) return false;
+        if (getEmail() != null ? !getEmail().equals(person.getEmail()) : person.getEmail() != null) return false;
+        return getIndex() != null ? getIndex().equals(person.getIndex()) : person.getIndex() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+        result = 31 * result + (getAge() != null ? getAge().hashCode() : 0);
+        result = 31 * result + (getEmail() != null ? getEmail().hashCode() : 0);
+        result = 31 * result + (getIndex() != null ? getIndex().hashCode() : 0);
+        return result;
     }
 }

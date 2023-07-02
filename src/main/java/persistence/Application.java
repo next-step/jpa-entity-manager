@@ -6,6 +6,7 @@ import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.MyEntityManager;
+import persistence.entity.MyEntityPersister;
 import persistence.entity.Person;
 
 public class Application {
@@ -18,7 +19,8 @@ public class Application {
             server.start();
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-            final MyEntityManager myEntityManager = new MyEntityManager(jdbcTemplate);
+            final MyEntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
+            final MyEntityManager myEntityManager = new MyEntityManager(entityPersister);
             myEntityManager.find(Person.class, 1L);
 
             server.stop();

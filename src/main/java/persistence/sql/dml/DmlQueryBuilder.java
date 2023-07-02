@@ -4,8 +4,11 @@ import persistence.sql.Entity;
 import persistence.sql.Id;
 import persistence.sql.QueryBuilder;
 
+import java.util.stream.Collectors;
+
 public class DmlQueryBuilder<T> extends QueryBuilder {
     private static final String INSERT_QUERY = "insert into %s (%s) values (%s)";
+    private static final String UPDATE_QUERY = "update %s set %s";
     private static final String DELETE_QUERY = "delete from %s %s";
     private static final String SELECT_CLAUSE = "select %s";
     private static final String FROM_CLAUSE = "from %s";
@@ -24,6 +27,18 @@ public class DmlQueryBuilder<T> extends QueryBuilder {
                 joinWithComma(columns.getColumnNames()),
                 joinWithComma(target.getValues())
         );
+    }
+
+    public String update(Object entity) {
+        final String tableName = getTableName();
+        final Entity target = new Entity(entity);
+        return String.format(
+                UPDATE_QUERY,
+                tableName,
+                target.valuesByField().entrySet().stream()
+                        .map(e -> e.getKey() + "=" + e.getValue())
+                        .collect(Collectors.joining(","))
+        ) + String.format(WHERE_CLAUSE, whereClause(new Id(entity)));
     }
 
     public String findAll() {
