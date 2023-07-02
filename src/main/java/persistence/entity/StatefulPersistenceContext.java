@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class StatefulPersistenceContext implements PersistenceContext {
 
     private final HashMap<EntityKey, Object> entitiesByKey;
-    private final HashMap<EntityKey, Object> entitySnapshotsByKey;
+    private final HashMap<EntityKey, Proxy> entitySnapshotsByKey;
 
     public StatefulPersistenceContext(HashMap<EntityKey, Object> entitiesByKey) {
         this.entitiesByKey = entitiesByKey;
@@ -39,7 +39,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
+    public Object getDatabaseSnapshot(Object id, Object entity) {
         EntityKey entityKey = EntityKey.of(id, entity.getClass().getSimpleName());
         Object cached = getCached(entityKey);
         if (cached != null) {
@@ -51,14 +51,9 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getCachedDatabaseSnapshot(EntityKey key) {
-        Object snapshot = getCached(key);
+    public Proxy getCachedDatabaseSnapshot(EntityKey key) {
 
-        if (snapshot == null) {
-            return NO_ROW;
-        }
-
-        return snapshot;
+        return entitySnapshotsByKey.get(key);
     }
 
     private void removeCache(EntityKey key) {
@@ -66,10 +61,15 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     private void addCache(Object entity, EntityKey key) {
-        entitySnapshotsByKey.put(key, entity);
+        try {
+            Proxy proxy = Proxy.copyObject(entity);
+            entitySnapshotsByKey.put(key, proxy);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Object getCached(EntityKey key) {
-        return entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(key);
+        return entitiesByKey.get(key);
     }
 }

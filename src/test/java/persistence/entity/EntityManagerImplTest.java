@@ -7,6 +7,7 @@ import persistence.DatabaseTest;
 import persistence.sql.ddl.h2.H2DeleteQueryBuilder;
 import persistence.sql.ddl.h2.H2InsertQueryBuilder;
 import persistence.sql.ddl.h2.H2SelectQueryBuilder;
+import persistence.sql.ddl.h2.H2UpdateQueryBuilder;
 
 import java.sql.SQLException;
 
@@ -19,7 +20,7 @@ class EntityManagerImplTest extends DatabaseTest {
     @BeforeEach
     public void beforeEach() throws SQLException {
         super.beforeEach();
-        queryBuilder = new QueryBuilder(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), new H2InsertQueryBuilder(), jdbcTemplate);
+        queryBuilder = new QueryBuilder(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), new H2InsertQueryBuilder(), new H2UpdateQueryBuilder(), jdbcTemplate);
     }
 
     @Test
