@@ -7,7 +7,9 @@ import jdbc.RowMapper;
 import jdbc.RowMapperImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.model.Person;
+import persistence.entity.BasicEntityManger;
+import persistence.entity.EntityManager;
+import model.Person;
 import persistence.sql.ddl.builder.DdlQueryBuilder;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
@@ -25,7 +27,9 @@ public class Application {
             final DatabaseServer server = new H2();
             server.start();
 
-            queryTest(server);
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+            entityMangerTest(jdbcTemplate);
+//            queryTest(jdbcTemplate);
 
             server.stop();
         } catch (Exception e) {
@@ -35,8 +39,42 @@ public class Application {
         }
     }
 
-    private static void queryTest(DatabaseServer server) throws SQLException {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+    private static void entityMangerTest(JdbcTemplate jdbcTemplate) {
+        // create
+        DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(Person.class);
+        String createQuery = ddlQueryBuilder.create();
+        jdbcTemplate.execute(createQuery);
+
+        // setup
+        Person person = new Person("yohan", 31, "yohan@test.com", 0);
+        EntityManager entityManager = new BasicEntityManger(jdbcTemplate);
+
+        // insert
+        entityManager.persist(person);
+
+        // select
+        Person selectedPerson = entityManager.find(Person.class, person.getId());
+        logger.info("추가된 조회된 유저 이름: " + selectedPerson.getName());
+
+        // update
+        person.changeName("lee");
+        entityManager.merge(person);
+
+        // select
+        Person updatedPerson = entityManager.find(Person.class, person.getId());
+        logger.info("업데이트된 유저 이름: " + updatedPerson.getName());
+
+        // delete
+        entityManager.remove(updatedPerson);
+        Person deletedPerson = entityManager.find(Person.class, person.getId());
+        logger.info("삭제 여부:" + deletedPerson);
+
+        // drop
+        String dropQuery = ddlQueryBuilder.drop();
+        jdbcTemplate.execute(dropQuery);
+    }
+
+    private static void queryTest(JdbcTemplate jdbcTemplate) throws SQLException {
         Class<Person> personClass = Person.class;
         RowMapper<Person> rowMapper = new RowMapperImpl<>(personClass);
 

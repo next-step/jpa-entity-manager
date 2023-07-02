@@ -3,19 +3,16 @@ package persistence.entity;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
-import jdbc.RowMapperImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.model.Person;
-import persistence.sql.ddl.builder.DdlQueryBuilder;
-import persistence.sql.dml.builder.InsertQueryBuilder;
-import persistence.sql.dml.builder.SelectQueryBuilder;
+import model.Person;
 
 import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
+import static fixture.TableFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityManagerTest {
@@ -30,19 +27,19 @@ class EntityManagerTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityManager = new BasicEntityManger(jdbcTemplate);
 
-        createTable(Person.class);
+        createTable(Person.class, jdbcTemplate);
     }
 
     @AfterEach
     void clear() {
-        dropTable(Person.class);
+        dropTable(Person.class, jdbcTemplate);
     }
 
     @Test
     @DisplayName("엔티티를 조회한다")
     void find() {
         // given
-        insert(createPerson());
+        insert(createPerson(), jdbcTemplate);
 
         // when
         Person result = entityManager.find(Person.class, 1L);
@@ -61,7 +58,7 @@ class EntityManagerTest {
         entityManager.persist(person);
 
         // then
-        Person result = select(Person.class, 1L);
+        Person result = select(Person.class, 1L, jdbcTemplate);
         assertThat(result).isNotNull();
     }
 
@@ -69,14 +66,14 @@ class EntityManagerTest {
     @DisplayName("엔티티를 삭제한다")
     void remove() {
         // given
-        insert(createPerson());
-        Person person = select(Person.class, 1L);
+        insert(createPerson(), jdbcTemplate);
+        Person person = select(Person.class, 1L, jdbcTemplate);
 
         // when
         entityManager.remove(person);
 
         // then
-        Person result = select(Person.class, 1L);
+        Person result = select(Person.class, 1L, jdbcTemplate);
         assertThat(result).isNull();
     }
 
@@ -94,26 +91,19 @@ class EntityManagerTest {
         assertThat(result == person).isTrue();
     }
 
-    private void createTable(Class<?> clazz) {
-        DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(clazz);
-        String createQuery = ddlQueryBuilder.create();
-        jdbcTemplate.execute(createQuery);
-    }
+    @Test
+    @DisplayName("원본 엔티티와 비교하여 변경사항이 있을 경우 엔티티를 업데이트한다")
+    void merge() {
+        // given
+        Person person = createPerson();
+        entityManager.persist(person);
 
-    private void dropTable(Class<?> clazz) {
-        DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(clazz);
-        String dropQuery = ddlQueryBuilder.drop();
-        jdbcTemplate.execute(dropQuery);
-    }
+        // when
+        person.changeName("lee");
+        entityManager.merge(person);
 
-    private void insert(Object object) {
-        String insertQuery = InsertQueryBuilder.INSTANCE.insert(object);
-        jdbcTemplate.execute(insertQuery);
-    }
-
-    private <T> T select(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
-        String findByIdQuery = selectQueryBuilder.findById(clazz, id);
-        return jdbcTemplate.queryForObject(findByIdQuery, new RowMapperImpl<>(clazz));
+        // then
+        Person selectedPerson = entityManager.find(Person.class, person.getId());
+        assertThat(selectedPerson.getName()).isEqualTo("lee");
     }
 }

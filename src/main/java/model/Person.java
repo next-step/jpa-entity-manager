@@ -1,4 +1,4 @@
-package persistence.model;
+package model;
 
 import jakarta.persistence.*;
 
@@ -28,6 +28,11 @@ public class Person {
     }
 
     public Person(String name, Integer age, String email, Integer index) {
+        this(null, name, age, email, index);
+    }
+
+    public Person(Long id, String name, Integer age, String email, Integer index) {
+        this.id = id;
         this.name = name;
         this.age = age;
         this.email = email;
@@ -52,6 +57,10 @@ public class Person {
 
     public Integer getIndex() {
         return index;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
     }
 
     @Override
