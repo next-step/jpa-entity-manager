@@ -42,6 +42,10 @@ public class Person {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public Person setName(String name) {
         this.name = name;
         return this;

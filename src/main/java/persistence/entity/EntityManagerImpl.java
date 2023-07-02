@@ -36,6 +36,10 @@ public class EntityManagerImpl implements EntityManager {
                 : dml.getInsertQuery(entity);
         jdbcTemplate.execute(query);
         context.addEntity(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity),
+                EntityHelper.clone(entity)
+        );
     }
 
     @Override
@@ -51,7 +55,28 @@ public class EntityManagerImpl implements EntityManager {
         context.removeEntity(entity);
     }
 
-    public <T> Optional<T> findFromDB(EntityKey<T> key) {
+    @Override
+    public void merge(Object entity) {
+        persist(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
+        );
+    }
+
+    @Override
+    public void detach(Object entity) {
+        context.removeEntity(entity);
+    }
+
+    @Override
+    public boolean isDirty(Object entity) {
+        return !hasEntity(entity) || !EntityHelper.equals(
+                entity,
+                context.getCachedDatabaseSnapshot(new EntityKey<>(entity))
+        );
+    }
+
+    private <T> Optional<T> findFromDB(EntityKey<T> key) {
         Class<T> clazz = key.getEntityClass();
         List<T> entities = jdbcTemplate.query(
                 dml.getFindByIdQuery(clazz, key.getEntityId()),
@@ -60,9 +85,11 @@ public class EntityManagerImpl implements EntityManager {
         if (entities.isEmpty()) {
             return Optional.empty();
         }
-        Object entity = entities.get(0);
+        T entity = entities.get(0);
         context.addEntity(entity);
-        return Optional.of((T) entity);
+        return Optional.of(context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
+        ));
     }
 
     private boolean hasEntity(Object entity) {
