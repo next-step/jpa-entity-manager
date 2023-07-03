@@ -17,6 +17,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void addEntity(Long id, Object entity) {
         entitiesByKey.put(id, entity);
+        entitySnapshotsByKey.put(id, createSnapshot(entity));
     }
 
     @Override

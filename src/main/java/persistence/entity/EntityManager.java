@@ -7,4 +7,8 @@ public interface EntityManager {
     void persist(Object entity);
 
     void remove(Object entity);
+
+    boolean isNew(Object entity);
+
+    <T> T merge(T entity);
 }

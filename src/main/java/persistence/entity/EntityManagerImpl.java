@@ -3,10 +3,12 @@ package persistence.entity;
 import jakarta.persistence.Id;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
+import persistence.sql.ddl.Person;
 import persistence.sql.ddl.exception.NoIdentifierException;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -47,6 +49,7 @@ public class EntityManagerImpl implements EntityManager {
         Long id = jdbcTemplate.executeAndGetGeneratedKey(query);
         setGeneratedKey(entity, id);
         persistenceContext.addEntity(id, entity);
+        persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
     private void setGeneratedKey(Object entity, Long id) {
@@ -83,5 +86,19 @@ public class EntityManagerImpl implements EntityManager {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean isNew(Object entity) {
+        return findPrimaryKey(entity) == null;
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        Long id = findPrimaryKey(entity);
+        UpdateQueryBuilder builder = new UpdateQueryBuilder(Person.class);
+        jdbcTemplate.execute(builder.build(id, entity));
+        persistenceContext.addEntity(id, entity);
+        return entity;
     }
 }
