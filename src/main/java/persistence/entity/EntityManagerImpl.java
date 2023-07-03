@@ -44,24 +44,16 @@ public class EntityManagerImpl implements EntityManager {
     public void persist(Object entity) {
         InsertQueryBuilder builder = new InsertQueryBuilder(entity.getClass());
         String query = builder.build(entity);
-        jdbcTemplate.execute(query);
-        addEntityToPersistenceContext(entity);
+        Long id = jdbcTemplate.executeAndGetGeneratedKey(query);
+        setGeneratedKey(entity, id);
+        persistenceContext.addEntity(id, entity);
     }
 
-    private void addEntityToPersistenceContext(Object entity) {
-        Class<?> entityClass = entity.getClass();
-        SelectQueryBuilder builder = new SelectQueryBuilder(entityClass);
-        String query = builder.buildFindLastQuery();
-        Object entityWithId = jdbcTemplate.queryForObject(query, new EntityRowMapper<>(entityClass));
-        Long id = findPrimaryKey(entityWithId);
-        persistenceContext.addEntity(id, entityWithId);
-    }
-
-    private Long findPrimaryKey(Object entity) {
+    private void setGeneratedKey(Object entity, Long id) {
         try {
             Field idField = getIdField(entity.getClass());
             idField.setAccessible(true);
-            return (Long) idField.get(entity);
+            idField.set(entity, id);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -81,5 +73,15 @@ public class EntityManagerImpl implements EntityManager {
         String query = builder.buildDeleteByIdQuery(id);
         jdbcTemplate.execute(query);
         persistenceContext.removeEntity(id);
+    }
+
+    private Long findPrimaryKey(Object entity) {
+        try {
+            Field idField = getIdField(entity.getClass());
+            idField.setAccessible(true);
+            return (Long) idField.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
