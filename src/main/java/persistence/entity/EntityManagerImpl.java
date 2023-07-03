@@ -35,7 +35,7 @@ public class EntityManagerImpl implements EntityManager {
         SelectQueryBuilder builder = new SelectQueryBuilder(clazz);
         String query = builder.buildFindByIdQuery(id);
         T foundEntity = jdbcTemplate.queryForObject(query, new EntityRowMapper<>(clazz));
-        persistenceContext.addEntity(findPrimaryKey(foundEntity), foundEntity);
+        persistenceContext.addEntity(id, foundEntity);
 
         return foundEntity;
     }
