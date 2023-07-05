@@ -3,10 +3,12 @@ package persistence.entity;
 import jakarta.persistence.Id;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
+import persistence.sql.ddl.Person;
 import persistence.sql.ddl.exception.NoIdentifierException;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -34,31 +36,27 @@ public class EntityManagerImpl implements EntityManager {
 
         SelectQueryBuilder builder = new SelectQueryBuilder(clazz);
         String query = builder.buildFindByIdQuery(id);
-        return jdbcTemplate.queryForObject(query, new EntityRowMapper<>(clazz));
+        T foundEntity = jdbcTemplate.queryForObject(query, new EntityRowMapper<>(clazz));
+        persistenceContext.addEntity(id, foundEntity);
+
+        return foundEntity;
     }
 
     @Override
     public void persist(Object entity) {
         InsertQueryBuilder builder = new InsertQueryBuilder(entity.getClass());
         String query = builder.build(entity);
-        jdbcTemplate.execute(query);
-        addEntityToPersistenceContext(entity);
+        Long id = jdbcTemplate.executeAndGetGeneratedKey(query);
+        setGeneratedKey(entity, id);
+        persistenceContext.addEntity(id, entity);
+        persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
-    private void addEntityToPersistenceContext(Object entity) {
-        Class<?> entityClass = entity.getClass();
-        SelectQueryBuilder builder = new SelectQueryBuilder(entityClass);
-        String query = builder.buildFindLastQuery();
-        Object entityWithId = jdbcTemplate.queryForObject(query, new EntityRowMapper<>(entityClass));
-        Long id = findPrimaryKey(entityWithId);
-        persistenceContext.addEntity(id, entityWithId);
-    }
-
-    private Long findPrimaryKey(Object entity) {
+    private void setGeneratedKey(Object entity, Long id) {
         try {
             Field idField = getIdField(entity.getClass());
             idField.setAccessible(true);
-            return (Long) idField.get(entity);
+            idField.set(entity, id);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -78,5 +76,29 @@ public class EntityManagerImpl implements EntityManager {
         String query = builder.buildDeleteByIdQuery(id);
         jdbcTemplate.execute(query);
         persistenceContext.removeEntity(id);
+    }
+
+    private Long findPrimaryKey(Object entity) {
+        try {
+            Field idField = getIdField(entity.getClass());
+            idField.setAccessible(true);
+            return (Long) idField.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isNew(Object entity) {
+        return findPrimaryKey(entity) == null;
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        Long id = findPrimaryKey(entity);
+        UpdateQueryBuilder builder = new UpdateQueryBuilder(Person.class);
+        jdbcTemplate.execute(builder.build(id, entity));
+        persistenceContext.addEntity(id, entity);
+        return entity;
     }
 }
