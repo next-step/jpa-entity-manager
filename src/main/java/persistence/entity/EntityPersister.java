@@ -3,25 +3,18 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
 
-import java.util.HashMap;
-import java.util.Map;
+import static persistence.entity.EntityQueryType.*;
 
 public class EntityPersister {
 
     private final JdbcTemplate jdbcTemplate;
     private final DmlGenerator dmlGenerator;
-    private final Map<Object, String> insertQueryCache;
-    private final Map<Object, String> updateQueryCache;
-    private final Map<Object, String> deleteQueryCache;
-    private final Map<Long, String> selectQueryCache;
+    private final EntityQueryCache<Object> queryCache;
 
     public EntityPersister(final JdbcTemplate jdbcTemplate, final DmlGenerator dmlGenerator) {
         this.jdbcTemplate = jdbcTemplate;
         this.dmlGenerator = dmlGenerator;
-        this.insertQueryCache = new HashMap<>();
-        this.updateQueryCache = new HashMap<>();
-        this.deleteQueryCache = new HashMap<>();
-        this.selectQueryCache = new HashMap<>();
+        this.queryCache = new EntityQueryCache<>();
     }
 
     public void insert(final Object entity) {
@@ -40,19 +33,19 @@ public class EntityPersister {
     }
 
     public String renderSelect(final Class<?> clazz, final Long id) {
-        return selectQueryCache.computeIfAbsent(id, object -> dmlGenerator.findById(clazz, id));
+        return queryCache.computeIfAbsent(SELECT, id, object -> dmlGenerator.findById(clazz, id));
     }
 
     public String renderInsert(final Object entity) {
-        return insertQueryCache.computeIfAbsent(entity, object -> dmlGenerator.insert(entity));
+        return queryCache.computeIfAbsent(INSERT, entity, object -> dmlGenerator.insert(entity));
     }
 
     public String renderUpdate(final Object entity) {
-        return updateQueryCache.computeIfAbsent(entity, object -> dmlGenerator.update(entity));
+        return queryCache.computeIfAbsent(UPDATE, entity, object -> dmlGenerator.update(entity));
     }
 
     public String renderDelete(final Object entity) {
-        return deleteQueryCache.computeIfAbsent(entity, object -> dmlGenerator.delete(entity));
+        return queryCache.computeIfAbsent(DELETE, entity, object -> dmlGenerator.delete(entity));
     }
 
 }
