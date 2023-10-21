@@ -30,4 +30,4 @@ public void delete(parameters는 자유롭게)
 
 `EntityManager 의 구현체에서 쿼리 생성 및 데이터 매핑 에 대한 책임을 EntityPersister 로 옮겨주자`
 
-- [ ] 기존 SimpleEntityManager 가 하던 find, persist, remove 로직을 EntityPersister 에게 위임한다.
+- [x] 기존 SimpleEntityManager 가 하던 find, persist, remove 로직을 EntityPersister 에게 위임한다.
