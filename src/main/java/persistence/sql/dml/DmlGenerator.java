@@ -54,6 +54,18 @@ public class DmlGenerator {
                 .build();
     }
 
+    public String update(final Object entity) {
+        final EntityMetadata<?> entityMetadata = entityMetadataProvider.getEntityMetadata(entity.getClass());
+        final List<String> columnNames = entityMetadata.getInsertableColumnNames();
+        final List<Object> values = ReflectionUtils.getFieldValues(entity, entityMetadata.getInsertableColumnFieldNames());
+        final Object idValue = ReflectionUtils.getFieldValue(entity, entityMetadata.getIdColumnFieldName());
+        return UpdateQueryBuilder.builder()
+                .table(entityMetadata.getTableName())
+                .addData(columnNames, convertToStrings(values))
+                .where(entityMetadata.getIdColumnName(), convertToString(idValue))
+                .build();
+    }
+
     private String convertToString(final Object object) {
         return object instanceof String ?
                 addSingleQuote(object) : String.valueOf(object);
@@ -68,5 +80,4 @@ public class DmlGenerator {
     private String addSingleQuote(final Object value) {
         return "'" + value + "'";
     }
-
 }

@@ -51,4 +51,11 @@ class DmlGeneratorTest {
         assertThat(query).isEqualToIgnoringCase("delete from users where id=1");
     }
 
+    @Test
+    @DisplayName("Person 클래스 정보로 delete ddl 을 생성할 수 있다.")
+    void generateUpdateDmlTest() {
+        final String query = generator.update(person);
+        assertThat(query).isEqualToIgnoringCase("update users set nick_name='min', old=30, email='jongmin4943@gmail.com' where id=1");
+    }
+
 }
