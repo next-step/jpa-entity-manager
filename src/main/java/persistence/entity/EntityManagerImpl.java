@@ -12,10 +12,12 @@ import java.util.List;
 public abstract class EntityManagerImpl<T> implements EntityManager<T> {
     private final RowMapper<T> rowMapper;
     private JdbcTemplate jdbcTemplate;
+    private Class<T> tClass;
 
     public EntityManagerImpl(Connection connection, Class<T> tClass) {
         this.rowMapper = new ResultMapper<>(tClass);
         this.jdbcTemplate = new JdbcTemplate(connection);
+        this.tClass = tClass;
     }
 
     @Override
@@ -27,17 +29,10 @@ public abstract class EntityManagerImpl<T> implements EntityManager<T> {
     }
 
     @Override
-    public <R> T findById(R r) {
-        String query = SelectQuery.create(rowMapper.getClass(), new Object() {
-        }.getClass().getEnclosingMethod().getName());
+    public <R> T find(R r) {
+        String query = SelectQuery.create(tClass, "findById", r);
 
         return jdbcTemplate.queryForObject(query, rowMapper);
-    }
-
-    @Override
-    public <T> T find(Class<T> clazz, Long Id) {
-        String query = SelectQuery.create(clazz, "findById", Id);
-        return (T) jdbcTemplate.queryForObject(query, rowMapper);
     }
 
     @Override

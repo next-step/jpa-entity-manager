@@ -60,7 +60,7 @@ class EntityManagerImplTest {
             데이터를_저장함(request);
 
             //when
-            SelectPerson result = entityManager.find(selectPerson, 3L);
+            SelectPerson result = entityManager.find(3L);
 
             //then
             assertSoftly(softAssertions -> {
@@ -75,7 +75,7 @@ class EntityManagerImplTest {
         @DisplayName("없는 ID 조회 시도시 오류")
         void notFound() {
             //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.find(selectPerson, -1L));
+            assertThrows(RuntimeException.class, () -> entityManager.find(-1L));
         }
     }
 
