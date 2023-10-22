@@ -5,14 +5,14 @@ import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-class Value {
+public class Value {
     private final Object value;
 
     private Value(Object object) {
         this.value = object;
     }
 
-    protected static <T> Value[] of(T t) {
+    public static <T> Value[] of(T t) {
         Field[] fields = t.getClass().getDeclaredFields();
         return Arrays.stream(fields)
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
