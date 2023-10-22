@@ -36,6 +36,7 @@ public class EntityColumn {
         }
         return column.name();
     }
+
     private ColumnType initColumType(Field field) {
         JDBCType jdbcType = convert(field.getType());
         if (jdbcType != JDBCType.VARCHAR) {
@@ -47,7 +48,7 @@ public class EntityColumn {
     private ColumnType createVarcharType(Field field) {
         final Column column = field.getAnnotation(Column.class);
         if (column != null && column.length() < VARCHAR_MIN_LENGTH) {
-            throw new NumberRangeException("길이는 1보다 작을 수 없습니다.");
+            throw new NumberRangeException("길이는 " + VARCHAR_MIN_LENGTH + "보다 작을 수 없습니다.");
         }
         if (column == null) {
             length = DEFAULT_VARCHAR_LENGTH;
@@ -63,7 +64,7 @@ public class EntityColumn {
             final Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field.get(object);
-        } catch (NoSuchFieldException | IllegalAccessException e ) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new NotFoundException("해당 필드를 찾을 수 없습니다.");
         }
     }
