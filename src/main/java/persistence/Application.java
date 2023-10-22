@@ -2,10 +2,9 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
-import jdbc.BaseJdbcTemplate;
+import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.JdbcTemplate;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -16,7 +15,7 @@ public class Application {
             final DatabaseServer server = new H2();
             server.start();
 
-            final JdbcTemplate jdbcTemplate = new BaseJdbcTemplate(server.getConnection());
+            final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
             server.stop();
         } catch (Exception e) {

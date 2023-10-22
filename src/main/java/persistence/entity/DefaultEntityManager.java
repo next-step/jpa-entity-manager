@@ -2,6 +2,7 @@ package persistence.entity;
 
 
 import java.util.List;
+import jdbc.JdbcTemplate;
 import persistence.exception.NotFoundException;
 import persistence.mapper.RowMapper;
 import persistence.meta.EntityMeta;
