@@ -45,7 +45,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder<Person> select = QueryGenerator.from(Person.class).select();
 
         //when & then
-        assertThatExceptionOfType(FieldEmptyException.class)
+        assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> select.findById(null));
     }
 

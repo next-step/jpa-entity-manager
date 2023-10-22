@@ -12,12 +12,11 @@ import database.H2;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Stream;
-import jdbc.BaseJdbcTemplate;
+import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
-import persistence.entity.JdbcTemplate;
 import persistence.testFixtures.Person;
 
 
@@ -31,7 +30,7 @@ public class RepositoryTest {
     static void setUp() throws SQLException {
         final DatabaseServer server = new H2();
         server.start();
-        jdbcTemplate = new BaseJdbcTemplate(server.getConnection());
+        jdbcTemplate = new JdbcTemplate(server.getConnection());
     }
 
 

@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import persistence.exception.NotFoundException;
-import persistence.exception.QueryException;
 import persistence.mapper.RowMapper;
 import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
@@ -67,7 +66,7 @@ public class EntityPersister<T> {
         try {
             return getTypeValue(resultSet, column);
         } catch (SQLException e) {
-            throw new QueryException(e);
+            throw new RuntimeException(e);
         }
     }
 

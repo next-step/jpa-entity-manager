@@ -18,7 +18,7 @@ public class SelectQueryBuilder<T> extends DMLQueryBuilder<T> {
 
     public String findById(Object id) {
         if (id == null) {
-            throw new FieldEmptyException("id가 비어 있으면 안 됩니다.");
+            throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
         }
 
         return select(columns(entityMeta))
