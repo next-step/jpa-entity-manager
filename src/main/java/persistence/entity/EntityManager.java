@@ -3,7 +3,7 @@ package persistence.entity;
 import java.util.List;
 
 public interface EntityManager {
-    Object persist(Object entity);
+    <T> T persist(T entity);
 
     void remove(Object entity);
 
