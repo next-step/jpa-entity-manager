@@ -21,4 +21,8 @@ public class QueryDml {
     public static <T> String delete(T t) {
         return DeleteQuery.create(t);
     }
+
+    public static <T> String update(T t, Object arg) {
+        return UpdateQuery.create(t, arg);
+    }
 }

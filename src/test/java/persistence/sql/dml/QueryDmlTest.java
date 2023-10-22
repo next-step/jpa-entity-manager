@@ -193,6 +193,52 @@ class QueryDmlTest {
         }
     }
 
+    @Nested
+    @DisplayName("update 쿼리 실행 확인")
+    class update {
+        Class<SelectPerson> selectPersonClass = SelectPerson.class;
+
+        @BeforeEach
+        void init() {
+            createTable(selectPersonClass);
+        }
+
+        @Test
+        @DisplayName("update쿼리 실행으로 값이 변경 되었는지 확인")
+        void success() {
+            //given
+            final Long id = 88L;
+
+            final String actualName = "zz";
+            final int actualAge = 30;
+            final String actualEmail = "xx";
+            final SelectPerson actual = new SelectPerson(id, actualName, actualAge, actualEmail, 3);
+            insert(actual);
+
+            final String name = "홍길동";
+            final SelectPerson expected = new SelectPerson(id, name, actualAge, actualEmail, 3);
+
+            //when
+            String query = QueryDml.update(expected, id);
+            jdbcTemplate.execute(query);
+
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(SelectPerson.class, "findAll"), new ResultMapper<>(SelectPerson.class));
+
+            //then
+            assertSoftly(softAssertions -> {
+                softAssertions.assertThat(actual.getId()).isEqualTo(result.getId());
+                softAssertions.assertThat(actual.getName()).isNotEqualTo(result.getName());
+                softAssertions.assertThat(actual.getAge()).isEqualTo(result.getAge());
+                softAssertions.assertThat(actual.getEmail()).isEqualTo(result.getEmail());
+            });
+        }
+
+        @AfterEach
+        void after() {
+            dropTable(selectPersonClass);
+        }
+    }
+
     private <T> String getSelectQuery(Class<T> tClass, String methodName) {
         return QueryDml.select(tClass, methodName);
     }

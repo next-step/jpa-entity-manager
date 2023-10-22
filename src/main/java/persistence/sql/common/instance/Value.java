@@ -1,6 +1,7 @@
 package persistence.sql.common.instance;
 
 import jakarta.persistence.Transient;
+import utils.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -20,7 +21,10 @@ public class Value {
                 .toArray(Value[]::new);
     }
 
-    private static <T> Object extractValue(T t, Field field) {
+    /**
+     * 해당 필드의 값을 추출합니다.
+     */
+    public static <T> Object extractValue(T t, Field field) {
         try {
             Field fi = t.getClass().getDeclaredField(field.getName());
 
@@ -32,30 +36,11 @@ public class Value {
         }
     }
 
-    /**
-     * value가 문자열인 경우 콜론과 함께 반환합니다.
-     * 예) 'apple', '1'
-     */
-    private String parseChar() {
-        String v = value.toString();
-        String type = value.getClass().getSimpleName();
-
-        if(!value.toString().matches("[-+]?\\d*\\.?\\d+")) {
-            v = String.format("'%s'", value);
-        }
-
-        if(type.equals("String") || type.equals("char") || type.equals("Character")) {
-            v = String.format("'%s'", value);
-        }
-
-        return v;
-    }
-
     public String getValue() {
-        if(value == null) {
+        if (value == null) {
             return null;
         }
 
-        return parseChar();
+        return StringUtils.parseChar(value);
     }
 }
