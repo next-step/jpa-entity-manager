@@ -1,4 +1,4 @@
-package persistence.sql.ddl;
+package persistence.sql;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
