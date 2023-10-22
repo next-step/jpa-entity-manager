@@ -5,16 +5,17 @@ import java.util.List;
 import persistence.sql.common.meta.EntityMeta;
 import utils.ConditionUtils;
 
-public class SelectQuery extends EntityMeta {
+public class SelectQuery {
 
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
     private static final String CONDITION_AND = " AND ";
 
+    private EntityMeta entityMeta;
     private final String methodName;
     private final Object[] args;
 
     public <T> SelectQuery(Class<T> tClass, String methodName, Object[] args) {
-        super(tClass);
+        this.entityMeta = EntityMeta.of(tClass);
         this.methodName = methodName;
         this.args = args;
     }
@@ -38,11 +39,11 @@ public class SelectQuery extends EntityMeta {
     }
 
     private String parseFiled() {
-        return String.format(DEFAULT_SELECT_COLUMN_QUERY, parseSelectFiled(), getTableName());
+        return String.format(DEFAULT_SELECT_COLUMN_QUERY, parseSelectFiled(), entityMeta.getTableName());
     }
 
     private String parseSelectFiled() {
-        return getColumnsWithComma();
+        return entityMeta.getColumnsWithComma();
     }
 
     private String parseWhere() {
@@ -50,8 +51,8 @@ public class SelectQuery extends EntityMeta {
         String conditionText = methodName.replace("find", "").replace("By", "");
         List<String> conditionList = ConditionUtils.getWordsFromCamelCase(conditionText);
 
-        String condtion = ConditionBuilder.getCondition(conditionList, args);
-        return condtion.replace(" id ", " " + setConditionField("id") + " ");
+        String condition = ConditionBuilder.getCondition(conditionList, args);
+        return condition.replace(" id ", " " + setConditionField("id") + " ");
     }
 
     private boolean isCondition(String methodName) {
@@ -60,7 +61,7 @@ public class SelectQuery extends EntityMeta {
 
     private String setConditionField(String word) {
         if(word.equals("id")) {
-            word = getIdName();
+            word = entityMeta.getIdName();
         }
         return word;
     }
