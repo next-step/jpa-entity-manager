@@ -13,29 +13,25 @@ public class DefaultEntityManager implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
     private final EntityMeta entityMeta;
     private final EntityMapper entityMapper;
+    private final EntityPersister entityPersister;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityMeta = entityMeta;
         this.entityMapper = new EntityMapper(entityMeta);
+        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta);
     }
 
 
     @Override
     public <T> T persist(T entity) {
-        final EntityPersister<T> entityPersister = (EntityPersister<T>) new EntityPersister<>(jdbcTemplate, entity.getClass());
-
         entityPersister.insert(entity);
-
         return entity;
     }
 
-
     @Override
     public void remove(Object entity) {
-        final String query = QueryGenerator.from(entityMeta).delete(entityMeta.getPkValue(entity));
-
-        jdbcTemplate.execute(query);
+        entityPersister.delete(entity);
     }
 
     @Override
