@@ -11,10 +11,15 @@ import java.util.stream.Collectors;
 
 public class InsertQueryBuilder {
 
+    public static final InsertQueryBuilder INSTANCE = new InsertQueryBuilder();
+
     private static final String INSERT_QUERY = "insert into %s (%s) values (%s);";
 
     private static final String INSERT_COLUMN_QUERY_DELIMITER = ", ";
     private static final String INSERT_COLUMN_STRING_VALUE_FORMAT = "'%s'";
+
+    private InsertQueryBuilder() {
+    }
 
     public String generateQuery(final EntityClass<?> entityClass, final Object entity) {
         Map<EntityColumn, Object> fieldValues = entityClass.getFieldValues(entity);

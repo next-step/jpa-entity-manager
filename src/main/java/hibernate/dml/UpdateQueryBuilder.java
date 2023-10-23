@@ -9,13 +9,15 @@ import java.util.stream.Collectors;
 
 public class UpdateQueryBuilder {
 
+    public static UpdateQueryBuilder INSTANCE = new UpdateQueryBuilder();
+
     private static final String UPDATE_QUERY = "update %s set %s where %s = %s;";
 
     private static final String UPDATE_SET_QUERY_FORMAT = "%s = %s";
     private static final String UPDATE_SET_QUERY_VALUE_FORMAT = "'%s'";
     private static final String UPDATE_SET_QUERY_DELIMITER = ", ";
 
-    public UpdateQueryBuilder() {
+    private UpdateQueryBuilder() {
     }
 
     public String generateQuery(final EntityClass<?> entityClass, Object entity) {

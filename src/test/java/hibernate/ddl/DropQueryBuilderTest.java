@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DropQueryBuilderTest {
 
-    private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder();
+    private final DropQueryBuilder dropQueryBuilder = DropQueryBuilder.INSTANCE;
 
     @Test
     void drop쿼리를_생성한다() {

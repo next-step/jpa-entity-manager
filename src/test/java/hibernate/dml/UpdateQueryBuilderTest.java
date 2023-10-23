@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UpdateQueryBuilderTest {
 
-    private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+    private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
 
     @Test
     void update쿼리를_생성한다() {

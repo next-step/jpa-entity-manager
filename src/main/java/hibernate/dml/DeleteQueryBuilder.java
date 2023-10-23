@@ -4,9 +4,11 @@ import hibernate.entity.EntityClass;
 
 public class DeleteQueryBuilder {
 
+    public static final DeleteQueryBuilder INSTANCE = new DeleteQueryBuilder();
+
     private static final String DELETE_QUERY = "delete from %s where %s = %s;";
 
-    public DeleteQueryBuilder() {
+    private DeleteQueryBuilder() {
     }
 
     public String generateQuery(final EntityClass<?> entityClass, final Object entity) {

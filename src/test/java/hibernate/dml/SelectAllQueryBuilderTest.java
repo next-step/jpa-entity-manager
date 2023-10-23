@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SelectAllQueryBuilderTest {
 
-    private final SelectAllQueryBuilder selectAllQueryBuilder = new SelectAllQueryBuilder();
+    private final SelectAllQueryBuilder selectAllQueryBuilder = SelectAllQueryBuilder.INSTANCE;
 
     @Test
     void select_all쿼리를_생성한다() {

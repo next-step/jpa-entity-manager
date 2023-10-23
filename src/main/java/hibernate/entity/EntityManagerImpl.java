@@ -8,7 +8,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
     private final EntityPersisters entityPersisters;
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+    private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
     public EntityManagerImpl(final JdbcTemplate jdbcTemplate, EntityPersisters entityPersisters) {
         this.jdbcTemplate = jdbcTemplate;

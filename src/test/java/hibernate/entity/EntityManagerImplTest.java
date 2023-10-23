@@ -27,7 +27,7 @@ class EntityManagerImplTest {
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
     private static EntityManagerImpl entityManager;
-    private static final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder();
+    private static final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
     @BeforeAll
     static void beforeAll() throws SQLException {
@@ -35,13 +35,7 @@ class EntityManagerImplTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityManager = new EntityManagerImpl(jdbcTemplate,
-                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(
-                        TestEntity.class,
-                        jdbcTemplate,
-                        new InsertQueryBuilder(),
-                        new DeleteQueryBuilder(),
-                        new UpdateQueryBuilder()
-                        ))));
+                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(TestEntity.class, jdbcTemplate))));
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class)));
     }

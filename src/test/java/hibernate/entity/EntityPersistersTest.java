@@ -1,8 +1,5 @@
 package hibernate.entity;
 
-import hibernate.dml.DeleteQueryBuilder;
-import hibernate.dml.InsertQueryBuilder;
-import hibernate.dml.UpdateQueryBuilder;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 
@@ -13,13 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityPersistersTest {
 
-    private final EntityPersister<TestEntity> entityPersister = new EntityPersister<>(
-            TestEntity.class,
-            null,
-            new InsertQueryBuilder(),
-            new DeleteQueryBuilder(),
-            new UpdateQueryBuilder()
-    );
+    private final EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, null);
     private final EntityPersisters entityPersisters = new EntityPersisters(Map.of(TestEntity.class, entityPersister));
 
     @Test

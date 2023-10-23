@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SelectQueryBuilderTest {
 
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+    private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
     @Test
     void select쿼리를_생성한다() {

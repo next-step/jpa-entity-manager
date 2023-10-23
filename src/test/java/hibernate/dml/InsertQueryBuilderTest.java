@@ -4,11 +4,12 @@ import hibernate.entity.EntityClass;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 
+import static hibernate.dml.InsertQueryBuilder.INSTANCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InsertQueryBuilderTest {
 
-    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+    private final InsertQueryBuilder insertQueryBuilder = INSTANCE;
 
     @Test
     void insert쿼리를_생성한다() {

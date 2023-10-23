@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DeleteQueryBuilderTest {
 
-    private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+    private final DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
 
     @Test
     void delete쿼리를_생성한다() {
