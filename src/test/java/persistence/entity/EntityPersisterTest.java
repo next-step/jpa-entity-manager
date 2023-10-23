@@ -48,6 +48,16 @@ class EntityPersisterTest {
         assertThat(entityPersister.update(person)).isTrue();
     }
 
+    @Test
+    @DisplayName("엔티티가 삭제 된다.")
+    void entityDelete() {
+        EntityPersister<Person> entityPersister = new EntityPersister<>(jdbcTemplate, Person.class);
+
+        Assertions.assertDoesNotThrow(() -> {
+            entityPersister.delete(1);
+        });
+    }
+
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(QueryGenerator.from(Person.class).drop());

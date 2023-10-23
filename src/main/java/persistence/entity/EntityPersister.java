@@ -26,4 +26,9 @@ public class EntityPersister<T> {
         return true;
     }
 
+    public void delete(Object id) {
+        final String query = QueryGenerator.from(entityMeta).delete(id);
+        jdbcTemplate.execute(query);
+    }
+
 }
