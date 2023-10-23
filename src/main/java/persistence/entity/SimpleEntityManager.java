@@ -6,7 +6,6 @@ import persistence.core.EntityMetadata;
 import persistence.core.EntityMetadataProvider;
 import persistence.core.PersistenceEnvironment;
 import persistence.exception.PersistenceException;
-import persistence.sql.dml.DmlGenerator;
 import persistence.util.ReflectionUtils;
 
 import java.sql.Connection;
@@ -16,22 +15,22 @@ import java.util.List;
 public class SimpleEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
-    private final DmlGenerator dmlGenerator;
     private final Connection connection;
     private boolean closed;
-
+    private final EntityPersisterProvider entityPersisterProvider;
 
     public SimpleEntityManager(final PersistenceEnvironment persistenceEnvironment) {
         this.connection = persistenceEnvironment.getConnection();
         this.jdbcTemplate = new JdbcTemplate(connection);
         this.closed = false;
-        this.dmlGenerator = persistenceEnvironment.getDmlGenerator();
+        this.entityPersisterProvider = new EntityPersisterProvider(jdbcTemplate, persistenceEnvironment.getDmlGenerator());
     }
 
     @Override
-    public <T> T find(final Class<T> clazz, final Long Id) {
+    public <T> T find(final Class<T> clazz, final Long id) {
         checkConnectionOpen();
-        final String query = dmlGenerator.findById(clazz, Id);
+        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(clazz);
+        final String query = entityPersister.renderSelect(id);
         return jdbcTemplate.queryForObject(query, getObjectRowMapper(clazz));
     }
 
@@ -55,15 +54,15 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public void persist(final Object entity) {
         checkConnectionOpen();
-        final String insert = dmlGenerator.insert(entity);
-        jdbcTemplate.execute(insert);
+        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(final Object entity) {
         checkConnectionOpen();
-        final String delete = dmlGenerator.delete(entity);
-        jdbcTemplate.execute(delete);
+        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+        entityPersister.delete(entity);
     }
 
     @Override
@@ -78,7 +77,7 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private void checkConnectionOpen() {
-        if(this.closed) {
+        if (this.closed) {
             throw new PersistenceException("DB와의 커넥션이 끊어졌습니다.");
         }
     }

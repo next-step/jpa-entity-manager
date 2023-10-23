@@ -1,56 +1,52 @@
 package persistence.sql.dml;
 
-import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.dialect.Dialect;
-import persistence.util.ReflectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class DmlGenerator {
 
-    private final EntityMetadataProvider entityMetadataProvider;
     private final Dialect dialect;
 
     public DmlGenerator(final Dialect dialect) {
-        this.entityMetadataProvider = EntityMetadataProvider.getInstance();
         this.dialect = dialect;
     }
 
-    public String insert(final Object entity) {
-        final EntityMetadata<?> entityMetadata = entityMetadataProvider.getEntityMetadata(entity.getClass());
-        final List<String> columnNames = entityMetadata.getInsertableColumnNames();
-        final List<Object> values = ReflectionUtils.getFieldValues(entity, entityMetadata.getInsertableColumnFieldNames());
+    public String insert(final String tableName, final List<String> columnNames, final List<Object> values) {
         return InsertQueryBuilder.builder()
-                .table(entityMetadata.getTableName())
+                .table(tableName)
                 .addData(columnNames, convertToStrings(values))
                 .build();
     }
 
-    public String findAll(final Class<?> clazz) {
-        final EntityMetadata<?> entityMetadata = entityMetadataProvider.getEntityMetadata(clazz);
+    public String findAll(final String tableName, final List<String> columnNames) {
         return new SelectQueryBuilder(dialect)
-                .table(entityMetadata.getTableName())
-                .column(entityMetadata.getColumnNames())
+                .table(tableName)
+                .column(columnNames)
                 .build();
     }
 
-    public String findById(final Class<?> clazz, final Object id) {
-        final EntityMetadata<?> entityMetadata = entityMetadataProvider.getEntityMetadata(clazz);
+    public String findById(final String tableName, final List<String> columnNames, final String idColumnName, final Object id) {
         return new SelectQueryBuilder(dialect)
-                .table(entityMetadata.getTableName())
-                .column(entityMetadata.getColumnNames())
-                .where(entityMetadata.getIdColumnName(), String.valueOf(id))
+                .table(tableName)
+                .column(columnNames)
+                .where(idColumnName, String.valueOf(id))
                 .build();
     }
 
-    public String delete(final Object entity) {
-        final EntityMetadata<?> entityMetadata = entityMetadataProvider.getEntityMetadata(entity.getClass());
-        final Object value = ReflectionUtils.getFieldValue(entity, entityMetadata.getIdColumnFieldName());
+    public String delete(final String tableName, final String idColumnName, final Object id) {
         return DeleteQueryBuilder.builder()
-                .table(entityMetadata.getTableName())
-                .where(entityMetadata.getIdColumnName(), convertToString(value))
+                .table(tableName)
+                .where(idColumnName, convertToString(id))
+                .build();
+    }
+
+    public String update(final String tableName, final List<String> columnNames, final List<Object> values, final String idColumnName, final Object idValue) {
+        return UpdateQueryBuilder.builder()
+                .table(tableName)
+                .addData(columnNames, convertToStrings(values))
+                .where(idColumnName, convertToString(idValue))
                 .build();
     }
 
@@ -68,5 +64,4 @@ public class DmlGenerator {
     private String addSingleQuote(final Object value) {
         return "'" + value + "'";
     }
-
 }

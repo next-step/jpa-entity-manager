@@ -18,6 +18,7 @@ import persistence.entity.SimpleEntityManager;
 import persistence.exception.PersistenceException;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dml.DmlGenerator;
+import persistence.util.ReflectionUtils;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -48,7 +49,13 @@ class ApplicationTest {
         final String createDdl = ddlGenerator.generateCreateDdl(entityMetadata);
         jdbcTemplate.execute(createDdl);
         people = createDummyUsers();
-        people.forEach(person -> jdbcTemplate.execute(dmlGenerator.insert(person)));
+
+
+        people.forEach(person -> {
+            final List<String> columnNames = entityMetadata.getInsertableColumnNames();
+            final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.getInsertableColumnFieldNames());
+            jdbcTemplate.execute(dmlGenerator.insert(entityMetadata.getTableName(), columnNames,values ));
+        });
     }
 
     @AfterEach
@@ -61,8 +68,9 @@ class ApplicationTest {
     @Test
     @DisplayName("쿼리 실행을 통해 데이터를 여러 row 를 넣어 정상적으로 나오는지 확인할 수 있다.")
     void findAllTest() {
-        final List<Person> result =
-                jdbcTemplate.query(dmlGenerator.findAll(Person.class), personRowMapper());
+        final String query = dmlGenerator.findAll(entityMetadata.getTableName(), entityMetadata.getColumnNames());
+
+        final List<Person> result = jdbcTemplate.query(query, personRowMapper());
 
         assertThat(result).hasSize(people.size());
     }
@@ -70,8 +78,9 @@ class ApplicationTest {
     @Test
     @DisplayName("findById 를 통해 원하는 row 를 찾을 수 있다.")
     void findByIdTest() {
-        final Person result =
-                jdbcTemplate.queryForObject(dmlGenerator.findById(Person.class, 1L), personRowMapper());
+        final String query = dmlGenerator.findById(entityMetadata.getTableName(), entityMetadata.getColumnNames(), entityMetadata.getIdColumnName(), 1L);
+
+        final Person result = jdbcTemplate.queryForObject(query, personRowMapper());
 
         assertThat(result).isNotNull();
     }
