@@ -13,11 +13,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Stream;
 import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
-import persistence.sql.QueryGenerator;
+
 import persistence.testFixtures.Person;
 
 
@@ -28,14 +30,13 @@ public class RepositoryTest {
     private Person person = new Person("이름", 30, "email@odna");
     private Person person2 = new Person("이름2", 32, "email2@odna");
 
-    @BeforeAll
-    static void setUp() throws SQLException {
-        final DatabaseServer server = new H2();
+    @BeforeEach
+    void setUp() throws SQLException {
+        server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
     }
-
 
     @TestFactory
     @DisplayName("레포지토리를 관리 한다.")
@@ -123,6 +124,11 @@ public class RepositoryTest {
                 )
 
         );
+    }
+
+    @AfterEach
+    void clear() {
+        server.stop();
     }
 
 }

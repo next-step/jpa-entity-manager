@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import persistence.dialect.Dialect;
 import persistence.exception.FieldEmptyException;
+import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryBuilder;
@@ -29,4 +30,17 @@ public class DMLQueryBuilder<T> extends QueryBuilder<T>{
                 .findFirst()
                 .orElseThrow(() -> new FieldEmptyException("pk가 없습니다."));
     }
+
+    protected String columnValue(EntityColumn column, T object) {
+        final ColumnType columType = column.getColumnType();
+        final Object value = column.getFieldValue(object);
+        if (value == null) {
+            return "null";
+        }
+        if (columType.isVarchar()) {
+            return "'" + value + "'";
+        }
+        return value.toString();
+    }
+
 }

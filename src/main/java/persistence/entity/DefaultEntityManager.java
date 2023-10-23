@@ -23,8 +23,7 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
-        final EntityPersister entityPersister =
-                (EntityPersister<T>) new EntityPersister<>(jdbcTemplate, entity.getClass());
+        final EntityPersister<T> entityPersister = (EntityPersister<T>) new EntityPersister<>(jdbcTemplate, entity.getClass());
 
         entityPersister.insert(entity);
 

@@ -64,4 +64,8 @@ public abstract class Dialect {
     public String delete() {
         return "DELETE";
     }
+
+    public String update(String tableName) {
+        return "UPDATE " + tableName + " SET ";
+    }
 }

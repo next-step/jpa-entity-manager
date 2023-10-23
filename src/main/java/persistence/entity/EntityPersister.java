@@ -19,4 +19,11 @@ public class EntityPersister<T> {
         final String query = QueryGenerator.from(entityMeta).insert(entity);
         jdbcTemplate.execute(query);
     }
+
+    public boolean update(T entity) {
+        final String query = QueryGenerator.from(entityMeta).update(entity);
+        jdbcTemplate.execute(query);
+        return true;
+    }
+
 }

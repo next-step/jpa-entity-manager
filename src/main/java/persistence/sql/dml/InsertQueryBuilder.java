@@ -37,18 +37,6 @@ public class InsertQueryBuilder<T> extends DMLQueryBuilder<T> {
                 .collect(Collectors.joining(", "));
     }
 
-    private String columnValue(EntityColumn column, T object) {
-        final ColumnType columType = column.getColumnType();
-        final Object value = column.getFieldValue(object);
-        if (value == null) {
-            return "null";
-        }
-        if (columType.isVarchar()) {
-            return "'" + value + "'";
-        }
-        return value.toString();
-    }
-
     private String queryInsert(String tableName) {
         return dialect.insert(tableName);
     }

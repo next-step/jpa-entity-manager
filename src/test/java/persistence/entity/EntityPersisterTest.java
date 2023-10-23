@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import database.DatabaseServer;
@@ -38,8 +39,18 @@ class EntityPersisterTest {
         });
     }
 
+    @Test
+    @DisplayName("엔티티가 업데이트가 된다.")
+    void entityUpdate() {
+        Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
+        EntityPersister<Person> entityPersister = new EntityPersister<>(jdbcTemplate, Person.class);
+
+        assertThat(entityPersister.update(person)).isTrue();
+    }
+
     @AfterEach
     void tearDown() {
+        jdbcTemplate.execute(QueryGenerator.from(Person.class).drop());
         server.stop();
     }
 }
