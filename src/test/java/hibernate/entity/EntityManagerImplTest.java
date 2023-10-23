@@ -42,6 +42,7 @@ class EntityManagerImplTest {
 
     @AfterAll
     static void afterAll() {
+        jdbcTemplate.execute("drop table test_entity;");
         server.stop();
     }
 
