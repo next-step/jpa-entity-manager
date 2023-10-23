@@ -5,6 +5,7 @@ import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
+import jdbc.ReflectionRowMapper;
 import jdbc.RowMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityPersisterTest {
 
@@ -34,6 +34,20 @@ class EntityPersisterTest {
     static void afterAll() {
         jdbcTemplate.execute("drop table test_entity;");
         server.stop();
+    }
+
+    @Test
+    void update_쿼리를_실행한다() {
+        // given
+        EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
+        TestEntity givenEntity = new TestEntity(1L, "영진최");
+        jdbcTemplate.execute("insert into test_entity (id, nick_name) values (1, '최진영');");
+
+        // when
+        boolean actual = entityPersister.update(givenEntity);
+
+        // then
+        assertThat(actual).isTrue();
     }
 
     @Test
