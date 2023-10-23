@@ -27,3 +27,4 @@ public void delete(parameters는 자유롭게)
   - EntityClass를 필드로 가진다.
   - 쿼리를 실제로 생성하고 전달하는 역할을 한다.
   - parameter가 현재 EntityPersister가 관리하는 entityclass와 다를 경우 예외가 발생한다.
+    - 해당 에러는 EntityClass에서 validation하고 있다.
