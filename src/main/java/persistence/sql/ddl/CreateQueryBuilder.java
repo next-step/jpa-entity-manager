@@ -40,7 +40,7 @@ public class CreateQueryBuilder<T> extends QueryBuilder<T> {
     }
 
     private String columnTypeQuery(EntityColumn entityColumn) {
-        final ColumnType columType = entityColumn.getColumType();
+        final ColumnType columType = entityColumn.getColumnType();
         if (columType.isVarchar()) {
             return dialect.getVarchar(entityColumn.getLength());
         }

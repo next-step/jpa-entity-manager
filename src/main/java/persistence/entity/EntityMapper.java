@@ -62,7 +62,7 @@ public class EntityMapper {
     }
 
     private Object getTypeValue(ResultSet resultSet, EntityColumn column) throws SQLException {
-        final ColumnType columType = column.getColumType();
+        final ColumnType columType = column.getColumnType();
         if (columType.isBigInt()) {
             return resultSet.getLong(column.getName());
         }

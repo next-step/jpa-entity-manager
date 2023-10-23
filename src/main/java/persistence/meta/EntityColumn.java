@@ -14,7 +14,7 @@ public class EntityColumn {
     private static final Integer DEFAULT_VARCHAR_LENGTH = 255;
     private static final Integer VARCHAR_MIN_LENGTH = 1;
     private final String name;
-    private final ColumnType columType;
+    private final ColumnType columnType;
     private final EntityColumnOption option;
     private final String fieldName;
     private Integer length;
@@ -25,7 +25,7 @@ public class EntityColumn {
         }
         this.name = initName(field);
         this.fieldName = field.getName();
-        this.columType = initColumType(field);
+        this.columnType = initColumType(field);
         this.option = new EntityColumnOption(field);
     }
 
@@ -77,8 +77,8 @@ public class EntityColumn {
         return option.isPk();
     }
 
-    public ColumnType getColumType() {
-        return columType;
+    public ColumnType getColumnType() {
+        return columnType;
     }
 
     public int getLength() {
@@ -86,7 +86,7 @@ public class EntityColumn {
     }
 
     public boolean isVarchar() {
-        return columType.isVarchar();
+        return columnType.isVarchar();
     }
 
     public boolean isNotNull() {

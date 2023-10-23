@@ -38,7 +38,7 @@ public class InsertQueryBuilder<T> extends DMLQueryBuilder<T> {
     }
 
     private String columnValue(EntityColumn column, T object) {
-        final ColumnType columType = column.getColumType();
+        final ColumnType columType = column.getColumnType();
         final Object value = column.getFieldValue(object);
         if (value == null) {
             return "null";
