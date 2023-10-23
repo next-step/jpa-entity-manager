@@ -41,13 +41,28 @@ class EntityPersisterTest {
         // given
         EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
         TestEntity givenEntity = new TestEntity("최진영");
-        entityPersister.insert(givenEntity);
 
         // when
+        entityPersister.insert(givenEntity);
         Integer actual = testEntityCount();
 
         // then
         assertThat(actual).isEqualTo(1);
+    }
+
+    @Test
+    void delete_쿼리를_실행한다() {
+        // given
+        EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
+        TestEntity givenEntity = new TestEntity(1L, "최진영");
+        jdbcTemplate.execute("insert into test_entity (id, nick_name) values (1, '최진영');");
+
+        // when
+        entityPersister.delete(givenEntity);
+        Integer actual = testEntityCount();
+
+        // then
+        assertThat(actual).isEqualTo(0);
     }
 
     private Integer testEntityCount() {
@@ -78,6 +93,11 @@ class EntityPersisterTest {
         private String email;
 
         public TestEntity() {
+        }
+
+        public TestEntity(Long id, String name) {
+            this.id = id;
+            this.name = name;
         }
 
         public TestEntity(String name) {
