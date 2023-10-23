@@ -2,7 +2,6 @@ package persistence.sql.dml;
 
 import java.util.stream.Collectors;
 import persistence.dialect.Dialect;
-import persistence.exception.FieldEmptyException;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 

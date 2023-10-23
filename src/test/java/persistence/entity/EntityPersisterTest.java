@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import database.DatabaseServer;
 import database.H2;

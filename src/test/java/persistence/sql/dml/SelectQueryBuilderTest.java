@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.exception.FieldEmptyException;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.Person;
 

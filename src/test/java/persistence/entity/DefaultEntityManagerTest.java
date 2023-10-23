@@ -3,7 +3,6 @@ package persistence.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-
 import database.DatabaseServer;
 import database.H2;
 import java.sql.SQLException;

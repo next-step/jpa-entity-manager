@@ -14,12 +14,10 @@ import java.util.List;
 import java.util.stream.Stream;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
-
 import persistence.testFixtures.Person;
 
 
