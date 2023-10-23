@@ -5,9 +5,9 @@ import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
-import jdbc.ReflectionRowMapper;
 import jdbc.RowMapper;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +28,11 @@ class EntityPersisterTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         jdbcTemplate.execute(new CreateQueryBuilder().generateQuery(new EntityClass<>(TestEntity.class)));
+    }
+
+    @AfterEach
+    void afterEach() {
+        jdbcTemplate.execute("truncate table test_entity;");
     }
 
     @AfterAll

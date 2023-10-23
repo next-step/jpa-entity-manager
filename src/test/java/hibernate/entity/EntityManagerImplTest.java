@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -30,7 +31,8 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(jdbcTemplate);
+        entityManager = new EntityManagerImpl(jdbcTemplate,
+                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(TestEntity.class, jdbcTemplate))));
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class)));
     }
@@ -104,7 +106,7 @@ class EntityManagerImplTest {
     }
 
     @Entity
-    @Table(name= "test_entity")
+    @Table(name = "test_entity")
     static class TestEntity {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
