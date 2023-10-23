@@ -17,20 +17,20 @@ public class SimpleEntityManager implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
     private final Connection connection;
     private boolean closed;
-    private final EntityPersister entityPersister;
-
+    private final EntityPersisterProvider entityPersisterProvider;
 
     public SimpleEntityManager(final PersistenceEnvironment persistenceEnvironment) {
         this.connection = persistenceEnvironment.getConnection();
         this.jdbcTemplate = new JdbcTemplate(connection);
         this.closed = false;
-        this.entityPersister = new EntityPersister(jdbcTemplate, persistenceEnvironment.getDmlGenerator());
+        this.entityPersisterProvider = new EntityPersisterProvider(jdbcTemplate, persistenceEnvironment.getDmlGenerator());
     }
 
     @Override
-    public <T> T find(final Class<T> clazz, final Long Id) {
+    public <T> T find(final Class<T> clazz, final Long id) {
         checkConnectionOpen();
-        final String query = entityPersister.renderSelect(clazz, Id);
+        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(clazz);
+        final String query = entityPersister.renderSelect(id);
         return jdbcTemplate.queryForObject(query, getObjectRowMapper(clazz));
     }
 
@@ -54,12 +54,14 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public void persist(final Object entity) {
         checkConnectionOpen();
+        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         entityPersister.insert(entity);
     }
 
     @Override
     public void remove(final Object entity) {
         checkConnectionOpen();
+        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         entityPersister.delete(entity);
     }
 

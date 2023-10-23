@@ -22,14 +22,14 @@ class EntityPersisterTest {
     @BeforeEach
     void setUp() throws SQLException {
         final Dialect dialect = new H2Dialect();
-        entityPersister = new EntityPersister(new MockJdbcTemplate(), new DmlGenerator(dialect));
+        entityPersister = new EntityPersister(Person.class, new MockJdbcTemplate(), new DmlGenerator(dialect));
         fixturePerson = FixturePerson.create(1L);
     }
 
     @Test
     @DisplayName("renderSelect 을 이용해 entity 의 select 문을 만들 수 있다.")
     void renderSelectTest() {
-        final String query = entityPersister.renderSelect(Person.class, 1L);
+        final String query = entityPersister.renderSelect(1L);
         assertThat(query).isEqualTo("select id, nick_name, old, email from users where id=1");
     }
 
