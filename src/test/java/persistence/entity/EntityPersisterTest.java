@@ -1,13 +1,8 @@
 package persistence.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
-import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -18,6 +13,12 @@ import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
 import persistence.sql.ddl.QueryDdl;
 import persistence.sql.dml.QueryDml;
+
+import java.sql.SQLException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityPersisterTest {
 
@@ -33,7 +34,7 @@ class EntityPersisterTest {
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        entityPersister = new EntityPersister(server.getConnection());
+        entityPersister = new EntityPersister(jdbcTemplate);
 
         jdbcTemplate.execute(QueryDdl.create(selectPerson));
     }
@@ -116,23 +117,24 @@ class EntityPersisterTest {
             데이터를_저장함(request);
 
             //when
-            entityPersister.delete(request);
+            entityPersister.delete(request, id);
 
             String selectQuery = 아이디로_데이터를_조회하는_쿼리_생성(id);
 
             //then
             assertThrows(RuntimeException.class,
-                () -> jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(SelectPerson.class)));
+                    () -> jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(SelectPerson.class)));
         }
 
         @Test
         @DisplayName("없는 테이블의 데이터 삭제 시도시 오류")
         void notFoundTable() {
             //given
-            Person request = new Person(99L, "zz", 30, "zz", 1);
+            final Long id = 99L;
+            Person request = new Person(id, "zz", 30, "zz", 1);
 
             //when & then
-            assertThrows(RuntimeException.class, () -> entityPersister.delete(request));
+            assertThrows(RuntimeException.class, () -> entityPersister.delete(request, id));
         }
     }
 

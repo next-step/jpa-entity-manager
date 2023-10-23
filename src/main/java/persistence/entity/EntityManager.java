@@ -1,14 +1,16 @@
 package persistence.entity;
 
-import jdbc.RowMapper;
-
 import java.util.List;
 
-public interface EntityManager<T> extends RowMapper<T> {
-    List<T> findAll();
-    <R> T find(R r);
+public interface EntityManager {
 
-    Object persist(Object entity);
+    <T> List<T> findAll(Class<T> tClass);
 
-    void remove(Object entity);
+    <T, R> T find(Class<T> tClass, R r);
+
+    <T> T persist(T t);
+
+    <T> void remove(T t, Object arg);
+
+    <T> void update(T t, Object arg);
 }

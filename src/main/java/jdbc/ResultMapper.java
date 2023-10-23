@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ResultMapper<T> implements RowMapper<T> {
-    private Class<T> tClass;
+    private final Class<T> tClass;
 
     public ResultMapper(Class<T> tClass) {
         this.tClass = tClass;
