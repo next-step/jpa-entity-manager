@@ -20,3 +20,4 @@
 
 ## 요구사항 2
 ### EntityManager 의 책임 줄여주기
+- ✅ JdbcTemplate을 EntityPersister로 위임
