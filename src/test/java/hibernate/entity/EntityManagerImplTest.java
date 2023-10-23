@@ -3,6 +3,9 @@ package hibernate.entity;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
+import hibernate.dml.DeleteQueryBuilder;
+import hibernate.dml.InsertQueryBuilder;
+import hibernate.dml.UpdateQueryBuilder;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
@@ -32,7 +35,13 @@ class EntityManagerImplTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityManager = new EntityManagerImpl(jdbcTemplate,
-                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(TestEntity.class, jdbcTemplate))));
+                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(
+                        TestEntity.class,
+                        jdbcTemplate,
+                        new InsertQueryBuilder(),
+                        new DeleteQueryBuilder(),
+                        new UpdateQueryBuilder()
+                        ))));
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class)));
     }

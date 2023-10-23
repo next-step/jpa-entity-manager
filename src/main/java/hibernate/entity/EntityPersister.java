@@ -9,13 +9,22 @@ public class EntityPersister<T> {
 
     private final EntityClass<T> entityClass;
     private final JdbcTemplate jdbcTemplate;
-    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
-    private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-    private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+    private final InsertQueryBuilder insertQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
 
-    public EntityPersister(final Class<T> clazz, final JdbcTemplate jdbcTemplate) {
+    public EntityPersister(
+            final Class<T> clazz,
+            final JdbcTemplate jdbcTemplate,
+            final InsertQueryBuilder insertQueryBuilder,
+            final DeleteQueryBuilder deleteQueryBuilder,
+            final UpdateQueryBuilder updateQueryBuilder
+    ) {
         this.entityClass = new EntityClass<>(clazz);
         this.jdbcTemplate = jdbcTemplate;
+        this.insertQueryBuilder = insertQueryBuilder;
+        this.deleteQueryBuilder = deleteQueryBuilder;
+        this.updateQueryBuilder = updateQueryBuilder;
     }
 
     public boolean update(final Object entity) {

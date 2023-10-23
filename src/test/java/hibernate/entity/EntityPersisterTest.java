@@ -3,6 +3,9 @@ package hibernate.entity;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
+import hibernate.dml.DeleteQueryBuilder;
+import hibernate.dml.InsertQueryBuilder;
+import hibernate.dml.UpdateQueryBuilder;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
@@ -20,6 +23,13 @@ class EntityPersisterTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
+    private final EntityPersister<TestEntity> entityPersister = new EntityPersister<>(
+            TestEntity.class,
+            jdbcTemplate,
+            new InsertQueryBuilder(),
+            new DeleteQueryBuilder(),
+            new UpdateQueryBuilder()
+    );
 
     @BeforeAll
     static void beforeAll() throws SQLException {
@@ -44,7 +54,6 @@ class EntityPersisterTest {
     @Test
     void update_쿼리를_실행한다() {
         // given
-        EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
         TestEntity givenEntity = new TestEntity(1L, "영진최");
         jdbcTemplate.execute("insert into test_entity (id, nick_name) values (1, '최진영');");
 
@@ -58,7 +67,6 @@ class EntityPersisterTest {
     @Test
     void insert_쿼리를_실행한다() {
         // given
-        EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
         TestEntity givenEntity = new TestEntity("최진영");
 
         // when
@@ -72,7 +80,6 @@ class EntityPersisterTest {
     @Test
     void delete_쿼리를_실행한다() {
         // given
-        EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
         TestEntity givenEntity = new TestEntity(1L, "최진영");
         jdbcTemplate.execute("insert into test_entity (id, nick_name) values (1, '최진영');");
 
