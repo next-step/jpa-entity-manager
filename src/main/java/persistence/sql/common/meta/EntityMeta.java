@@ -55,13 +55,13 @@ public class EntityMeta {
                 .toArray(String[]::new));
     }
 
-    protected String getPrimaryKeyWithComma() {
+    public String getPrimaryKeyWithComma() {
         return StringUtils.withComma(Arrays.stream(columns).filter(Column::isPrimaryKey)
                 .map(Column::getName)
                 .toArray(String[]::new));
     }
 
-    protected String getConstraintsWithColumns() {
+    public String getConstraintsWithColumns() {
         return StringUtils.withComma(Arrays.stream(columns)
                 .map(column -> column.getName()
                     + column.getType()

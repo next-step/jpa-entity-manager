@@ -2,11 +2,14 @@ package persistence.sql.ddl;
 
 import persistence.sql.common.meta.EntityMeta;
 
-public class DropQuery extends EntityMeta {
+public class DropQuery {
+
     private static final String DEFAULT_DROP_QUERY = "DROP TABLE %s";
 
-    private <T> DropQuery(Class<T> tClass) {
-        super(tClass);
+    private final EntityMeta entityMeta;
+
+    public <T> DropQuery(T t) {
+        entityMeta = EntityMeta.of(t.getClass());
     }
 
     public static <T> String drop(Class<T> tClass) {
@@ -14,6 +17,6 @@ public class DropQuery extends EntityMeta {
     }
 
     private String combineQuery() {
-        return String.format(DEFAULT_DROP_QUERY, getTableName());
+        return String.format(DEFAULT_DROP_QUERY, entityMeta.getTableName());
     }
 }
