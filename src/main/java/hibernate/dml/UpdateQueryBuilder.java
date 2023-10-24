@@ -29,12 +29,6 @@ public class UpdateQueryBuilder {
         return String.format(UPDATE_QUERY, tableName, parseSetQueries(fieldValues), entityId.getFieldName(), id);
     }
 
-    public String generateQuery(final EntityClass<?> entityClass, Object entity) {
-        Map<EntityColumn, Object> fieldValues = entityClass.getFieldValues(entity);
-        return String.format(UPDATE_QUERY,
-                entityClass.tableName(), parseSetQueries(fieldValues), entityClass.getEntityId().getFieldName(), entityClass.extractEntityId(entity));
-    }
-
     private String parseSetQueries(final Map<EntityColumn, Object> fieldValues) {
         return fieldValues.entrySet()
                 .stream()

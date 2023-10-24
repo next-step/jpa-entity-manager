@@ -1,6 +1,5 @@
 package hibernate.dml;
 
-import hibernate.entity.EntityClass;
 import hibernate.entity.column.EntityColumn;
 
 public class DeleteQueryBuilder {
@@ -18,9 +17,5 @@ public class DeleteQueryBuilder {
             final Object id
     ) {
         return String.format(DELETE_QUERY, tableName, entityId.getFieldName(), id);
-    }
-
-    public String generateQuery(final EntityClass<?> entityClass, final Object entity) {
-        return String.format(DELETE_QUERY, entityClass.tableName(), entityClass.getEntityId().getFieldName(), entityClass.extractEntityId(entity));
     }
 }

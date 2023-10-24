@@ -26,13 +26,6 @@ public class InsertQueryBuilder {
         return String.format(INSERT_QUERY, tableName, parseColumnQueries(entityColumns), parseColumnValueQueries(entityColumns, fieldValues));
     }
 
-    public String generateQuery(final EntityClass<?> entityClass, final Object entity) {
-        Map<EntityColumn, Object> fieldValues = entityClass.getFieldValues(entity);
-        List<EntityColumn> entityColumns = new ArrayList<>(fieldValues.keySet());
-        return String.format(INSERT_QUERY,
-                entityClass.tableName(), parseColumnQueries(entityColumns), parseColumnValueQueries(entityColumns, fieldValues));
-    }
-
     private String parseColumnQueries(final List<EntityColumn> entityColumns) {
         return entityColumns.stream()
                 .map(EntityColumn::getFieldName)
