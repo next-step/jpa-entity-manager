@@ -3,39 +3,56 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {
+
+    private JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
+    private final Map<String, EntityPersister<?>> persisterMap;
+
 
     public EntityManagerImpl(Connection connection) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
+        this.jdbcTemplate = new JdbcTemplate(connection);
         this.entityPersister = new EntityPersister(jdbcTemplate);
+        this.persisterMap = new HashMap<>();
     }
 
     @Override
-    public <T> List<T> findAll(Class<T> tClass) {
-        return entityPersister.findAll(tClass);
+    public <T> List<T> findAll(Class<T> tClazz) {
+        return getPersister(tClazz).findAll();
     }
 
     @Override
     public <R, I> R find(Class<R> rClass, I i) {
-        return (R) entityPersister.findById(rClass, i);
+        return getPersister(rClass).findById(i);
     }
 
     @Override
     public <T> T persist(T t) {
-        entityPersister.insert(t);
+        getPersister(t.getClass()).insert(t);
         return t;
     }
 
     @Override
-    public void remove(Object arg) {
-        entityPersister.delete(arg);
+    public <T> void remove(Class<T> tClass, Object arg) {
+        getPersister(tClass).delete(arg);
     }
 
     @Override
     public <T> void update(T t, Object arg) {
-        entityPersister.update(t, arg);
+        getPersister(t.getClass()).update(t, arg);
+    }
+
+    private <T> EntityPersister<T> getPersister(Class<T> tClass) {
+        String key = tClass.getName();
+
+        if(persisterMap.get(key) == null) {
+            persisterMap.put(key, new EntityPersister<>(jdbcTemplate, tClass));
+        }
+
+        return (EntityPersister<T>) persisterMap.get(key);
     }
 }

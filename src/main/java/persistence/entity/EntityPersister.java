@@ -16,7 +16,6 @@ public class EntityPersister<T> {
 
     private TableName tableName;
     private Columns columns;
-    private Value[] values;
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -30,16 +29,14 @@ public class EntityPersister<T> {
         this.columns = Columns.of(tClass.getDeclaredFields());
     }
 
-    public <T> List<T> findAll(Class<T> tClass) {
-        final TableName tableName = TableName.of(tClass);
-        final Columns columns = Columns.of(tClass.getDeclaredFields());
+    public List<T> findAll() {
         String query = SelectQuery.create(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
         return jdbcTemplate.query(query, new ResultMapper<>(tClass));
     }
 
-    public <R, I> T findById(R r, I i) {
+    public <I> T findById(I i) {
         String query = SelectQuery.create(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns, i);
 

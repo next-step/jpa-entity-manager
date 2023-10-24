@@ -10,7 +10,7 @@ public interface EntityManager {
 
     <T> T persist(T t);
 
-    void remove(Object arg);
+    <T> void remove(Class<T> tClass, Object arg);
 
     <T> void update(T t, Object arg);
 }

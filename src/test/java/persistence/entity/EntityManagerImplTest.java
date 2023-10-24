@@ -6,7 +6,6 @@ import domain.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Disabled("개선 후 사용 예정")
 class EntityManagerImplTest {
 
     private final Class<SelectPerson> clazz = SelectPerson.class;
@@ -34,9 +32,10 @@ class EntityManagerImplTest {
     @BeforeEach
     void init() throws SQLException {
         DatabaseServer server = new H2();
-        entityManager = new EntityManagerImpl(server.getConnection());
 
+        entityManager = new EntityManagerImpl(server.getConnection());
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+
         테이블을_생성함(clazz);
     }
 
@@ -48,6 +47,7 @@ class EntityManagerImplTest {
         @DisplayName("저장된 모든 데이터를 조회함")
         void success() {
             //given
+            Class<SelectPerson> clazz = SelectPerson.class;
             final long maxCount = 10;
 
             for (long i = 0; i < maxCount; i++) {
@@ -186,8 +186,10 @@ class EntityManagerImplTest {
 
             데이터를_저장함(person);
 
+            Class<SelectPerson> clazz = SelectPerson.class;
+
             //when
-            entityManager.remove(id);
+            entityManager.remove(clazz, id);
 
             //then
             assertThrows(RuntimeException.class, () -> 데이터를_조회함(clazz, id));
@@ -200,8 +202,10 @@ class EntityManagerImplTest {
             final Long id = 33L;
             final Person person = new Person(id, "zz", 3, "xx", 3);
 
+            Class<Person> clazz = Person.class;
+
             //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.remove(id));
+            assertThrows(RuntimeException.class, () -> entityManager.remove(clazz, id));
         }
     }
 
