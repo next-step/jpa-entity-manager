@@ -187,8 +187,8 @@ class EntityPersisterTest {
     }
 
     private <T> void 데이터를_저장함(T t) {
-        final TableName tableName = TableName을_생성함(t.getClass());
-        final Columns columns = Columns을_생성함(t.getClass().getDeclaredFields());
+        final TableName tableName = TableName을_생성함(t);
+        final Columns columns = Columns을_생성함(t);
         final Values values = Values을_생성함(t);
 
         jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));

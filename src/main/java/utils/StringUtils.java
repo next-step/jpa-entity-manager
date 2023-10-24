@@ -1,5 +1,8 @@
 package utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class StringUtils {
     public static String withComma(String[] input) {
         return String.join(", ", input);
@@ -10,10 +13,13 @@ public final class StringUtils {
      * 예) 'apple', '1'
      */
     public static String parseChar(Object value) {
+        final String REGEX = "[-+]?\\d*\\.?\\d+";
+        Pattern pattern = Pattern.compile(REGEX);
+
         String v = value.toString();
         String type = value.getClass().getSimpleName();
 
-        if(!value.toString().matches("[-+]?\\d*\\.?\\d+")) {
+        if(!pattern.matcher(v).find()) {
             v = String.format("'%s'", value);
         }
 

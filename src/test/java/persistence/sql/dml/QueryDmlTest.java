@@ -115,8 +115,8 @@ class QueryDmlTest {
 
             final SelectPerson person = new SelectPerson(id, name, age, email, index);
 
-            final TableName tableName = TableName을_생성함(person.getClass());
-            final Columns columns = Columns을_생성함(person.getClass().getDeclaredFields());
+            final TableName tableName = TableName을_생성함(person);
+            final Columns columns = Columns을_생성함(person);
 
             insert(person);
 
@@ -144,8 +144,8 @@ class QueryDmlTest {
             insert(person1);
             insert(person2);
 
-            final TableName tableName = TableName을_생성함(person1.getClass());
-            final Columns columns = Columns을_생성함(person1.getClass().getDeclaredFields());
+            final TableName tableName = TableName을_생성함(person1);
+            final Columns columns = Columns을_생성함(person1);
 
             //when
             List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns)
@@ -199,7 +199,7 @@ class QueryDmlTest {
 
             Class<SelectPerson> clazz = SelectPerson.class;
             final TableName tableName = TableName을_생성함(clazz);
-            final Columns columns = Columns을_생성함(clazz.getDeclaredFields());
+            final Columns columns = Columns을_생성함(clazz);
 
             //when
             String query = DeleteQuery.create(tableName, columns, id);
