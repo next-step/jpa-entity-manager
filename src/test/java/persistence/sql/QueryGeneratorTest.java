@@ -1,4 +1,4 @@
-package persistence.sql.ddl;
+package persistence.sql;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.exception.NoEntityException;
 import persistence.meta.EntityMeta;
-import persistence.sql.QueryGenerator;
 
 class QueryGeneratorTest {
     @Test

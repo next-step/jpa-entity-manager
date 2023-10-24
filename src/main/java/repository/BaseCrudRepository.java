@@ -1,9 +1,9 @@
 package repository;
 
 import java.util.List;
+import jdbc.JdbcTemplate;
 import persistence.entity.DefaultEntityManager;
 import persistence.entity.EntityManager;
-import persistence.entity.JdbcTemplate;
 
 public class BaseCrudRepository<T> extends AbstractRepository<T> implements CrudRepository<T> {
     private final EntityManager entityManager;

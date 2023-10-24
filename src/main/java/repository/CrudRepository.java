@@ -7,7 +7,6 @@ public interface CrudRepository<T> {
 
     void delete(T entity);
 
-
     T findById(Class<T> tClass, Object id);
 
     List<T> findAll();

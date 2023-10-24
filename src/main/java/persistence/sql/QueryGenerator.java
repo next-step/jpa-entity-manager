@@ -9,6 +9,7 @@ import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 
 public class QueryGenerator<T> {
     private final static Dialect DEFAULT_DIALECT = new H2Dialect();
@@ -57,4 +58,10 @@ public class QueryGenerator<T> {
     public SelectQueryBuilder<T> select() {
         return new SelectQueryBuilder<>(entityMeta, dialect);
     }
+
+    public String update(T entity) {
+        return new UpdateQueryBuilder<>(entityMeta, dialect).update(entity);
+    }
+
+
 }

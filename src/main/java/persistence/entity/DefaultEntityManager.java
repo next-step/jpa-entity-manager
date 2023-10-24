@@ -2,8 +2,8 @@ package persistence.entity;
 
 
 import java.util.List;
+import jdbc.JdbcTemplate;
 import persistence.exception.NotFoundException;
-import persistence.mapper.RowMapper;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 
@@ -11,27 +11,26 @@ import persistence.sql.QueryGenerator;
 public class DefaultEntityManager implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
     private final EntityMeta entityMeta;
+    private final EntityMapper entityMapper;
+    private final EntityPersister entityPersister;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityMeta = entityMeta;
+        this.entityMapper = new EntityMapper(entityMeta);
+        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta);
     }
 
+
     @Override
-    public Object persist(Object entity) {
-        final String query = QueryGenerator.from(entityMeta).insert(entity);
-
-        jdbcTemplate.execute(query);
-
+    public <T> T persist(T entity) {
+        entityPersister.insert(entity);
         return entity;
     }
 
-
     @Override
     public void remove(Object entity) {
-        final String query = QueryGenerator.from(entityMeta).delete(entityMeta.getPkValue(entity));
-
-        jdbcTemplate.execute(query);
+        entityPersister.delete(entity);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class DefaultEntityManager implements EntityManager {
                 .select()
                 .findById(id);
 
-        return jdbcTemplate.queryForObject(query, getRowMapper(clazz));
+        return jdbcTemplate.queryForObject(query, (resultSet) -> entityMapper.resultSetToEntity(clazz, resultSet));
     }
 
     @Override
@@ -53,11 +52,8 @@ public class DefaultEntityManager implements EntityManager {
                 .select()
                 .findAll();
 
-        return jdbcTemplate.query(query, getRowMapper(tClass));
+        return jdbcTemplate.query(query, (resultSet) -> entityMapper.resultSetToEntity(tClass, resultSet));
     }
 
 
-    private <T> RowMapper<T> getRowMapper(Class<T> tClass) {
-        return new EntityPersister<>(tClass).getRowMapper();
-    }
 }

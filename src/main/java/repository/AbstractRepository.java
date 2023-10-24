@@ -1,6 +1,6 @@
 package repository;
 
-import persistence.entity.JdbcTemplate;
+import jdbc.JdbcTemplate;
 import persistence.meta.EntityMeta;
 
 public abstract class AbstractRepository<T> {

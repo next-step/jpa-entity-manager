@@ -5,13 +5,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import persistence.entity.JdbcTemplate;
 import persistence.mapper.RowMapper;
 
-public class BaseJdbcTemplate implements JdbcTemplate {
+public class JdbcTemplate {
     private final Connection connection;
 
-    public BaseJdbcTemplate(final Connection connection) {
+    public JdbcTemplate(final Connection connection) {
         this.connection = connection;
     }
 

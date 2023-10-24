@@ -35,7 +35,7 @@ public class EntityColumns {
                 .stream()
                 .filter(EntityColumn::isPk)
                 .findFirst()
-                .orElseThrow(() -> new FieldEmptyException("pk가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("pk가 없습니다."));
     }
 
 
