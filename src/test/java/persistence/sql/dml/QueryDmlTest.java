@@ -25,6 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class QueryDmlTest {
     private DatabaseServer server;
@@ -56,9 +59,9 @@ class QueryDmlTest {
 
             //when & then
             assertThrows(InvalidEntityException.class
-                    , () -> QueryDml.insert(TableName.of(person.getClass())
-                            , Columns.of(person.getClass().getDeclaredFields())
-                            , Values.of(person.getClass().getDeclaredFields())));
+                    , () -> QueryDml.insert(TableName을_생성함(person.getClass())
+                            , Columns을_생성함(person.getClass().getDeclaredFields())
+                            , Values을_생성함(person.getClass().getDeclaredFields())));
         }
 
         @Test
@@ -73,9 +76,9 @@ class QueryDmlTest {
 
             InsertPerson person = new InsertPerson(id, name, age, email, index);
 
-            final TableName tableName = TableName.of(person.getClass());
-            final Columns columns = Columns.of(person.getClass().getDeclaredFields());
-            final Values values = Values.of(person);
+            final TableName tableName = TableName을_생성함(person);
+            final Columns columns = Columns을_생성함(person);
+            final Values values = Values을_생성함(person);
 
             //when
             String query = QueryDml.insert(tableName, columns, values);
@@ -112,8 +115,8 @@ class QueryDmlTest {
 
             final SelectPerson person = new SelectPerson(id, name, age, email, index);
 
-            final TableName tableName = TableName.of(person.getClass());
-            final Columns columns = Columns.of(person.getClass().getDeclaredFields());
+            final TableName tableName = TableName을_생성함(person.getClass());
+            final Columns columns = Columns을_생성함(person.getClass().getDeclaredFields());
 
             insert(person);
 
@@ -141,11 +144,12 @@ class QueryDmlTest {
             insert(person1);
             insert(person2);
 
-            final TableName tableName = TableName.of(person1.getClass());
-            final Columns columns = Columns.of(person1.getClass().getDeclaredFields());
+            final TableName tableName = TableName을_생성함(person1.getClass());
+            final Columns columns = Columns을_생성함(person1.getClass().getDeclaredFields());
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(SelectPerson.class));
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns)
+                    , new ResultMapper<>(SelectPerson.class));
 
             //then
             assertThat(personList).size().isEqualTo(2);
@@ -194,8 +198,8 @@ class QueryDmlTest {
             insert(person);
 
             Class<SelectPerson> clazz = SelectPerson.class;
-            final TableName tableName = TableName.of(clazz);
-            final Columns columns = Columns.of(clazz.getDeclaredFields());
+            final TableName tableName = TableName을_생성함(clazz);
+            final Columns columns = Columns을_생성함(clazz.getDeclaredFields());
 
             //when
             String query = DeleteQuery.create(tableName, columns, id);
@@ -239,9 +243,9 @@ class QueryDmlTest {
             final SelectPerson expected = new SelectPerson(id, name, actualAge, actualEmail, 3);
 
             Class<SelectPerson> clazz = SelectPerson.class;
-            final TableName tableName = TableName.of(clazz);
-            final Columns columns = Columns.of(clazz.getDeclaredFields());
-            final Values values = Values.of(expected);
+            final TableName tableName = TableName을_생성함(clazz);
+            final Columns columns = Columns을_생성함(clazz);
+            final Values values = Values을_생성함(expected);
 
             //when
             String query = QueryDml.update(values, tableName, columns, id);
@@ -263,14 +267,13 @@ class QueryDmlTest {
         }
     }
 
-    private <T> String getSelectQuery(String methodName, TableName tableName, Columns columns) {
-
+    private String getSelectQuery(String methodName, TableName tableName, Columns columns) {
         return QueryDml.select(methodName, tableName, columns);
     }
 
     private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
-        final TableName tableName = TableName.of(tClass);
-        final Columns columns = Columns.of(tClass.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass.getDeclaredFields());
 
         return QueryDml.select(methodName, tableName, columns, args);
     }
@@ -280,8 +283,8 @@ class QueryDmlTest {
     }
 
     private <T> void insert(T t) {
-        final TableName tableName = TableName.of(t.getClass());
-        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
+        final TableName tableName = TableName을_생성함(t);
+        final Columns columns = Columns을_생성함(t.getClass());
         final Values values = Values.of(t);
 
         jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));

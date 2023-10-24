@@ -13,6 +13,9 @@ import persistence.sql.common.meta.TableName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class UpdateQueryTest {
     @Test
@@ -23,9 +26,9 @@ class UpdateQueryTest {
         Person person = new Person(3L, "zz", 30, "xx", 2);
 
         Class<Person> clazz = Person.class;
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
-        final Values values = Values.of(person);
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
+        final Values values = Values을_생성함(person);
 
         //when
         String result = UpdateQuery.create(values, tableName, columns, 3L);
@@ -42,9 +45,9 @@ class UpdateQueryTest {
         NonExistentTablePerson person = new NonExistentTablePerson(3L, "zz", 30, "xx");
 
         Class<NonExistentTablePerson> clazz = NonExistentTablePerson.class;
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
-        final Values values = Values.of(person);
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
+        final Values values = Values을_생성함(person);
 
         //when
         String result = UpdateQuery.create(values, tableName, columns, 3L);
@@ -61,9 +64,9 @@ class UpdateQueryTest {
         SelectPerson person = new SelectPerson(3L, "zz", 30, "xx", 2);
 
         Class<SelectPerson> clazz = SelectPerson.class;
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
-        final Values values = Values.of(person);
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
+        final Values values = Values을_생성함(person);
 
         //when
         String result = UpdateQuery.create(values, tableName, columns, 3L);
@@ -82,6 +85,6 @@ class UpdateQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-                , () -> UpdateQuery.create(Values.of(person), TableName.of(clazz), Columns.of(clazz.getDeclaredFields()), 3L));
+                , () -> UpdateQuery.create(Values을_생성함(person), TableName을_생성함(clazz), Columns을_생성함(clazz), 3L));
     }
 }

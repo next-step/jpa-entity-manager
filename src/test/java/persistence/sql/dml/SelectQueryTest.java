@@ -12,6 +12,8 @@ import persistence.sql.common.meta.TableName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class SelectQueryTest {
 
@@ -24,7 +26,7 @@ class SelectQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-            , () -> SelectQuery.create(methodName, TableName.of(aClass), Columns.of(aClass.getDeclaredFields())));
+            , () -> SelectQuery.create(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass)));
     }
 
     @Test
@@ -36,8 +38,8 @@ class SelectQueryTest {
         final Class<NonExistentTablePerson> aClass = NonExistentTablePerson.class;
         final String methodName = "findAll";
 
-        final TableName tableName = TableName.of(aClass);
-        final Columns columns = Columns.of(aClass.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(aClass);
+        final Columns columns = Columns을_생성함(aClass);
 
         //when
         String query = SelectQuery.create(methodName, tableName, columns);
@@ -54,8 +56,8 @@ class SelectQueryTest {
 
         final Class<Person> aClass = Person.class;
 
-        final TableName tableName = TableName.of(aClass);
-        final Columns columns = Columns.of(aClass.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(aClass);
+        final Columns columns = Columns을_생성함(aClass);
 
         //when
         String query = SelectQuery.create(new Object() {
@@ -72,8 +74,8 @@ class SelectQueryTest {
         String expectedQuery = "SELECT select_person_id, nick_name, old, email FROM selectPerson WHERE select_person_id = 1";
 
         Class<SelectPerson> clazz = SelectPerson.class;
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
 
         //when
         String query = SelectQuery.create("findById", tableName, columns, 1L);

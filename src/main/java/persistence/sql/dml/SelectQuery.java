@@ -11,17 +11,15 @@ public class SelectQuery {
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
 
     private final String methodName;
+    private final TableName tableName;
+    private final Columns columns;
     private final Object[] args;
-
-    //TODO: 추후 final 변경 필요
-    private TableName tableName;
-    private Columns columns;
 
     public SelectQuery(String methodName, Object[] args, TableName tableName, Columns columns) {
         this.methodName = methodName;
-        this.args = args;
         this.tableName = tableName;
         this.columns = columns;
+        this.args = args;
     }
 
     public static String create(String methodName, TableName tableName, Columns columns, Object... args) {

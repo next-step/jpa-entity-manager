@@ -10,7 +10,7 @@ public class UpdateQuery {
     private final TableName tableName;
     private final Columns columns;
     private final Values values;
-    private Object arg;
+    private final Object arg;
 
     public UpdateQuery(TableName tableName, Columns columns, Values values, Object arg) {
         this.tableName = tableName;

@@ -10,9 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
-import persistence.sql.common.instance.Values;
-import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
 
 import java.sql.SQLException;

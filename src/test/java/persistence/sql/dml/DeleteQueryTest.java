@@ -8,6 +8,8 @@ import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class DeleteQueryTest {
     @Test
@@ -18,8 +20,8 @@ class DeleteQueryTest {
         final String expectedQuery = String.format("DELETE FROM users WHERE id = %s", id);
 
         Class<Person> clazz = Person.class;
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
 
         //when
         String query = DeleteQuery.create(tableName, columns, 3L);
@@ -35,11 +37,9 @@ class DeleteQueryTest {
         final Long id = 3L;
         final String expectedQuery = String.format("DELETE FROM selectPerson WHERE select_person_id = %s", id);
 
-        SelectPerson person = new SelectPerson(3L, "zz", 30, "zz", 1);
-
         Class<SelectPerson> clazz = SelectPerson.class;
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
 
         //when
         String query = DeleteQuery.create(tableName, columns, 3L);

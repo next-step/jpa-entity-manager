@@ -21,6 +21,9 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class EntityPersisterTest {
 
@@ -177,16 +180,16 @@ class EntityPersisterTest {
     private String 아이디로_데이터를_조회하는_쿼리_생성(Long id) {
         Class<SelectPerson> clazz = SelectPerson.class;
 
-        final TableName tableName = TableName.of(clazz);
-        final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(clazz);
+        final Columns columns = Columns을_생성함(clazz);
 
         return QueryDml.select("findById", tableName, columns, id);
     }
 
     private <T> void 데이터를_저장함(T t) {
-        final TableName tableName = TableName.of(t.getClass());
-        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
-        final Values values = Values.of(t);
+        final TableName tableName = TableName을_생성함(t.getClass());
+        final Columns columns = Columns을_생성함(t.getClass().getDeclaredFields());
+        final Values values = Values을_생성함(t);
 
         jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));
     }

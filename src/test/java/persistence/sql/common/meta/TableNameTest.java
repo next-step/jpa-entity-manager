@@ -1,15 +1,16 @@
 package persistence.sql.common.meta;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentTablePerson;
 import persistence.person.NotEntityPerson;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class TableNameTest {
 
@@ -20,7 +21,7 @@ class TableNameTest {
         Class<Person> clazz = Person.class;
 
         //when
-        TableName result = TableName.of(clazz);
+        TableName result = TableName을_생성함(clazz);
 
         //then
         assertSoftly(softAssertions -> {
@@ -46,7 +47,7 @@ class TableNameTest {
         Class<NonExistentTablePerson> clazz = NonExistentTablePerson.class;
 
         //when
-        TableName result = TableName.of(clazz);
+        TableName result = TableName을_생성함(clazz);
 
         //then
         assertThat(result.getValue()).isEqualTo("NonExistentTablePerson");
