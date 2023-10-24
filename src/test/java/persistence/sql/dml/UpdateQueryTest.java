@@ -7,6 +7,7 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentTablePerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -24,9 +25,10 @@ class UpdateQueryTest {
         Class<Person> clazz = Person.class;
         final TableName tableName = TableName.of(clazz);
         final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final Values values = Values.of(person);
 
         //when
-        String result = UpdateQuery.create(person, tableName, columns, 3L);
+        String result = UpdateQuery.create(values, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -42,9 +44,10 @@ class UpdateQueryTest {
         Class<NonExistentTablePerson> clazz = NonExistentTablePerson.class;
         final TableName tableName = TableName.of(clazz);
         final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final Values values = Values.of(person);
 
         //when
-        String result = UpdateQuery.create(person, tableName, columns, 3L);
+        String result = UpdateQuery.create(values, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -60,9 +63,10 @@ class UpdateQueryTest {
         Class<SelectPerson> clazz = SelectPerson.class;
         final TableName tableName = TableName.of(clazz);
         final Columns columns = Columns.of(clazz.getDeclaredFields());
+        final Values values = Values.of(person);
 
         //when
-        String result = UpdateQuery.create(person, tableName, columns, 3L);
+        String result = UpdateQuery.create(values, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -78,6 +82,6 @@ class UpdateQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-                , () -> UpdateQuery.create(person, TableName.of(clazz), Columns.of(clazz.getDeclaredFields()), 3L));
+                , () -> UpdateQuery.create(Values.of(person), TableName.of(clazz), Columns.of(clazz.getDeclaredFields()), 3L));
     }
 }

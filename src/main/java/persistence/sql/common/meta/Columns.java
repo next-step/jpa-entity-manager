@@ -37,4 +37,8 @@ public class Columns {
                 .get()
                 .getName();
     }
+
+    public Column[] getValue() {
+        return value;
+    }
 }

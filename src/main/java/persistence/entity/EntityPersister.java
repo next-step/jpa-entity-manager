@@ -3,6 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import persistence.sql.common.instance.Value;
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.dml.QueryDml;
@@ -45,21 +46,22 @@ public class EntityPersister<T> {
 
     public <T> boolean update(T t, Object arg) {
         try {
-            jdbcTemplate.execute(QueryDml.update(t, tableName, columns, arg));
+            jdbcTemplate.execute(QueryDml.update(getValues(t), tableName, columns, arg));
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public <T> void insert(T t) {
-        final TableName tableName = TableName.of(t.getClass());
-        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
-
-        jdbcTemplate.execute(QueryDml.insert(tableName, columns, t));
+    public <I> void insert(I i) {
+        jdbcTemplate.execute(QueryDml.insert(tableName, columns, getValues(i)));
     }
 
     public void delete(Object arg) {
         jdbcTemplate.execute(QueryDml.delete(tableName, columns, arg));
+    }
+
+    public <I> Values getValues(I i) {
+        return Values.of(i);
     }
 }

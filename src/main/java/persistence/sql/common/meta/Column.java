@@ -49,7 +49,11 @@ public class Column {
     }
 
     public String getName() {
-        return name.value();
+        return name.getName();
+    }
+
+    public String getFieldName() {
+        return name.getFieldName();
     }
 
     public String getType() {

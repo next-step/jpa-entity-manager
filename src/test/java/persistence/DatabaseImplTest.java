@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import persistence.person.DatabasePerson;
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
@@ -126,8 +127,9 @@ class DatabaseImplTest {
     private <T> void insert(T t) throws SQLException {
         final TableName tableName = TableName.of(t.getClass());
         final Columns columns = Columns.of(t.getClass().getDeclaredFields());
+        final Values values = Values.of(t);
 
-        database.execute(QueryDml.insert(tableName, columns, t));
+        database.execute(QueryDml.insert(tableName, columns, values));
     }
 
     private void delete(TableName tableName, Columns columns, Object args) throws SQLException {

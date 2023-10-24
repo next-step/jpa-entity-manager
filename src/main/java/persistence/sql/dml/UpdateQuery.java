@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.common.instance.InstanceManager;
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -9,28 +9,30 @@ public class UpdateQuery {
 
     private final TableName tableName;
     private final Columns columns;
+    private final Values values;
     private Object arg;
 
-    public UpdateQuery(TableName tableName, Columns columns, Object arg) {
+    public UpdateQuery(TableName tableName, Columns columns, Values values, Object arg) {
         this.tableName = tableName;
         this.columns = columns;
+        this.values = values;
         this.arg = arg;
     }
 
-    public static <T> String create(T t, TableName tableName, Columns columns, Object args) {
-        return new UpdateQuery(tableName, columns, args).combine(t);
+    public static String create(Values values, TableName tableName, Columns columns, Object args) {
+        return new UpdateQuery(tableName, columns, values, args).combine();
     }
 
-    private <T> String combine(T t) {
-        return String.join(" ", getTableQuery(t), getCondition());
+    private String combine() {
+        return String.join(" ", getTableQuery(), getCondition());
     }
 
-    private <T> String getTableQuery(T t) {
-        return String.format(DEFAULT_UPDATE_COLUMN_QUERY, tableName.getValue(), setChangeField(t));
+    private String getTableQuery() {
+        return String.format(DEFAULT_UPDATE_COLUMN_QUERY, tableName.getValue(), setChangeField());
     }
 
-    private <T> String setChangeField(T t) {
-        return InstanceManager.getFieldNameAndValue(t);
+    private String setChangeField() {
+        return values.getFieldNameAndValue(columns);
     }
 
     private String getCondition() {

@@ -13,6 +13,7 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.InsertPerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
@@ -54,7 +55,10 @@ class QueryDmlTest {
             NotEntityPerson person = new NotEntityPerson(1L, "name", 3);
 
             //when & then
-            assertThrows(InvalidEntityException.class, () -> QueryDml.insert(TableName.of(person.getClass()), Columns.of(person.getClass().getDeclaredFields()), person));
+            assertThrows(InvalidEntityException.class
+                    , () -> QueryDml.insert(TableName.of(person.getClass())
+                            , Columns.of(person.getClass().getDeclaredFields())
+                            , Values.of(person.getClass().getDeclaredFields())));
         }
 
         @Test
@@ -71,9 +75,10 @@ class QueryDmlTest {
 
             final TableName tableName = TableName.of(person.getClass());
             final Columns columns = Columns.of(person.getClass().getDeclaredFields());
+            final Values values = Values.of(person);
 
             //when
-            String query = QueryDml.insert(tableName, columns, person);
+            String query = QueryDml.insert(tableName, columns, values);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -236,9 +241,10 @@ class QueryDmlTest {
             Class<SelectPerson> clazz = SelectPerson.class;
             final TableName tableName = TableName.of(clazz);
             final Columns columns = Columns.of(clazz.getDeclaredFields());
+            final Values values = Values.of(expected);
 
             //when
-            String query = QueryDml.update(expected, tableName, columns, id);
+            String query = QueryDml.update(values, tableName, columns, id);
             jdbcTemplate.execute(query);
             SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(clazz));
 
@@ -276,8 +282,9 @@ class QueryDmlTest {
     private <T> void insert(T t) {
         final TableName tableName = TableName.of(t.getClass());
         final Columns columns = Columns.of(t.getClass().getDeclaredFields());
+        final Values values = Values.of(t);
 
-        jdbcTemplate.execute(QueryDml.insert(tableName, columns, t));
+        jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));
     }
 
     private <T> void dropTable(Class<T> tClass) {

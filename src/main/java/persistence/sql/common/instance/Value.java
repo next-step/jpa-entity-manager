@@ -7,9 +7,11 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class Value {
+    private final String fieldName;
     private final Object value;
 
-    private Value(Object object) {
+    private Value(String fieldName, Object object) {
+        this.fieldName = fieldName;
         this.value = object;
     }
 
@@ -17,7 +19,7 @@ public class Value {
         Field[] fields = t.getClass().getDeclaredFields();
         return Arrays.stream(fields)
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
-                .map(field -> new Value(extractValue(t, field)))
+                .map(field -> new Value(field.getName(), extractValue(t, field)))
                 .toArray(Value[]::new);
     }
 
@@ -42,5 +44,9 @@ public class Value {
         }
 
         return StringUtils.parseChar(value);
+    }
+
+    public boolean isEquals(String fieldName) {
+        return this.fieldName.equals(fieldName);
     }
 }

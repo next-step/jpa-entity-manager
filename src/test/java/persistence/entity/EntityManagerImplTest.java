@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
@@ -250,8 +251,6 @@ class EntityManagerImplTest {
     }
 
     private <T> T 데이터를_조회함(Class<T> tClass, Object id) {
-        final TableName tableName = TableName.of(tClass);
-        final Columns columns = Columns.of(tClass.getDeclaredFields());
         return entityManager.find(tClass, id);
     }
 

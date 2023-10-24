@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import java.lang.reflect.Field;
 
 public class ColumnName {
-    private String value;
+    private String fieldName;
+    private String name;
 
     private ColumnName(Field field) {
+        this.fieldName = field.getName();
         extractName(field);
     }
 
@@ -26,10 +28,14 @@ public class ColumnName {
             columnName = field.getDeclaredAnnotation(Column.class).name();
         }
 
-        this.value = columnName;
+        this.name = columnName;
     }
 
-    public String value() {
-        return value;
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -1,12 +1,13 @@
 package persistence.sql.dml;
 
+import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
 public class QueryDml {
 
-    public static <T> String insert(TableName tableName, Columns columns, T t) {
-        return InsertQuery.create(tableName, columns, t);
+    public static String insert(TableName tableName, Columns columns, Values values) {
+        return InsertQuery.create(tableName, columns, values);
     }
 
     public static String select(String methodName, TableName tableName, Columns columns, Object... args) {
@@ -17,7 +18,7 @@ public class QueryDml {
         return DeleteQuery.create(tableName, columns, args);
     }
 
-    public static <T> String update(T t, TableName tableName, Columns columns, Object arg) {
-        return UpdateQuery.create(t, tableName, columns, arg);
+    public static String update(Values values, TableName tableName, Columns columns, Object arg) {
+        return UpdateQuery.create(values, tableName, columns, arg);
     }
 }
