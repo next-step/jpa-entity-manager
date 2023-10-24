@@ -15,16 +15,21 @@ enum ColumnType {
     }
 
     public static <T> ColumnType of(Class<T> tClass) {
-        return switch (tClass.getSimpleName()) {
-            case "int" -> INT;
-            case "Integer" -> INTEGER;
-            case "Long" -> BIGINT;
-            case "String" -> VARCHAR;
-            default -> NULL;
-        };
+        switch (tClass.getSimpleName()) {
+            case "int":
+                return INT;
+            case "Integer":
+                return INTEGER;
+            case "Long":
+                return BIGINT;
+            case "String":
+                return VARCHAR;
+            default:
+                return NULL;
+        }
     }
 
-    protected String getType() {
+    String getType() {
         String type = " " + this;
         if (defaultSize != null) {
             type = type + String.format("(%s)", this.defaultSize);
