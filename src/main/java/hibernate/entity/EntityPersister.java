@@ -34,7 +34,7 @@ public class EntityPersister<T> {
         EntityColumn entityId = entityColumns.getEntityId();
         final String query = updateQueryBuilder.generateQuery(
                 tableName.getTableName(),
-                getFieldValues(entity),
+                entityColumns.getFieldValues(entity),
                 entityId,
                 entityId.getFieldValue(entity)
         );
@@ -45,7 +45,7 @@ public class EntityPersister<T> {
         validateEntityType(entity);
         final String query = insertQueryBuilder.generateQuery(
                 tableName.getTableName(),
-                getFieldValues(entity)
+                entityColumns.getFieldValues(entity)
         );
         jdbcTemplate.execute(query);
     }
@@ -59,19 +59,6 @@ public class EntityPersister<T> {
                 entityId.getFieldValue(entity)
         );
         jdbcTemplate.execute(query);
-    }
-
-    private Map<EntityColumn, Object> getFieldValues(final Object entity) {
-        return entityColumns.getValues()
-                .stream()
-                .map(entityColumn -> new AbstractMap.SimpleEntry<>(entityColumn, entityColumn.getFieldValue(entity)))
-                .filter(entry -> entry.getValue() != null)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (existing, replacement) -> existing,
-                        LinkedHashMap::new
-                ));
     }
 
     private void validateEntityType(final Object entity) {

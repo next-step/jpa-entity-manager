@@ -1,9 +1,7 @@
 package hibernate.entity.column;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EntityColumns {
@@ -26,6 +24,18 @@ public class EntityColumns {
                 .filter(EntityColumn::isId)
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("id field가 없습니다."));
+    }
+
+    public Map<EntityColumn, Object> getFieldValues(final Object entity) {
+        return values.stream()
+                .map(entityColumn -> new AbstractMap.SimpleEntry<>(entityColumn, entityColumn.getFieldValue(entity)))
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
     }
 
     public List<EntityColumn> getValues() {
