@@ -2,7 +2,6 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
-import persistence.sql.common.instance.Value;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
@@ -13,19 +12,14 @@ import java.util.List;
 
 public class EntityPersister<T> {
     private final JdbcTemplate jdbcTemplate;
-    private Class<T> tClass;
-
-    private TableName tableName;
-    private Columns columns;
-
-    public EntityPersister(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final ResultMapper<T> resultMapper;
+    private final TableName tableName;
+    private final Columns columns;
 
     public EntityPersister(JdbcTemplate jdbcTemplate, Class<T> tClass) {
         this.jdbcTemplate = jdbcTemplate;
 
-        this.tClass = tClass;
+        this.resultMapper = new ResultMapper<>(tClass);
         this.tableName = TableName.of(tClass);
         this.columns = Columns.of(tClass.getDeclaredFields());
     }
@@ -34,14 +28,14 @@ public class EntityPersister<T> {
         String query = SelectQuery.create(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
-        return jdbcTemplate.query(query, new ResultMapper<>(tClass));
+        return jdbcTemplate.query(query, resultMapper);
     }
 
     public <I> T findById(I i) {
         String query = SelectQuery.create(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns, i);
 
-        return jdbcTemplate.queryForObject(query, new ResultMapper<>(tClass));
+        return jdbcTemplate.queryForObject(query, resultMapper);
     }
 
     public <T> boolean update(T t, Object arg) {

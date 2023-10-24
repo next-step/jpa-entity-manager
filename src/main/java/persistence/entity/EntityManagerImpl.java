@@ -10,13 +10,11 @@ import java.util.Map;
 public class EntityManagerImpl implements EntityManager {
 
     private JdbcTemplate jdbcTemplate;
-    private final EntityPersister entityPersister;
     private final Map<String, EntityPersister<?>> persisterMap;
 
 
     public EntityManagerImpl(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
-        this.entityPersister = new EntityPersister(jdbcTemplate);
         this.persisterMap = new HashMap<>();
     }
 
