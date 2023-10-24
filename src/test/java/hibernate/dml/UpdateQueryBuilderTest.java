@@ -1,9 +1,11 @@
 package hibernate.dml;
 
+import hibernate.entity.column.EntityColumn;
 import hibernate.entity.column.EntityField;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,17 +17,14 @@ class UpdateQueryBuilderTest {
     @Test
     void update쿼리를_생성한다() throws NoSuchFieldException {
         // given
-        String expected = "update test_entity set id = 1, nick_name = '최진영' where id = 1;";
+        Map<EntityColumn, Object> fieldValues = new LinkedHashMap<>();
         EntityField entityId = new EntityField(TestEntity.class.getDeclaredField("id"));
+        fieldValues.put(new EntityField(InsertQueryBuilderTest.TestEntity.class.getDeclaredField("id")), 1);
+        fieldValues.put(new EntityField(InsertQueryBuilderTest.TestEntity.class.getDeclaredField("name")), "최진영");
+        String expected = "update test_entity set id = 1, nick_name = '최진영' where id = 1;";
 
         // when
-        String actual = updateQueryBuilder.generateQuery(
-                "test_entity",
-                Map.of(
-                        entityId, 1,
-                        new EntityField(TestEntity.class.getDeclaredField("name")), "최진영"
-                ),
-                entityId, 1);
+        String actual = updateQueryBuilder.generateQuery("test_entity", fieldValues, entityId, 1);
 
         // then
         assertThat(actual).isEqualTo(expected);

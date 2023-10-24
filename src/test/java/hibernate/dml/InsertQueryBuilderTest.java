@@ -1,8 +1,12 @@
 package hibernate.dml;
 
-import hibernate.entity.EntityClass;
+import hibernate.entity.column.EntityColumn;
+import hibernate.entity.column.EntityField;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static hibernate.dml.InsertQueryBuilder.INSTANCE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,14 +16,15 @@ class InsertQueryBuilderTest {
     private final InsertQueryBuilder insertQueryBuilder = INSTANCE;
 
     @Test
-    void insert쿼리를_생성한다() {
+    void insert쿼리를_생성한다() throws NoSuchFieldException {
         // given
-        TestEntity givenEntity = new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com");
+        Map<EntityColumn, Object> fieldValues = new LinkedHashMap<>();
+        fieldValues.put(new EntityField(TestEntity.class.getDeclaredField("id")), 1);
+        fieldValues.put(new EntityField(TestEntity.class.getDeclaredField("name")), "최진영");
         String expected = "insert into test_entity (id, nick_name) values (1, '최진영');";
 
         // when
-        String actual = insertQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class), givenEntity)
-                .toLowerCase();
+        String actual = insertQueryBuilder.generateQuery("test_entity", fieldValues);
 
         // then
         assertThat(actual).isEqualTo(expected);

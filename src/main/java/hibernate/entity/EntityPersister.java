@@ -29,7 +29,10 @@ public class EntityPersister<T> {
     }
 
     public void insert(final Object entity) {
-        final String query = insertQueryBuilder.generateQuery(entityClass, entity);
+        final String query = insertQueryBuilder.generateQuery(
+                entityClass.tableName(),
+                entityClass.getFieldValues(entity)
+        );
         jdbcTemplate.execute(query);
     }
 

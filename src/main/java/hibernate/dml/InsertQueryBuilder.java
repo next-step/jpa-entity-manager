@@ -21,6 +21,11 @@ public class InsertQueryBuilder {
     private InsertQueryBuilder() {
     }
 
+    public String generateQuery(final String tableName, final Map<EntityColumn, Object> fieldValues) {
+        List<EntityColumn> entityColumns = new ArrayList<>(fieldValues.keySet());
+        return String.format(INSERT_QUERY, tableName, parseColumnQueries(entityColumns), parseColumnValueQueries(entityColumns, fieldValues));
+    }
+
     public String generateQuery(final EntityClass<?> entityClass, final Object entity) {
         Map<EntityColumn, Object> fieldValues = entityClass.getFieldValues(entity);
         List<EntityColumn> entityColumns = new ArrayList<>(fieldValues.keySet());
