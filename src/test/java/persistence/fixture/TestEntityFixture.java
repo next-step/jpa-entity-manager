@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 public class TestEntityFixture {
     @Entity
     @Table(name = "entity_name")
-    public static class EntityWithValidAnnotation {
+    public static class SampleOneWithValidAnnotation {
+        public Long getId() {
+            return id;
+        }
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         Long id;
@@ -14,12 +18,59 @@ public class TestEntityFixture {
         @Column(name = "old")
         Integer age;
 
-        public EntityWithValidAnnotation() {
+        public SampleOneWithValidAnnotation() {
         }
 
-        public EntityWithValidAnnotation(String name, Integer age) {
+        public SampleOneWithValidAnnotation(String name, Integer age) {
             this.name = name;
             this.age = age;
+        }
+
+        public SampleOneWithValidAnnotation(long id, String nickName, int age) {
+            this.id = id;
+            this.name = nickName;
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return "SampleOneWithValidAnnotation{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", age=" + age +
+                    '}';
+        }
+    }
+
+    @Entity
+    @Table(name = "two")
+    public static class SampleTwoWithValidAnnotation {
+        @Id
+        @Column(name = "two_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+        @Column(name = "nick_name", length = 200, nullable = false)
+        String name;
+        @Column
+        Integer age;
+
+        public SampleTwoWithValidAnnotation() {
+
+        }
+
+        public SampleTwoWithValidAnnotation(long id, String nickName, int age) {
+            this.id = id;
+            this.name = nickName;
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return "SampleTwoWithValidAnnotation{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", age=" + age +
+                    '}';
         }
     }
 
@@ -33,15 +84,6 @@ public class TestEntityFixture {
         String name;
         @Column(name = "age")
         Integer age;
-
-        public EntityWithMultiIdAnnotation() {
-
-        }
-
-        public EntityWithMultiIdAnnotation(String name, Integer age) {
-            this.name = name;
-            this.age = age;
-        }
     }
 
     public static class EntityWithOutEntityAnnotation {
@@ -54,13 +96,23 @@ public class TestEntityFixture {
         String name;
         @Column(name = "age")
         Integer age;
+    }
 
-        public EntityWithOutEntityAnnotation() {
-        }
+    @Table(name = "entity_with_string_id")
+    public static class EntityWithStringId {
+        @Id
+        String id;
+        @Id
+        @Column(name = "name", length = 200)
+        String name;
+        @Column(name = "age")
+        Integer age;
 
-        public EntityWithOutEntityAnnotation(String name, Integer age) {
+        public EntityWithStringId(String id, String name, Integer age) {
+            this.id = id;
             this.name = name;
             this.age = age;
         }
+
     }
 }
