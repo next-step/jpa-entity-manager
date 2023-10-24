@@ -29,13 +29,6 @@ class EntityPersisterTest {
     }
 
     @Test
-    @DisplayName("renderSelect 을 이용해 entity 의 select 문을 만들 수 있다.")
-    void renderSelectTest() {
-        final String query = entityPersister.renderSelect(1L);
-        assertThat(query).isEqualTo("select id, nick_name, old, email from users where id=1");
-    }
-
-    @Test
     @DisplayName("renderInsert 를 이용해 entity 의 insert 문을 만들 수 있다.")
     void renderInsertTest() {
         final String query = entityPersister.renderInsert(fixturePerson);

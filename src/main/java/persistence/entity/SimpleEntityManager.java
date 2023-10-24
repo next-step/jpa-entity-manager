@@ -1,16 +1,12 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
-import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.core.PersistenceEnvironment;
 import persistence.exception.PersistenceException;
-import persistence.util.ReflectionUtils;
+import persistence.sql.dml.DmlGenerator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 
 public class SimpleEntityManager implements EntityManager {
 
@@ -18,37 +14,22 @@ public class SimpleEntityManager implements EntityManager {
     private final Connection connection;
     private boolean closed;
     private final EntityPersisterProvider entityPersisterProvider;
+    private final DmlGenerator dmlGenerator;
 
     public SimpleEntityManager(final PersistenceEnvironment persistenceEnvironment) {
         this.connection = persistenceEnvironment.getConnection();
         this.jdbcTemplate = new JdbcTemplate(connection);
         this.closed = false;
-        this.entityPersisterProvider = new EntityPersisterProvider(jdbcTemplate, persistenceEnvironment.getDmlGenerator());
+        this.dmlGenerator = persistenceEnvironment.getDmlGenerator();
+        this.entityPersisterProvider = new EntityPersisterProvider(jdbcTemplate, dmlGenerator);
     }
 
     @Override
     public <T> T find(final Class<T> clazz, final Long id) {
         checkConnectionOpen();
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(clazz);
-        final String query = entityPersister.renderSelect(id);
-        return jdbcTemplate.queryForObject(query, getObjectRowMapper(clazz));
-    }
-
-    private <T> RowMapper<T> getObjectRowMapper(final Class<T> clazz) {
-        final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
-        final List<String> columnNames = entityMetadata.getColumnNames();
-        final List<String> fieldNames = entityMetadata.getColumnFieldNames();
-
-        return rowMapper -> {
-            final T instance = ReflectionUtils.createInstance(clazz);
-            for (int i = 0; i < entityMetadata.getColumnSize(); i++) {
-                final String fieldName = fieldNames.get(i);
-                final String columnName = columnNames.get(i);
-                final Object object = rowMapper.getObject(columnName);
-                ReflectionUtils.injectField(instance, fieldName, object);
-            }
-            return instance;
-        };
+        final EntityLoader<T> entityLoader = new EntityLoader<>(clazz, entityPersister, jdbcTemplate, dmlGenerator);
+        return entityLoader.loadById(id);
     }
 
     @Override

@@ -41,4 +41,4 @@ public class EntityPersister {
 - [x] RowMapper 클래스는 변환할 엔터티의 정보를 미리 가지고 있다가 객체를 받아 처리한다.
 
 - 요구사항 2 - EntityManager 의 책임 줄여주기
-- [ ] 기존 SimpleEntityManager 가 하던 find 로직을 EntityLoader 에게 위임한다.
+- [x] 기존 SimpleEntityManager 가 하던 find 로직을 EntityLoader 에게 위임한다.
