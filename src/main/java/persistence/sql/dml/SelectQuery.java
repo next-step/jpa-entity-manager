@@ -1,31 +1,35 @@
 package persistence.sql.dml;
 
-import java.util.List;
-
-import persistence.sql.common.meta.EntityMeta;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 import utils.ConditionUtils;
+
+import java.util.List;
 
 public class SelectQuery {
 
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
-    private static final String CONDITION_AND = " AND ";
 
-    private EntityMeta entityMeta;
     private final String methodName;
     private final Object[] args;
 
-    public <T> SelectQuery(Class<T> tClass, String methodName, Object[] args) {
-        this.entityMeta = EntityMeta.of(tClass);
+    //TODO: 추후 final 변경 필요
+    private TableName tableName;
+    private Columns columns;
+
+    public SelectQuery(String methodName, Object[] args, TableName tableName, Columns columns) {
         this.methodName = methodName;
         this.args = args;
+        this.tableName = tableName;
+        this.columns = columns;
     }
 
-    public static <T> String create(Class<T> tClass, String methodName) {
-        return new SelectQuery(tClass, methodName, null).combine();
+    public static String create(String methodName, TableName tableName, Columns columns, Object... args) {
+        return new SelectQuery(methodName, args, tableName, columns).combine();
     }
 
-    public static <T> String create(Class<T> tClass, String methodName, Object... args) {
-        return new SelectQuery(tClass, methodName, args).combine();
+    public static String create(String methodName, TableName tableName, Columns columns) {
+        return new SelectQuery(methodName, null, tableName, columns).combine();
     }
 
     public String combine() {
@@ -39,11 +43,11 @@ public class SelectQuery {
     }
 
     private String parseFiled() {
-        return String.format(DEFAULT_SELECT_COLUMN_QUERY, parseSelectFiled(), entityMeta.getTableName());
+        return String.format(DEFAULT_SELECT_COLUMN_QUERY, parseSelectFiled(), tableName.getValue());
     }
 
     private String parseSelectFiled() {
-        return entityMeta.getColumnsWithComma();
+        return columns.getColumnsWithComma();
     }
 
     private String parseWhere() {
@@ -60,8 +64,8 @@ public class SelectQuery {
     }
 
     private String setConditionField(String word) {
-        if(word.equals("id")) {
-            word = entityMeta.getIdName();
+        if (word.equals("id")) {
+            word = columns.getIdName();
         }
         return word;
     }

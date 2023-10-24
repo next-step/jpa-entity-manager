@@ -19,8 +19,8 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T, R> T find(Class<T> tClass, R r) {
-        return entityPersister.findById(tClass, r);
+    public <R, I> R find(Class<R> rClass, I i) {
+        return (R) entityPersister.findById(rClass, i);
     }
 
     @Override

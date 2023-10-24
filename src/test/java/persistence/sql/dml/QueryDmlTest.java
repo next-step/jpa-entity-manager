@@ -107,10 +107,13 @@ class QueryDmlTest {
 
             final SelectPerson person = new SelectPerson(id, name, age, email, index);
 
+            final TableName tableName = TableName.of(person.getClass());
+            final Columns columns = Columns.of(person.getClass().getDeclaredFields());
+
             insert(person);
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery(SelectPerson.class, "findAll"), new ResultMapper<>(SelectPerson.class));
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(SelectPerson.class));
             SelectPerson result = personList.get(0);
 
             //then
@@ -133,8 +136,11 @@ class QueryDmlTest {
             insert(person1);
             insert(person2);
 
+            final TableName tableName = TableName.of(person1.getClass());
+            final Columns columns = Columns.of(person1.getClass().getDeclaredFields());
+
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery(SelectPerson.class, "findAll"), new ResultMapper<>(SelectPerson.class));
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(SelectPerson.class));
 
             //then
             assertThat(personList).size().isEqualTo(2);
@@ -227,7 +233,10 @@ class QueryDmlTest {
             String query = QueryDml.update(expected, id);
             jdbcTemplate.execute(query);
 
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(SelectPerson.class, "findAll"), new ResultMapper<>(SelectPerson.class));
+            Class<SelectPerson> clazz = SelectPerson.class;
+            final TableName tableName = TableName.of(clazz);
+            final Columns columns = Columns.of(clazz.getDeclaredFields());
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(clazz));
 
             //then
             assertSoftly(softAssertions -> {
@@ -244,12 +253,16 @@ class QueryDmlTest {
         }
     }
 
-    private <T> String getSelectQuery(Class<T> tClass, String methodName) {
-        return QueryDml.select(tClass, methodName);
+    private <T> String getSelectQuery(String methodName, TableName tableName, Columns columns) {
+
+        return QueryDml.select(methodName, tableName, columns);
     }
 
     private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
-        return QueryDml.select(tClass, methodName, args);
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
+
+        return QueryDml.select(methodName, tableName, columns, args);
     }
 
     private <T> void createTable(Class<T> tClass) {

@@ -1,8 +1,9 @@
 package persistence.sql.common.meta;
 
+import utils.StringUtils;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import utils.StringUtils;
 
 public class Columns {
     private final Column[] value;
@@ -21,7 +22,19 @@ public class Columns {
      */
     public String getColumnsWithComma() {
         return StringUtils.withComma(Arrays.stream(value)
-            .map(Column::getName)
-            .toArray(String[]::new));
+                .map(Column::getName)
+                .toArray(String[]::new));
+    }
+
+    /**
+     * @return
+     * @Id의 field 명을 가져온다.
+     */
+    public String getIdName() {
+        return Arrays.stream(value)
+                .filter(Column::isPrimaryKey)
+                .findFirst()
+                .get()
+                .getName();
     }
 }

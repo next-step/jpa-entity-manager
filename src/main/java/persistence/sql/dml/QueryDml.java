@@ -9,12 +9,8 @@ public class QueryDml {
         return InsertQuery.create(tableName, columns, t);
     }
 
-    public static <T> String select(Class<T> tClass, String methodName) {
-        return SelectQuery.create(tClass, methodName);
-    }
-
-    public static <T> String select(Class<T> tClass, String methodName, Object... args) {
-        return SelectQuery.create(tClass, methodName, args);
+    public static String select(String methodName, TableName tableName, Columns columns, Object... args) {
+        return SelectQuery.create(methodName, tableName, columns, args);
     }
 
     public static <T> String delete(T t, Object args) {

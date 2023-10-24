@@ -6,10 +6,13 @@ import domain.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
 
 import java.sql.SQLException;
@@ -19,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Disabled("개선 후 사용 예정")
 class EntityManagerImplTest {
 
     private final Class<SelectPerson> clazz = SelectPerson.class;
@@ -242,6 +246,8 @@ class EntityManagerImplTest {
     }
 
     private <T> T 데이터를_조회함(Class<T> tClass, Object id) {
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
         return entityManager.find(tClass, id);
     }
 

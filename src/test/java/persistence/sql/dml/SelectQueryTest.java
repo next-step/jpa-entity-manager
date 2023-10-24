@@ -7,6 +7,8 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentTablePerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,7 +23,8 @@ class SelectQueryTest {
         final String methodName = "findAll";
 
         //when & then
-        assertThrows(InvalidEntityException.class, () -> SelectQuery.create(aClass, methodName));
+        assertThrows(InvalidEntityException.class
+            , () -> SelectQuery.create(methodName, TableName.of(aClass), Columns.of(aClass.getDeclaredFields())));
     }
 
     @Test
@@ -33,8 +36,11 @@ class SelectQueryTest {
         final Class<NonExistentTablePerson> aClass = NonExistentTablePerson.class;
         final String methodName = "findAll";
 
+        final TableName tableName = TableName.of(aClass);
+        final Columns columns = Columns.of(aClass.getDeclaredFields());
+
         //when
-        String query = SelectQuery.create(aClass, methodName);
+        String query = SelectQuery.create(methodName, tableName, columns);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);
@@ -48,9 +54,12 @@ class SelectQueryTest {
 
         final Class<Person> aClass = Person.class;
 
+        final TableName tableName = TableName.of(aClass);
+        final Columns columns = Columns.of(aClass.getDeclaredFields());
+
         //when
-        String query = SelectQuery.create(aClass, new Object() {
-        }.getClass().getEnclosingMethod().getName());
+        String query = SelectQuery.create(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);
@@ -62,8 +71,12 @@ class SelectQueryTest {
         //given
         String expectedQuery = "SELECT select_person_id, nick_name, old, email FROM selectPerson WHERE select_person_id = 1";
 
+        Class<SelectPerson> clazz = SelectPerson.class;
+        final TableName tableName = TableName.of(clazz);
+        final Columns columns = Columns.of(clazz.getDeclaredFields());
+
         //when
-        String query = SelectQuery.create(SelectPerson.class, "findById", 1L);
+        String query = SelectQuery.create("findById", tableName, columns, 1L);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);

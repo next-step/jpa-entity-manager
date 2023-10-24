@@ -36,7 +36,7 @@ class EntityPersisterTest {
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        entityPersister = new EntityPersister(jdbcTemplate);
+        entityPersister = new EntityPersister<>(jdbcTemplate, selectPerson);
 
         jdbcTemplate.execute(QueryDdl.create(selectPerson));
     }
@@ -199,7 +199,12 @@ class EntityPersisterTest {
     }
 
     private String 아이디로_데이터를_조회하는_쿼리_생성(Long id) {
-        return QueryDml.select(SelectPerson.class, "findById", id);
+        Class<SelectPerson> clazz = SelectPerson.class;
+
+        final TableName tableName = TableName.of(clazz);
+        final Columns columns = Columns.of(clazz.getDeclaredFields());
+
+        return QueryDml.select("findById", tableName, columns, id);
     }
 
     private <T> void 데이터를_저장함(T t) {

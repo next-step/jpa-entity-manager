@@ -3,36 +3,45 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import persistence.sql.common.instance.Value;
-import persistence.sql.common.meta.Column;
 import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.EntityMeta;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.dml.QueryDml;
 import persistence.sql.dml.SelectQuery;
 
 import java.util.List;
 
-public class EntityPersister {
+public class EntityPersister<T> {
     private final JdbcTemplate jdbcTemplate;
+    private Class<T> tClass;
 
     private TableName tableName;
-    private Column[] columns;
+    private Columns columns;
     private Value[] values;
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public EntityPersister(JdbcTemplate jdbcTemplate, Class<T> tClass) {
+        this.jdbcTemplate = jdbcTemplate;
+
+        this.tClass = tClass;
+        this.tableName = TableName.of(tClass);
+        this.columns = Columns.of(tClass.getDeclaredFields());
+    }
+
     public <T> List<T> findAll(Class<T> tClass) {
-        String query = SelectQuery.create(tClass, new Object() {
-        }.getClass().getEnclosingMethod().getName());
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
+        String query = SelectQuery.create(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
         return jdbcTemplate.query(query, new ResultMapper<>(tClass));
     }
 
-    public <T, R> T findById(Class<T> tClass, R r) {
-        String query = SelectQuery.create(tClass, new Object() {
-        }.getClass().getEnclosingMethod().getName(), r);
+    public <R, I> T findById(R r, I i) {
+        String query = SelectQuery.create(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns, i);
 
         return jdbcTemplate.queryForObject(query, new ResultMapper<>(tClass));
     }
@@ -55,11 +64,5 @@ public class EntityPersister {
 
     public <T> void delete(T t, Object arg) {
         jdbcTemplate.execute(QueryDml.delete(t, arg));
-    }
-
-    private <T> void mapping(T t) {
-        this.tableName = TableName.of(t.getClass());
-        this.columns = Column.of(t.getClass().getDeclaredFields());
-        this.values = Value.of(t.getClass());
     }
 }
