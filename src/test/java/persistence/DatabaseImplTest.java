@@ -3,6 +3,7 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -25,24 +26,27 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DatabaseImplTest {
 
-    private DatabaseImpl database;
-    private DatabaseServer server;
-    private Class<DatabasePerson> tClass;
+    private static Database database;
+    private static Class<DatabasePerson> tClass;
 
-    @BeforeEach
-    void init() throws SQLException {
-        server = new H2();
+    @BeforeAll
+    static void init() throws SQLException {
+        DatabaseServer server = new H2();
         server.start();
-        tClass = DatabasePerson.class;
 
         database = new DatabaseImpl(server.getConnection());
-        createTable(tClass);
+        tClass = DatabasePerson.class;
+    }
+
+    @BeforeEach
+    void beforeEach() throws SQLException {
+        테이블을_생성함(tClass);
     }
 
     @Test
     @Order(1)
     @DisplayName("database 인터페이스를 통한 insert 성공")
-    void insert() throws SQLException {
+    void insert() {
         //given
         final Long id = 3L;
         final String name = "name";
@@ -113,14 +117,14 @@ class DatabaseImplTest {
 
     @AfterEach
     void after() throws SQLException {
-        dropTable(tClass);
+        테이블을_삭제함(tClass);
     }
 
-    private <T> void createTable(Class<T> tClass) throws SQLException {
+    private static <T> void 테이블을_생성함(Class<T> tClass) throws SQLException {
         database.execute(QueryDdl.create(tClass));
     }
 
-    private <T> void dropTable(Class<T> tClass) throws SQLException {
+    private static <T> void 테이블을_삭제함(Class<T> tClass) throws SQLException {
         database.execute(QueryDdl.drop(tClass));
     }
 

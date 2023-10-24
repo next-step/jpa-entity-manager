@@ -4,7 +4,9 @@ import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,19 +23,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityManagerImplTest {
 
-    private final Class<SelectPerson> clazz = SelectPerson.class;
+    private static final Class<SelectPerson> clazz = SelectPerson.class;
 
-    private EntityManager entityManager;
+    private static EntityManager entityManager;
 
-    private JdbcTemplate jdbcTemplate;
+    private static JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    void init() throws SQLException {
+    @BeforeAll
+    static void beforeInit() throws SQLException {
         DatabaseServer server = new H2();
+        server.start();
 
         entityManager = new EntityManagerImpl(server.getConnection());
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+    }
 
+    @BeforeEach
+    void init() {
         테이블을_생성함(clazz);
     }
 
@@ -251,11 +257,11 @@ class EntityManagerImplTest {
         return entityManager.find(tClass, id);
     }
 
-    private <T> void 테이블을_생성함(Class<T> tClass) {
+    private static <T> void 테이블을_생성함(Class<T> tClass) {
         jdbcTemplate.execute(QueryDdl.create(tClass));
     }
 
-    private <T> void 테이블을_삭제함(Class<T> tClass) {
+    private static <T> void 테이블을_삭제함(Class<T> tClass) {
         jdbcTemplate.execute(QueryDdl.drop(tClass));
     }
 

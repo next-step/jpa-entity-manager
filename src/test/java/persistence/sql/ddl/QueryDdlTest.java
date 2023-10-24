@@ -2,16 +2,16 @@ package persistence.sql.ddl;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Person;
 import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import domain.Person;
-import persistence.person.NotEntityPerson;
 import persistence.person.ExistTablePerson;
 import persistence.person.NonExistentTablePerson;
+import persistence.person.NotEntityPerson;
 
 import java.sql.SQLException;
 
@@ -19,12 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class QueryDdlTest {
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
 
-    private DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
-
-    @BeforeEach
-    void start() throws SQLException {
+    @BeforeAll
+    static void start() throws SQLException {
         server = new H2();
         server.start();
 
@@ -107,12 +106,12 @@ class QueryDdlTest {
         }
     }
 
-    private <T> void createTable(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.create(tClass));
+    @AfterAll
+    static void stop() {
+        server.stop();
     }
 
-    @AfterEach
-    void stop() {
-        server.stop();
+    private <T> void createTable(Class<T> tClass) {
+        jdbcTemplate.execute(QueryDdl.create(tClass));
     }
 }

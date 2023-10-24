@@ -5,7 +5,9 @@ import database.H2;
 import domain.Person;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,20 +29,23 @@ import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class EntityPersisterTest {
 
-    private Class<SelectPerson> selectPerson = SelectPerson.class;
+    private static Class<SelectPerson> selectPerson = SelectPerson.class;
+    private static EntityPersister entityPersister;
+    public static DatabaseServer server;
+    public static JdbcTemplate jdbcTemplate;
 
-    private EntityPersister entityPersister;
-    private JdbcTemplate jdbcTemplate;
-    private DatabaseServer server;
-
-    @BeforeEach
-    void init() throws SQLException {
+    @BeforeAll
+    static void init() throws SQLException {
         server = new H2();
+        server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         entityPersister = new EntityPersister<>(jdbcTemplate, selectPerson);
+    }
 
+    @BeforeEach
+    void beforeEach() {
         jdbcTemplate.execute(QueryDdl.create(selectPerson));
     }
 
@@ -175,6 +180,11 @@ class EntityPersisterTest {
     @AfterEach
     void after() {
         jdbcTemplate.execute(QueryDdl.drop(selectPerson));
+    }
+
+    @AfterAll
+    static void stop() {
+        server.stop();
     }
 
     private String 아이디로_데이터를_조회하는_쿼리_생성(Long id) {

@@ -4,7 +4,9 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,11 +32,11 @@ import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class QueryDmlTest {
-    private DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    void start() throws SQLException {
+    @BeforeAll
+    static void start() throws SQLException {
         server = new H2();
         server.start();
 
@@ -48,7 +50,7 @@ class QueryDmlTest {
 
         @BeforeEach
         void init() {
-            createTable(aClass);
+            테이블을_생성함(aClass);
         }
 
         @Test
@@ -100,7 +102,7 @@ class QueryDmlTest {
 
         @BeforeEach
         void init() {
-            createTable(selectPersonClass);
+            테이블을_생성함(selectPersonClass);
         }
 
         @Test
@@ -180,7 +182,7 @@ class QueryDmlTest {
 
         @BeforeEach
         void init() {
-            createTable(selectPersonClass);
+            테이블을_생성함(selectPersonClass);
         }
 
         @Test
@@ -224,7 +226,7 @@ class QueryDmlTest {
 
         @BeforeEach
         void init() {
-            createTable(selectPersonClass);
+            테이블을_생성함(selectPersonClass);
         }
 
         @Test
@@ -267,24 +269,29 @@ class QueryDmlTest {
         }
     }
 
+    @AfterAll
+    static void stop() {
+        server.stop();
+    }
+
     private String getSelectQuery(String methodName, TableName tableName, Columns columns) {
         return QueryDml.select(methodName, tableName, columns);
     }
 
     private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
         final TableName tableName = TableName을_생성함(tClass);
-        final Columns columns = Columns을_생성함(tClass.getDeclaredFields());
+        final Columns columns = Columns을_생성함(tClass);
 
         return QueryDml.select(methodName, tableName, columns, args);
     }
 
-    private <T> void createTable(Class<T> tClass) {
+    private <T> void 테이블을_생성함(Class<T> tClass) {
         jdbcTemplate.execute(QueryDdl.create(tClass));
     }
 
     private <T> void insert(T t) {
         final TableName tableName = TableName을_생성함(t);
-        final Columns columns = Columns을_생성함(t.getClass());
+        final Columns columns = Columns을_생성함(t);
         final Values values = Values.of(t);
 
         jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));
@@ -292,10 +299,5 @@ class QueryDmlTest {
 
     private <T> void dropTable(Class<T> tClass) {
         jdbcTemplate.execute(QueryDdl.drop(tClass));
-    }
-
-    @AfterEach
-    void stop() {
-        server.stop();
     }
 }
