@@ -8,23 +8,23 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static hibernate.dml.InsertQueryBuilder.INSTANCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InsertQueryBuilderTest {
+class UpdateQueryBuilderTest {
 
-    private final InsertQueryBuilder insertQueryBuilder = INSTANCE;
+    private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
 
     @Test
-    void insert쿼리를_생성한다() throws NoSuchFieldException {
+    void update쿼리를_생성한다() throws NoSuchFieldException {
         // given
         Map<EntityColumn, Object> fieldValues = new LinkedHashMap<>();
-        fieldValues.put(new EntityField(TestEntity.class.getDeclaredField("id")), 1);
-        fieldValues.put(new EntityField(TestEntity.class.getDeclaredField("name")), "최진영");
-        String expected = "insert into test_entity (id, nick_name) values (1, '최진영');";
+        EntityField entityId = new EntityField(TestEntity.class.getDeclaredField("id"));
+        fieldValues.put(new EntityField(InsertQueryBuilderTest.TestEntity.class.getDeclaredField("id")), 1);
+        fieldValues.put(new EntityField(InsertQueryBuilderTest.TestEntity.class.getDeclaredField("name")), "최진영");
+        String expected = "update test_entity set id = 1, nick_name = '최진영' where id = 1;";
 
         // when
-        String actual = insertQueryBuilder.generateQuery("test_entity", fieldValues);
+        String actual = updateQueryBuilder.generateQuery("test_entity", fieldValues, entityId, 1);
 
         // then
         assertThat(actual).isEqualTo(expected);

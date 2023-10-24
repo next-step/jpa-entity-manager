@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 
 public class SelectQueryBuilder {
 
+    public static final SelectQueryBuilder INSTANCE = new SelectQueryBuilder();
+
     private static final String SELECT_QUERY = "select %s from %s where %s = %s;";
 
     private static final String SELECT_QUERY_COLUMN_DELIMITER = ", ";
 
-    public SelectQueryBuilder() {
+    private SelectQueryBuilder() {
     }
 
     public String generateQuery(final EntityClass<?> entityClass, final Object id) {

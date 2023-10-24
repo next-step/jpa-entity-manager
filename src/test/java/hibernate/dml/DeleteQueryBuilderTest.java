@@ -1,6 +1,7 @@
 package hibernate.dml;
 
 import hibernate.entity.EntityClass;
+import hibernate.entity.column.EntityField;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 
@@ -8,17 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DeleteQueryBuilderTest {
 
-    private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+    private final DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
 
     @Test
-    void delete쿼리를_생성한다() {
+    void delete쿼리를_생성한다() throws NoSuchFieldException {
         // given
         String expected = "delete from test_entity where id = 1;";
-        TestEntity givenEntity = new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com");
 
         // when
-        String actual = deleteQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class), givenEntity)
-                .toLowerCase();
+        String actual = deleteQueryBuilder.generateQuery("test_entity", new EntityField(TestEntity.class.getDeclaredField("id")), 1);
 
         // then
         assertThat(actual).isEqualTo(expected);

@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 public class CreateQueryBuilder {
 
+    public static final CreateQueryBuilder INSTANCE = new CreateQueryBuilder();
+
     private static final String CREATE_TABLE_QUERY = "create table %s (%s);";
     private static final String CREATE_COLUMN_QUERY = "%s %s";
     private static final String CREATE_COLUMN_OPTION_DELIMITER = " ";
@@ -23,7 +25,7 @@ public class CreateQueryBuilder {
             new IdIdentityOptionGenerateStrategy()
     );
 
-    public CreateQueryBuilder() {
+    private CreateQueryBuilder() {
     }
 
     public String generateQuery(final EntityClass<?> entity) {

@@ -3,6 +3,9 @@ package hibernate.entity;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
+import hibernate.dml.DeleteQueryBuilder;
+import hibernate.dml.InsertQueryBuilder;
+import hibernate.dml.UpdateQueryBuilder;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -23,14 +27,15 @@ class EntityManagerImplTest {
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
     private static EntityManagerImpl entityManager;
-    private static final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder();
+    private static final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
     @BeforeAll
     static void beforeAll() throws SQLException {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(jdbcTemplate);
+        entityManager = new EntityManagerImpl(jdbcTemplate,
+                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(TestEntity.class, jdbcTemplate))));
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class)));
     }
@@ -42,6 +47,7 @@ class EntityManagerImplTest {
 
     @AfterAll
     static void afterAll() {
+        jdbcTemplate.execute("drop table test_entity;");
         server.stop();
     }
 
@@ -103,7 +109,7 @@ class EntityManagerImplTest {
     }
 
     @Entity
-    @Table(name= "test_entity")
+    @Table(name = "test_entity")
     static class TestEntity {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

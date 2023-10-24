@@ -44,53 +44,6 @@ class EntityClassTest {
                 .hasMessage("기본 생성자가 존재하지 않습니다.");
     }
 
-    @Test
-    void 필드명과_데이터가_담긴_Map을_반환한다() {
-        TestEntity givenObject = new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com");
-        Map<EntityColumn, Object> actual = new EntityClass<>(TestEntity.class).getFieldValues(givenObject);
-
-        assert actual != null;
-        assertAll(
-                () -> assertThat(actual).hasSize(2),
-                () -> assertThat(parseEntityColumnValue(actual, "id")).isEqualTo(1L),
-                () -> assertThat(parseEntityColumnValue(actual, "nick_name")).isEqualTo("최진영")
-        );
-    }
-
-    @Test
-    void 다른_타입의_인스턴스_필드값을_반환하려하는_경우_예외가_발생한다() {
-        TestEntity givenObject = new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com");
-        EntityClass<TableEntity> givenEntityClass = new EntityClass<>(TableEntity.class);
-        assertThatThrownBy(() -> givenEntityClass.getFieldValues(givenObject))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
-    }
-
-    private Object parseEntityColumnValue(final Map<EntityColumn, Object> entityColumns, final String key) {
-        return entityColumns.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getFieldName().equals(key))
-                .findAny()
-                .map(Map.Entry::getValue)
-                .get();
-    }
-
-    @Test
-    void entity객체에서_id를_추출한다() {
-        TestEntity givenEntity = new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com");
-        Object actual = new EntityClass<>(TestEntity.class).extractEntityId(givenEntity);
-        assertThat(actual).isEqualTo(givenEntity.id);
-    }
-
-    @Test
-    void 다른_타입의_entity객체에서_id추출_시_예외가_발생한다() {
-        TableEntity givenEntity = new TableEntity(1L);
-        assertThatThrownBy(() -> new EntityClass<>(TestEntity.class).extractEntityId(givenEntity))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
-    }
-
-
     @Entity
     @Table(name = "new_table")
     static class TableEntity {

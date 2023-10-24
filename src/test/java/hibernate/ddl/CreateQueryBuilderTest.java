@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CreateQueryBuilderTest {
 
-    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder();
+    private final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
     @Test
     void Entity가_걸린_클래스의_create_쿼리를_생성한다() {

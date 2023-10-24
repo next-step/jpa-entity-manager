@@ -1,7 +1,5 @@
 package hibernate.entity;
 
-import hibernate.dml.DeleteQueryBuilder;
-import hibernate.dml.InsertQueryBuilder;
 import hibernate.dml.SelectQueryBuilder;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
@@ -9,12 +7,12 @@ import jdbc.ReflectionRowMapper;
 public class EntityManagerImpl implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
-    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
-    private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+    private final EntityPersisters entityPersisters;
+    private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
-    public EntityManagerImpl(final JdbcTemplate jdbcTemplate) {
+    public EntityManagerImpl(final JdbcTemplate jdbcTemplate, EntityPersisters entityPersisters) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityPersisters = entityPersisters;
     }
 
     @Override
@@ -25,13 +23,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(final Object entity) {
-        final String query = insertQueryBuilder.generateQuery(new EntityClass<>(entity.getClass()), entity);
-        jdbcTemplate.execute(query);
+        entityPersisters.findEntityPersister(entity)
+                .insert(entity);
     }
 
     @Override
     public void remove(final Object entity) {
-        final String query = deleteQueryBuilder.generateQuery(new EntityClass<>(entity.getClass()), entity);
-        jdbcTemplate.execute(query);
+        entityPersisters.findEntityPersister(entity)
+                .delete(entity);
     }
 }
