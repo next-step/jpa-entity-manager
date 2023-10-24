@@ -10,7 +10,7 @@ import static persistence.sql.util.StringConstant.COLUMN_JOIN;
 
 public class UpdateQueryBuilder {
 
-    private static final String UPDATE = "UPDATE";
+    private static final String UPDATE = "UPDATE ";
     private static final String SET = " SET ";
 
     private final EntityMeta entityMeta;
