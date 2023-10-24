@@ -24,7 +24,7 @@ public class UpdateQueryBuilder {
 
     private void validateEntityAnnotation(EntityMeta entityMeta) {
         if (!entityMeta.isEntity()) {
-            throw new IllegalArgumentException("Delete Query 빌드 대상이 아닙니다.");
+            throw new IllegalArgumentException("Update Query 빌드 대상이 아닙니다.");
         }
     }
 
