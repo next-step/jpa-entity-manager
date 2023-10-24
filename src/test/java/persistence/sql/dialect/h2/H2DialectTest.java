@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import persistence.sql.entity.EntityColumn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,16 +33,16 @@ class H2DialectTest {
     @ParameterizedTest
     @CsvSource("withoutLength,withoutColumn")
     void h2VarcharLengthTestWithoutDeclaredLength(String fieldName) throws Exception {
-        assertThat(new H2Dialect().getStringLength(ColumnTestClass.class.getDeclaredField(fieldName)))
-                .isEqualTo("(255)");
+        assertThat(new H2Dialect().getDbType(new EntityColumn(ColumnTestClass.class.getDeclaredField(fieldName))))
+                .isEqualTo("varchar(255)");
     }
 
     @DisplayName("String 타입이고 @Column(length = 값)에 값이 명시된 경우 그 값을 따른다.")
     @ParameterizedTest
     @CsvSource("withColumnAndLength")
     void h2VarcharLengthTestWithDeclaredLength(String fieldName) throws Exception {
-        assertThat(new H2Dialect().getStringLength(ColumnTestClass.class.getDeclaredField(fieldName)))
-                .isEqualTo("(" + TEST_LENGTH + ")");
+        assertThat(new H2Dialect().getDbType(new EntityColumn(ColumnTestClass.class.getDeclaredField(fieldName))))
+                .isEqualTo("varchar(" + TEST_LENGTH + ")");
     }
 
 }

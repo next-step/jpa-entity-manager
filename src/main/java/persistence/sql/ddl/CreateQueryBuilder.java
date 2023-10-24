@@ -67,11 +67,7 @@ public class CreateQueryBuilder {
     }
 
     private void appendColumnType(EntityColumn entityColumn, StringBuilder columnQueryPart) {
-        Class<?> entityColumnType = entityColumn.getType();
-        columnQueryPart.append(dialect.getDbType(entityColumnType));
-        if (entityColumnType == String.class) {
-            columnQueryPart.append(dialect.getStringLength(entityColumn.getField()));
-        }
+        columnQueryPart.append(dialect.getDbType(entityColumn));
     }
 
     private void appendIdAttributesIfId(EntityColumn entityColumn, StringBuilder columnQueryPart) {
