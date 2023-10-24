@@ -43,7 +43,7 @@ public class EntityPersister {
         jdbcTemplate.execute(deleteQuery);
     }
 
-    public String renderSelect(final Long id) {
+    public String renderSelect(final Object id) {
         return dmlGenerator.findById(tableName, columns.getNames(), idColumn.getName(), id);
     }
 
@@ -63,6 +63,18 @@ public class EntityPersister {
     public String renderDelete(final Object entity) {
         final Object idValue = ReflectionUtils.getFieldValue(entity, idColumn.getFieldName());
         return dmlGenerator.delete(tableName, idColumn.getName(), idValue);
+    }
+
+    public List<String> getColumnNames() {
+        return columns.getNames();
+    }
+
+    public List<String> getColumnFieldNames() {
+        return columns.getFieldNames();
+    }
+
+    public int getColumnSize() {
+        return columns.size();
     }
 
 }
