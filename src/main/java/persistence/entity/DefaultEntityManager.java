@@ -6,21 +6,21 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectFactory;
 import persistence.sql.dml.DmlQueryGenerator;
 
-public class JdbcEntityManager implements EntityManager {
+public class DefaultEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
     private final DmlQueryGenerator dmlQueryGenerator;
 
-    private JdbcEntityManager(JdbcTemplate jdbcTemplate, DmlQueryGenerator dmlQueryGenerator) {
+    private DefaultEntityManager(JdbcTemplate jdbcTemplate, DmlQueryGenerator dmlQueryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
         this.dmlQueryGenerator = dmlQueryGenerator;
     }
 
-    public static JdbcEntityManager of(JdbcTemplate jdbcTemplate) {
+    public static DefaultEntityManager of(JdbcTemplate jdbcTemplate) {
         DialectFactory dialectFactory = DialectFactory.getInstance();
         Dialect dialect = dialectFactory.getDialect(jdbcTemplate.getDbmsName());
         DmlQueryGenerator dmlQueryGenerator = DmlQueryGenerator.of(dialect);
-        return new JdbcEntityManager(jdbcTemplate, dmlQueryGenerator);
+        return new DefaultEntityManager(jdbcTemplate, dmlQueryGenerator);
     }
 
     @Override
