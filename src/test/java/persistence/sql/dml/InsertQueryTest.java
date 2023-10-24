@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentEntityPerson;
 import persistence.person.NonExistentTablePerson;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 class InsertQueryTest {
 
@@ -20,8 +22,11 @@ class InsertQueryTest {
         final String expectedQuery = "INSERT INTO users (id, nick_name, old, email) VALUES(1, 'name', 3, 'zz@cc.com')";
         final Person person = new Person(1L, "name", 3, "zz@cc.com", 1);
 
+        final TableName tableName = TableName.of(person.getClass());
+        final Columns columns = Columns.of(person.getClass().getDeclaredFields());
+
         //when
-        String query = InsertQuery.create(person);
+        String query = InsertQuery.create(tableName, columns, person);
 
         //then
         assertSoftly(softAssertions -> {
@@ -38,7 +43,8 @@ class InsertQueryTest {
         final NonExistentEntityPerson person = new NonExistentEntityPerson(1L, "name", 3);
 
         //when & then
-        assertThrows(InvalidEntityException.class, () -> InsertQuery.create(person));
+        assertThrows(InvalidEntityException.class
+            , () -> InsertQuery.create(TableName.of(person.getClass()), Columns.of(person.getClass().getDeclaredFields()), person));
     }
 
     @Test
@@ -48,8 +54,11 @@ class InsertQueryTest {
         final String expectedQuery = "INSERT INTO NonExistentTablePerson (id, nick_name, old, email) VALUES(1, 'name', 3, 'zz@cc.com')";
         final NonExistentTablePerson person = new NonExistentTablePerson(1L, "name", 3, "zz@cc.com");
 
+        final TableName tableName = TableName.of(person.getClass());
+        final Columns columns = Columns.of(person.getClass().getDeclaredFields());
+
         //when
-        String query = InsertQuery.create(person);
+        String query = InsertQuery.create(tableName, columns, person);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);

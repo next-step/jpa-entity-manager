@@ -1,9 +1,12 @@
 package persistence.sql.dml;
 
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
+
 public class QueryDml {
 
-    public static <T> String insert(T t) {
-        return InsertQuery.create(t);
+    public static <T> String insert(TableName tableName, Columns columns, T t) {
+        return InsertQuery.create(tableName, columns, t);
     }
 
     public static <T> String select(Class<T> tClass, String methodName) {

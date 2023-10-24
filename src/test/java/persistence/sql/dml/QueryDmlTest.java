@@ -13,6 +13,8 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.InsertPerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
 
 import java.sql.SQLException;
@@ -52,7 +54,7 @@ class QueryDmlTest {
             NotEntityPerson person = new NotEntityPerson(1L, "name", 3);
 
             //when & then
-            assertThrows(InvalidEntityException.class, () -> QueryDml.insert(person));
+            assertThrows(InvalidEntityException.class, () -> QueryDml.insert(TableName.of(person.getClass()), Columns.of(person.getClass().getDeclaredFields()), person));
         }
 
         @Test
@@ -67,8 +69,11 @@ class QueryDmlTest {
 
             InsertPerson person = new InsertPerson(id, name, age, email, index);
 
+            final TableName tableName = TableName.of(person.getClass());
+            final Columns columns = Columns.of(person.getClass().getDeclaredFields());
+
             //when
-            String query = QueryDml.insert(person);
+            String query = QueryDml.insert(tableName, columns, person);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -252,7 +257,10 @@ class QueryDmlTest {
     }
 
     private <T> void insert(T t) {
-        jdbcTemplate.execute(QueryDml.insert(t));
+        final TableName tableName = TableName.of(t.getClass());
+        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
+
+        jdbcTemplate.execute(QueryDml.insert(tableName, columns, t));
     }
 
     private <T> void dropTable(Class<T> tClass) {

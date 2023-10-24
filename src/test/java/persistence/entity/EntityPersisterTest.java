@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
 import persistence.sql.dml.QueryDml;
 
@@ -201,6 +203,9 @@ class EntityPersisterTest {
     }
 
     private <T> void 데이터를_저장함(T t) {
-        jdbcTemplate.execute(QueryDml.insert(t));
+        final TableName tableName = TableName.of(t.getClass());
+        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
+
+        jdbcTemplate.execute(QueryDml.insert(tableName, columns, t));
     }
 }
