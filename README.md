@@ -38,3 +38,12 @@ public void delete(parameters는 자유롭게)
 - EntityPersisters
   - entity의 class에 맞는 EntityPerister를 반환한다.
     - 맞는 EntityPersister가 없는 경우 예외가 발생한다.
+
+### 2단계 - 엔터티 초기화 (EntityLoader)
+```
+- EntityLoader 는 엔터티를 데이터베이스에서 로드하고 로드된 엔터티 상태를 영속성 컨텍스트 내에서 추적 및 관리
+```
+- EntityLoader
+  - select 쿼리를 실행하여 엔티티 객체에 로드한다.
+- ReflectionRowMapper
+  - clazz를 받아 계속 생성하는데, 이미 생성한 ReflectionRowMapper를 캐싱하여 반환할 수 있도록 한다.
