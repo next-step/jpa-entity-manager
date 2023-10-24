@@ -42,7 +42,7 @@ public class JdbcTemplate {
         }
     }
 
-    public long executeForGeneratedKey(final String sql) {
+    public long executeAndReturnGeneratedId(final String sql) {
         try (final PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.execute();
 

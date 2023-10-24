@@ -6,10 +6,6 @@ public class TestEntityFixture {
     @Entity
     @Table(name = "entity_name")
     public static class SampleOneWithValidAnnotation {
-        public Long getId() {
-            return id;
-        }
-
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         Long id;
@@ -30,6 +26,10 @@ public class TestEntityFixture {
             this.id = id;
             this.name = nickName;
             this.age = age;
+        }
+
+        public Long getId() {
+            return id;
         }
 
         @Override
