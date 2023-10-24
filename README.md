@@ -37,7 +37,7 @@ public class EntityPersister {
 `EntityLoader 는 엔터티를 데이터베이스에서 로드하고 로드된 엔터티 상태를 영속성 컨텍스트 내에서 추적 및 관리`
 
 - 요구사항 1 - RowMapper 리팩터링
-- [ ] RowMapper 를 클래스로 분리해서 책임을 맡긴다.
-- [ ] RowMapper 클래스는 변환할 엔터티의 정보를 미리 가지고 있다가 객체를 받아 처리한다.
+- [x] RowMapper 를 클래스로 분리해서 책임을 맡긴다.
+- [x] RowMapper 클래스는 변환할 엔터티의 정보를 미리 가지고 있다가 객체를 받아 처리한다.
 
 - 요구사항 2 - EntityManager 의 책임 줄여주기
