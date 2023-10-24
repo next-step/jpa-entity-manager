@@ -8,19 +8,23 @@ import jdbc.JdbcTemplate;
 public class EntityPersister<T> {
 
     private final EntityClass<T> entityClass;
+    private final EntityTableName tableName;
+    private final Class<T> clazz;
     private final JdbcTemplate jdbcTemplate;
     private final InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.INSTANCE;
     private final DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
     private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
 
     public EntityPersister(final Class<T> clazz, final JdbcTemplate jdbcTemplate) {
+        this.tableName = new EntityTableName(clazz);
+        this.clazz = clazz;
         this.entityClass = new EntityClass<>(clazz);
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public boolean update(final Object entity) {
         final String query = updateQueryBuilder.generateQuery(
-                entityClass.tableName(),
+                tableName.getTableName(),
                 entityClass.getFieldValues(entity),
                 entityClass.getEntityId(),
                 entityClass.extractEntityId(entity)
@@ -30,7 +34,7 @@ public class EntityPersister<T> {
 
     public void insert(final Object entity) {
         final String query = insertQueryBuilder.generateQuery(
-                entityClass.tableName(),
+                tableName.getTableName(),
                 entityClass.getFieldValues(entity)
         );
         jdbcTemplate.execute(query);
@@ -38,7 +42,7 @@ public class EntityPersister<T> {
 
     public void delete(final Object entity) {
         final String query = deleteQueryBuilder.generateQuery(
-                entityClass.tableName(),
+                tableName.getTableName(),
                 entityClass.getEntityId(),
                 entityClass.extractEntityId(entity)
         );
