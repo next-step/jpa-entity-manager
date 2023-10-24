@@ -37,7 +37,11 @@ public class EntityPersister<T> {
     }
 
     public void delete(final Object entity) {
-        final String query = deleteQueryBuilder.generateQuery(entityClass, entity);
+        final String query = deleteQueryBuilder.generateQuery(
+                entityClass.tableName(),
+                entityClass.getEntityId(),
+                entityClass.extractEntityId(entity)
+        );
         jdbcTemplate.execute(query);
     }
 }
