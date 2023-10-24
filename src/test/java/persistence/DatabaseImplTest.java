@@ -103,8 +103,11 @@ class DatabaseImplTest {
 
         insert(person);
 
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
+
         //when & then
-        assertDoesNotThrow(() -> delete(person, id));
+        assertDoesNotThrow(() -> delete(tableName, columns, id));
     }
 
     @AfterEach
@@ -127,8 +130,8 @@ class DatabaseImplTest {
         database.execute(QueryDml.insert(tableName, columns, t));
     }
 
-    private <T> void delete(T t, Object args) throws SQLException {
-        database.execute(QueryDml.delete(t, args));
+    private void delete(TableName tableName, Columns columns, Object args) throws SQLException {
+        database.execute(QueryDml.delete(tableName, columns, args));
     }
 
     private <T> ResultSet findAll(Class<T> tClass, String methodName) throws SQLException {

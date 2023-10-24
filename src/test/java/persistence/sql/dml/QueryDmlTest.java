@@ -188,8 +188,12 @@ class QueryDmlTest {
 
             insert(person);
 
+            Class<SelectPerson> clazz = SelectPerson.class;
+            final TableName tableName = TableName.of(clazz);
+            final Columns columns = Columns.of(clazz.getDeclaredFields());
+
             //when
-            String query = DeleteQuery.create(person, id);
+            String query = DeleteQuery.create(tableName, columns, id);
             jdbcTemplate.execute(query);
 
             //then

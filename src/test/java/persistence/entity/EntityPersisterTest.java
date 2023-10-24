@@ -119,24 +119,13 @@ class EntityPersisterTest {
             데이터를_저장함(request);
 
             //when
-            entityPersister.delete(request, id);
+            entityPersister.delete(id);
 
             String selectQuery = 아이디로_데이터를_조회하는_쿼리_생성(id);
 
             //then
             assertThrows(RuntimeException.class,
                     () -> jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(SelectPerson.class)));
-        }
-
-        @Test
-        @DisplayName("없는 테이블의 데이터 삭제 시도시 오류")
-        void notFoundTable() {
-            //given
-            final Long id = 99L;
-            Person request = new Person(id, "zz", 30, "zz", 1);
-
-            //when & then
-            assertThrows(RuntimeException.class, () -> entityPersister.delete(request, id));
         }
     }
 

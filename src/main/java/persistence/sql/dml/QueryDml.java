@@ -13,12 +13,8 @@ public class QueryDml {
         return SelectQuery.create(methodName, tableName, columns, args);
     }
 
-    public static <T> String delete(T t, Object args) {
-        return DeleteQuery.create(t, args);
-    }
-
-    public static <T> String delete(T t) {
-        return DeleteQuery.create(t);
+    public static String delete(TableName tableName, Columns columns, Object args) {
+        return DeleteQuery.create(tableName, columns, args);
     }
 
     public static <T> String update(T t, Object arg) {

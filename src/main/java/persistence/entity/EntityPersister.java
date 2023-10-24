@@ -62,7 +62,7 @@ public class EntityPersister<T> {
         jdbcTemplate.execute(QueryDml.insert(tableName, columns, t));
     }
 
-    public <T> void delete(T t, Object arg) {
-        jdbcTemplate.execute(QueryDml.delete(t, arg));
+    public void delete(Object arg) {
+        jdbcTemplate.execute(QueryDml.delete(tableName, columns, arg));
     }
 }

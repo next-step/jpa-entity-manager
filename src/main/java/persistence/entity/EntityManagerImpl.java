@@ -30,8 +30,8 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> void remove(T t, Object arg) {
-        entityPersister.delete(t, arg);
+    public void remove(Object arg) {
+        entityPersister.delete(arg);
     }
 
     @Override

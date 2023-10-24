@@ -187,7 +187,7 @@ class EntityManagerImplTest {
             데이터를_저장함(person);
 
             //when
-            entityManager.remove(person, id);
+            entityManager.remove(id);
 
             //then
             assertThrows(RuntimeException.class, () -> 데이터를_조회함(clazz, id));
@@ -201,7 +201,7 @@ class EntityManagerImplTest {
             final Person person = new Person(id, "zz", 3, "xx", 3);
 
             //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.remove(person, id));
+            assertThrows(RuntimeException.class, () -> entityManager.remove(id));
         }
     }
 
