@@ -19,7 +19,12 @@ public class EntityPersister<T> {
     }
 
     public boolean update(final Object entity) {
-        final String query = updateQueryBuilder.generateQuery(entityClass, entity);
+        final String query = updateQueryBuilder.generateQuery(
+                entityClass.tableName(),
+                entityClass.getFieldValues(entity),
+                entityClass.getEntityId(),
+                entityClass.extractEntityId(entity)
+        );
         return jdbcTemplate.executeUpdate(query);
     }
 

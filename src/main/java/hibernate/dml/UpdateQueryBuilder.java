@@ -20,6 +20,15 @@ public class UpdateQueryBuilder {
     private UpdateQueryBuilder() {
     }
 
+    public String generateQuery(
+            final String tableName,
+            final Map<EntityColumn, Object> fieldValues,
+            final EntityColumn entityId,
+            final Object id
+    ) {
+        return String.format(UPDATE_QUERY, tableName, parseSetQueries(fieldValues), entityId.getFieldName(), id);
+    }
+
     public String generateQuery(final EntityClass<?> entityClass, Object entity) {
         Map<EntityColumn, Object> fieldValues = entityClass.getFieldValues(entity);
         return String.format(UPDATE_QUERY,

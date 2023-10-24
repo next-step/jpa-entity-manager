@@ -1,8 +1,10 @@
 package hibernate.dml;
 
-import hibernate.entity.EntityClass;
+import hibernate.entity.column.EntityField;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,13 +13,19 @@ class UpdateQueryBuilderTest {
     private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
 
     @Test
-    void update쿼리를_생성한다() {
+    void update쿼리를_생성한다() throws NoSuchFieldException {
         // given
-        TestEntity givenEntity = new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com");
         String expected = "update test_entity set id = 1, nick_name = '최진영' where id = 1;";
+        EntityField entityId = new EntityField(TestEntity.class.getDeclaredField("id"));
 
         // when
-        String actual = updateQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class), givenEntity);
+        String actual = updateQueryBuilder.generateQuery(
+                "test_entity",
+                Map.of(
+                        entityId, 1,
+                        new EntityField(TestEntity.class.getDeclaredField("name")), "최진영"
+                ),
+                entityId, 1);
 
         // then
         assertThat(actual).isEqualTo(expected);
