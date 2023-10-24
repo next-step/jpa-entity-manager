@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import database.MockJdbcTemplate;
+import mock.MockJdbcTemplate;
 import domain.FixtureEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
