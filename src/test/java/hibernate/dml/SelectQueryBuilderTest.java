@@ -1,8 +1,11 @@
 package hibernate.dml;
 
 import hibernate.entity.EntityClass;
+import hibernate.entity.column.EntityField;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,13 +14,17 @@ class SelectQueryBuilderTest {
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
     @Test
-    void select쿼리를_생성한다() {
+    void select쿼리를_생성한다() throws NoSuchFieldException {
         // given
         String expected = "select id, nick_name from test_entity where id = 1;";
 
         // when
-        String actual = selectQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class), 1L)
-                .toLowerCase();
+        String actual = selectQueryBuilder.generateQuery(
+                "test_entity",
+                List.of("id", "nick_name"),
+                new EntityField(TestEntity.class.getDeclaredField("id")),
+                1
+        );
 
         // then
         assertThat(actual).isEqualTo(expected);
