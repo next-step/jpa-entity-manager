@@ -7,6 +7,8 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentTablePerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,8 +21,12 @@ class UpdateQueryTest {
         String expectedResult = "UPDATE users SET nick_name = 'zz', old = 30, email = 'xx' WHERE id = 3";
         Person person = new Person(3L, "zz", 30, "xx", 2);
 
+        Class<Person> clazz = Person.class;
+        final TableName tableName = TableName.of(clazz);
+        final Columns columns = Columns.of(clazz.getDeclaredFields());
+
         //when
-        String result = UpdateQuery.create(person, 3L);
+        String result = UpdateQuery.create(person, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -33,8 +39,12 @@ class UpdateQueryTest {
         String expectedResult = "UPDATE NonExistentTablePerson SET nick_name = 'zz', old = 30, email = 'xx' WHERE id = 3";
         NonExistentTablePerson person = new NonExistentTablePerson(3L, "zz", 30, "xx");
 
+        Class<NonExistentTablePerson> clazz = NonExistentTablePerson.class;
+        final TableName tableName = TableName.of(clazz);
+        final Columns columns = Columns.of(clazz.getDeclaredFields());
+
         //when
-        String result = UpdateQuery.create(person, 3L);
+        String result = UpdateQuery.create(person, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -47,8 +57,12 @@ class UpdateQueryTest {
         String expectedResult = "UPDATE selectPerson SET nick_name = 'zz', old = 30, email = 'xx' WHERE select_person_id = 3";
         SelectPerson person = new SelectPerson(3L, "zz", 30, "xx", 2);
 
+        Class<SelectPerson> clazz = SelectPerson.class;
+        final TableName tableName = TableName.of(clazz);
+        final Columns columns = Columns.of(clazz.getDeclaredFields());
+
         //when
-        String result = UpdateQuery.create(person, 3L);
+        String result = UpdateQuery.create(person, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -60,7 +74,10 @@ class UpdateQueryTest {
         //given
         NotEntityPerson person = new NotEntityPerson(3L, "zz", 30);
 
+        Class<NotEntityPerson> clazz = NotEntityPerson.class;
+
         //when & then
-        assertThrows(InvalidEntityException.class, () -> UpdateQuery.create(person, 3L));
+        assertThrows(InvalidEntityException.class
+                , () -> UpdateQuery.create(person, TableName.of(clazz), Columns.of(clazz.getDeclaredFields()), 3L));
     }
 }

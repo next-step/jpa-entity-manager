@@ -17,7 +17,7 @@ public class QueryDml {
         return DeleteQuery.create(tableName, columns, args);
     }
 
-    public static <T> String update(T t, Object arg) {
-        return UpdateQuery.create(t, arg);
+    public static <T> String update(T t, TableName tableName, Columns columns, Object arg) {
+        return UpdateQuery.create(t, tableName, columns, arg);
     }
 }

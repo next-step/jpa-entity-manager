@@ -233,13 +233,13 @@ class QueryDmlTest {
             final String name = "홍길동";
             final SelectPerson expected = new SelectPerson(id, name, actualAge, actualEmail, 3);
 
-            //when
-            String query = QueryDml.update(expected, id);
-            jdbcTemplate.execute(query);
-
             Class<SelectPerson> clazz = SelectPerson.class;
             final TableName tableName = TableName.of(clazz);
             final Columns columns = Columns.of(clazz.getDeclaredFields());
+
+            //when
+            String query = QueryDml.update(expected, tableName, columns, id);
+            jdbcTemplate.execute(query);
             SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(clazz));
 
             //then

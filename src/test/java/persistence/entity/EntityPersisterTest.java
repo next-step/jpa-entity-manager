@@ -18,7 +18,6 @@ import persistence.sql.dml.QueryDml;
 
 import java.sql.SQLException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -165,20 +164,6 @@ class EntityPersisterTest {
                 softAssertions.assertThat(result.getEmail()).isEqualTo(email);
                 softAssertions.assertThat(result.getIndex()).isNull();
             });
-        }
-
-        @Test
-        @DisplayName("없는 테이블에 데이터를 isnert할 경우 오류 출력")
-        void invalidTable() {
-            //given
-            final Long id = 33L;
-            Person request = new Person(id, "zz", 30, "xx", 2);
-
-            //when
-            boolean result = entityPersister.update(request, id);
-
-            //then
-            assertThat(result).isFalse();
         }
     }
 

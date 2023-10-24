@@ -48,7 +48,7 @@ public class EntityPersister<T> {
 
     public <T> boolean update(T t, Object arg) {
         try {
-            jdbcTemplate.execute(QueryDml.update(t, arg));
+            jdbcTemplate.execute(QueryDml.update(t, tableName, columns, arg));
             return true;
         } catch (Exception e) {
             return false;
