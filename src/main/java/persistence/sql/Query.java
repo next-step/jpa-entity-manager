@@ -5,6 +5,7 @@ import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 import persistence.sql.entity.EntityData;
 
 public class Query {
@@ -45,6 +46,11 @@ public class Query {
     public <T> String delete(T entity) {
         EntityData entityData = new EntityData(entity.getClass());
         return new DeleteQueryBuilder().generateQuery(entityData, entity);
+    }
+
+    public <T> String update(T entity) {
+        EntityData entityData = new EntityData(entity.getClass());
+        return new UpdateQueryBuilder().generateQuery(entityData, entity);
     }
 
 }

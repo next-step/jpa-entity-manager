@@ -10,8 +10,7 @@ import persistence.sql.dialect.h2.H2Dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SimpleEntityManagerTest {
-
+class EntityPersisterTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
@@ -44,59 +43,48 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute("drop table if exists users CASCADE");
     }
 
-    @DisplayName("EntityManger#find를 통해 Entity를 조회한다.")
-    @Test
-    void findTest() {
-        // given
-        EntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, new EntityPersister(QUERY, jdbcTemplate));
-        Person expected = new Person(1L, "test1", 10, "test1@gmail.com", 0);
-
-        // when
-        Person actual = entityManager.find(Person.class, 1L);
-
-        // then
-        assertThat(actual.equals(expected)).isTrue();
-    }
-
-    @DisplayName("EntityManger#persist를 통해 Entity를 신규 저장한다.")
-    @Test
-    void persistTest() {
-        // given
-        EntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, new EntityPersister(QUERY, jdbcTemplate));
-        Person testEntity = new Person(2L, "test2", 11, "test2@gmail.com", 0);
-
-        // when
-        entityManager.persist(testEntity);
-        Person found = entityManager.find(Person.class, 2L);
-
-        // then
-        assertThat(found.equals(testEntity)).isTrue();
-    }
-
-    @DisplayName("EntityManger#persist를 통해 Entity를 수정한다.")
+    @DisplayName("EntityPersister#update를 통해 Entity를 수정(update)한다.")
     @Test
     void updateTest() {
         // given
-        EntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, new EntityPersister(QUERY, jdbcTemplate));
+        EntityPersister entityPersister = new EntityPersister(QUERY, jdbcTemplate);
+        SimpleEntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, entityPersister);
         Person testEntity = new Person(1L, "test2", 11, "test2@gmail.com", 0);
 
         // when
-        entityManager.persist(testEntity);
+        entityPersister.update(testEntity);
         Person found = entityManager.find(Person.class, 1L);
 
         // then
         assertThat(found.equals(testEntity)).isTrue();
     }
 
-    @DisplayName("EntityManger#remove를 통해 Entity를 삭제한다.")
+    @DisplayName("EntityPersister#insert를 통해 Entity를 저장(insert)한다.")
     @Test
-    void removeTest() {
+    void insertTest() {
         // given
-        EntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, new EntityPersister(QUERY, jdbcTemplate));
+        EntityPersister entityPersister = new EntityPersister(QUERY, jdbcTemplate);
+        SimpleEntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, entityPersister);
+        Person testEntity = new Person(2L, "test2", 11, "test2@gmail.com", 0);
+
+        // when
+        entityPersister.insert(testEntity);
+        Person found = entityManager.find(Person.class, 2L);
+
+        // then
+        assertThat(found.equals(testEntity)).isTrue();
+    }
+
+    @DisplayName("EntityPersister#delete를 통해 Entity를 삭제(delete)한다.")
+    @Test
+    void deleteTest() {
+        // given
+        EntityPersister entityPersister = new EntityPersister(QUERY, jdbcTemplate);
+        EntityManager entityManager = new SimpleEntityManager(QUERY, jdbcTemplate, entityPersister);
         Person testEntity = new Person(1L, "test1", 10, "test1@gmail.com", 0);
 
         // when
-        entityManager.remove(testEntity);
+        entityPersister.delete(testEntity);
 
         // then
         assertThat(entityManager.find(Person.class, 1L)).isNull();
