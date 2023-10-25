@@ -1,12 +1,10 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import persistence.sql.QueryUtil;
+import jdbc.JdbcTemplate;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -48,7 +46,7 @@ public class EntityManagerImpl implements EntityManager {
     private <T> EntityPersister<T> getPersister(Class<T> tClass) {
         String key = tClass.getName();
 
-        if(persisterMap.get(key) == null) {
+        if (persisterMap.get(key) == null) {
             persisterMap.put(key, new EntityPersister<>(jdbcTemplate, tClass));
         }
 

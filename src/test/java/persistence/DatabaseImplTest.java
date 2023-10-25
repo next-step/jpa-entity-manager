@@ -9,6 +9,7 @@ import database.DatabaseServer;
 import database.H2;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +25,11 @@ import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.CreateQuery;
 import persistence.sql.ddl.DropQuery;
-import persistence.sql.dml.SelectQuery;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DatabaseImplTest {
 
+    private static DatabaseServer server;
     private static Database database;
     private static Class<DatabasePerson> tClass;
 
@@ -37,7 +38,7 @@ class DatabaseImplTest {
 
     @BeforeAll
     static void init() throws SQLException {
-        DatabaseServer server = new H2();
+        server = new H2();
         server.start();
 
         database = new DatabaseImpl(server.getConnection());
@@ -124,6 +125,11 @@ class DatabaseImplTest {
     @AfterEach
     void after() throws SQLException {
         테이블을_삭제함(tClass);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        server.stop();
     }
 
     private <T> void 테이블을_생성함(Class<T> tClass) throws SQLException {

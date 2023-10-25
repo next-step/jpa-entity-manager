@@ -12,6 +12,7 @@ import domain.Person;
 import java.sql.SQLException;
 import java.util.List;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,8 @@ class EntityManagerImplTest {
 
     private static final Class<SelectPerson> clazz = SelectPerson.class;
 
+    private static DatabaseServer server;
+
     private static EntityManager entityManager;
 
     private static JdbcTemplate jdbcTemplate;
@@ -37,7 +40,7 @@ class EntityManagerImplTest {
 
     @BeforeAll
     static void beforeInit() throws SQLException {
-        DatabaseServer server = new H2();
+        server = new H2();
         server.start();
 
         entityManager = new EntityManagerImpl(server.getConnection());
@@ -261,6 +264,11 @@ class EntityManagerImplTest {
     @AfterEach
     void after() {
         테이블을_삭제함(clazz);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        server.stop();
     }
 
     private <T> T 데이터를_조회함(Class<T> tClass, Object id) {

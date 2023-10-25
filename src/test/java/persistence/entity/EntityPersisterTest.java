@@ -1,8 +1,15 @@
 package persistence.entity;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
+
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
+import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import org.junit.jupiter.api.AfterAll;
@@ -19,16 +26,6 @@ import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.CreateQuery;
 import persistence.sql.ddl.DropQuery;
-import persistence.sql.dml.InsertQuery;
-
-import java.sql.SQLException;
-import persistence.sql.dml.SelectQuery;
-
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
-import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
-import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class EntityPersisterTest {
 
@@ -143,7 +140,7 @@ class EntityPersisterTest {
 
             //then
             assertThrows(RuntimeException.class,
-                    () -> jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(SelectPerson.class)));
+                () -> jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(SelectPerson.class)));
         }
     }
 
