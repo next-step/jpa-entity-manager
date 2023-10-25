@@ -15,7 +15,6 @@ import static persistence.sql.common.DDLType.CREATE;
 @Nested
 @DisplayName("CreateDDLQueryBuilder 클래스의")
 public class CreateDDLQueryBuilderTest extends DatabaseTest {
-    private final AttributeParser parser = new AttributeParser();
 
     @Nested
     @DisplayName("prepareStatement 메소드는")
@@ -26,7 +25,7 @@ public class CreateDDLQueryBuilderTest extends DatabaseTest {
             @Test
             @DisplayName("CREATE DDL을 리턴한다.")
             void returnDDL() {
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class, parser);
+                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
 
                 String ddl = DDLQueryBuilderFactory.createQueryBuilder(CREATE)
                         .prepareStatement(entityAttribute, new H2SqlConverter());

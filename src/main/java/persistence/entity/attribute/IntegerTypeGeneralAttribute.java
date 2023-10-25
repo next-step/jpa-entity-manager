@@ -7,17 +7,20 @@ import persistence.sql.ddl.converter.SqlConverter;
 import java.lang.reflect.Field;
 
 public class IntegerTypeGeneralAttribute extends GeneralAttribute {
+    private final Field field;
     private final boolean nullable;
     private final int scale;
     private final String fieldName;
     private final String columnName;
 
     private IntegerTypeGeneralAttribute(
+            Field field,
             int scale,
             String fieldName,
             String columnName,
             boolean nullable
     ) {
+        this.field = field;
         this.scale = scale;
         this.fieldName = fieldName;
         this.columnName = columnName;
@@ -27,6 +30,7 @@ public class IntegerTypeGeneralAttribute extends GeneralAttribute {
     public static IntegerTypeGeneralAttribute of(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
         return new IntegerTypeGeneralAttribute(
+                field,
                 column.scale(),
                 field.getName(),
                 column.name().isBlank() ? field.getName() : column.name(),

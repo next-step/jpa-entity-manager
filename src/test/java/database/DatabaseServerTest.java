@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
-import persistence.entity.attribute.AttributeParser;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.fixture.TestEntityFixture;
 import persistence.mapper.TestEntityRowMapper;
@@ -32,7 +31,7 @@ public class DatabaseServerTest extends DatabaseTest {
 
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
 
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class, new AttributeParser());
+                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
 
                 TestEntityFixture.SampleOneWithValidAnnotation entityOne =
                         new TestEntityFixture.SampleOneWithValidAnnotation("민준", 29);

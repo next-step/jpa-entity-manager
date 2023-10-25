@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.attribute.AttributeParser;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.mapper.StringRowMapper;
 import persistence.sql.common.DDLType;
@@ -20,7 +19,6 @@ import java.util.List;
 
 public class DatabaseTest {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseTest.class);
-
     protected DatabaseServer server = null;
     protected JdbcTemplate jdbcTemplate = null;
 
@@ -45,7 +43,7 @@ public class DatabaseTest {
 
     protected void setUpFixtureTable(Class<?> clazz, SqlConverter sqlConverter) {
         DDLQueryBuilder queryBuilder = DDLQueryBuilderFactory.createQueryBuilder(DDLType.CREATE);
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz, new AttributeParser());
+        EntityAttribute entityAttribute = EntityAttribute.of(clazz);
         jdbcTemplate.execute(queryBuilder.prepareStatement(entityAttribute, sqlConverter));
     }
 }

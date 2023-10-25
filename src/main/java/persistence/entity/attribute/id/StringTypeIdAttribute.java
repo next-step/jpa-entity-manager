@@ -8,17 +8,20 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 public class StringTypeIdAttribute extends IdAttribute {
+    private final Field field;
     private final String fieldName;
     private final Integer length;
     private final String columnName;
     private final GenerationType generateValueStrategy;
 
     public StringTypeIdAttribute(
+            Field field,
             String fieldName,
             Integer length,
             String columnName,
             GenerationType generateValueStrategy
     ) {
+        this.field = field;
         this.fieldName = fieldName;
         this.length = length;
         this.columnName = columnName;
@@ -30,6 +33,7 @@ public class StringTypeIdAttribute extends IdAttribute {
         Optional<Column> columnOptional = Optional.ofNullable(field.getAnnotation(Column.class));
 
         return new StringTypeIdAttribute(
+                field,
                 field.getName(),
                 columnOptional.map(Column::length).orElse(255),
                 columnOptional.map(Column::name).orElse(field.getName()),
@@ -44,6 +48,11 @@ public class StringTypeIdAttribute extends IdAttribute {
                 String.format("(%s)", length) +
                 " ";
         return component.trim();
+    }
+
+    @Override
+    public Field getField() {
+        return field;
     }
 
     @Override

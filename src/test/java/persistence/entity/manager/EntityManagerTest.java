@@ -6,8 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
-import persistence.entity.attribute.AttributeParser;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.fixture.TestEntityFixture;
 import persistence.sql.dml.builder.InsertQueryBuilder;
@@ -34,7 +34,7 @@ public class EntityManagerTest extends DatabaseTest {
                 setUpFixtureTable(TestEntityFixture.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class, new AttributeParser());
+                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
                 TestEntityFixture.SampleOneWithValidAnnotation sample =
                         new TestEntityFixture.SampleOneWithValidAnnotation(1L, "민준", 29);
@@ -42,9 +42,11 @@ public class EntityManagerTest extends DatabaseTest {
                 String insertDML
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
                 jdbcTemplate.execute(insertDML);
-                EntityPersister entityPersister = new EntityPersister(new JdbcTemplate(server.getConnection()));
 
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister);
+                EntityPersister entityPersister = new EntityPersister(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+
+                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoader);
                 TestEntityFixture.SampleOneWithValidAnnotation retrieved =
                         entityManager.findById(TestEntityFixture.SampleOneWithValidAnnotation.class, "1");
 
@@ -61,7 +63,7 @@ public class EntityManagerTest extends DatabaseTest {
                 setUpFixtureTable(TestEntityFixture.SampleTwoWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixture.SampleTwoWithValidAnnotation.class, new AttributeParser());
+                        EntityAttribute.of(TestEntityFixture.SampleTwoWithValidAnnotation.class);
 
                 TestEntityFixture.SampleTwoWithValidAnnotation sample =
                         new TestEntityFixture.SampleTwoWithValidAnnotation(1L, "민준", 29);
@@ -71,7 +73,9 @@ public class EntityManagerTest extends DatabaseTest {
                 jdbcTemplate.execute(insertDML);
 
                 EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister);
+                EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+
+                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoader);
 
                 TestEntityFixture.SampleTwoWithValidAnnotation retrieved =
                         entityManager.findById(TestEntityFixture.SampleTwoWithValidAnnotation.class, "1");
@@ -96,7 +100,9 @@ public class EntityManagerTest extends DatabaseTest {
                 setUpFixtureTable(TestEntityFixture.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister);
+                EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+
+                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoader);
 
                 TestEntityFixture.SampleOneWithValidAnnotation persisted =
                         entityManager.persist(sample);
@@ -122,7 +128,9 @@ public class EntityManagerTest extends DatabaseTest {
                 setUpFixtureTable(TestEntityFixture.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister);
+                EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+
+                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoader);
 
                 entityManager.persist(sample);
 

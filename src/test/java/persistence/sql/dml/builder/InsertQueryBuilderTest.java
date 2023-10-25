@@ -13,8 +13,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Nested
 @DisplayName("InsertQueryBuilder 클래스의")
 public class InsertQueryBuilderTest {
-    AttributeParser attributeParser = new AttributeParser();
-
 
     @Nested
     @DisplayName("prepareStatement 메소드는")
@@ -27,7 +25,7 @@ public class InsertQueryBuilderTest {
             void returnStatement() {
                 Person person = new Person(1L, "민준", 29, "민준.com");
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class, attributeParser);
+                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
                 String statement = insertQueryBuilder.prepareStatement(entityAttribute, person);
                 assertThat(statement)

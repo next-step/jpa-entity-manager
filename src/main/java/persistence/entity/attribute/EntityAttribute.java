@@ -25,13 +25,13 @@ public class EntityAttribute {
         this.idAttribute = idAttribute;
     }
 
-    public static EntityAttribute of(Class<?> clazz, AttributeParser parser) {
+    public static EntityAttribute of(Class<?> clazz) {
         validate(clazz);
 
         String tableName = Optional.ofNullable(clazz.getAnnotation(Table.class)).map(Table::name).orElse(clazz.getSimpleName());
 
-        List<GeneralAttribute> generalAttributes = parser.parseGeneralAttributes(clazz);
-        IdAttribute idAttribute = parser.parseIdAttribute(clazz);
+        List<GeneralAttribute> generalAttributes = AttributeParser.parseGeneralAttributes(clazz);
+        IdAttribute idAttribute = AttributeParser.parseIdAttribute(clazz);
 
         return new EntityAttribute(tableName, idAttribute, generalAttributes);
     }
