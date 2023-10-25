@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jdbc.RowMapper;
-import persistence.exception.NoSuchEntityFoundException;
 import persistence.sql.entity.EntityColumn;
 import persistence.sql.entity.EntityData;
 
@@ -20,7 +19,7 @@ public class SimpleRowMapper<T> implements RowMapper<T> {
     @Override
     public T mapRow(ResultSet resultSet) throws SQLException {
         if (!resultSet.next()) {
-            throw new NoSuchEntityFoundException();
+            return null;
         }
 
         T entity;
@@ -40,10 +39,6 @@ public class SimpleRowMapper<T> implements RowMapper<T> {
 
     /**
      * 엔티티의 각각 필드에 값 설정
-     *
-     * @param resultSet
-     * @param entity
-     * @param entityColumn
      */
     private void setValues(ResultSet resultSet, T entity, EntityColumn entityColumn) {
         Field field = entityColumn.getField();
@@ -57,11 +52,6 @@ public class SimpleRowMapper<T> implements RowMapper<T> {
 
     /**
      * ResultSet에서 타입과 필드 이름을 통해 값을 가져옴
-     *
-     * @param entityColumn
-     * @param resultSet
-     * @return
-     * @throws SQLException
      */
     private Object getValueFromResultSet(EntityColumn entityColumn, ResultSet resultSet) throws SQLException {
         if (entityColumn.getType() == Long.class) {
@@ -74,6 +64,5 @@ public class SimpleRowMapper<T> implements RowMapper<T> {
             throw new RuntimeException("정의되지 않은 타입입니다.");
         }
     }
-
 
 }
