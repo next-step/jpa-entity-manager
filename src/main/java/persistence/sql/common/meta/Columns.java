@@ -17,6 +17,18 @@ public class Columns {
     }
 
     /**
+     * 칼럼 제약조건에 대해서 문자열로 반환합니다.
+     */
+    public String getConstraintsWithColumns() {
+        return StringUtils.withComma(Arrays.stream(value)
+            .map(column -> column.getName()
+                + column.getType()
+                + column.getConstraints().getNotNull()
+                + column.getConstraints().getGeneratedValue())
+            .toArray(String[]::new));
+    }
+
+    /**
      * 칼럼명을 ','으로 이어 한 문자열로 반환합니다.
      * 예) "name, age, gender"
      */
@@ -36,6 +48,13 @@ public class Columns {
                 .findFirst()
                 .get()
                 .getName();
+    }
+
+    public String getPrimaryKeyWithComma() {
+        return StringUtils.withComma(Arrays.stream(value)
+            .filter(Column::isPrimaryKey)
+            .map(Column::getName)
+            .toArray(String[]::new));
     }
 
     public Column[] getValue() {

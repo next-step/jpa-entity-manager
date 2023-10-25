@@ -1,7 +1,14 @@
 package persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+
 import database.DatabaseServer;
 import database.H2;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +23,6 @@ import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.QueryDdl;
 import persistence.sql.dml.QueryDml;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DatabaseImplTest {
@@ -121,7 +122,10 @@ class DatabaseImplTest {
     }
 
     private static <T> void 테이블을_생성함(Class<T> tClass) throws SQLException {
-        database.execute(QueryDdl.create(tClass));
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        database.execute(QueryDdl.create(tableName, columns));
     }
 
     private static <T> void 테이블을_삭제함(Class<T> tClass) throws SQLException {

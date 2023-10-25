@@ -1,9 +1,11 @@
 package persistence.sql.ddl;
 
-public class QueryDdl {
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
-    public static <T> String create(Class<T> tClass) {
-        return CreateQuery.create(tClass);
+public class QueryDdl {
+    public static String create(TableName tableName, Columns columns) {
+        return CreateQuery.of(tableName, columns);
     }
 
     public static <T> String drop(Class<T> tClass) {

@@ -14,9 +14,13 @@ import persistence.person.NonExistentTablePerson;
 import persistence.person.NotEntityPerson;
 
 import java.sql.SQLException;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class QueryDdlTest {
     private static DatabaseServer server;
@@ -40,7 +44,7 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> QueryDdl.create(personClass));
+            assertThrows(NullPointerException.class, () -> QueryDdl.create(TableName을_생성함(personClass), Columns을_생성함(personClass)));
         }
     }
 
@@ -52,9 +56,10 @@ class QueryDdlTest {
         void success() {
             //given
             Class<NonExistentTablePerson> personClass = NonExistentTablePerson.class;
-
+            final TableName tableName = TableName을_생성함(personClass);
+            final Columns columns = Columns을_생성함(personClass);
             //when
-            String query = QueryDdl.create(personClass);
+            String query = QueryDdl.create(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -69,9 +74,11 @@ class QueryDdlTest {
         void success() {
             //given
             Class<ExistTablePerson> personClass = ExistTablePerson.class;
+            final TableName tableName = TableName을_생성함(personClass);
+            final Columns columns = Columns을_생성함(personClass);
 
             //when
-            String query = QueryDdl.create(personClass);
+            String query = QueryDdl.create(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -112,6 +119,9 @@ class QueryDdlTest {
     }
 
     private <T> void createTable(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.create(tClass));
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
     }
 }

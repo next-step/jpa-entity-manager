@@ -46,7 +46,10 @@ class EntityPersisterTest {
 
     @BeforeEach
     void beforeEach() {
-        jdbcTemplate.execute(QueryDdl.create(selectPerson));
+        final TableName tableName = TableName을_생성함(selectPerson);
+        final Columns columns = Columns을_생성함(selectPerson);
+
+        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
     }
 
     @Nested

@@ -1,20 +1,23 @@
 package persistence.sql.ddl;
 
-import persistence.sql.common.meta.EntityMeta;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 class CreateQuery {
 
     private static final String DEFAULT_CREATE_QUERY = "CREATE TABLE %s (%s)";
     private static final String DEFAULT_PRIMARY_KEY_QUERY = ", PRIMARY KEY (%s)";
 
-    private final EntityMeta entityMeta;
+    private TableName tableName;
+    private Columns columns;
 
-    private <T> CreateQuery(Class<T> tClass) {
-        this.entityMeta = EntityMeta.of(tClass);
+    public CreateQuery(TableName tableName, Columns columns) {
+        this.tableName = tableName;
+        this.columns = columns;
     }
 
-    public static <T> String create(Class<T> tClass) {
-        return new CreateQuery(tClass).join();
+    public static String of(TableName tableName, Columns columns) {
+        return new CreateQuery(tableName, columns).join();
     }
 
     private String join() {
@@ -25,11 +28,11 @@ class CreateQuery {
      * 해당 Class를 분석하여 CREATE QUERY로 조합합니다.
      */
     private String combineQuery() {
-        return String.format(DEFAULT_CREATE_QUERY, entityMeta.getTableName(),
-            entityMeta.getConstraintsWithColumns() + createColumns());
+        return String.format(DEFAULT_CREATE_QUERY, tableName.getValue(),
+            columns.getConstraintsWithColumns() + createColumns());
     }
 
     private String createColumns() {
-        return String.format(DEFAULT_PRIMARY_KEY_QUERY, entityMeta.getPrimaryKeyWithComma());
+        return String.format(DEFAULT_PRIMARY_KEY_QUERY, columns.getPrimaryKeyWithComma());
     }
 }

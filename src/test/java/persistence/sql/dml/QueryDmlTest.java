@@ -286,7 +286,10 @@ class QueryDmlTest {
     }
 
     private <T> void 테이블을_생성함(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.create(tClass));
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
     }
 
     private <T> void insert(T t) {
