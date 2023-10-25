@@ -2,34 +2,32 @@ package hibernate.entity;
 
 import hibernate.dml.SelectQueryBuilder;
 import jdbc.JdbcTemplate;
-import jdbc.ReflectionRowMapper;
 
 public class EntityManagerImpl implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
-    private final EntityPersisters entityPersisters;
+    private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
-    public EntityManagerImpl(final JdbcTemplate jdbcTemplate, EntityPersisters entityPersisters) {
+    public EntityManagerImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.entityPersisters = entityPersisters;
+        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
-        final String query = selectQueryBuilder.generateQuery(new EntityClass<>(clazz), id);
-        return jdbcTemplate.queryForObject(query, new ReflectionRowMapper<>(clazz));
+        return entityLoader.find(EntityClass.getInstance(clazz), id);
     }
 
     @Override
     public void persist(final Object entity) {
-        entityPersisters.findEntityPersister(entity)
-                .insert(entity);
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(final Object entity) {
-        entityPersisters.findEntityPersister(entity)
-                .delete(entity);
+        entityPersister.delete(entity);
     }
 }

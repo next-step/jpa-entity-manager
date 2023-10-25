@@ -1,5 +1,6 @@
 package jdbc;
 
+import hibernate.entity.EntityClass;
 import jakarta.persistence.*;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ class ReflectionRowMapperTest {
         givenResultSet.addColumn("id", Types.BIGINT, 0, 0);
         givenResultSet.addColumn("nick_name", Types.VARCHAR, 0, 0);
         givenResultSet.addRow(1L, "최진영");
-        RowMapper<TestEntity> rowMapper = new ReflectionRowMapper<>(TestEntity.class);
+        RowMapper<TestEntity> rowMapper = ReflectionRowMapper.getInstance(EntityClass.getInstance(TestEntity.class));
 
         // when
         TestEntity actual = rowMapper.mapRow(givenResultSet);

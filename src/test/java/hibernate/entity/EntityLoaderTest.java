@@ -11,17 +11,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityLoaderTest {
 
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private final EntityLoader<TestEntity> entityLoader = new EntityLoader<>(TestEntity.class, jdbcTemplate);
+    private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
 
     @BeforeAll
     static void beforeAll() throws SQLException {
@@ -29,7 +28,7 @@ class EntityLoaderTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(new EntityClass<>(EntityManagerImplTest.TestEntity.class)));
+        jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(EntityClass.getInstance(EntityManagerImplTest.TestEntity.class)));
     }
 
     @AfterEach
@@ -49,7 +48,7 @@ class EntityLoaderTest {
         jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (1, '최진영', 19)");
 
         // when
-        TestEntity actual = entityLoader.find(TestEntity.class, 1L);
+        TestEntity actual = entityLoader.find(EntityClass.getInstance(TestEntity.class), 1L);
 
         // then
         assertAll(

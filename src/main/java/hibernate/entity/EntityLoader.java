@@ -1,32 +1,25 @@
 package hibernate.entity;
 
 import hibernate.dml.SelectQueryBuilder;
-import hibernate.entity.column.EntityColumns;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
 
-public class EntityLoader<T> {
+public class EntityLoader {
 
-    private final Class<T> clazz;
-    private final EntityTableName entityTableName;
-    private final EntityColumns entityColumns;
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
-    public EntityLoader(final Class<T> clazz, final JdbcTemplate jdbcTemplate) {
-        this.clazz = clazz;
-        this.entityTableName = new EntityTableName(clazz);
-        this.entityColumns = new EntityColumns(clazz.getDeclaredFields());
+    public EntityLoader(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public <T> T find(final Class<T> clazz, final Object id) {
+    public <T> T find(final EntityClass<T> entityClass, final Object id) {
         final String query = selectQueryBuilder.generateQuery(
-                entityTableName.getValue(),
-                entityColumns.getFieldNames(),
-                entityColumns.getEntityId(),
+                entityClass.tableName(),
+                entityClass.getFieldNames(),
+                entityClass.getEntityId(),
                 id
         );
-        return jdbcTemplate.queryForObject(query, new ReflectionRowMapper<>(clazz));
+        return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
     }
 }

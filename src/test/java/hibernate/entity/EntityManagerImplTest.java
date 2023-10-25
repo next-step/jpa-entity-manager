@@ -3,9 +3,6 @@ package hibernate.entity;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
-import hibernate.dml.DeleteQueryBuilder;
-import hibernate.dml.InsertQueryBuilder;
-import hibernate.dml.UpdateQueryBuilder;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
@@ -17,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -34,10 +30,9 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(jdbcTemplate,
-                new EntityPersisters(Map.of(TestEntity.class, new EntityPersister<>(TestEntity.class, jdbcTemplate))));
+        entityManager = new EntityManagerImpl(jdbcTemplate);
 
-        jdbcTemplate.execute(createQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class)));
+        jdbcTemplate.execute(createQueryBuilder.generateQuery(EntityClass.getInstance(TestEntity.class)));
     }
 
     @AfterEach
@@ -74,7 +69,7 @@ class EntityManagerImplTest {
 
         // when
         entityManager.persist(givenEntity);
-        TestEntity actual = jdbcTemplate.queryForObject("select id, nick_name, age from test_entity;", new ReflectionRowMapper<>(TestEntity.class));
+        TestEntity actual = jdbcTemplate.queryForObject("select id, nick_name, age from test_entity;", ReflectionRowMapper.getInstance(EntityClass.getInstance(TestEntity.class)));
 
         // then
         assertAll(

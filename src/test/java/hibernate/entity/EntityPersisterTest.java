@@ -21,7 +21,7 @@ class EntityPersisterTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private final EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
+    private final EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
 
     @BeforeAll
     static void beforeAll() throws SQLException {
@@ -29,7 +29,7 @@ class EntityPersisterTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(new EntityClass<>(TestEntity.class)));
+        jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(EntityClass.getInstance(TestEntity.class)));
     }
 
     @AfterEach
