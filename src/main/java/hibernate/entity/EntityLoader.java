@@ -1,6 +1,5 @@
 package hibernate.entity;
 
-import hibernate.dml.SelectAllQueryBuilder;
 import hibernate.dml.SelectQueryBuilder;
 import hibernate.entity.column.EntityColumns;
 import jdbc.JdbcTemplate;
@@ -23,7 +22,7 @@ public class EntityLoader<T> {
 
     public <T> T find(final Class<T> clazz, final Object id) {
         final String query = selectQueryBuilder.generateQuery(
-                entityTableName.getTableName(),
+                entityTableName.getValue(),
                 entityColumns.getFieldNames(),
                 entityColumns.getEntityId(),
                 id

@@ -28,7 +28,7 @@ public class EntityPersister<T> {
         validateEntityType(entity);
         EntityColumn entityId = entityColumns.getEntityId();
         final String query = updateQueryBuilder.generateQuery(
-                tableName.getTableName(),
+                tableName.getValue(),
                 entityColumns.getFieldValues(entity),
                 entityId,
                 entityId.getFieldValue(entity)
@@ -39,7 +39,7 @@ public class EntityPersister<T> {
     public void insert(final Object entity) {
         validateEntityType(entity);
         final String query = insertQueryBuilder.generateQuery(
-                tableName.getTableName(),
+                tableName.getValue(),
                 entityColumns.getFieldValues(entity)
         );
         jdbcTemplate.execute(query);
@@ -49,7 +49,7 @@ public class EntityPersister<T> {
         validateEntityType(entity);
         EntityColumn entityId = entityColumns.getEntityId();
         final String query = deleteQueryBuilder.generateQuery(
-                tableName.getTableName(),
+                tableName.getValue(),
                 entityId,
                 entityId.getFieldValue(entity)
         );

@@ -3,14 +3,13 @@ package hibernate.entity;
 import hibernate.entity.column.EntityColumn;
 import hibernate.entity.column.EntityColumns;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 
 public class EntityClass<T> {
 
-    private final String tableName;
+    private final EntityTableName tableName;
     private final EntityColumns entityColumns;
     private final Class<T> clazz;
 
@@ -18,20 +17,9 @@ public class EntityClass<T> {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("Entity 어노테이션이 없는 클래스는 입력될 수 없습니다.");
         }
-        this.tableName = parseTableName(clazz);
+        this.tableName = new EntityTableName(clazz);
         this.entityColumns = new EntityColumns(clazz.getDeclaredFields());
         this.clazz = clazz;
-    }
-
-    private String parseTableName(final Class<T> clazz) {
-        if (!clazz.isAnnotationPresent(Table.class)) {
-            return clazz.getSimpleName();
-        }
-        String tableName = clazz.getAnnotation(Table.class).name();
-        if (tableName.isEmpty()) {
-            return clazz.getSimpleName();
-        }
-        return tableName;
     }
 
     public T newInstance()  {
@@ -57,7 +45,7 @@ public class EntityClass<T> {
     }
 
     public String tableName() {
-        return tableName;
+        return tableName.getValue();
     }
 
     public EntityColumn getEntityId() {
