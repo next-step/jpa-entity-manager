@@ -58,4 +58,8 @@ public class PersonV3 {
     public Integer getIndex() {
         return index;
     }
+
+    public void updateEmail(String emailToUpdate) {
+        this.email = emailToUpdate;
+    }
 }
