@@ -9,10 +9,10 @@ import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
-public class EntityMapper {
+public class EntityLoader {
     private final EntityMeta entityMeta;
 
-    public EntityMapper(EntityMeta entityMeta) {
+    public EntityLoader(EntityMeta entityMeta) {
         this.entityMeta = entityMeta;
     }
 

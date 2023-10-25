@@ -12,14 +12,14 @@ import persistence.sql.QueryGenerator;
 public class DefaultEntityManager implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
     private final EntityMeta entityMeta;
-    private final EntityMapper entityMapper;
+    private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
     private final Dialect dialect;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityMeta = entityMeta;
-        this.entityMapper = new EntityMapper(entityMeta);
+        this.entityLoader = new EntityLoader(entityMeta);
         this.dialect = dialect;
         this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
     }
@@ -46,7 +46,7 @@ public class DefaultEntityManager implements EntityManager {
                 .select()
                 .findByIdQuery(id);
 
-        return jdbcTemplate.queryForObject(query, (resultSet) -> entityMapper.resultSetToEntity(clazz, resultSet));
+        return jdbcTemplate.queryForObject(query, (resultSet) -> entityLoader.resultSetToEntity(clazz, resultSet));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DefaultEntityManager implements EntityManager {
                 .select()
                 .findAllQuery();
 
-        return jdbcTemplate.query(query, (resultSet) -> entityMapper.resultSetToEntity(tClass, resultSet));
+        return jdbcTemplate.query(query, (resultSet) -> entityLoader.resultSetToEntity(tClass, resultSet));
     }
 
 

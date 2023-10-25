@@ -21,6 +21,6 @@
 ## 2단계 엔터티 초기화 (EntityLoader)
 > EntityLoader 는 엔터티를 데이터베이스에서 로드하고 로드된 엔터티 상태를 영속성 컨텍스트 내에서 추적 및 관리
 
-- [ ] 요구사항 1 - RowMapper 리팩터링
-  -  [ ] 동적으로 생성하는 엔터티로더(`EntityLoader`) 생성
+- [X] 요구사항 1 - RowMapper 리팩터링
+  -  [X] 동적으로 생성하는 엔터티로더(`EntityLoader`) 생성
 - [ ] 요구사항 2 - EntityManager 의 책임 줄여주기
