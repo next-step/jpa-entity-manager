@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConditionUtils {
+public final class ConditionUtils {
 
     /**
      * 카멜케이스 형식으로 작성된 문자열을 List 형식으로 반환합니다

@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ResultMapper<T> implements RowMapper<T> {
-    private Class<T> tClass;
+    private final Class<T> tClass;
 
     public ResultMapper(Class<T> tClass) {
         this.tClass = tClass;
@@ -68,7 +68,7 @@ public class ResultMapper<T> implements RowMapper<T> {
     private void setFieldData(ResultSet resultSet, Field field, T clazz) {
         try {
             field.set(clazz, extracted(resultSet, field, field.getType(), Objects.requireNonNull(
-                    ColumnName.of(field)).value()));
+                    ColumnName.of(field)).getName()));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

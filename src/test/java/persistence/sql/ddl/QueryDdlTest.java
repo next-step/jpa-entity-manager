@@ -2,29 +2,35 @@ package persistence.sql.ddl;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Person;
 import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import domain.Person;
-import persistence.person.NotEntityPerson;
 import persistence.person.ExistTablePerson;
 import persistence.person.NonExistentTablePerson;
+import persistence.person.NotEntityPerson;
 
 import java.sql.SQLException;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class QueryDdlTest {
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
 
-    private DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
+    private final CreateQuery createQuery = CreateQuery.create();
+    private final DropQuery dropQuery = DropQuery.create();
 
-    @BeforeEach
-    void start() throws SQLException {
+    @BeforeAll
+    static void start() throws SQLException {
         server = new H2();
         server.start();
 
@@ -41,7 +47,7 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> QueryDdl.create(personClass));
+            assertThrows(NullPointerException.class, () -> createQuery.getQuery(TableName을_생성함(personClass), Columns을_생성함(personClass)));
         }
     }
 
@@ -53,9 +59,10 @@ class QueryDdlTest {
         void success() {
             //given
             Class<NonExistentTablePerson> personClass = NonExistentTablePerson.class;
-
+            final TableName tableName = TableName을_생성함(personClass);
+            final Columns columns = Columns을_생성함(personClass);
             //when
-            String query = QueryDdl.create(personClass);
+            String query = createQuery.getQuery(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -70,9 +77,11 @@ class QueryDdlTest {
         void success() {
             //given
             Class<ExistTablePerson> personClass = ExistTablePerson.class;
+            final TableName tableName = TableName을_생성함(personClass);
+            final Columns columns = Columns을_생성함(personClass);
 
             //when
-            String query = QueryDdl.create(personClass);
+            String query = createQuery.getQuery(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -90,7 +99,7 @@ class QueryDdlTest {
             createTable(personClass);
 
             //when
-            String query = QueryDdl.drop(personClass);
+            String query = dropQuery.getQuery(TableName을_생성함(personClass));
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -103,16 +112,19 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> QueryDdl.drop(personClass));
+            assertThrows(NullPointerException.class, () -> dropQuery.getQuery(TableName을_생성함(personClass)));
         }
     }
 
-    private <T> void createTable(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.create(tClass));
+    @AfterAll
+    static void stop() {
+        server.stop();
     }
 
-    @AfterEach
-    void stop() {
-        server.stop();
+    private <T> void createTable(Class<T> tClass) {
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
     }
 }

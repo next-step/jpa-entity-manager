@@ -1,19 +1,26 @@
 package persistence.sql.ddl;
 
-import persistence.sql.common.meta.EntityMeta;
+import persistence.sql.common.meta.TableName;
 
-public class DropQuery extends EntityMeta {
+public class DropQuery {
+
     private static final String DEFAULT_DROP_QUERY = "DROP TABLE %s";
 
-    private <T> DropQuery(Class<T> tClass) {
-        super(tClass);
+    private TableName tableName;
+
+    private DropQuery() { }
+
+    public static DropQuery create() {
+        return new DropQuery();
     }
 
-    public static <T> String drop(Class<T> tClass) {
-        return new DropQuery(tClass).combineQuery();
+    public String getQuery(TableName tableName) {
+        this.tableName = tableName;
+
+        return combineQuery();
     }
 
     private String combineQuery() {
-        return String.format(DEFAULT_DROP_QUERY, getTableName());
+        return String.format(DEFAULT_DROP_QUERY, tableName.getValue());
     }
 }

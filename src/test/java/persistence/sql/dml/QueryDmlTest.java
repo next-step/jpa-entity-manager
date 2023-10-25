@@ -1,10 +1,22 @@
 package persistence.sql.dml;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
+
 import database.DatabaseServer;
 import database.H2;
+import java.sql.SQLException;
+import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,22 +25,23 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.InsertPerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
-import persistence.sql.ddl.QueryDdl;
-
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import persistence.sql.QueryUtil;
+import persistence.sql.common.instance.Values;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
+import persistence.sql.ddl.CreateQuery;
+import persistence.sql.ddl.DropQuery;
 
 class QueryDmlTest {
-    private DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    void start() throws SQLException {
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
+
+    private final CreateQuery createQuery = CreateQuery.create();
+    private final DropQuery dropQuery = DropQuery.create();
+
+    @BeforeAll
+    static void start() throws SQLException {
         server = new H2();
         server.start();
 
@@ -38,11 +51,12 @@ class QueryDmlTest {
     @Nested
     @DisplayName("insert query")
     class insert {
+
         Class<InsertPerson> aClass = InsertPerson.class;
 
         @BeforeEach
         void init() {
-            createTable(aClass);
+            테이블을_생성함(aClass);
         }
 
         @Test
@@ -52,7 +66,10 @@ class QueryDmlTest {
             NotEntityPerson person = new NotEntityPerson(1L, "name", 3);
 
             //when & then
-            assertThrows(InvalidEntityException.class, () -> QueryDml.insert(person));
+            assertThrows(InvalidEntityException.class
+                , () -> QueryUtil.insert().get(TableName을_생성함(person.getClass())
+                    , Columns을_생성함(person.getClass().getDeclaredFields())
+                    , Values을_생성함(person.getClass().getDeclaredFields())));
         }
 
         @Test
@@ -67,8 +84,12 @@ class QueryDmlTest {
 
             InsertPerson person = new InsertPerson(id, name, age, email, index);
 
+            final TableName tableName = TableName을_생성함(person);
+            final Columns columns = Columns을_생성함(person);
+            final Values values = Values을_생성함(person);
+
             //when
-            String query = QueryDml.insert(person);
+            String query = QueryUtil.insert().get(tableName, columns, values);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -83,11 +104,12 @@ class QueryDmlTest {
     @Nested
     @DisplayName("select query")
     class selectQuery {
+
         Class<SelectPerson> selectPersonClass = SelectPerson.class;
 
         @BeforeEach
         void init() {
-            createTable(selectPersonClass);
+            테이블을_생성함(selectPersonClass);
         }
 
         @Test
@@ -102,10 +124,14 @@ class QueryDmlTest {
 
             final SelectPerson person = new SelectPerson(id, name, age, email, index);
 
+            final TableName tableName = TableName을_생성함(person);
+            final Columns columns = Columns을_생성함(person);
+
             insert(person);
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery(SelectPerson.class, "findAll"), new ResultMapper<>(SelectPerson.class));
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns),
+                new ResultMapper<>(SelectPerson.class));
             SelectPerson result = personList.get(0);
 
             //then
@@ -128,8 +154,12 @@ class QueryDmlTest {
             insert(person1);
             insert(person2);
 
+            final TableName tableName = TableName을_생성함(person1);
+            final Columns columns = Columns을_생성함(person1);
+
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery(SelectPerson.class, "findAll"), new ResultMapper<>(SelectPerson.class));
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns)
+                , new ResultMapper<>(SelectPerson.class));
 
             //then
             assertThat(personList).size().isEqualTo(2);
@@ -144,7 +174,7 @@ class QueryDmlTest {
 
             //when & then
             assertThrows(InvalidEntityException.class,
-                    () -> jdbcTemplate.query(getSelectQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
+                () -> jdbcTemplate.query(getSelectQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
         }
 
         @AfterEach
@@ -156,11 +186,12 @@ class QueryDmlTest {
     @Nested
     @DisplayName("delete query")
     class delete {
+
         Class<SelectPerson> selectPersonClass = SelectPerson.class;
 
         @BeforeEach
         void init() {
-            createTable(selectPersonClass);
+            테이블을_생성함(selectPersonClass);
         }
 
         @Test
@@ -177,14 +208,18 @@ class QueryDmlTest {
 
             insert(person);
 
+            Class<SelectPerson> clazz = SelectPerson.class;
+            final TableName tableName = TableName을_생성함(clazz);
+            final Columns columns = Columns을_생성함(clazz);
+
             //when
-            String query = DeleteQuery.create(person, id);
+            String query = QueryUtil.delete().get(tableName, columns, id);
             jdbcTemplate.execute(query);
 
             //then
             assertThrows(RuntimeException.class
-                    , () -> jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
-                            , new ResultMapper<>(SelectPerson.class)), "No data is available [2000-214]");
+                , () -> jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
+                    , new ResultMapper<>(SelectPerson.class)), "No data is available [2000-214]");
         }
 
         @AfterEach
@@ -193,28 +228,90 @@ class QueryDmlTest {
         }
     }
 
-    private <T> String getSelectQuery(Class<T> tClass, String methodName) {
-        return QueryDml.select(tClass, methodName);
+    @Nested
+    @DisplayName("update 쿼리 실행 확인")
+    class update {
+
+        Class<SelectPerson> selectPersonClass = SelectPerson.class;
+
+        @BeforeEach
+        void init() {
+            테이블을_생성함(selectPersonClass);
+        }
+
+        @Test
+        @DisplayName("update쿼리 실행으로 값이 변경 되었는지 확인")
+        void success() {
+            //given
+            final Long id = 88L;
+
+            final String actualName = "zz";
+            final int actualAge = 30;
+            final String actualEmail = "xx";
+            final SelectPerson actual = new SelectPerson(id, actualName, actualAge, actualEmail, 3);
+            insert(actual);
+
+            final String name = "홍길동";
+            final SelectPerson expected = new SelectPerson(id, name, actualAge, actualEmail, 3);
+
+            Class<SelectPerson> clazz = SelectPerson.class;
+            final TableName tableName = TableName을_생성함(clazz);
+            final Columns columns = Columns을_생성함(clazz);
+            final Values values = Values을_생성함(expected);
+
+            //when
+            String query = QueryUtil.update().get(values, tableName, columns, id);
+            jdbcTemplate.execute(query);
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns),
+                new ResultMapper<>(clazz));
+
+            //then
+            assertSoftly(softAssertions -> {
+                softAssertions.assertThat(actual.getId()).isEqualTo(result.getId());
+                softAssertions.assertThat(actual.getName()).isNotEqualTo(result.getName());
+                softAssertions.assertThat(actual.getAge()).isEqualTo(result.getAge());
+                softAssertions.assertThat(actual.getEmail()).isEqualTo(result.getEmail());
+            });
+        }
+
+        @AfterEach
+        void after() {
+            dropTable(selectPersonClass);
+        }
+    }
+
+    @AfterAll
+    static void stop() {
+        server.stop();
+    }
+
+    private String getSelectQuery(String methodName, TableName tableName, Columns columns) {
+        return QueryUtil.select().get(methodName, tableName, columns, null);
     }
 
     private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
-        return QueryDml.select(tClass, methodName, args);
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        return QueryUtil.select().get(methodName, tableName, columns, args);
     }
 
-    private <T> void createTable(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.create(tClass));
+    private <T> void 테이블을_생성함(Class<T> tClass) {
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
     }
 
     private <T> void insert(T t) {
-        jdbcTemplate.execute(QueryDml.insert(t));
+        final TableName tableName = TableName을_생성함(t);
+        final Columns columns = Columns을_생성함(t);
+        final Values values = Values.of(t);
+
+        jdbcTemplate.execute(QueryUtil.insert().get(tableName, columns, values));
     }
 
     private <T> void dropTable(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.drop(tClass));
-    }
-
-    @AfterEach
-    void stop() {
-        server.stop();
+        jdbcTemplate.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
     }
 }

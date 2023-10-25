@@ -1,30 +1,33 @@
 package persistence.sql.dml;
 
-import java.util.List;
-
-import persistence.sql.common.meta.EntityMeta;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 import utils.ConditionUtils;
 
-public class SelectQuery extends EntityMeta {
+import java.util.List;
+
+public class SelectQuery {
 
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
-    private static final String CONDITION_AND = " AND ";
 
-    private final String methodName;
-    private final Object[] args;
+    private String methodName;
+    private TableName tableName;
+    private Columns columns;
+    private Object[] args;
 
-    public <T> SelectQuery(Class<T> tClass, String methodName, Object[] args) {
-        super(tClass);
+    private SelectQuery() { }
+
+    public static SelectQuery create() {
+        return new SelectQuery();
+    }
+
+    public String get(String methodName, TableName tableName, Columns columns, Object... args) {
         this.methodName = methodName;
+        this.tableName = tableName;
+        this.columns = columns;
         this.args = args;
-    }
 
-    public static <T> String create(Class<T> tClass, String methodName) {
-        return new SelectQuery(tClass, methodName, null).combine();
-    }
-
-    public static <T> String create(Class<T> tClass, String methodName, Object... args) {
-        return new SelectQuery(tClass, methodName, args).combine();
+        return combine();
     }
 
     public String combine() {
@@ -38,11 +41,11 @@ public class SelectQuery extends EntityMeta {
     }
 
     private String parseFiled() {
-        return String.format(DEFAULT_SELECT_COLUMN_QUERY, parseSelectFiled(), getTableName());
+        return String.format(DEFAULT_SELECT_COLUMN_QUERY, parseSelectFiled(), tableName.getValue());
     }
 
     private String parseSelectFiled() {
-        return getColumnsWithComma();
+        return columns.getColumnsWithComma();
     }
 
     private String parseWhere() {
@@ -50,8 +53,8 @@ public class SelectQuery extends EntityMeta {
         String conditionText = methodName.replace("find", "").replace("By", "");
         List<String> conditionList = ConditionUtils.getWordsFromCamelCase(conditionText);
 
-        String condtion = ConditionBuilder.getCondition(conditionList, args);
-        return condtion.replace(" id ", " " + setConditionField("id") + " ");
+        String condition = ConditionBuilder.getCondition(conditionList, args);
+        return condition.replace(" id ", " " + setConditionField("id") + " ");
     }
 
     private boolean isCondition(String methodName) {
@@ -59,8 +62,8 @@ public class SelectQuery extends EntityMeta {
     }
 
     private String setConditionField(String word) {
-        if(word.equals("id")) {
-            word = getIdName();
+        if (word.equals("id")) {
+            word = columns.getIdName();
         }
         return word;
     }

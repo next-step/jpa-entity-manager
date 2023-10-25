@@ -1,22 +1,28 @@
 package persistence.sql.dml;
 
-import persistence.sql.common.instance.InstanceManager;
-import persistence.sql.common.meta.EntityMeta;
+import persistence.sql.common.instance.Values;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 public class InsertQuery {
     private static final String DEFAULT_INSERT_COLUMN_QUERY = "INSERT INTO %s (%s)";
     private static final String DEFAULT_INSERT_VALUE_QUERY = "VALUES(%s)";
+    private TableName tableName;
+    private Columns columns;
+    private Values values;
 
-    private EntityMeta entityMeta;
-    private InstanceManager instanceManager;
+    private InsertQuery() { }
 
-    protected <T> InsertQuery(T t) {
-        this.entityMeta = EntityMeta.of(t.getClass());
-        this.instanceManager = InstanceManager.of(t);
+    public static InsertQuery create() {
+        return new InsertQuery();
     }
 
-    public static <T> String create(T t) {
-        return new InsertQuery(t).combineQuery();
+    public String get(TableName tableName, Columns columns, Values values) {
+        this.tableName = tableName;
+        this.columns = columns;
+        this.values = values;
+
+        return combineQuery();
     }
 
     /**
@@ -27,10 +33,10 @@ public class InsertQuery {
     }
 
     private String parseColumns() {
-        return String.format(DEFAULT_INSERT_COLUMN_QUERY, entityMeta.getTableName(), entityMeta.getColumnsWithComma());
+        return String.format(DEFAULT_INSERT_COLUMN_QUERY, tableName.getValue(), columns.getColumnsWithComma());
     }
 
     private String parseValues() {
-        return String.format(DEFAULT_INSERT_VALUE_QUERY, instanceManager.getValuesWithComma());
+        return String.format(DEFAULT_INSERT_VALUE_QUERY, values.getValuesWithComma());
     }
 }

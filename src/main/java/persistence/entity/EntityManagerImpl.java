@@ -1,54 +1,55 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-import jdbc.ResultMapper;
-import jdbc.RowMapper;
-import persistence.sql.dml.QueryDml;
-import persistence.sql.dml.SelectQuery;
-
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import jdbc.JdbcTemplate;
 
-public abstract class EntityManagerImpl<T> implements EntityManager<T> {
-    private final RowMapper<T> rowMapper;
-    private JdbcTemplate jdbcTemplate;
+public class EntityManagerImpl implements EntityManager {
 
-    public EntityManagerImpl(Connection connection, Class<T> tClass) {
-        this.rowMapper = new ResultMapper<>(tClass);
+    private final JdbcTemplate jdbcTemplate;
+    private final Map<String, EntityPersister<?>> persisterMap;
+
+
+    public EntityManagerImpl(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
+        this.persisterMap = new HashMap<>();
     }
 
     @Override
-    public List<T> findAll() {
-        String query = SelectQuery.create(rowMapper.getClass(), new Object() {
-        }.getClass().getEnclosingMethod().getName());
-
-        return jdbcTemplate.query(query, rowMapper);
+    public <T> List<T> findAll(Class<T> tClazz) {
+        return getPersister(tClazz).findAll();
     }
 
     @Override
-    public <R> T findById(R r) {
-        String query = SelectQuery.create(rowMapper.getClass(), new Object() {
-        }.getClass().getEnclosingMethod().getName());
-
-        return jdbcTemplate.queryForObject(query, rowMapper);
+    public <R, I> R find(Class<R> rClass, I i) {
+        return getPersister(rClass).findById(i);
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) {
-        String query = SelectQuery.create(clazz, "findById", Id);
-        return (T) jdbcTemplate.queryForObject(query, rowMapper);
+    public <T> T persist(T t) {
+        getPersister(t.getClass()).insert(t);
+        return t;
     }
 
     @Override
-    public Object persist(Object entity) {
-        jdbcTemplate.execute(QueryDml.insert(entity));
-        // TODO: 반환값이 정확히 무엇인지 확인 할 필요가 있음
-        return entity;
+    public <T> void remove(Class<T> tClass, Object arg) {
+        getPersister(tClass).delete(arg);
     }
 
     @Override
-    public void remove(Object entity) {
-        jdbcTemplate.execute(QueryDml.delete(entity));
+    public <T> void update(T t, Object arg) {
+        getPersister(t.getClass()).update(t, arg);
+    }
+
+    private <T> EntityPersister<T> getPersister(Class<T> tClass) {
+        String key = tClass.getName();
+
+        if (persisterMap.get(key) == null) {
+            persisterMap.put(key, new EntityPersister<>(jdbcTemplate, tClass));
+        }
+
+        return (EntityPersister<T>) persisterMap.get(key);
     }
 }

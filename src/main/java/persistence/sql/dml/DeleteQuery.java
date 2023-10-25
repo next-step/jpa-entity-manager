@@ -1,45 +1,39 @@
 package persistence.sql.dml;
 
-import persistence.sql.common.instance.InstanceManager;
-import persistence.sql.common.meta.EntityMeta;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
 
 public class DeleteQuery {
 
     private static final String DEFAULT_DELETE_QUERY = "DELETE FROM %s";
 
-    private final EntityMeta entityMeta;
-    private final InstanceManager instanceManager;
-    private final Object arg;
+    private TableName tableName;
+    private Columns columns;
+    private Object arg;
 
-    private <T> DeleteQuery(T t, Object arg) {
-        this.entityMeta = EntityMeta.of(t.getClass());
-        this.instanceManager = InstanceManager.of(t);
+    private DeleteQuery() { }
+
+    public static DeleteQuery create() {
+        return new DeleteQuery();
+    }
+
+    public String get(TableName tableName, Columns columns, Object arg) {
+        this.tableName = tableName;
+        this.columns = columns;
         this.arg = arg;
-    }
 
-    private <T> DeleteQuery(T t) {
-        this.entityMeta = EntityMeta.of(t.getClass());
-        this.instanceManager = InstanceManager.of(t);
-        this.arg = entityMeta.getIdName();
-    }
-
-    public static <T> String create(T t, Object arg) {
-        return new DeleteQuery(t, arg).combine();
-    }
-
-    public static <T> String create(T t) {
-        return new DeleteQuery(t).combine();
+        return combine();
     }
 
     private String combine() {
-        return String.join(" ",  getTableQuery(), getCondition());
+        return String.join(" ", getTableQuery(), getCondition());
     }
 
     private String getTableQuery() {
-        return String.format(DEFAULT_DELETE_QUERY, entityMeta.getTableName());
+        return String.format(DEFAULT_DELETE_QUERY, tableName.getValue());
     }
 
     private String getCondition() {
-        return ConditionBuilder.getCondition(entityMeta.getIdName(), arg);
+        return ConditionBuilder.getCondition(columns.getIdName(), arg);
     }
 }

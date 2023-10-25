@@ -1,8 +1,17 @@
 package persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+
 import database.DatabaseServer;
 import database.H2;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -10,36 +19,41 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import persistence.person.DatabasePerson;
-import persistence.sql.ddl.QueryDdl;
-import persistence.sql.dml.QueryDml;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import persistence.sql.QueryUtil;
+import persistence.sql.common.instance.Values;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
+import persistence.sql.ddl.CreateQuery;
+import persistence.sql.ddl.DropQuery;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DatabaseImplTest {
 
-    private DatabaseImpl database;
-    private DatabaseServer server;
-    private Class<DatabasePerson> tClass;
+    private static DatabaseServer server;
+    private static Database database;
+    private static Class<DatabasePerson> tClass;
 
-    @BeforeEach
-    void init() throws SQLException {
+    private final CreateQuery createQuery = CreateQuery.create();
+    private final DropQuery dropQuery = DropQuery.create();
+
+    @BeforeAll
+    static void init() throws SQLException {
         server = new H2();
         server.start();
-        tClass = DatabasePerson.class;
 
         database = new DatabaseImpl(server.getConnection());
-        createTable(tClass);
+        tClass = DatabasePerson.class;
+    }
+
+    @BeforeEach
+    void beforeEach() throws SQLException {
+        테이블을_생성함(tClass);
     }
 
     @Test
     @Order(1)
     @DisplayName("database 인터페이스를 통한 insert 성공")
-    void insert() throws SQLException {
+    void insert() {
         //given
         final Long id = 3L;
         final String name = "name";
@@ -101,36 +115,57 @@ class DatabaseImplTest {
 
         insert(person);
 
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
+
         //when & then
-        assertDoesNotThrow(() -> delete(person, id));
+        assertDoesNotThrow(() -> delete(tableName, columns, id));
     }
 
     @AfterEach
     void after() throws SQLException {
-        dropTable(tClass);
+        테이블을_삭제함(tClass);
     }
 
-    private <T> void createTable(Class<T> tClass) throws SQLException {
-        database.execute(QueryDdl.create(tClass));
+    @AfterAll
+    static void afterAll() {
+        server.stop();
     }
 
-    private <T> void dropTable(Class<T> tClass) throws SQLException {
-        database.execute(QueryDdl.drop(tClass));
+    private <T> void 테이블을_생성함(Class<T> tClass) throws SQLException {
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        database.execute(createQuery.getQuery(tableName, columns));
+    }
+
+    private <T> void 테이블을_삭제함(Class<T> tClass) throws SQLException {
+        database.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
     }
 
     private <T> void insert(T t) throws SQLException {
-        database.execute(QueryDml.insert(t));
+        final TableName tableName = TableName.of(t.getClass());
+        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
+        final Values values = Values.of(t);
+
+        database.execute(QueryUtil.insert().get(tableName, columns, values));
     }
 
-    private <T> void delete(T t, Object args) throws SQLException {
-        database.execute(QueryDml.delete(t, args));
+    private void delete(TableName tableName, Columns columns, Object args) throws SQLException {
+        database.execute(QueryUtil.delete().get(tableName, columns, args));
     }
 
     private <T> ResultSet findAll(Class<T> tClass, String methodName) throws SQLException {
-        return database.executeQuery(QueryDml.select(tClass, methodName));
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
+
+        return database.executeQuery(QueryUtil.select().get(methodName, tableName, columns, null));
     }
 
     private <T> ResultSet find(Class<T> tClass, String methodName, Object... args) throws SQLException {
-        return database.executeQuery(QueryDml.select(tClass, methodName, args));
+        final TableName tableName = TableName.of(tClass);
+        final Columns columns = Columns.of(tClass.getDeclaredFields());
+
+        return database.executeQuery(QueryUtil.select().get(methodName, tableName, columns, args));
     }
 }
