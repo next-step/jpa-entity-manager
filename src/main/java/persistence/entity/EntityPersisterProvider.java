@@ -1,7 +1,6 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-import persistence.sql.dml.DmlGenerator;
+import persistence.core.PersistenceEnvironment;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,18 +8,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EntityPersisterProvider {
 
     private final Map<Class<?>, EntityPersister> cache;
-    private final JdbcTemplate jdbcTemplate;
-    private final DmlGenerator dmlGenerator;
+    private final PersistenceEnvironment persistenceEnvironment;
 
-    public EntityPersisterProvider(final JdbcTemplate jdbcTemplate, final DmlGenerator dmlGenerator) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.dmlGenerator = dmlGenerator;
+    public EntityPersisterProvider(final PersistenceEnvironment persistenceEnvironment) {
+        this.persistenceEnvironment = persistenceEnvironment;
         this.cache = new ConcurrentHashMap<>();
     }
 
     public EntityPersister getEntityPersister(final Class<?> clazz) {
         return cache.computeIfAbsent(clazz, cls->
-            new EntityPersister(clazz, jdbcTemplate, dmlGenerator)
+            new EntityPersister(clazz, persistenceEnvironment)
         );
     }
 

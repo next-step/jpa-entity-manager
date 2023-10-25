@@ -1,16 +1,12 @@
 package persistence.entity;
 
-import mock.MockJdbcTemplate;
 import domain.FixturePerson;
 import domain.Person;
+import mock.MockPersistenceEnvironment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.dialect.Dialect;
-import persistence.dialect.h2.H2Dialect;
-import persistence.sql.dml.DmlGenerator;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,9 +18,8 @@ class EntityPersisterTest {
     private Person fixturePerson;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        final Dialect dialect = new H2Dialect();
-        entityPersister = new EntityPersister(Person.class, new MockJdbcTemplate(), new DmlGenerator(dialect));
+    void setUp() {
+        entityPersister = new EntityPersister(Person.class, new MockPersistenceEnvironment());
         fixturePerson = FixturePerson.create(1L);
     }
 

@@ -1,46 +1,61 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.core.EntityColumn;
-import persistence.core.EntityColumns;
-import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
+import persistence.core.*;
+import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
 import persistence.util.ReflectionUtils;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class EntityPersister {
+    private final PersistenceEnvironment persistenceEnvironment;
     private final String tableName;
     private final EntityColumn idColumn;
     private final EntityColumns columns;
     private final EntityColumns insertableColumns;
-    private final JdbcTemplate jdbcTemplate;
     private final DmlGenerator dmlGenerator;
 
-    public EntityPersister(final Class<?> clazz, final JdbcTemplate jdbcTemplate, final DmlGenerator dmlGenerator) {
+    public EntityPersister(final Class<?> clazz, final PersistenceEnvironment persistenceEnvironment) {
         final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+        this.persistenceEnvironment = persistenceEnvironment;
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.columns = entityMetadata.getColumns();
         this.insertableColumns = entityMetadata.getInsertableColumn();
-        this.jdbcTemplate = jdbcTemplate;
-        this.dmlGenerator = dmlGenerator;
+        this.dmlGenerator = persistenceEnvironment.getDmlGenerator();
     }
 
     public void insert(final Object entity) {
         final String insertQuery = renderInsert(entity);
-        jdbcTemplate.execute(insertQuery);
+        try (final Connection connection = persistenceEnvironment.getConnection()) {
+            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
+            jdbcTemplate.execute(insertQuery);
+        } catch (final SQLException e) {
+            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
+        }
     }
 
     public void update(final Object entity) {
         final String updateQuery = renderUpdate(entity);
-        jdbcTemplate.execute(updateQuery);
+        try (final Connection connection = persistenceEnvironment.getConnection()) {
+            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
+            jdbcTemplate.execute(updateQuery);
+        } catch (final SQLException e) {
+            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
+        }
     }
 
     public void delete(final Object entity) {
         final String deleteQuery = renderDelete(entity);
-        jdbcTemplate.execute(deleteQuery);
+        try (final Connection connection = persistenceEnvironment.getConnection()) {
+            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
+            jdbcTemplate.execute(deleteQuery);
+        } catch (final SQLException e) {
+            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
+        }
     }
 
     public String renderInsert(final Object entity) {
