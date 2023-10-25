@@ -47,7 +47,7 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> createQuery.getQuery(TableName을_생성함(personClass), Columns을_생성함(personClass)));
+            assertThrows(NullPointerException.class, () -> createQuery.get(TableName을_생성함(personClass), Columns을_생성함(personClass)));
         }
     }
 
@@ -62,7 +62,7 @@ class QueryDdlTest {
             final TableName tableName = TableName을_생성함(personClass);
             final Columns columns = Columns을_생성함(personClass);
             //when
-            String query = createQuery.getQuery(tableName, columns);
+            String query = createQuery.get(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -81,7 +81,7 @@ class QueryDdlTest {
             final Columns columns = Columns을_생성함(personClass);
 
             //when
-            String query = createQuery.getQuery(tableName, columns);
+            String query = createQuery.get(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -99,7 +99,7 @@ class QueryDdlTest {
             createTable(personClass);
 
             //when
-            String query = dropQuery.getQuery(TableName을_생성함(personClass));
+            String query = dropQuery.get(TableName을_생성함(personClass));
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -112,7 +112,7 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> dropQuery.getQuery(TableName을_생성함(personClass)));
+            assertThrows(NullPointerException.class, () -> dropQuery.get(TableName을_생성함(personClass)));
         }
     }
 
@@ -125,6 +125,6 @@ class QueryDdlTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
+        jdbcTemplate.execute(createQuery.get(tableName, columns));
     }
 }

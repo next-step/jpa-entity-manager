@@ -17,7 +17,7 @@ public class CreateQuery {
         return new CreateQuery();
     }
 
-    public String getQuery(TableName tableName, Columns columns) {
+    public String get(TableName tableName, Columns columns) {
         this.tableName = tableName;
         this.columns = columns;
 

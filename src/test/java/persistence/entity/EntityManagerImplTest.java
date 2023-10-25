@@ -279,11 +279,11 @@ class EntityManagerImplTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
+        jdbcTemplate.execute(createQuery.get(tableName, columns));
     }
 
     private <T> void 테이블을_삭제함(Class<T> tClass) {
-        jdbcTemplate.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
+        jdbcTemplate.execute(dropQuery.get(TableName을_생성함(tClass)));
     }
 
     private <T> void 데이터를_저장함(T t) {

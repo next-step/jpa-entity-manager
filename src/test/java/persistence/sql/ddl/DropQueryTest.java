@@ -25,7 +25,7 @@ class DropQueryTest {
         final TableName tableName = TableName을_생성함(clazz);
 
         //when
-        final String result = dropQuery.getQuery(tableName);
+        final String result = dropQuery.get(tableName);
 
         //then
         assertThat(result).isEqualTo(expectedSql);
@@ -38,7 +38,7 @@ class DropQueryTest {
         Class<NonExistentEntityPerson> personClass = NonExistentEntityPerson.class;
 
         //when & then
-        assertThrows(InvalidEntityException.class, () -> dropQuery.getQuery(TableName을_생성함(personClass)));
+        assertThrows(InvalidEntityException.class, () -> dropQuery.get(TableName을_생성함(personClass)));
     }
 
     @Test
@@ -49,7 +49,7 @@ class DropQueryTest {
         final String expectedSql = "DROP TABLE users";
 
         //when
-        final String result = dropQuery.getQuery(TableName을_생성함(personClass));
+        final String result = dropQuery.get(TableName을_생성함(personClass));
 
         //then
         assertThat(result).isEqualTo(expectedSql);

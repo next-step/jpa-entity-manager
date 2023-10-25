@@ -14,7 +14,7 @@ public class DropQuery {
         return new DropQuery();
     }
 
-    public String getQuery(TableName tableName) {
+    public String get(TableName tableName) {
         this.tableName = tableName;
 
         return combineQuery();

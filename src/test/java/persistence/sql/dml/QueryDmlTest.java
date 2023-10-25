@@ -300,7 +300,7 @@ class QueryDmlTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
+        jdbcTemplate.execute(createQuery.get(tableName, columns));
     }
 
     private <T> void insert(T t) {
@@ -312,6 +312,6 @@ class QueryDmlTest {
     }
 
     private <T> void dropTable(Class<T> tClass) {
-        jdbcTemplate.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
+        jdbcTemplate.execute(dropQuery.get(TableName을_생성함(tClass)));
     }
 }

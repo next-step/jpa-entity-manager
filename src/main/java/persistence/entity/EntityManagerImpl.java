@@ -10,21 +10,23 @@ public class EntityManagerImpl implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
     private final Map<String, EntityPersister<?>> persisterMap;
+    private final Map<String, EntityLoader<?>> loaderMap;
 
 
     public EntityManagerImpl(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
         this.persisterMap = new HashMap<>();
+        this.loaderMap = new HashMap<>();
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClazz) {
-        return getPersister(tClazz).findAll();
+        return getLoader(tClazz).findAll();
     }
 
     @Override
     public <R, I> R find(Class<R> rClass, I i) {
-        return getPersister(rClass).findById(i);
+        return getLoader(rClass).findById(i);
     }
 
     @Override
@@ -51,5 +53,15 @@ public class EntityManagerImpl implements EntityManager {
         }
 
         return (EntityPersister<T>) persisterMap.get(key);
+    }
+
+    private <T> EntityLoader<T> getLoader(Class<T> tClass) {
+        String key = tClass.getName();
+
+        if (loaderMap.get(key) == null) {
+            loaderMap.put(key, new EntityLoader<>(jdbcTemplate, tClass));
+        }
+
+        return (EntityLoader<T>) loaderMap.get(key);
     }
 }

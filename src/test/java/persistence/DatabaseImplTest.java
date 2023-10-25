@@ -136,11 +136,11 @@ class DatabaseImplTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        database.execute(createQuery.getQuery(tableName, columns));
+        database.execute(createQuery.get(tableName, columns));
     }
 
     private <T> void 테이블을_삭제함(Class<T> tClass) throws SQLException {
-        database.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
+        database.execute(dropQuery.get(TableName을_생성함(tClass)));
     }
 
     private <T> void insert(T t) throws SQLException {

@@ -24,8 +24,6 @@ import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.ddl.CreateQuery;
-import persistence.sql.ddl.DropQuery;
 
 class EntityPersisterTest {
 
@@ -33,9 +31,6 @@ class EntityPersisterTest {
     private static EntityPersister entityPersister;
     public static DatabaseServer server;
     public static JdbcTemplate jdbcTemplate;
-
-    private final CreateQuery createQuery = CreateQuery.create();
-    private final DropQuery dropQuery = DropQuery.create();
 
     @BeforeAll
     static void init() throws SQLException {
@@ -52,7 +47,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(selectPerson);
         final Columns columns = Columns을_생성함(selectPerson);
 
-        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
+        jdbcTemplate.execute(QueryUtil.create().get(tableName, columns));
     }
 
     @Nested
@@ -185,7 +180,7 @@ class EntityPersisterTest {
 
     @AfterEach
     void after() {
-        jdbcTemplate.execute(dropQuery.getQuery(TableName을_생성함(selectPerson)));
+        jdbcTemplate.execute(QueryUtil.drop().get(TableName을_생성함(selectPerson)));
     }
 
     @AfterAll
