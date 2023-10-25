@@ -30,32 +30,17 @@ public class EntityPersister {
 
     public void insert(final Object entity) {
         final String insertQuery = renderInsert(entity);
-        try (final Connection connection = persistenceEnvironment.getConnection()) {
-            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
-            jdbcTemplate.execute(insertQuery);
-        } catch (final SQLException e) {
-            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
-        }
+        executeQuery(insertQuery);
     }
 
     public void update(final Object entity) {
         final String updateQuery = renderUpdate(entity);
-        try (final Connection connection = persistenceEnvironment.getConnection()) {
-            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
-            jdbcTemplate.execute(updateQuery);
-        } catch (final SQLException e) {
-            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
-        }
+        executeQuery(updateQuery);
     }
 
     public void delete(final Object entity) {
         final String deleteQuery = renderDelete(entity);
-        try (final Connection connection = persistenceEnvironment.getConnection()) {
-            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
-            jdbcTemplate.execute(deleteQuery);
-        } catch (final SQLException e) {
-            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
-        }
+        executeQuery(deleteQuery);
     }
 
     public String renderInsert(final Object entity) {
@@ -94,5 +79,14 @@ public class EntityPersister {
 
     public String getIdColumnName() {
         return idColumn.getName();
+    }
+
+    private void executeQuery(final String query) {
+        try (final Connection connection = persistenceEnvironment.getConnection()) {
+            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
+            jdbcTemplate.execute(query);
+        } catch (final SQLException e) {
+            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
+        }
     }
 }
