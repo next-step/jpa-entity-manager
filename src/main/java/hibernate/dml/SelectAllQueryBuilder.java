@@ -24,15 +24,4 @@ public class SelectAllQueryBuilder {
     private String parseColumnQueries(final List<String> fieldNames) {
         return String.join(SELECT_AlL_QUERY_COLUMN_DELIMITER, fieldNames);
     }
-
-    public String generateQuery(final EntityClass<?> entityClass) {
-        return String.format(SELECT_ALL_QUERY, parseColumnQueries(entityClass), entityClass.tableName());
-    }
-
-    private String parseColumnQueries(final EntityClass<?> entityClass) {
-        return entityClass.getEntityColumns()
-                .stream()
-                .map(EntityColumn::getFieldName)
-                .collect(Collectors.joining(SELECT_AlL_QUERY_COLUMN_DELIMITER));
-    }
 }
