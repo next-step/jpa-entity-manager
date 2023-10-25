@@ -30,7 +30,7 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(jdbcTemplate);
+        entityManager = new EntityManagerImpl(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate));
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery(EntityClass.getInstance(TestEntity.class)));
     }

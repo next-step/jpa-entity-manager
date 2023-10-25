@@ -1,17 +1,13 @@
 package hibernate.entity;
 
-import jdbc.JdbcTemplate;
-
 public class EntityManagerImpl implements EntityManager {
 
-    private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
-    public EntityManagerImpl(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.entityLoader = new EntityLoader(jdbcTemplate);
-        this.entityPersister = new EntityPersister(jdbcTemplate);
+    public EntityManagerImpl(final EntityPersister entityPersister, final EntityLoader entityLoader) {
+        this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
 
     @Override
