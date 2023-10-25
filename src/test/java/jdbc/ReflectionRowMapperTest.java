@@ -20,6 +20,7 @@ class ReflectionRowMapperTest {
         givenResultSet.addColumn("id", Types.BIGINT, 0, 0);
         givenResultSet.addColumn("nick_name", Types.VARCHAR, 0, 0);
         givenResultSet.addRow(1L, "최진영");
+        givenResultSet.next();
         RowMapper<TestEntity> rowMapper = ReflectionRowMapper.getInstance(EntityClass.getInstance(TestEntity.class));
 
         // when

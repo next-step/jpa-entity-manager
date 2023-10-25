@@ -91,7 +91,6 @@ class EntityManagerImplTest {
             @Override
             public Integer mapRow(ResultSet resultSet) {
                 try {
-                    resultSet.next();
                     return resultSet.getInt(1);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);

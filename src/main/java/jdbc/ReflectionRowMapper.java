@@ -25,7 +25,6 @@ public class ReflectionRowMapper<T> implements RowMapper<T> {
 
     @Override
     public T mapRow(final ResultSet resultSet) throws SQLException {
-        resultSet.next();
         T instance = entityClass.newInstance();
         List<EntityColumn> entityColumns = entityClass.getEntityColumns();
         for (EntityColumn entityColumn : entityColumns) {
