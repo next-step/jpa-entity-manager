@@ -18,8 +18,8 @@ public class EntityManagerImpl implements EntityManager {
 
     }
 
-    public static EntityManagerImpl of(EntityPersister entityPersister,EntityLoader entityLoader) {
-        return new EntityManagerImpl(entityPersister,entityLoader);
+    public static EntityManagerImpl of(EntityPersister entityPersister, EntityLoader entityLoader) {
+        return new EntityManagerImpl(entityPersister, entityLoader);
     }
 
     @Override
