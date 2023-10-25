@@ -22,7 +22,7 @@ public class PersistenceEnvironment {
         this.dialect = dialect;
         this.dmlGenerator = new DmlGenerator(dialect);
         this.entityPersisterProvider = new EntityPersisterProvider(this);
-        this.entityLoaderProvider = new EntityLoaderProvider(this, this.entityPersisterProvider);
+        this.entityLoaderProvider = new EntityLoaderProvider(this);
     }
 
     public Dialect getDialect() {

@@ -11,16 +11,16 @@ public class EntityLoaderProvider {
     private final PersistenceEnvironment persistenceEnvironment;
     private final EntityPersisterProvider entityPersisterProvider;
 
-    public EntityLoaderProvider(final PersistenceEnvironment persistenceEnvironment, final EntityPersisterProvider entityPersisterProvider) {
+    public EntityLoaderProvider(final PersistenceEnvironment persistenceEnvironment) {
         this.persistenceEnvironment = persistenceEnvironment;
-        this.entityPersisterProvider = entityPersisterProvider;
+        this.entityPersisterProvider = persistenceEnvironment.getEntityPersisterProvider();
         this.cache = new ConcurrentHashMap<>();
     }
 
     @SuppressWarnings("unchecked")
     public <T> EntityLoader<T> getEntityLoader(final Class<T> clazz) {
         return (EntityLoader<T>) cache.computeIfAbsent(clazz, cls ->
-                new EntityLoader<T>(clazz, persistenceEnvironment, entityPersisterProvider.getEntityPersister(clazz))
+                new EntityLoader<>(clazz, persistenceEnvironment, entityPersisterProvider.getEntityPersister(clazz))
         );
     }
 
