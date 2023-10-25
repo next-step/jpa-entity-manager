@@ -31,31 +31,31 @@ public class EntityPersister<T> {
         return jdbcTemplate.query(query, resultMapper);
     }
 
-    public <I> T findById(I i) {
+    public <I> T findById(I input) {
         String query = SelectQuery.create(new Object() {
-        }.getClass().getEnclosingMethod().getName(), tableName, columns, i);
+        }.getClass().getEnclosingMethod().getName(), tableName, columns, input);
 
         return jdbcTemplate.queryForObject(query, resultMapper);
     }
 
-    public <T> boolean update(T t, Object arg) {
+    public <I> boolean update(I input, Object arg) {
         try {
-            jdbcTemplate.execute(QueryDml.update(getValues(t), tableName, columns, arg));
+            jdbcTemplate.execute(QueryDml.update(getValues(input), tableName, columns, arg));
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public <I> void insert(I i) {
-        jdbcTemplate.execute(QueryDml.insert(tableName, columns, getValues(i)));
+    public <I> void insert(I input) {
+        jdbcTemplate.execute(QueryDml.insert(tableName, columns, getValues(input)));
     }
 
     public void delete(Object arg) {
         jdbcTemplate.execute(QueryDml.delete(tableName, columns, arg));
     }
 
-    public <I> Values getValues(I i) {
-        return Values.of(i);
+    public <I> Values getValues(I input) {
+        return Values.of(input);
     }
 }
