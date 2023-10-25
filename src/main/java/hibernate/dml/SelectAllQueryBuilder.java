@@ -1,10 +1,6 @@
 package hibernate.dml;
 
-import hibernate.entity.EntityClass;
-import hibernate.entity.column.EntityColumn;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SelectAllQueryBuilder {
 
