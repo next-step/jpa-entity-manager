@@ -12,7 +12,6 @@ public class EntityLoader<T> {
     private final EntityTableName entityTableName;
     private final EntityColumns entityColumns;
     private final JdbcTemplate jdbcTemplate;
-    private final SelectAllQueryBuilder selectAllQueryBuilder = SelectAllQueryBuilder.INSTANCE;
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
     public EntityLoader(final Class<T> clazz, final JdbcTemplate jdbcTemplate) {
