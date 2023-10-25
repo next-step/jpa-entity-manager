@@ -44,7 +44,7 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> QueryDdl.create(TableName을_생성함(personClass), Columns을_생성함(personClass)));
+            assertThrows(NullPointerException.class, () -> CreateQuery.of(TableName을_생성함(personClass), Columns을_생성함(personClass)));
         }
     }
 
@@ -59,7 +59,7 @@ class QueryDdlTest {
             final TableName tableName = TableName을_생성함(personClass);
             final Columns columns = Columns을_생성함(personClass);
             //when
-            String query = QueryDdl.create(tableName, columns);
+            String query = CreateQuery.of(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -78,7 +78,7 @@ class QueryDdlTest {
             final Columns columns = Columns을_생성함(personClass);
 
             //when
-            String query = QueryDdl.create(tableName, columns);
+            String query = CreateQuery.of(tableName, columns);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -96,7 +96,7 @@ class QueryDdlTest {
             createTable(personClass);
 
             //when
-            String query = QueryDdl.drop(personClass);
+            String query = DropQuery.drop(TableName을_생성함(personClass));
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -109,7 +109,7 @@ class QueryDdlTest {
             Class<NotEntityPerson> personClass = NotEntityPerson.class;
 
             //when & then
-            assertThrows(NullPointerException.class, () -> QueryDdl.drop(personClass));
+            assertThrows(NullPointerException.class, () -> DropQuery.drop(TableName을_생성함(personClass)));
         }
     }
 
@@ -122,6 +122,6 @@ class QueryDdlTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
+        jdbcTemplate.execute(CreateQuery.of(tableName, columns));
     }
 }

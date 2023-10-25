@@ -8,12 +8,12 @@ public class DropQuery {
 
     private final TableName tableName;
 
-    public <T> DropQuery(Class<T> tClass) {
-        this.tableName = TableName.of(tClass);
+    private DropQuery(TableName tableName) {
+        this.tableName = tableName;
     }
 
-    public static <T> String drop(Class<T> tClass) {
-        return new DropQuery(tClass).combineQuery();
+    public static String drop(TableName tableName) {
+        return new DropQuery(tableName).combineQuery();
     }
 
     private String combineQuery() {

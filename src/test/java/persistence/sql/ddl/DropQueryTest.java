@@ -2,6 +2,7 @@ package persistence.sql.ddl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import domain.Person;
 import persistence.exception.InvalidEntityException;
 import persistence.person.ExistTablePerson;
 import persistence.person.NonExistentEntityPerson;
+import persistence.sql.common.meta.TableName;
 
 class DropQueryTest {
 
@@ -18,8 +20,11 @@ class DropQueryTest {
         //given
         final String expectedSql = "DROP TABLE users";
 
+        Class<Person> clazz = Person.class;
+        final TableName tableName = TableName을_생성함(clazz);
+
         //when
-        final String result = DropQuery.drop(Person.class);
+        final String result = DropQuery.drop(tableName);
 
         //then
         assertThat(result).isEqualTo(expectedSql);
@@ -32,7 +37,7 @@ class DropQueryTest {
         Class<NonExistentEntityPerson> personClass = NonExistentEntityPerson.class;
 
         //when & then
-        assertThrows(InvalidEntityException.class, () -> DropQuery.drop(personClass));
+        assertThrows(InvalidEntityException.class, () -> DropQuery.drop(TableName을_생성함(personClass)));
     }
 
     @Test
@@ -43,7 +48,7 @@ class DropQueryTest {
         final String expectedSql = "DROP TABLE users";
 
         //when
-        final String result = DropQuery.drop(personClass);
+        final String result = DropQuery.drop(TableName을_생성함(personClass));
 
         //then
         assertThat(result).isEqualTo(expectedSql);

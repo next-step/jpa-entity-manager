@@ -5,10 +5,12 @@ import jdbc.ResultMapper;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.dml.QueryDml;
+import persistence.sql.dml.DeleteQuery;
+import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.SelectQuery;
 
 import java.util.List;
+import persistence.sql.dml.UpdateQuery;
 
 public class EntityPersister<T> {
     private final JdbcTemplate jdbcTemplate;
@@ -40,7 +42,7 @@ public class EntityPersister<T> {
 
     public <I> boolean update(I input, Object arg) {
         try {
-            jdbcTemplate.execute(QueryDml.update(getValues(input), tableName, columns, arg));
+            jdbcTemplate.execute(UpdateQuery.create(getValues(input), tableName, columns, arg));
             return true;
         } catch (Exception e) {
             return false;
@@ -48,11 +50,11 @@ public class EntityPersister<T> {
     }
 
     public <I> void insert(I input) {
-        jdbcTemplate.execute(QueryDml.insert(tableName, columns, getValues(input)));
+        jdbcTemplate.execute(InsertQuery.create(tableName, columns, getValues(input)));
     }
 
     public void delete(Object arg) {
-        jdbcTemplate.execute(QueryDml.delete(tableName, columns, arg));
+        jdbcTemplate.execute(DeleteQuery.create(tableName, columns, arg));
     }
 
     public <I> Values getValues(I input) {

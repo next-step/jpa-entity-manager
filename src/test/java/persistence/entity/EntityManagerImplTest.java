@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.ddl.QueryDdl;
+import persistence.sql.ddl.CreateQuery;
+import persistence.sql.ddl.DropQuery;
 
 class EntityManagerImplTest {
 
@@ -263,11 +264,11 @@ class EntityManagerImplTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
+        jdbcTemplate.execute(CreateQuery.of(tableName, columns));
     }
 
     private static <T> void 테이블을_삭제함(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.drop(tClass));
+        jdbcTemplate.execute(DropQuery.drop(TableName을_생성함(tClass)));
     }
 
     private <T> void 데이터를_저장함(T t) {

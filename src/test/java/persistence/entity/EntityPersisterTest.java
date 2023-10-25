@@ -16,10 +16,12 @@ import persistence.person.SelectPerson;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.ddl.QueryDdl;
-import persistence.sql.dml.QueryDml;
+import persistence.sql.ddl.CreateQuery;
+import persistence.sql.ddl.DropQuery;
+import persistence.sql.dml.InsertQuery;
 
 import java.sql.SQLException;
+import persistence.sql.dml.SelectQuery;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,7 +51,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(selectPerson);
         final Columns columns = Columns을_생성함(selectPerson);
 
-        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
+        jdbcTemplate.execute(CreateQuery.of(tableName, columns));
     }
 
     @Nested
@@ -182,7 +184,7 @@ class EntityPersisterTest {
 
     @AfterEach
     void after() {
-        jdbcTemplate.execute(QueryDdl.drop(selectPerson));
+        jdbcTemplate.execute(DropQuery.drop(TableName을_생성함(selectPerson)));
     }
 
     @AfterAll
@@ -196,7 +198,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(clazz);
         final Columns columns = Columns을_생성함(clazz);
 
-        return QueryDml.select("findById", tableName, columns, id);
+        return SelectQuery.create("findById", tableName, columns, id);
     }
 
     private <T> void 데이터를_저장함(T t) {
@@ -204,6 +206,6 @@ class EntityPersisterTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values을_생성함(t);
 
-        jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));
+        jdbcTemplate.execute(InsertQuery.create(tableName, columns, values));
     }
 }

@@ -18,7 +18,8 @@ import persistence.person.SelectPerson;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.ddl.QueryDdl;
+import persistence.sql.ddl.CreateQuery;
+import persistence.sql.ddl.DropQuery;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -61,7 +62,7 @@ class QueryDmlTest {
 
             //when & then
             assertThrows(InvalidEntityException.class
-                    , () -> QueryDml.insert(TableName을_생성함(person.getClass())
+                    , () -> InsertQuery.create(TableName을_생성함(person.getClass())
                             , Columns을_생성함(person.getClass().getDeclaredFields())
                             , Values을_생성함(person.getClass().getDeclaredFields())));
         }
@@ -83,7 +84,7 @@ class QueryDmlTest {
             final Values values = Values을_생성함(person);
 
             //when
-            String query = QueryDml.insert(tableName, columns, values);
+            String query = InsertQuery.create(tableName, columns, values);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(query));
@@ -250,7 +251,7 @@ class QueryDmlTest {
             final Values values = Values을_생성함(expected);
 
             //when
-            String query = QueryDml.update(values, tableName, columns, id);
+            String query = UpdateQuery.create(values, tableName, columns, id);
             jdbcTemplate.execute(query);
             SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns), new ResultMapper<>(clazz));
 
@@ -275,21 +276,21 @@ class QueryDmlTest {
     }
 
     private String getSelectQuery(String methodName, TableName tableName, Columns columns) {
-        return QueryDml.select(methodName, tableName, columns);
+        return SelectQuery.create(methodName, tableName, columns);
     }
 
     private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        return QueryDml.select(methodName, tableName, columns, args);
+        return SelectQuery.create(methodName, tableName, columns, args);
     }
 
     private <T> void 테이블을_생성함(Class<T> tClass) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(QueryDdl.create(tableName, columns));
+        jdbcTemplate.execute(CreateQuery.of(tableName, columns));
     }
 
     private <T> void insert(T t) {
@@ -297,10 +298,10 @@ class QueryDmlTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values.of(t);
 
-        jdbcTemplate.execute(QueryDml.insert(tableName, columns, values));
+        jdbcTemplate.execute(InsertQuery.create(tableName, columns, values));
     }
 
     private <T> void dropTable(Class<T> tClass) {
-        jdbcTemplate.execute(QueryDdl.drop(tClass));
+        jdbcTemplate.execute(DropQuery.drop(TableName을_생성함(tClass)));
     }
 }
