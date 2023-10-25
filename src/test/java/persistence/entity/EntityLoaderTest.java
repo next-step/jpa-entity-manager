@@ -2,17 +2,11 @@ package persistence.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.*;
 
 import database.DatabaseServer;
 import database.H2;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.List;
 import jdbc.JdbcTemplate;
-import org.assertj.core.api.SoftAssertions;
-import org.h2.jdbc.JdbcResultSet;
-import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

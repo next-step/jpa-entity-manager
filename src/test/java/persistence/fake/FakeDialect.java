@@ -2,7 +2,6 @@ package persistence.fake;
 
 import jakarta.persistence.GenerationType;
 import persistence.dialect.Dialect;
-import persistence.dialect.h2.H2Dialect;
 
 public class FakeDialect extends Dialect {
     @Override

@@ -2,7 +2,6 @@ package persistence.dialect;
 
 import jakarta.persistence.GenerationType;
 import persistence.meta.ColumnType;
-import persistence.sql.QueryGenerator;
 
 public abstract class Dialect {
     protected static final int DEFAULT_STRING_LENGTH = 255;

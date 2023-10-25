@@ -2,7 +2,6 @@ package repository;
 
 import jdbc.JdbcTemplate;
 import persistence.dialect.Dialect;
-import persistence.dialect.h2.H2Dialect;
 import persistence.meta.EntityMeta;
 
 public abstract class AbstractRepository<T> {

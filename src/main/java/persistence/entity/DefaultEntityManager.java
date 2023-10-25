@@ -4,9 +4,7 @@ package persistence.entity;
 import java.util.List;
 import jdbc.JdbcTemplate;
 import persistence.dialect.Dialect;
-import persistence.exception.NotFoundException;
 import persistence.meta.EntityMeta;
-import persistence.sql.QueryGenerator;
 
 
 public class DefaultEntityManager implements EntityManager {
