@@ -7,11 +7,6 @@ import hibernate.entity.column.EntityColumn;
 import hibernate.entity.column.EntityColumns;
 import jdbc.JdbcTemplate;
 
-import java.util.AbstractMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class EntityPersister<T> {
 
     private final Class<T> clazz;
