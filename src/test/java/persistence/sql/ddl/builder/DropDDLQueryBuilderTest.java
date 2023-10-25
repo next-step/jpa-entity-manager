@@ -15,7 +15,7 @@ import static persistence.sql.common.DDLType.DROP;
 
 @Nested
 @DisplayName("DropDDLQueryBuilder 클래스의")
-public class DropDDLQueryBuilderTest extends DatabaseTest {
+public class DropDDLQueryBuilderTest {
     private final SqlConverter sqlConverter = new H2SqlConverter();
     private final AttributeParser parser = new AttributeParser();
 

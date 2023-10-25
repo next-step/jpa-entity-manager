@@ -26,8 +26,10 @@ public class LongTypeIdAttribute extends IdAttribute {
     public static LongTypeIdAttribute of(Field field) {
         return new LongTypeIdAttribute(
                 field.getName(),
-                Optional.ofNullable(field.getAnnotation(Column.class)).map(Column::name).orElse(field.getName()),
-                Optional.ofNullable(field.getAnnotation(GeneratedValue.class)).map(GeneratedValue::strategy).orElse(null)
+                Optional.ofNullable(field.getAnnotation(Column.class))
+                        .map(Column::name).orElse(field.getName()),
+                Optional.ofNullable(field.getAnnotation(GeneratedValue.class))
+                        .map(GeneratedValue::strategy).orElse(null)
         );
     }
 
