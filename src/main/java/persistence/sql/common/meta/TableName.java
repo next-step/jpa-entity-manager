@@ -27,22 +27,36 @@ public class TableName {
         return getTableName(tClass);
     }
 
+    /**
+     * @Table이 존재하는지 여부 확인
+     */
     private <T> boolean isTable(Class<T> tClass) {
         return tClass.isAnnotationPresent(Table.class);
     }
 
+    /**
+     * @Table에 name 옵션이 존재한지 여부 확인
+     */
+    private <T> boolean isTableAndValue(Class<T> tClass) {
+        return isTable(tClass) && !"".equals(tClass.getAnnotation(Table.class).name());
+    }
+
+    /**
+     * @Entity가 존재하지 않는지 확인
+     */
     private <T> boolean isNotEntity(Class<T> tClass) {
         return !tClass.isAnnotationPresent(Entity.class);
     }
 
+    /**
+     * @Table의 name 값을 가져옵니다.
+     */
     private <T> String getTableName(Class<T> tClass) {
-        String tableName = tClass.getSimpleName();
-
-        if (isTable(tClass) && !"".equals(tClass.getAnnotation(Table.class).name())) {
-            tableName = tClass.getAnnotation(Table.class).name();
+        if (isTableAndValue(tClass)) {
+            return tClass.getAnnotation(Table.class).name();
         }
 
-        return tableName;
+        return tClass.getSimpleName();
     }
 
     public String getValue() {
