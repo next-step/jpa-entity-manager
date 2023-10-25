@@ -1,16 +1,23 @@
 package repository;
 
 import jdbc.JdbcTemplate;
+import persistence.dialect.Dialect;
+import persistence.dialect.h2.H2Dialect;
 import persistence.meta.EntityMeta;
 
 public abstract class AbstractRepository<T> {
+
     protected final JdbcTemplate jdbcTemplate;
     protected final Class<T> tClass;
+
     protected final EntityMeta entityMeta;
 
-    protected AbstractRepository(JdbcTemplate jdbcTemplate, Class<T> tClass) {
+    protected final Dialect dialect;
+
+    protected AbstractRepository(JdbcTemplate jdbcTemplate, Class<T> tClass, Dialect dialect) {
         this.tClass = tClass;
         this.entityMeta = new EntityMeta(tClass);
         this.jdbcTemplate = jdbcTemplate;
+        this.dialect = dialect;
     }
 }

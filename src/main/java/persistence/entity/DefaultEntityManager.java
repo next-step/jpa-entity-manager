@@ -3,6 +3,7 @@ package persistence.entity;
 
 import java.util.List;
 import jdbc.JdbcTemplate;
+import persistence.dialect.Dialect;
 import persistence.exception.NotFoundException;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
@@ -13,12 +14,14 @@ public class DefaultEntityManager implements EntityManager {
     private final EntityMeta entityMeta;
     private final EntityMapper entityMapper;
     private final EntityPersister entityPersister;
+    private final Dialect dialect;
 
-    public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta) {
+    public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityMeta = entityMeta;
         this.entityMapper = new EntityMapper(entityMeta);
-        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta);
+        this.dialect = dialect;
+        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
     }
 
 
@@ -39,7 +42,7 @@ public class DefaultEntityManager implements EntityManager {
             throw new NotFoundException("id가 널이면 안 됩니다.");
         }
 
-        final String query = QueryGenerator.from(entityMeta)
+        final String query = QueryGenerator.of(entityMeta, dialect)
                 .select()
                 .findByIdQuery(id);
 
@@ -48,7 +51,7 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
-        final String query = QueryGenerator.from(entityMeta)
+        final String query = QueryGenerator.of(entityMeta, dialect)
                 .select()
                 .findAllQuery();
 

@@ -2,9 +2,12 @@ package persistence.sql.ddl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.dialect.Dialect;
 import persistence.fake.FakeDialect;
+import persistence.fake.UpperStringDirect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.ChangColumNamePerson;
@@ -13,13 +16,18 @@ import persistence.testFixtures.PkHasPerson;
 
 @DisplayName("CreateQueryBuilder 테스트")
 class CreateQueryBuilderTest {
+    private Dialect dialect;
+    @BeforeEach
+    void setUp() {
+        dialect = new FakeDialect();
+    }
 
     @Test
     @DisplayName("요구사항 1 - @id를 가진 create 쿼리 만들기 ")
     void pkHasCreateQuery() {
         //given
         final EntityMeta entityMeta = new EntityMeta(PkHasPerson.class);
-        final QueryGenerator<PkHasPerson> query = QueryGenerator.from(entityMeta);
+        final QueryGenerator<PkHasPerson> query = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = query.create();
@@ -39,7 +47,7 @@ class CreateQueryBuilderTest {
     void changColumNameQuery() {
         //given
         final EntityMeta entityMeta = new EntityMeta(ChangColumNamePerson.class);
-        final QueryGenerator<ChangColumNamePerson> query = QueryGenerator.from(entityMeta);
+        final QueryGenerator<ChangColumNamePerson> query = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = query.create();
@@ -59,7 +67,7 @@ class CreateQueryBuilderTest {
     void transientAndTableQuery() {
         //given
         final EntityMeta entityMeta = new EntityMeta(Person.class);
-        final QueryGenerator<Person> ddl = QueryGenerator.from(entityMeta);
+        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = ddl.create();
@@ -78,7 +86,7 @@ class CreateQueryBuilderTest {
     void dialectChange() {
         //given
         final EntityMeta entityMeta = new EntityMeta(Person.class);
-        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, new FakeDialect());
+        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, new UpperStringDirect());
 
         //when
         String sql = ddl.create();
