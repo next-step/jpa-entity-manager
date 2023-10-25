@@ -32,6 +32,9 @@ class EntityManagerImplTest {
 
     private static JdbcTemplate jdbcTemplate;
 
+    private final CreateQuery createQuery = CreateQuery.create();
+    private final DropQuery dropQuery = DropQuery.create();
+
     @BeforeAll
     static void beforeInit() throws SQLException {
         DatabaseServer server = new H2();
@@ -93,6 +96,7 @@ class EntityManagerImplTest {
     @Nested
     @DisplayName("find()")
     class find {
+
         @Test
         @DisplayName("정상적으로 데이터 단건을 조회해 옴")
         void success() {
@@ -143,6 +147,7 @@ class EntityManagerImplTest {
     @Nested
     @DisplayName("persist()")
     class persist {
+
         @Test
         @DisplayName("성공적으로 데이터를 저장함")
         void success() {
@@ -184,6 +189,7 @@ class EntityManagerImplTest {
     @Nested
     @DisplayName("remove()")
     class remove {
+
         @Test
         @DisplayName("데이터를 정상적으로 삭제함")
         void success() {
@@ -219,6 +225,7 @@ class EntityManagerImplTest {
     @Nested
     @DisplayName("update()")
     class update {
+
         @Test
         @DisplayName("성공적으로 데이터를 수정한다")
         void success() {
@@ -260,15 +267,15 @@ class EntityManagerImplTest {
         return entityManager.find(tClass, id);
     }
 
-    private static <T> void 테이블을_생성함(Class<T> tClass) {
+    private <T> void 테이블을_생성함(Class<T> tClass) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(CreateQuery.of(tableName, columns));
+        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
     }
 
-    private static <T> void 테이블을_삭제함(Class<T> tClass) {
-        jdbcTemplate.execute(DropQuery.drop(TableName을_생성함(tClass)));
+    private <T> void 테이블을_삭제함(Class<T> tClass) {
+        jdbcTemplate.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
     }
 
     private <T> void 데이터를_저장함(T t) {

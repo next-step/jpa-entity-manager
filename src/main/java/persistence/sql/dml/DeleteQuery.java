@@ -7,18 +7,22 @@ public class DeleteQuery {
 
     private static final String DEFAULT_DELETE_QUERY = "DELETE FROM %s";
 
-    private final TableName tableName;
-    private final Columns columns;
-    private final Object arg;
+    private TableName tableName;
+    private Columns columns;
+    private Object arg;
 
-    private DeleteQuery(TableName tableName, Columns columns, Object arg) {
+    private DeleteQuery() { }
+
+    public static DeleteQuery create() {
+        return new DeleteQuery();
+    }
+
+    public String get(TableName tableName, Columns columns, Object arg) {
         this.tableName = tableName;
         this.columns = columns;
         this.arg = arg;
-    }
 
-    public static String create(TableName tableName, Columns columns, Object arg) {
-        return new DeleteQuery(tableName, columns, arg).combine();
+        return combine();
     }
 
     private String combine() {

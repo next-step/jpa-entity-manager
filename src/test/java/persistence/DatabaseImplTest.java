@@ -18,13 +18,12 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import persistence.person.DatabasePerson;
+import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.CreateQuery;
 import persistence.sql.ddl.DropQuery;
-import persistence.sql.dml.DeleteQuery;
-import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.SelectQuery;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,6 +31,9 @@ class DatabaseImplTest {
 
     private static Database database;
     private static Class<DatabasePerson> tClass;
+
+    private final CreateQuery createQuery = CreateQuery.create();
+    private final DropQuery dropQuery = DropQuery.create();
 
     @BeforeAll
     static void init() throws SQLException {
@@ -124,15 +126,15 @@ class DatabaseImplTest {
         테이블을_삭제함(tClass);
     }
 
-    private static <T> void 테이블을_생성함(Class<T> tClass) throws SQLException {
+    private <T> void 테이블을_생성함(Class<T> tClass) throws SQLException {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        database.execute(CreateQuery.of(tableName, columns));
+        database.execute(createQuery.getQuery(tableName, columns));
     }
 
-    private static <T> void 테이블을_삭제함(Class<T> tClass) throws SQLException {
-        database.execute(DropQuery.drop(TableName을_생성함(tClass)));
+    private <T> void 테이블을_삭제함(Class<T> tClass) throws SQLException {
+        database.execute(dropQuery.getQuery(TableName을_생성함(tClass)));
     }
 
     private <T> void insert(T t) throws SQLException {
@@ -140,24 +142,24 @@ class DatabaseImplTest {
         final Columns columns = Columns.of(t.getClass().getDeclaredFields());
         final Values values = Values.of(t);
 
-        database.execute(InsertQuery.create(tableName, columns, values));
+        database.execute(QueryUtil.insert().get(tableName, columns, values));
     }
 
     private void delete(TableName tableName, Columns columns, Object args) throws SQLException {
-        database.execute(DeleteQuery.create(tableName, columns, args));
+        database.execute(QueryUtil.delete().get(tableName, columns, args));
     }
 
     private <T> ResultSet findAll(Class<T> tClass, String methodName) throws SQLException {
         final TableName tableName = TableName.of(tClass);
         final Columns columns = Columns.of(tClass.getDeclaredFields());
 
-        return database.executeQuery(SelectQuery.create(methodName, tableName, columns, null));
+        return database.executeQuery(QueryUtil.select().get(methodName, tableName, columns, null));
     }
 
     private <T> ResultSet find(Class<T> tClass, String methodName, Object... args) throws SQLException {
         final TableName tableName = TableName.of(tClass);
         final Columns columns = Columns.of(tClass.getDeclaredFields());
 
-        return database.executeQuery(SelectQuery.create(methodName, tableName, columns, args));
+        return database.executeQuery(QueryUtil.select().get(methodName, tableName, columns, args));
     }
 }

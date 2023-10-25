@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
+import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
@@ -36,6 +37,9 @@ class EntityPersisterTest {
     public static DatabaseServer server;
     public static JdbcTemplate jdbcTemplate;
 
+    private final CreateQuery createQuery = CreateQuery.create();
+    private final DropQuery dropQuery = DropQuery.create();
+
     @BeforeAll
     static void init() throws SQLException {
         server = new H2();
@@ -51,7 +55,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(selectPerson);
         final Columns columns = Columns을_생성함(selectPerson);
 
-        jdbcTemplate.execute(CreateQuery.of(tableName, columns));
+        jdbcTemplate.execute(createQuery.getQuery(tableName, columns));
     }
 
     @Nested
@@ -184,7 +188,7 @@ class EntityPersisterTest {
 
     @AfterEach
     void after() {
-        jdbcTemplate.execute(DropQuery.drop(TableName을_생성함(selectPerson)));
+        jdbcTemplate.execute(dropQuery.getQuery(TableName을_생성함(selectPerson)));
     }
 
     @AfterAll
@@ -198,7 +202,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(clazz);
         final Columns columns = Columns을_생성함(clazz);
 
-        return SelectQuery.create("findById", tableName, columns, id);
+        return QueryUtil.select().get("findById", tableName, columns, id);
     }
 
     private <T> void 데이터를_저장함(T t) {
@@ -206,6 +210,6 @@ class EntityPersisterTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values을_생성함(t);
 
-        jdbcTemplate.execute(InsertQuery.create(tableName, columns, values));
+        jdbcTemplate.execute(QueryUtil.insert().get(tableName, columns, values));
     }
 }

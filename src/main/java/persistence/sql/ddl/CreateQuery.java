@@ -8,16 +8,20 @@ public class CreateQuery {
     private static final String DEFAULT_CREATE_QUERY = "CREATE TABLE %s (%s)";
     private static final String DEFAULT_PRIMARY_KEY_QUERY = ", PRIMARY KEY (%s)";
 
-    private final TableName tableName;
-    private final Columns columns;
+    private TableName tableName;
+    private Columns columns;
 
-    private CreateQuery(TableName tableName, Columns columns) {
-        this.tableName = tableName;
-        this.columns = columns;
+    private CreateQuery() { }
+
+    public static CreateQuery create() {
+        return new CreateQuery();
     }
 
-    public static String of(TableName tableName, Columns columns) {
-        return new CreateQuery(tableName, columns).join();
+    public String getQuery(TableName tableName, Columns columns) {
+        this.tableName = tableName;
+        this.columns = columns;
+
+        return join();
     }
 
     private String join() {

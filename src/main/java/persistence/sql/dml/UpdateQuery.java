@@ -7,20 +7,24 @@ import persistence.sql.common.meta.TableName;
 public class UpdateQuery {
     private static final String DEFAULT_UPDATE_COLUMN_QUERY = "UPDATE %s SET %s";
 
-    private final TableName tableName;
-    private final Columns columns;
-    private final Values values;
-    private final Object arg;
+    private TableName tableName;
+    private Columns columns;
+    private Values values;
+    private Object arg;
 
-    public UpdateQuery(TableName tableName, Columns columns, Values values, Object arg) {
+    private UpdateQuery() { }
+
+    public static UpdateQuery create() {
+        return new UpdateQuery();
+    }
+
+    public String get(Values values, TableName tableName, Columns columns, Object args) {
         this.tableName = tableName;
         this.columns = columns;
         this.values = values;
-        this.arg = arg;
-    }
+        this.arg = args;
 
-    public static String create(Values values, TableName tableName, Columns columns, Object args) {
-        return new UpdateQuery(tableName, columns, values, args).combine();
+        return combine();
     }
 
     private String combine() {

@@ -6,10 +6,11 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import persistence.sql.QueryUtil;
 
 public class EntityManagerImpl implements EntityManager {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
     private final Map<String, EntityPersister<?>> persisterMap;
 
 

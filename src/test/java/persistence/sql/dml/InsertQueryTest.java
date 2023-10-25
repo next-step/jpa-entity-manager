@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentEntityPerson;
 import persistence.person.NonExistentTablePerson;
+import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.MetaUtils;
@@ -32,7 +33,7 @@ class InsertQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String query = InsertQuery.create(tableName, columns, values);
+        String query = QueryUtil.insert().get(tableName, columns, values);
 
         //then
         assertSoftly(softAssertions -> {
@@ -50,7 +51,7 @@ class InsertQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-                , () -> InsertQuery.create(TableName을_생성함(person.getClass())
+                , () -> QueryUtil.insert().get(TableName을_생성함(person.getClass())
                         , Columns을_생성함(person.getClass().getDeclaredFields())
                         , Values을_생성함(person.getClass().getDeclaredFields())));
     }
@@ -67,7 +68,7 @@ class InsertQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String query = InsertQuery.create(tableName, columns, values);
+        String query = QueryUtil.insert().get(tableName, columns, values);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);

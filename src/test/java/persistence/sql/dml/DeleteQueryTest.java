@@ -4,6 +4,7 @@ import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.person.SelectPerson;
+import persistence.sql.QueryUtil;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -24,7 +25,7 @@ class DeleteQueryTest {
         final Columns columns = Columns을_생성함(clazz);
 
         //when
-        String query = DeleteQuery.create(tableName, columns, 3L);
+        String query = QueryUtil.delete().get(tableName, columns, 3L);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);
@@ -42,7 +43,7 @@ class DeleteQueryTest {
         final Columns columns = Columns을_생성함(clazz);
 
         //when
-        String query = DeleteQuery.create(tableName, columns, 3L);
+        String query = QueryUtil.delete().get(tableName, columns, 3L);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);

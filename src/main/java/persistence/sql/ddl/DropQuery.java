@@ -6,14 +6,18 @@ public class DropQuery {
 
     private static final String DEFAULT_DROP_QUERY = "DROP TABLE %s";
 
-    private final TableName tableName;
+    private TableName tableName;
 
-    private DropQuery(TableName tableName) {
-        this.tableName = tableName;
+    private DropQuery() { }
+
+    public static DropQuery create() {
+        return new DropQuery();
     }
 
-    public static String drop(TableName tableName) {
-        return new DropQuery(tableName).combineQuery();
+    public String getQuery(TableName tableName) {
+        this.tableName = tableName;
+
+        return combineQuery();
     }
 
     private String combineQuery() {

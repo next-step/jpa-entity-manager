@@ -10,24 +10,24 @@ public class SelectQuery {
 
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
 
-    private final String methodName;
-    private final TableName tableName;
-    private final Columns columns;
-    private final Object[] args;
+    private String methodName;
+    private TableName tableName;
+    private Columns columns;
+    private Object[] args;
 
-    public SelectQuery(String methodName, Object[] args, TableName tableName, Columns columns) {
+    private SelectQuery() { }
+
+    public static SelectQuery create() {
+        return new SelectQuery();
+    }
+
+    public String get(String methodName, TableName tableName, Columns columns, Object... args) {
         this.methodName = methodName;
         this.tableName = tableName;
         this.columns = columns;
         this.args = args;
-    }
 
-    public static String create(String methodName, TableName tableName, Columns columns, Object... args) {
-        return new SelectQuery(methodName, args, tableName, columns).combine();
-    }
-
-    public static String create(String methodName, TableName tableName, Columns columns) {
-        return new SelectQuery(methodName, null, tableName, columns).combine();
+        return combine();
     }
 
     public String combine() {

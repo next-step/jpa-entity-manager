@@ -1,25 +1,28 @@
 package persistence.sql.dml;
 
 import persistence.sql.common.instance.Values;
-import persistence.sql.common.instance.Value;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
 public class InsertQuery {
     private static final String DEFAULT_INSERT_COLUMN_QUERY = "INSERT INTO %s (%s)";
     private static final String DEFAULT_INSERT_VALUE_QUERY = "VALUES(%s)";
-    private final TableName tableName;
-    private final Columns columns;
-    private final Values values;
+    private TableName tableName;
+    private Columns columns;
+    private Values values;
 
-    protected InsertQuery(TableName tableName, Columns columns, Values values) {
+    private InsertQuery() { }
+
+    public static InsertQuery create() {
+        return new InsertQuery();
+    }
+
+    public String get(TableName tableName, Columns columns, Values values) {
         this.tableName = tableName;
         this.columns = columns;
         this.values = values;
-    }
 
-    public static String create(TableName tableName, Columns columns, Values values) {
-        return new InsertQuery(tableName, columns, values).combineQuery();
+        return combineQuery();
     }
 
     /**

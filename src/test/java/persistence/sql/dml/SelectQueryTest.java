@@ -7,6 +7,7 @@ import persistence.exception.InvalidEntityException;
 import persistence.person.NonExistentTablePerson;
 import persistence.person.NotEntityPerson;
 import persistence.person.SelectPerson;
+import persistence.sql.QueryUtil;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -26,7 +27,7 @@ class SelectQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-            , () -> SelectQuery.create(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass)));
+            , () -> QueryUtil.select().get(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass), null));
     }
 
     @Test
@@ -42,7 +43,7 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(aClass);
 
         //when
-        String query = SelectQuery.create(methodName, tableName, columns);
+        String query = QueryUtil.select().get(methodName, tableName, columns, null);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);
@@ -60,8 +61,8 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(aClass);
 
         //when
-        String query = SelectQuery.create(new Object() {
-        }.getClass().getEnclosingMethod().getName(), tableName, columns);
+        String query = QueryUtil.select().get(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns, null);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);
@@ -78,7 +79,7 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(clazz);
 
         //when
-        String query = SelectQuery.create("findById", tableName, columns, 1L);
+        String query = QueryUtil.select().get("findById", tableName, columns, 1L);
 
         //then
         assertThat(query).isEqualTo(expectedQuery);
