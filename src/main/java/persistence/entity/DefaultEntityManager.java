@@ -4,40 +4,38 @@ import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectFactory;
+import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.DmlQueryGenerator;
 
 public class DefaultEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
-    private final DmlQueryGenerator dmlQueryGenerator;
+    private final EntityPersister entityPersister;
 
-    private DefaultEntityManager(JdbcTemplate jdbcTemplate, DmlQueryGenerator dmlQueryGenerator) {
+    private DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityPersister entityPersister) {
         this.jdbcTemplate = jdbcTemplate;
-        this.dmlQueryGenerator = dmlQueryGenerator;
+        this.entityPersister = entityPersister;
     }
 
     public static DefaultEntityManager of(JdbcTemplate jdbcTemplate) {
-        DialectFactory dialectFactory = DialectFactory.getInstance();
-        Dialect dialect = dialectFactory.getDialect(jdbcTemplate.getDbmsName());
-        DmlQueryGenerator dmlQueryGenerator = DmlQueryGenerator.of(dialect);
-        return new DefaultEntityManager(jdbcTemplate, dmlQueryGenerator);
+        return new DefaultEntityManager(jdbcTemplate, EntityPersister.of(jdbcTemplate));
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
+        // TODO : step 2-2 에서 EntityLoader 를 통해 구현
+        DmlQueryGenerator dmlQueryGenerator = DmlQueryGenerator.of(H2Dialect.getInstance());
         String selectByPkQuery = dmlQueryGenerator.generateSelectByPkQuery(clazz, id);
         return jdbcTemplate.queryForObject(selectByPkQuery, new EntityRowMapper<>(clazz));
     }
 
     @Override
     public void persist(Object entity) {
-        String insertEntityQuery = dmlQueryGenerator.generateInsertQuery(entity);
-        jdbcTemplate.execute(insertEntityQuery);
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        String deleteEntityQuery = dmlQueryGenerator.generateDeleteQuery(entity);
-        jdbcTemplate.execute(deleteEntityQuery);
+        entityPersister.delete(entity);
     }
 }
