@@ -46,17 +46,6 @@ public class SimpleEntityManager implements EntityManager {
         entityPersister.delete(entity);
     }
 
-    @Override
-    public void close() {
-        try {
-            connection.close();
-        } catch (final SQLException e) {
-            throw new PersistenceException("커넥션 닫기를 실패했습니다.", e);
-        } finally {
-            this.closed = true;
-        }
-    }
-
     private void checkConnectionOpen() {
         if (this.closed) {
             throw new PersistenceException("DB와의 커넥션이 끊어졌습니다.");

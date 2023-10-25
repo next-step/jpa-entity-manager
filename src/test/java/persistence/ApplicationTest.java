@@ -15,7 +15,6 @@ import persistence.core.PersistenceEnvironment;
 import persistence.dialect.h2.H2Dialect;
 import persistence.entity.EntityManager;
 import persistence.entity.SimpleEntityManager;
-import persistence.exception.PersistenceException;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dml.DmlGenerator;
 import persistence.util.ReflectionUtils;
@@ -24,7 +23,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -54,7 +52,7 @@ class ApplicationTest {
         people.forEach(person -> {
             final List<String> columnNames = entityMetadata.getInsertableColumnNames();
             final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.getInsertableColumnFieldNames());
-            jdbcTemplate.execute(dmlGenerator.insert(entityMetadata.getTableName(), columnNames,values ));
+            jdbcTemplate.execute(dmlGenerator.insert(entityMetadata.getTableName(), columnNames, values));
         });
     }
 
@@ -116,28 +114,6 @@ class ApplicationTest {
         final EntityManager entityManager = new SimpleEntityManager(persistenceEnvironment);
 
         assertDoesNotThrow(() -> entityManager.remove(people.get(0)));
-    }
-
-    @Test
-    @DisplayName("entityManager.close 를 이용해 DB Connection 을 닫을 수 있다.")
-    void connectionCloseTest() {
-        final EntityManager entityManager = new SimpleEntityManager(persistenceEnvironment);
-
-        assertDoesNotThrow(entityManager::close);
-    }
-
-    @Test
-    @DisplayName("entityManager.close 를 이용해 DB Connection 을 닫힌 후 에는 아무 작업을 할 수 없다.")
-    void connectionAlreadyCloseTest() {
-        final EntityManager entityManager = new SimpleEntityManager(persistenceEnvironment);
-
-        entityManager.close();
-
-        assertThatThrownBy(() -> {
-            entityManager.find(Person.class, 1L);
-            entityManager.persist(people.get(0));
-            entityManager.remove(people.get(0));
-        }).isInstanceOf(PersistenceException.class);
     }
 
     private RowMapper<Person> personRowMapper() {
