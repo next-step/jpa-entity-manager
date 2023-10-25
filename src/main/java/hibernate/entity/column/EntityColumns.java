@@ -41,4 +41,10 @@ public class EntityColumns {
     public List<EntityColumn> getValues() {
         return values;
     }
+
+    public List<String> getFieldNames() {
+        return values.stream()
+                .map(EntityColumn::getFieldName)
+                .collect(Collectors.toList());
+    }
 }
