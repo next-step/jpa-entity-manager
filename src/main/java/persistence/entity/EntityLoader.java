@@ -1,59 +1,55 @@
 package persistence.entity;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import persistence.exception.NotFoundException;
+import java.util.List;
+import jdbc.JdbcTemplate;
+import persistence.dialect.Dialect;
 import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
+import persistence.sql.QueryGenerator;
 
 public class EntityLoader {
     private final EntityMeta entityMeta;
+    private final Dialect dialect;
+    private final JdbcTemplate jdbcTemplate;
 
-    public EntityLoader(EntityMeta entityMeta) {
+    public EntityLoader(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
+        this.jdbcTemplate = jdbcTemplate;
         this.entityMeta = entityMeta;
+        this.dialect = dialect;
     }
 
-    public <T> T resultSetToEntity(Class<T> tClass, ResultSet resultSet) {
-        final T instance = getInstance(tClass);
+    public <T> T find(Class<T> tClass, Object id) {
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .select()
+                .findByIdQuery(id);
+
+        return jdbcTemplate.queryForObject(query,
+                (resultSet) -> resultSetToEntity(tClass, resultSet));
+    }
+
+    public <T> List<T> findAll(Class<T> tClass) {
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .select()
+                .findAllQuery();
+
+        return jdbcTemplate.query(query, (resultSet) -> resultSetToEntity(tClass, resultSet));
+    }
+
+    private <T> T resultSetToEntity(Class<T> tClass, ResultSet resultSet) {
+        final T instance = ReflectionUtils.getInstance(tClass);
+
         for (EntityColumn entityColumn : entityMeta.getEntityColumns()) {
-            final Object resultSetColumn = getResultSetColumn(resultSet, entityColumn);
-            final Field field = getFiled(tClass, entityColumn);
-            setFieldValue(instance, field, resultSetColumn);
+            final Object resultSetColumn = getLoadValue(resultSet, entityColumn);
+            ReflectionUtils.setFieldValue(instance, entityColumn.getFieldName(), resultSetColumn);
         }
         return instance;
     }
 
-    private <T> void setFieldValue(T instance, Field field, Object resultSetColumn) {
-        try {
-            field.setAccessible(true);
-            field.set(instance, resultSetColumn);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private <T> T getInstance(Class<T> tClass) {
-        try {
-            return tClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException |
-                 IllegalAccessException e) {
-            throw new NotFoundException(e);
-        }
-    }
-
-    private <T> Field getFiled(Class<T> tClass, EntityColumn entityColumn) {
-        try {
-            return tClass.getDeclaredField(entityColumn.getFieldName());
-        } catch (NoSuchFieldException e) {
-            throw new NotFoundException("필드를 찾을수 없습니다.");
-        }
-
-    }
-
-    private Object getResultSetColumn(ResultSet resultSet, EntityColumn column) {
+    private Object getLoadValue(ResultSet resultSet, EntityColumn column) {
         try {
             return getTypeValue(resultSet, column);
         } catch (SQLException e) {

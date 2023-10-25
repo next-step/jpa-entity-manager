@@ -23,4 +23,4 @@
 
 - [X] 요구사항 1 - RowMapper 리팩터링
   -  [X] 동적으로 생성하는 엔터티로더(`EntityLoader`) 생성
-- [ ] 요구사항 2 - EntityManager 의 책임 줄여주기
+- [X] 요구사항 2 - EntityManager 의 책임 줄여주기
