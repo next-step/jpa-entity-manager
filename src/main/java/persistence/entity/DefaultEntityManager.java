@@ -41,7 +41,7 @@ public class DefaultEntityManager implements EntityManager {
 
         final String query = QueryGenerator.from(entityMeta)
                 .select()
-                .findById(id);
+                .findByIdQuery(id);
 
         return jdbcTemplate.queryForObject(query, (resultSet) -> entityMapper.resultSetToEntity(clazz, resultSet));
     }
@@ -50,7 +50,7 @@ public class DefaultEntityManager implements EntityManager {
     public <T> List<T> findAll(Class<T> tClass) {
         final String query = QueryGenerator.from(entityMeta)
                 .select()
-                .findAll();
+                .findAllQuery();
 
         return jdbcTemplate.query(query, (resultSet) -> entityMapper.resultSetToEntity(tClass, resultSet));
     }

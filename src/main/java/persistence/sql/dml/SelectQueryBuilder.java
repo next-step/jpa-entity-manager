@@ -11,25 +11,25 @@ public class SelectQueryBuilder<T> extends DMLQueryBuilder<T> {
         super(entityMeta, dialect);
     }
 
-    public String findAll() {
-        return select(columns(entityMeta)) + from(entityMeta.getTableName());
+    public String findAllQuery() {
+        return selectQuery(getColumnsString(entityMeta)) + getFromTableQuery(entityMeta.getTableName());
     }
 
-    public String findById(Object id) {
+    public String findByIdQuery(Object id) {
         if (id == null) {
             throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
         }
 
-        return select(columns(entityMeta))
-                + from(entityMeta.getTableName())
-                + whereId(pkColumn(), id);
+        return selectQuery(getColumnsString(entityMeta))
+                + getFromTableQuery(entityMeta.getTableName())
+                + whereId(getPkColumn(), id);
     }
 
-    private String select(String fileNames) {
+    private String selectQuery(String fileNames) {
         return dialect.select(fileNames);
     }
 
-    private String columns(EntityMeta entityMeta) {
+    private String getColumnsString(EntityMeta entityMeta) {
         return entityMeta.getEntityColumns()
                 .stream()
                 .map(EntityColumn::getName)

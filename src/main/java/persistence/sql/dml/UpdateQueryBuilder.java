@@ -14,20 +14,20 @@ public class UpdateQueryBuilder<T> extends DMLQueryBuilder<T> {
         super(entityMeta, dialect);
     }
     public String update(T entity) {
-        return update(entityMeta.getTableName())
+        return updateQuery(entityMeta.getTableName())
                 + updateValues(entityMeta.getEntityColumns(), entity)
-                + whereId(pkColumn(), pkColumn().getFieldValue(entity));
+                + whereId(getPkColumn(), getPkColumn().getFieldValue(entity));
     }
 
-    private String update(String tableName)  {
-        return dialect.update(tableName);
+    private String updateQuery(String tableName)  {
+        return dialect.updateForTableQuery(tableName);
     }
 
     private String updateValues(List<EntityColumn> entityColumns, T entity) {
          return entityColumns
                 .stream()
                 .filter((it) -> !it.isPk())
-                .map((it) -> it.getName() + EQUAL +columnValue(it, entity))
+                .map((it) -> it.getName() + EQUAL + getColumnValueString(it, entity))
                 .collect(Collectors.joining(", "));
     }
 

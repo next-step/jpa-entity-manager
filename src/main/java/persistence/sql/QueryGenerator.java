@@ -52,7 +52,7 @@ public class QueryGenerator<T> {
     }
 
     public String delete(Object id) {
-        return new DeleteQueryBuilder<>(entityMeta, dialect).delete(id);
+        return new DeleteQueryBuilder<>(entityMeta, dialect).getDeleteQuery(id);
     }
 
     public SelectQueryBuilder<T> select() {

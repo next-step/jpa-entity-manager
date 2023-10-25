@@ -18,7 +18,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder<Person> select = QueryGenerator.from(Person.class).select();
 
         //when
-        String sql = select.findAll();
+        String sql = select.findAllQuery();
 
         //then
         assertThat(sql).isEqualTo("SELECT id, nick_name, old, email FROM users");
@@ -31,7 +31,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder<Person> select = QueryGenerator.from(Person.class).select();
 
         //when
-        String sql = select.findById(1L);
+        String sql = select.findByIdQuery(1L);
 
         //then
         assertThat(sql).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id = 1");
@@ -45,7 +45,7 @@ class SelectQueryBuilderTest {
 
         //when & then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> select.findById(null));
+            .isThrownBy(() -> select.findByIdQuery(null));
     }
 
 }

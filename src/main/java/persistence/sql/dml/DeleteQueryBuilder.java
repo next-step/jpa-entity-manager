@@ -9,17 +9,17 @@ public class DeleteQueryBuilder<T> extends DMLQueryBuilder<T> {
         super(entityMeta, dialect);
     }
 
-    public String delete(Object id) {
+    public String getDeleteQuery(Object id) {
         if (id == null) {
             throw new FieldEmptyException("id가 비어 있으면 안 됩니다.");
         }
 
-        return delete()
-                + from(entityMeta.getTableName())
-                + whereId(pkColumn(), id);
+        return getDeleteQuery()
+                + getFromTableQuery(entityMeta.getTableName())
+                + whereId(getPkColumn(), id);
     }
 
-    private String delete() {
-        return dialect.delete();
+    private String getDeleteQuery() {
+        return dialect.deleteQuery();
     }
 }

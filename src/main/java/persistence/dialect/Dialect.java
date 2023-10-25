@@ -49,7 +49,7 @@ public abstract class Dialect {
     }
 
 
-    public String values(String value) {
+    public String valuesQuery(String value) {
         return " VALUES (" + value + ")";
     }
 
@@ -57,15 +57,15 @@ public abstract class Dialect {
         return "CREATE TABLE " + tableName;
     }
 
-    public String from(String tableName) {
+    public String getFromTableQuery(String tableName) {
         return " FROM " + tableName;
     }
 
-    public String delete() {
+    public String deleteQuery() {
         return "DELETE";
     }
 
-    public String update(String tableName) {
+    public String updateForTableQuery(String tableName) {
         return "UPDATE " + tableName + " SET ";
     }
 }

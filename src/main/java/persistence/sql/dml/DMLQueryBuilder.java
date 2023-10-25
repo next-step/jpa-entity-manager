@@ -12,8 +12,8 @@ public class DMLQueryBuilder<T> extends QueryBuilder<T>{
         super(entityMeta, dialect);
     }
 
-    protected String from(String tableName) {
-        return dialect.from(tableName);
+    protected String getFromTableQuery(String tableName) {
+        return dialect.getFromTableQuery(tableName);
     }
 
     protected String whereId(EntityColumn column, Object id) {
@@ -23,7 +23,7 @@ public class DMLQueryBuilder<T> extends QueryBuilder<T>{
         return dialect.whereId(column.getName(), id.toString());
     }
 
-    protected EntityColumn pkColumn() {
+    protected EntityColumn getPkColumn() {
         return entityMeta.getEntityColumns()
                 .stream()
                 .filter(EntityColumn::isPk)
@@ -31,7 +31,7 @@ public class DMLQueryBuilder<T> extends QueryBuilder<T>{
                 .orElseThrow(() -> new FieldEmptyException("pk가 없습니다."));
     }
 
-    protected String columnValue(EntityColumn column, T object) {
+    protected String getColumnValueString(EntityColumn column, T object) {
         final ColumnType columType = column.getColumnType();
         final Object value = column.getFieldValue(object);
         if (value == null) {
