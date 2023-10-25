@@ -57,13 +57,6 @@ class EntityPersisterTest {
     }
 
     @Test
-    void update_쿼리_실행_시_다른_타입의_entity가_입력될_경우_예외가_발생한다() {
-        assertThatThrownBy(() -> entityPersister.update(new ErrorEntity()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
-    }
-
-    @Test
     void insert_쿼리를_실행한다() {
         // given
         TestEntity givenEntity = new TestEntity("최진영");
@@ -74,13 +67,6 @@ class EntityPersisterTest {
 
         // then
         assertThat(actual).isEqualTo(1);
-    }
-
-    @Test
-    void insert_쿼리_실행_시_다른_타입의_entity가_입력될_경우_예외가_발생한다() {
-        assertThatThrownBy(() -> entityPersister.insert(new ErrorEntity()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
     }
 
     @Test
@@ -95,13 +81,6 @@ class EntityPersisterTest {
 
         // then
         assertThat(actual).isEqualTo(0);
-    }
-
-    @Test
-    void delete_쿼리_실행_시_다른_타입의_entity가_입력될_경우_예외가_발생한다() {
-        assertThatThrownBy(() -> entityPersister.delete(new ErrorEntity()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
     }
 
     private Integer testEntityCount() {

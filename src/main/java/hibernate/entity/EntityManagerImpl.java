@@ -1,6 +1,5 @@
 package hibernate.entity;
 
-import hibernate.dml.SelectQueryBuilder;
 import jdbc.JdbcTemplate;
 
 public class EntityManagerImpl implements EntityManager {
@@ -8,7 +7,6 @@ public class EntityManagerImpl implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
-    private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
 
     public EntityManagerImpl(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -56,6 +57,19 @@ class EntityLoaderTest {
                 () -> assertThat(actual.name).isEqualTo("최진영"),
                 () -> assertThat(actual.age).isEqualTo(19)
         );
+    }
+
+    @Test
+    void findAll_쿼리를_실행한다() {
+        // given
+        jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (1, '최진영', 19)");
+        jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (2, '진영최', 29)");
+
+        // when
+        List<TestEntity> actual = entityLoader.findAll(EntityClass.getInstance(TestEntity.class));
+
+        // then
+        assertThat(actual).hasSize(2);
     }
 
     @Entity
