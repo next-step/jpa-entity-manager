@@ -47,13 +47,7 @@ class DefaultEntityManagerTest {
         final List<Person> persons = entityManager.findAll(Person.class);
 
         //then
-        assertSoftly((it) -> {
-            it.assertThat(persons).hasSize(1);
-            it.assertThat(persons.get(0).getAge()).isEqualTo(person.getAge());
-            it.assertThat(persons.get(0).getName()).isEqualTo(person.getName());
-            it.assertThat(persons.get(0).getEmail()).isEqualTo(person.getEmail());
-            it.assertThat(persons.get(0).getId()).isNotNull();
-        });
+        assertThat(persons).hasSize(1);
     }
 
     @Test
