@@ -17,6 +17,7 @@ public class EntityPersister {
     private final EntityColumns insertableColumns;
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
+    private final EntityIdMapper entityRowMapper;
 
     public EntityPersister(final Class<?> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
@@ -26,11 +27,12 @@ public class EntityPersister {
         this.insertableColumns = entityMetadata.getInsertableColumn();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
+        this.entityRowMapper = new EntityIdMapper(clazz);
     }
 
     public void insert(final Object entity) {
         final String insertQuery = renderInsert(entity);
-        jdbcTemplate.execute(insertQuery);
+        jdbcTemplate.executeInsert(insertQuery, resultSet -> entityRowMapper.mapId(entity, resultSet));
     }
 
     public void update(final Object entity) {
