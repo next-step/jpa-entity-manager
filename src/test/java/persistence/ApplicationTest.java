@@ -1,7 +1,6 @@
 package persistence;
 
 import domain.Person;
-import jdbc.RowMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,4 @@ class ApplicationTest extends IntegrationTestEnvironment {
         assertThat(result).isNotNull();
     }
 
-    private RowMapper<Person> personRowMapper() {
-        return rs -> new Person(rs.getLong("id"), rs.getString("nick_name"), rs.getInt("old"), rs.getString("email"));
-    }
 }

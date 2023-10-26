@@ -4,6 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import jdbc.JdbcTemplate;
+import jdbc.RowMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import persistence.core.EntityMetadata;
@@ -59,5 +60,9 @@ public abstract class IntegrationTestEnvironment {
         final Person test02 = new Person("test02", 20, "test02@gmail.com");
         final Person test03 = new Person("test03", 30, "test03@gmail.com");
         return List.of(test00, test01, test02, test03);
+    }
+
+    protected RowMapper<Person> personRowMapper() {
+        return rs -> new Person(rs.getLong("id"), rs.getString("nick_name"), rs.getInt("old"), rs.getString("email"));
     }
 }
