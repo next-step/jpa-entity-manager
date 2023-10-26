@@ -58,8 +58,7 @@ public class EntityManagerImpl implements EntityManager {
         EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
         Object entityId = entityClass.getEntityId()
                 .getFieldValue(entity);
-        // TODO getFieldId 를 추가하도록 수정
-        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(new EntityKey(entityId, entity.getClass()));
+        EntitySnapshot snapshot = getSnapshot(entity, entityId);
         Map<EntityColumn, Object> changedColumns = snapshot.changedColumns(entity);
         if (changedColumns.isEmpty()) {
             return;
@@ -67,6 +66,16 @@ public class EntityManagerImpl implements EntityManager {
         entityPersister.update(entityClass, entityId, changedColumns);
         persistenceContext.addEntity(entityId, entity);
         persistenceContext.getDatabaseSnapshot(entityId, entity);
+    }
+
+    private EntitySnapshot getSnapshot(Object entity, Object entityId) {
+        EntityKey entityKey = new EntityKey(entityId, entity.getClass());
+        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        if (snapshot == null) {
+            find(entity.getClass(), entityId);
+            return persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        }
+        return snapshot;
     }
 
     @Override

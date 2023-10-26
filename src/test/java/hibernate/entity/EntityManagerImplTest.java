@@ -164,6 +164,26 @@ class EntityManagerImplTest {
         );
     }
 
+    @Test
+    void merge할_때_영속화되어있지_않아도_기존_필드와_다르면_업데이트된다() {
+        // given
+        TestEntity givenEntity = new TestEntity(1L, "영진최", 19, "jinyoungchoi95@gmail.com");
+        jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (1, '최진영', 19)");
+
+        // when
+        entityManager.merge(givenEntity);
+        TestEntity actual = findTestEntity();
+
+        // then
+        assertAll(
+                () -> assertThat(actual.id).isEqualTo(1L),
+                () -> assertThat(actual.name).isEqualTo("영진최"),
+                () -> assertThat(actual.age).isEqualTo(19),
+                () -> assertThat(persistenceContextEntities.values()).contains(givenEntity),
+                () -> assertThat(persistenceContextSnapshotEntities.values().stream().findAny().get().getSnapshot().values().contains("영진최")).isTrue()
+        );
+    }
+
     private TestEntity findTestEntity() {
         return jdbcTemplate.queryForObject("select id, nick_name, age from test_entity", new RowMapper<TestEntity>() {
             @Override
