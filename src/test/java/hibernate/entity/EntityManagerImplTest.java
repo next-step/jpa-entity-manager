@@ -56,7 +56,7 @@ class EntityManagerImplTest {
     }
 
     @Test
-    void 저장된_객채를_찾는다() {
+    void 저장된_객채를_찾은_후_PersistenceContext에_저장한다() {
         // given
         jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (1, '최진영', 19)");
 
@@ -67,7 +67,8 @@ class EntityManagerImplTest {
         assertAll(
                 () -> assertThat(actual.id).isEqualTo(1L),
                 () -> assertThat(actual.name).isEqualTo("최진영"),
-                () -> assertThat(actual.age).isEqualTo(19)
+                () -> assertThat(actual.age).isEqualTo(19),
+                () -> assertThat(persistenceContextEntities).containsValue(actual)
         );
     }
 

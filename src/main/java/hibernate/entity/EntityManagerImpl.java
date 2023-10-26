@@ -18,7 +18,6 @@ public class EntityManagerImpl implements EntityManager {
         this.persistenceContext = persistenceContext;
     }
 
-    // TODO : PersistenceContext에 addEntity가 구현되면 추가구현한다.
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
         Object persistenceContextEntity = persistenceContext.getEntity(new EntityKey(id, clazz));
@@ -27,7 +26,9 @@ public class EntityManagerImpl implements EntityManager {
         }
 
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
-        return entityLoader.find(entityClass, id);
+        T loadEntity = entityLoader.find(entityClass, id);
+        persistenceContext.addEntity(id, loadEntity);
+        return loadEntity;
     }
 
     @Override
