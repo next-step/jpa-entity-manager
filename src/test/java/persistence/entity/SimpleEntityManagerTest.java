@@ -81,4 +81,37 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
         assertThat(person1 == person2).isTrue();
     }
 
+    @Test
+    @DisplayName("Entity 를 변경 후 persist 하면 update 된다.")
+    void updatePersistTest() {
+        final Person test = entityManager.find(Person.class, 1L);
+
+        test.changeEmail("changed!");
+        entityManager.persist(test);
+
+        final Person testV2 = jdbcTemplate.queryForObject("select * from users where id=1", personRowMapper());
+        assertSoftly(softly -> {
+            softly.assertThat(test.getId()).isEqualTo(testV2.getId());
+            softly.assertThat(test.getName()).isEqualTo(testV2.getName());
+            softly.assertThat(test.getAge()).isEqualTo(testV2.getAge());
+            softly.assertThat(test.getEmail()).isEqualTo(testV2.getEmail());
+        });
+    }
+
+    @Test
+    @DisplayName("Id 를 가진 객체를 persist 할 경우 update 된다.")
+    void updatePersistFailTest() {
+        final Person test = new Person(1L, "changedTester", 111, "changedEmail");
+
+        entityManager.persist(test);
+
+        final Person testV2 = jdbcTemplate.queryForObject("select * from users where id=1", personRowMapper());
+        assertSoftly(softly -> {
+            softly.assertThat(test.getId()).isEqualTo(testV2.getId());
+            softly.assertThat(test.getName()).isEqualTo(testV2.getName());
+            softly.assertThat(test.getAge()).isEqualTo(testV2.getAge());
+            softly.assertThat(test.getEmail()).isEqualTo(testV2.getEmail());
+        });
+    }
+
 }
