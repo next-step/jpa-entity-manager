@@ -29,9 +29,13 @@ public class EntityManagerImpl implements EntityManager {
 
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
-        persistenceContext.addEntity(id, loadEntity);
-        persistenceContext.getDatabaseSnapshot(id, loadEntity);
+        persistNewEntity(loadEntity, id);
         return loadEntity;
+    }
+
+    private void persistNewEntity(Object entity, Object entityId) {
+        persistenceContext.addEntity(entityId, entity);
+        persistenceContext.getDatabaseSnapshot(entityId, entity);
     }
 
     @Override
@@ -42,8 +46,7 @@ public class EntityManagerImpl implements EntityManager {
 
         Object generatedId = entityPersister.insert(entity);
         entityId.assignFieldValue(entity, generatedId);
-        persistenceContext.addEntity(generatedId, entity);
-        persistenceContext.getDatabaseSnapshot(generatedId, entity);
+        persistNewEntity(entity, generatedId);
     }
 
     private void validateAlreadyPersist(Object entity, EntityColumn entityId) {
@@ -64,8 +67,7 @@ public class EntityManagerImpl implements EntityManager {
             return;
         }
         entityPersister.update(entityClass, entityId, changedColumns);
-        persistenceContext.addEntity(entityId, entity);
-        persistenceContext.getDatabaseSnapshot(entityId, entity);
+        persistNewEntity(entity, entityId);
     }
 
     private EntitySnapshot getSnapshot(Object entity, Object entityId) {
