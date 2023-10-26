@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class ApplicationTest {
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
-    private PersistenceEnvironment persistenceEnvironment;
     private DdlGenerator ddlGenerator;
     private DmlGenerator dmlGenerator;
     private EntityMetadata<?> entityMetadata;
@@ -45,7 +44,7 @@ class ApplicationTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         final PersistenceEnvironment persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
-        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(persistenceEnvironment);
+        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(persistenceEnvironment.getDmlGenerator(), jdbcTemplate);
         final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(persistenceEnvironment, entityPersisterProvider);
         entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
         ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());

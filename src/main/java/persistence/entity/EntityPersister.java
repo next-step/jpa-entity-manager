@@ -1,46 +1,46 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.core.*;
-import persistence.exception.PersistenceException;
+import persistence.core.EntityColumn;
+import persistence.core.EntityColumns;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.sql.dml.DmlGenerator;
 import persistence.util.ReflectionUtils;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 public class EntityPersister {
-    private final PersistenceEnvironment persistenceEnvironment;
     private final String tableName;
     private final EntityColumn idColumn;
     private final EntityColumns columns;
     private final EntityColumns insertableColumns;
     private final DmlGenerator dmlGenerator;
+    private final JdbcTemplate jdbcTemplate;
 
-    public EntityPersister(final Class<?> clazz, final PersistenceEnvironment persistenceEnvironment) {
+    public EntityPersister(final Class<?> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
-        this.persistenceEnvironment = persistenceEnvironment;
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.columns = entityMetadata.getColumns();
         this.insertableColumns = entityMetadata.getInsertableColumn();
-        this.dmlGenerator = persistenceEnvironment.getDmlGenerator();
+        this.dmlGenerator = dmlGenerator;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void insert(final Object entity) {
         final String insertQuery = renderInsert(entity);
-        executeQuery(insertQuery);
+        jdbcTemplate.execute(insertQuery);
     }
 
     public void update(final Object entity) {
         final String updateQuery = renderUpdate(entity);
-        executeQuery(updateQuery);
+        jdbcTemplate.execute(updateQuery);
     }
 
     public void delete(final Object entity) {
         final String deleteQuery = renderDelete(entity);
-        executeQuery(deleteQuery);
+        jdbcTemplate.execute(deleteQuery);
     }
 
     public String renderInsert(final Object entity) {
@@ -81,12 +81,4 @@ public class EntityPersister {
         return idColumn.getName();
     }
 
-    private void executeQuery(final String query) {
-        try (final Connection connection = persistenceEnvironment.getConnection()) {
-            final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
-            jdbcTemplate.execute(query);
-        } catch (final SQLException e) {
-            throw new PersistenceException("SQL 실행 중 오류가 발생했습니다.", e);
-        }
-    }
 }

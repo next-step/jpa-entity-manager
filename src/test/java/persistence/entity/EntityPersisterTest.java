@@ -2,11 +2,13 @@ package persistence.entity;
 
 import domain.FixturePerson;
 import domain.Person;
-import mock.MockPersistenceEnvironment;
+import mock.MockDmlGenerator;
+import mock.MockJdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,8 +20,8 @@ class EntityPersisterTest {
     private Person fixturePerson;
 
     @BeforeEach
-    void setUp() {
-        entityPersister = new EntityPersister(Person.class, new MockPersistenceEnvironment());
+    void setUp() throws SQLException {
+        entityPersister = new EntityPersister(Person.class, new MockDmlGenerator(), new MockJdbcTemplate());
         fixturePerson = FixturePerson.create(1L);
     }
 

@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import domain.FixtureEntity;
+import jdbc.JdbcTemplate;
 import mock.MockPersistenceEnvironment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ class EntityLoaderProviderTest {
     @BeforeEach
     void setUp() {
         final MockPersistenceEnvironment persistenceEnvironment = new MockPersistenceEnvironment();
-        entityLoaderProvider = new EntityLoaderProvider(persistenceEnvironment, new EntityPersisterProvider(persistenceEnvironment));
+        entityLoaderProvider = new EntityLoaderProvider(persistenceEnvironment, new EntityPersisterProvider(persistenceEnvironment.getDmlGenerator(), new JdbcTemplate(persistenceEnvironment.getConnection())));
     }
 
     @Test

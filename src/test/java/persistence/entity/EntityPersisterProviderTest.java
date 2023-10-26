@@ -1,10 +1,13 @@
 package persistence.entity;
 
 import domain.FixtureEntity;
-import mock.MockPersistenceEnvironment;
+import mock.MockDmlGenerator;
+import mock.MockJdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,8 +16,8 @@ class EntityPersisterProviderTest {
     private EntityPersisterProvider entityPersisterProvider;
 
     @BeforeEach
-    void setUp() {
-        entityPersisterProvider = new EntityPersisterProvider(new MockPersistenceEnvironment());
+    void setUp() throws SQLException {
+        entityPersisterProvider = new EntityPersisterProvider(new MockDmlGenerator(), new MockJdbcTemplate());
     }
 
     @Test
