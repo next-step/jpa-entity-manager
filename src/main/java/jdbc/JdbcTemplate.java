@@ -23,6 +23,14 @@ public class JdbcTemplate {
         }
     }
 
+    public boolean executeUpdate(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            return statement.execute(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             if (!resultSet.next()) {

@@ -107,4 +107,30 @@ class EntityManagerImplIntegrationTest {
         assertThatCode(() -> entityManager.remove(expectedPerson))
             .doesNotThrowAnyException();
     }
+
+    @Test
+    @DisplayName("EntityManager를 통해 Entity를 수정할 수 있다.")
+    void updateEntity() {
+        //given
+        final String userName = "유저1";
+        final int userAge = 20;
+        PersonV3 person1 = new PersonV3(userName, userAge, "user1@jpa.com", 1);
+        entityManager.persist(person1);
+        final PersonV3 expectedPerson = entityManager.find(PersonV3.class, 1L);
+
+        //when
+        final String updatedEmail = "updatedUser1@jpa.com";
+        expectedPerson.updateEmail(updatedEmail);
+        entityManager.persist(expectedPerson);
+
+        //then
+        final PersonV3 updatedPerson = entityManager.find(PersonV3.class, 1L);
+        assertAll(
+            () -> assertThat(updatedPerson.getId()).isEqualTo(1L),
+            () -> assertThat(updatedPerson.getEmail()).isEqualTo(updatedEmail),
+            () -> assertThat(updatedPerson.getName()).isEqualTo(userName),
+            () -> assertThat(updatedPerson.getAge()).isEqualTo(userAge)
+        );
+
+    }
 }
