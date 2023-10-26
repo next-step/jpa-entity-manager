@@ -21,7 +21,7 @@ class EntityPersisterTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private final EntityPersister<TestEntity> entityPersister = new EntityPersister<>(TestEntity.class, jdbcTemplate);
+    private final EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
 
     @BeforeAll
     static void beforeAll() throws SQLException {
@@ -29,7 +29,7 @@ class EntityPersisterTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(new EntityClass<>(TestEntity.class)));
+        jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(EntityClass.getInstance(TestEntity.class)));
     }
 
     @AfterEach
@@ -57,13 +57,6 @@ class EntityPersisterTest {
     }
 
     @Test
-    void update_쿼리_실행_시_다른_타입의_entity가_입력될_경우_예외가_발생한다() {
-        assertThatThrownBy(() -> entityPersister.update(new ErrorEntity()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
-    }
-
-    @Test
     void insert_쿼리를_실행한다() {
         // given
         TestEntity givenEntity = new TestEntity("최진영");
@@ -74,13 +67,6 @@ class EntityPersisterTest {
 
         // then
         assertThat(actual).isEqualTo(1);
-    }
-
-    @Test
-    void insert_쿼리_실행_시_다른_타입의_entity가_입력될_경우_예외가_발생한다() {
-        assertThatThrownBy(() -> entityPersister.insert(new ErrorEntity()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
     }
 
     @Test
@@ -97,19 +83,11 @@ class EntityPersisterTest {
         assertThat(actual).isEqualTo(0);
     }
 
-    @Test
-    void delete_쿼리_실행_시_다른_타입의_entity가_입력될_경우_예외가_발생한다() {
-        assertThatThrownBy(() -> entityPersister.delete(new ErrorEntity()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("EntityClass와 일치하지 않는 객체입니다.");
-    }
-
     private Integer testEntityCount() {
         return jdbcTemplate.queryForObject("select count(*) from test_entity", new RowMapper<Integer>() {
             @Override
             public Integer mapRow(ResultSet resultSet) {
                 try {
-                    resultSet.next();
                     return resultSet.getInt(1);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);

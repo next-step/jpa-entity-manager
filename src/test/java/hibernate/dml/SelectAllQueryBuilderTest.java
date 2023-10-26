@@ -1,8 +1,9 @@
 package hibernate.dml;
 
-import hibernate.entity.EntityClass;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,8 +17,7 @@ class SelectAllQueryBuilderTest {
         String expected = "select id, nick_name from test_entity;";
 
         // when
-        String actual = selectAllQueryBuilder.generateQuery(new EntityClass<>(TestEntity.class))
-                .toLowerCase();
+        String actual = selectAllQueryBuilder.generateQuery("test_entity", List.of("id", "nick_name"));
 
         // then
         assertThat(actual).isEqualTo(expected);

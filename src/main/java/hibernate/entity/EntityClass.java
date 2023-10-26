@@ -3,35 +3,31 @@ package hibernate.entity;
 import hibernate.entity.column.EntityColumn;
 import hibernate.entity.column.EntityColumns;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityClass<T> {
 
-    private final String tableName;
+    private static final Map<Class<?>, EntityClass<?>> CACHE = new ConcurrentHashMap<>();
+
+    private final EntityTableName tableName;
     private final EntityColumns entityColumns;
     private final Class<T> clazz;
 
-    public EntityClass(final Class<T> clazz) {
+    private EntityClass(final Class<T> clazz) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("Entity 어노테이션이 없는 클래스는 입력될 수 없습니다.");
         }
-        this.tableName = parseTableName(clazz);
+        this.tableName = new EntityTableName(clazz);
         this.entityColumns = new EntityColumns(clazz.getDeclaredFields());
         this.clazz = clazz;
     }
 
-    private String parseTableName(final Class<T> clazz) {
-        if (!clazz.isAnnotationPresent(Table.class)) {
-            return clazz.getSimpleName();
-        }
-        String tableName = clazz.getAnnotation(Table.class).name();
-        if (tableName.isEmpty()) {
-            return clazz.getSimpleName();
-        }
-        return tableName;
+    public static <T> EntityClass<T> getInstance(final Class<T> clazz) {
+        return (EntityClass<T>) CACHE.computeIfAbsent(clazz, EntityClass::new);
     }
 
     public T newInstance()  {
@@ -56,8 +52,12 @@ public class EntityClass<T> {
         }
     }
 
+    public Map<EntityColumn, Object> getFieldValues(final Object entity) {
+        return entityColumns.getFieldValues(entity);
+    }
+
     public String tableName() {
-        return tableName;
+        return tableName.getValue();
     }
 
     public EntityColumn getEntityId() {
@@ -66,5 +66,9 @@ public class EntityClass<T> {
 
     public List<EntityColumn> getEntityColumns() {
         return entityColumns.getValues();
+    }
+
+    public List<String> getFieldNames() {
+        return entityColumns.getFieldNames();
     }
 }

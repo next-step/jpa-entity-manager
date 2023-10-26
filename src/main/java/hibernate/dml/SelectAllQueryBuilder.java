@@ -1,9 +1,6 @@
 package hibernate.dml;
 
-import hibernate.entity.EntityClass;
-import hibernate.entity.column.EntityColumn;
-
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class SelectAllQueryBuilder {
 
@@ -16,14 +13,11 @@ public class SelectAllQueryBuilder {
     private SelectAllQueryBuilder() {
     }
 
-    public String generateQuery(final EntityClass<?> entityClass) {
-        return String.format(SELECT_ALL_QUERY, parseColumnQueries(entityClass), entityClass.tableName());
+    public String generateQuery(final String tableName, final List<String> fieldNames) {
+        return String.format(SELECT_ALL_QUERY, parseColumnQueries(fieldNames), tableName);
     }
 
-    private String parseColumnQueries(final EntityClass<?> entityClass) {
-        return entityClass.getEntityColumns()
-                .stream()
-                .map(EntityColumn::getFieldName)
-                .collect(Collectors.joining(SELECT_AlL_QUERY_COLUMN_DELIMITER));
+    private String parseColumnQueries(final List<String> fieldNames) {
+        return String.join(SELECT_AlL_QUERY_COLUMN_DELIMITER, fieldNames);
     }
 }

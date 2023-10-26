@@ -6,10 +6,10 @@ import java.util.Objects;
 
 public class EntityTableName {
 
-    private final String tableName;
+    private final String value;
 
     public EntityTableName(final Class<?> clazz) {
-        this.tableName = parseTableName(clazz);
+        this.value = parseTableName(clazz);
     }
 
     private String parseTableName(final Class<?> clazz) {
@@ -23,8 +23,8 @@ public class EntityTableName {
         return tableName;
     }
 
-    public String getTableName() {
-        return tableName;
+    public String getValue() {
+        return value;
     }
 
     @Override
@@ -32,11 +32,11 @@ public class EntityTableName {
         if (this == entity) return true;
         if (entity == null || getClass() != entity.getClass()) return false;
         EntityTableName that = (EntityTableName) entity;
-        return Objects.equals(tableName, that.tableName);
+        return Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableName);
+        return Objects.hash(value);
     }
 }
