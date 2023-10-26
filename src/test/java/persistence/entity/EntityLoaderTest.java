@@ -5,7 +5,6 @@ import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import mock.MockDatabaseServer;
 import mock.MockDmlGenerator;
-import mock.MockEntityPersister;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +43,7 @@ class EntityLoaderTest {
     @DisplayName("loadById 를 통해 객체를 조회할 수 있다.")
     void loadByIdTest() throws SQLException {
         final Class<Person> clazz = Person.class;
-        final EntityLoader<Person> entityLoader = new EntityLoader<>(clazz, new MockDmlGenerator(), new MockJdbcTemplate(), new MockEntityPersister(clazz));
+        final EntityLoader<Person> entityLoader = new EntityLoader<>(clazz, new MockDmlGenerator(), new MockJdbcTemplate());
 
         final Person person = entityLoader.loadById(1L);
 

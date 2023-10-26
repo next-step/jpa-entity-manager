@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.exception.PersistenceException;
 import persistence.util.ReflectionUtils;
 
@@ -13,11 +15,12 @@ public class EntityRowMapper<T> {
     private final List<String> fieldNames;
     private final int columnSize;
 
-    public EntityRowMapper(final Class<T> clazz, final EntityPersister entityPersister) {
+    public EntityRowMapper(final Class<T> clazz) {
+        final EntityMetadata<T> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
         this.clazz = clazz;
-        this.columnNames = entityPersister.getColumnNames();
-        this.fieldNames = entityPersister.getColumnFieldNames();
-        this.columnSize = entityPersister.getColumnSize();
+        this.columnNames = entityMetadata.getColumnNames();
+        this.fieldNames = entityMetadata.getColumnFieldNames();
+        this.columnSize = entityMetadata.getColumnSize();
     }
 
     public T mapRow(final ResultSet resultSet) {

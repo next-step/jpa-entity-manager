@@ -2,7 +2,6 @@ package persistence.entity;
 
 
 import domain.Person;
-import mock.MockEntityPersister;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,10 +17,9 @@ class EntityRowMapperTest {
     private EntityRowMapper<Person> entityRowMapper;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() {
         final Class<Person> clazz = Person.class;
-        final EntityPersister entityPersister = new MockEntityPersister(clazz);
-        entityRowMapper = new EntityRowMapper<>(clazz, entityPersister);
+        entityRowMapper = new EntityRowMapper<>(clazz);
     }
 
     @Test

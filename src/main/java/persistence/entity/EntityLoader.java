@@ -1,19 +1,28 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.core.EntityColumn;
+import persistence.core.EntityColumns;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.sql.dml.DmlGenerator;
 
 public class EntityLoader<T> {
+    private final String tableName;
+    private final EntityColumn idColumn;
+    private final EntityColumns columns;
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
-    private final EntityPersister entityPersister;
     private final EntityRowMapper<T> entityRowMapper;
 
-    public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate, final EntityPersister entityPersister) {
-        this.entityPersister = entityPersister;
+    public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        final EntityMetadata<T> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+        this.tableName = entityMetadata.getTableName();
+        this.idColumn = entityMetadata.getIdColumn();
+        this.columns = entityMetadata.getColumns();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
-        this.entityRowMapper = new EntityRowMapper<>(clazz, entityPersister);
+        this.entityRowMapper = new EntityRowMapper<>(clazz);
     }
 
     public T loadById(final Object id) {
@@ -22,6 +31,6 @@ public class EntityLoader<T> {
     }
 
     public String renderSelect(final Object id) {
-        return dmlGenerator.findById(entityPersister.getTableName(), entityPersister.getColumnNames(), entityPersister.getIdColumnName(), id);
+        return dmlGenerator.findById(tableName, columns.getNames(), idColumn.getName(), id);
     }
 }

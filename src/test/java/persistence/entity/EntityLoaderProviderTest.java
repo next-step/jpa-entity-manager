@@ -17,9 +17,7 @@ class EntityLoaderProviderTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        final MockDmlGenerator dmlGenerator = new MockDmlGenerator();
-        final MockJdbcTemplate jdbcTemplate = new MockJdbcTemplate();
-        entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate, new EntityPersisterProvider(dmlGenerator, jdbcTemplate));
+        entityLoaderProvider = new EntityLoaderProvider(new MockDmlGenerator(), new MockJdbcTemplate());
     }
 
     @Test

@@ -47,7 +47,7 @@ class ApplicationTest {
         ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
         final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
-        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate, entityPersisterProvider);
+        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
         entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
 
         entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
