@@ -3,19 +3,16 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 public class DefaultEntityManager implements EntityManager {
-
-    private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
-    private DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityPersister entityPersister, EntityLoader entityLoader) {
-        this.jdbcTemplate = jdbcTemplate;
+    private DefaultEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
     }
 
     public static DefaultEntityManager of(JdbcTemplate jdbcTemplate) {
-        return new DefaultEntityManager(jdbcTemplate, EntityPersister.of(jdbcTemplate), EntityLoader.of(jdbcTemplate));
+        return new DefaultEntityManager(EntityPersister.of(jdbcTemplate), EntityLoader.of(jdbcTemplate));
     }
 
     @Override
