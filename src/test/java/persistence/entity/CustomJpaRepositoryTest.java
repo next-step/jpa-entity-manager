@@ -17,7 +17,8 @@ class CustomJpaRepositoryTest extends IntegrationTestEnvironment {
     void setup() {
         final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
         final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
-        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
+        final EntityKeyGenerator entityKeyGenerator = new EntityKeyGenerator();
+        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider, entityKeyGenerator);
         customJpaRepository = new CustomJpaRepository<>(entityManager, Person.class);
     }
 

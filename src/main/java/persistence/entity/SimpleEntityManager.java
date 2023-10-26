@@ -11,10 +11,10 @@ public class SimpleEntityManager implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityKeyGenerator entityKeyGenerator;
 
-    public SimpleEntityManager(final EntityPersisterProvider entityPersisterProvider, final EntityLoaderProvider entityLoaderProvider) {
+    public SimpleEntityManager(final EntityPersisterProvider entityPersisterProvider, final EntityLoaderProvider entityLoaderProvider, final EntityKeyGenerator entityKeyGenerator) {
         this.entityPersisterProvider = entityPersisterProvider;
         this.entityLoaderProvider = entityLoaderProvider;
-        this.entityKeyGenerator = new EntityKeyGenerator();
+        this.entityKeyGenerator = entityKeyGenerator;
         this.persistenceContext = new SimplePersistenceContext();
     }
 
