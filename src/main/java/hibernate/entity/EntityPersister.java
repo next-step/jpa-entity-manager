@@ -29,13 +29,13 @@ public class EntityPersister {
         return jdbcTemplate.executeUpdate(query);
     }
 
-    public void insert(final Object entity) {
+    public Object insert(final Object entity) {
         EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
         final String query = insertQueryBuilder.generateQuery(
                 entityClass.tableName(),
                 entityClass.getFieldValues(entity)
         );
-        jdbcTemplate.execute(query);
+        return jdbcTemplate.executeInsert(query);
     }
 
     public void delete(final Object entity) {

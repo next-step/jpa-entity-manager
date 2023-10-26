@@ -85,19 +85,21 @@ class EntityManagerImplTest {
     }
 
     @Test
-    void 객체를_저장한다() {
+    void 객체를_persist한_후_entity에_삽입하고_PersistenceContext에_넣는다() {
         // given
         TestEntity givenEntity = new TestEntity("최진영", 19, "jinyoungchoi95@gmail.com");
 
         // when
         entityManager.persist(givenEntity);
         TestEntity actual = jdbcTemplate.queryForObject("select id, nick_name, age from test_entity;", ReflectionRowMapper.getInstance(EntityClass.getInstance(TestEntity.class)));
+        TestEntity actualPersistenceContext = (TestEntity) persistenceContextEntities.get(new EntityKey(actual.id, TestEntity.class));
 
         // then
         assertAll(
                 () -> assertThat(actual.id).isEqualTo(1L),
                 () -> assertThat(actual.name).isEqualTo(givenEntity.name),
-                () -> assertThat(actual.age).isEqualTo(givenEntity.age)
+                () -> assertThat(actual.age).isEqualTo(givenEntity.age),
+                () -> assertThat(actualPersistenceContext.id).isEqualTo(1L)
         );
     }
 

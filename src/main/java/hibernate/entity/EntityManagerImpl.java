@@ -35,7 +35,10 @@ public class EntityManagerImpl implements EntityManager {
         EntityColumn entityId = EntityClass.getInstance(entity.getClass())
                 .getEntityId();
         validateAlreadyPersist(entity, entityId);
-        entityPersister.insert(entity);
+
+        Object generatedId = entityPersister.insert(entity);
+        entityId.assignFieldValue(entity, generatedId);
+        persistenceContext.addEntity(generatedId, entity);
     }
 
     private void validateAlreadyPersist(Object entity, EntityColumn entityId) {
