@@ -75,6 +75,27 @@ class CustomJpaRepositoryTest {
         );
     }
 
+    @Test
+    void 영속화된_entity인_경우_update한다() {
+        // given
+        EntityKey givenEntityKey = new EntityKey(1L, TestEntity.class);
+        TestEntity givenEntity = new TestEntity(1L, "최진영", 19);
+        persistenceContextEntities.put(givenEntityKey, givenEntity);
+        persistenceContextSnapshotEntities.put(givenEntityKey, new EntitySnapshot(givenEntity));
+        jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (1, '최진영', 19)");
+
+        // when
+        customJpaRepository.save(new TestEntity(1L, "진영최", 19));
+        TestEntity actual = findTestEntity();
+
+        // then
+        assertAll(
+                () -> assertThat(actual.id).isEqualTo(1L),
+                () -> assertThat(actual.name).isEqualTo("진영최"),
+                () -> assertThat(actual.age).isEqualTo(19)
+        );
+    }
+
     private TestEntity findTestEntity() {
         return jdbcTemplate.queryForObject("select id, nick_name, age from test_entity", new RowMapper<TestEntity>() {
             @Override
