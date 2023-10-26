@@ -65,6 +65,11 @@ public interface PersistenceContext {
   - getEntity
     - Map에 저장되어있는 entity를 반환한다.
     - 존재하지 않는다면 null을 반환한다.
+  - addEntity
+    - entity를 넣는다.
 - EntityManager
   - find
     - PersistenceContext에서 검색 후 없으면 EntityLoader에서 검색 후 PersistenceContext에 저장한다.
+  - persist
+    - PersistenceContext에 이미 entity가 영속화되어있으면 예외가 발생한다. (이걸 addEntity에서 해야하나?)
+    - EntityPersister에서 insert한 후 PersistenceContext에 넣는다.
