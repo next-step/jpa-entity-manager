@@ -64,7 +64,7 @@ public interface PersistenceContext {
 - PersistenceContext
   - getEntity
     - Map에 저장되어있는 entity를 반환한다.
-    - 존재하지 않는다면 예외를 발생한다.
+    - 존재하지 않는다면 null을 반환한다.
 - EntityManager
   - find
     - PersistenceContext에서 검색 후 없으면 EntityLoader에서 검색 후 PersistenceContext에 저장한다.
