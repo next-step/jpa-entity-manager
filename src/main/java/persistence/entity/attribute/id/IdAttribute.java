@@ -3,9 +3,12 @@ package persistence.entity.attribute.id;
 import jakarta.persistence.GenerationType;
 import persistence.sql.ddl.converter.SqlConverter;
 
-public abstract class IdAttribute {
+import java.lang.reflect.Field;
 
+public abstract class IdAttribute {
     abstract public String prepareDDL(SqlConverter sqlConverter);
+
+    abstract public Field getField();
 
     abstract public String getColumnName();
 

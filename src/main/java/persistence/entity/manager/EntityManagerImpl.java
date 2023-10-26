@@ -1,6 +1,7 @@
 package persistence.entity.manager;
 
 import jakarta.persistence.Id;
+import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 
 import java.lang.reflect.Field;
@@ -8,23 +9,22 @@ import java.util.Arrays;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
 
-    private EntityManagerImpl(EntityPersister entityPersister) {
+    private EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
+        this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
+
     }
 
-    public static EntityManagerImpl of(EntityPersister entityPersister) {
-        return new EntityManagerImpl(entityPersister);
+    public static EntityManagerImpl of(EntityPersister entityPersister, EntityLoader entityLoader) {
+        return new EntityManagerImpl(entityPersister, entityLoader);
     }
 
     @Override
     public <T> T findById(Class<T> clazz, String id) {
-        return loadAndManageEntity(clazz, id);
-    }
-
-    private <T> T loadAndManageEntity(Class<T> clazz, String id) {
-        return entityPersister.findById(clazz, id);
+        return entityLoader.load(clazz, id);
     }
 
     @Override

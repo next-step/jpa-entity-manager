@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 public class AttributeParser {
 
-    public AttributeParser() {
+    private AttributeParser() {
     }
 
-    public IdAttribute parseIdAttribute(Field field) {
+    public static IdAttribute parseIdAttribute(Field field) {
         if (field.getType().equals(String.class)) {
             return StringTypeIdAttribute.of(field);
         }
@@ -26,7 +26,7 @@ public class AttributeParser {
         throw new IllegalStateException(String.format("[%s] 알수없는 필드 타입입니다.", field.getType()));
     }
 
-    public IdAttribute parseIdAttribute(Class<?> clazz) {
+    public static IdAttribute parseIdAttribute(Class<?> clazz) {
         Field id = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
@@ -34,15 +34,15 @@ public class AttributeParser {
         return parseIdAttribute(id);
     }
 
-    public List<GeneralAttribute> parseGeneralAttributes(Class<?> clazz) {
+    public static List<GeneralAttribute> parseGeneralAttributes(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Column.class)
                         && !field.isAnnotationPresent(Id.class))
-                .map(this::parseGeneralAttribute)
+                .map(AttributeParser::parseGeneralAttribute)
                 .collect(Collectors.toList());
     }
 
-    public GeneralAttribute parseGeneralAttribute(
+    public static GeneralAttribute parseGeneralAttribute(
             Field field
     ) {
         if (field.getType().equals(String.class)) {

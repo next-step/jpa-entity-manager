@@ -16,7 +16,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DisplayName("EntityAttribute 클래스의")
 public class EntityAttributeTest {
     SqlConverter sqlConverter = new H2SqlConverter();
-    AttributeParser attributeParser = new AttributeParser();
 
     @Nested
     @DisplayName("of 메소드는")
@@ -28,7 +27,7 @@ public class EntityAttributeTest {
             @DisplayName("EntityAttribute를 반환한다.")
             void returnEntityAttribute() {
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class, attributeParser);
+                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
 
                 Assertions.assertAll(
                         () -> assertThat(entityAttribute.getTableName())
@@ -51,7 +50,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                TestEntityFixture.EntityWithMultiIdAnnotation.class, attributeParser));
+                                TestEntityFixture.EntityWithMultiIdAnnotation.class));
             }
         }
 
@@ -63,7 +62,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                TestEntityFixture.EntityWithOutEntityAnnotation.class, attributeParser));
+                                TestEntityFixture.EntityWithOutEntityAnnotation.class));
             }
         }
     }
