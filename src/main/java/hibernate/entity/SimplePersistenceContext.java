@@ -18,7 +18,7 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getEntity(final Object id) {
+    public Object getEntity(final EntityKey id) {
         return entities.get(id);
     }
 
@@ -42,5 +42,10 @@ public class SimplePersistenceContext implements PersistenceContext {
     public Object getDatabaseSnapshot(final Object id, final Object entity) {
         EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
         return snapshotEntities.put(new EntityKey(id, entity.getClass()), entitySnapshot);
+    }
+
+    @Override
+    public Object getCachedDatabaseSnapshot(EntityKey id) {
+        return snapshotEntities.get(id);
     }
 }

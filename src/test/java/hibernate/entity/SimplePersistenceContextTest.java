@@ -85,6 +85,15 @@ class SimplePersistenceContextTest {
         assertThat(givenSnapshotEntities).hasSize(1);
     }
 
+    @Test
+    void 저장된_스냅샷_entity를_가져온다() {
+        EntityKey givenKey = new EntityKey(1L, TestEntity.class);
+        EntitySnapshot givenSnapshot = new EntitySnapshot(new TestEntity(1L));
+        Object actual = new SimplePersistenceContext(Map.of(), Map.of(givenKey, givenSnapshot)).getCachedDatabaseSnapshot(givenKey);
+
+        assertThat(actual).isEqualTo(givenSnapshot);
+    }
+
     @Entity
     static class TestEntity {
         @Id
