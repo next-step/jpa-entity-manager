@@ -45,7 +45,7 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getCachedDatabaseSnapshot(EntityKey id) {
+    public EntitySnapshot getCachedDatabaseSnapshot(final EntityKey id) {
         return snapshotEntities.get(id);
     }
 }

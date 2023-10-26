@@ -30,6 +30,7 @@ class EntityManagerImplTest {
     @BeforeEach
     void beforeEach() {
         persistenceContextEntities = new ConcurrentHashMap<>();
+        persistenceContextSnapshotEntities = new ConcurrentHashMap<>();
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
@@ -143,6 +144,37 @@ class EntityManagerImplTest {
         );
     }
 
+    @Test
+    void merge할_때_기존_필드와_다르면_업데이트된다() {
+        // given
+        TestEntity givenEntity = new TestEntity(1L, "최진영", 19, "jinyoungchoi95@gmail.com");
+        entityManager.persist(givenEntity);
+
+        // when
+        entityManager.merge(new TestEntity(1L, "영진최", 19, "jinyoungchoi95@gmail.com"));
+        TestEntity actual = findTestEntity();
+
+        // then
+        assertAll(
+                () -> assertThat(actual.id).isEqualTo(1L),
+                () -> assertThat(actual.name).isEqualTo("영진최"),
+                () -> assertThat(actual.age).isEqualTo(19)
+        );
+    }
+
+    private TestEntity findTestEntity() {
+        return jdbcTemplate.queryForObject("select id, nick_name, age from test_entity", new RowMapper<TestEntity>() {
+            @Override
+            public TestEntity mapRow(ResultSet resultSet) throws SQLException {
+                return new TestEntity(
+                        resultSet.getLong("id"),
+                        resultSet.getString("nick_name"),
+                        resultSet.getInt("age")
+                );
+            }
+        });
+    }
+
     @Entity
     @Table(name = "test_entity")
     static class TestEntity {
@@ -159,6 +191,12 @@ class EntityManagerImplTest {
         private String email;
 
         public TestEntity() {
+        }
+
+        public TestEntity(Long id, String name, Integer age) {
+            this.id = id;
+            this.name = name;
+            this.age = age;
         }
 
         public TestEntity(Long id, String name, Integer age, String email) {

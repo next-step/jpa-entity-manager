@@ -2,6 +2,8 @@ package hibernate.entity;
 
 import hibernate.entity.column.EntityColumn;
 
+import java.util.Map;
+
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityPersister entityPersister;
@@ -53,7 +55,16 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void merge(Object entity) {
-
+        EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
+        Object entityId = entityClass.getEntityId()
+                .getFieldValue(entity);
+        // TODO getFieldId 를 추가하도록 수정
+        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(new EntityKey(entityId, entity.getClass()));
+        Map<EntityColumn, Object> changedColumns = snapshot.changedColumns(entity);
+        if (changedColumns.isEmpty()) {
+            return;
+        }
+        entityPersister.update(entityClass, entityId, changedColumns);
     }
 
     @Override
