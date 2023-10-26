@@ -32,13 +32,17 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(final Object entity) {
-        Object id = EntityClass.getInstance(entity.getClass())
-                .getEntityId()
-                .getFieldValue(entity);
+        EntityColumn entityId = EntityClass.getInstance(entity.getClass())
+                .getEntityId();
+        validateAlreadyPersist(entity, entityId);
+        entityPersister.insert(entity);
+    }
+
+    private void validateAlreadyPersist(Object entity, EntityColumn entityId) {
+        Object id = entityId.getFieldValue(entity);
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
-        entityPersister.insert(entity);
     }
 
     @Override
