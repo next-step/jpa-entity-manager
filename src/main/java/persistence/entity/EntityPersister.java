@@ -1,31 +1,31 @@
 package persistence.entity;
 
-import java.util.List;
 import jdbc.JdbcTemplate;
-import jdbc.ResultMapper;
-import persistence.sql.QueryUtil;
+import persistence.sql.dml.Query;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
 public class EntityPersister<T> {
+    private final Query query;
 
     private final JdbcTemplate jdbcTemplate;
     private final TableName tableName;
     private final Columns columns;
 
-    public EntityPersister(JdbcTemplate jdbcTemplate, Class<T> tClass) {
+    public EntityPersister(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
         this.jdbcTemplate = jdbcTemplate;
 
         this.tableName = TableName.of(tClass);
         this.columns = Columns.of(tClass.getDeclaredFields());
+        this.query = query;
     }
 
     public <I> boolean update(I input, Object arg) {
         try {
-            String query = QueryUtil.update().get(getValues(input), tableName, columns, arg);
+            String q = query.update(getValues(input), tableName, columns, arg);
 
-            jdbcTemplate.execute(query);
+            jdbcTemplate.execute(q);
             return true;
         } catch (Exception e) {
             return false;
@@ -33,15 +33,15 @@ public class EntityPersister<T> {
     }
 
     public <I> void insert(I input) {
-        String query = QueryUtil.insert().get(tableName, columns, getValues(input));
+        String q = query.insert(tableName, columns, getValues(input));
 
-        jdbcTemplate.execute(query);
+        jdbcTemplate.execute(q);
     }
 
     public void delete(Object arg) {
-        String query = QueryUtil.delete().get(tableName, columns, arg);
+        String q = query.delete(tableName, columns, arg);
 
-        jdbcTemplate.execute(query);
+        jdbcTemplate.execute(q);
     }
 
     public <I> Values getValues(I input) {

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
 import domain.NonExistentEntityPerson;
 import domain.NonExistentTablePerson;
-import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.MetaUtils;
@@ -21,6 +20,8 @@ import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class InsertQueryTest {
 
+    private static final Query query = Query.getInstance();
+
     @Test
     @DisplayName("Person 객체를 읽어 @Transient 필드 제외하고 성공적으로 insert query 생성")
     void success() {
@@ -33,12 +34,12 @@ class InsertQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String query = QueryUtil.insert().get(tableName, columns, values);
+        String q = query.insert(tableName, columns, values);
 
         //then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(query).isEqualTo(expectedQuery);
-            softAssertions.assertThat(query).isNotEqualToIgnoringCase("index");
+            softAssertions.assertThat(q).isEqualTo(expectedQuery);
+            softAssertions.assertThat(q).isNotEqualToIgnoringCase("index");
         });
 
     }
@@ -51,7 +52,7 @@ class InsertQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-                , () -> QueryUtil.insert().get(TableName을_생성함(person.getClass())
+                , () -> query.insert(TableName을_생성함(person.getClass())
                         , Columns을_생성함(person.getClass().getDeclaredFields())
                         , Values을_생성함(person.getClass().getDeclaredFields())));
     }
@@ -68,9 +69,9 @@ class InsertQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String query = QueryUtil.insert().get(tableName, columns, values);
+        String q = query.insert(tableName, columns, values);
 
         //then
-        assertThat(query).isEqualTo(expectedQuery);
+        assertThat(q).isEqualTo(expectedQuery);
     }
 }

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import jdbc.JdbcTemplate;
 import persistence.exception.EntityManagerInitException;
+import persistence.sql.dml.Query;
 
 public class EntityManagerFactory {
 
@@ -30,7 +31,7 @@ public class EntityManagerFactory {
     private static Map<String, EntityPersister<?>> persisterInit(JdbcTemplate jdbcTemplate, List<Class<?>> list) {
         Map<String, EntityPersister<?>> map = new HashMap<>();
 
-        list.forEach(aClass -> map.put(aClass.getName(), new EntityPersister<>(jdbcTemplate, aClass)));
+        list.forEach(aClass -> map.put(aClass.getName(), new EntityPersister<>(jdbcTemplate, aClass, Query.getInstance())));
 
         return map;
     }
@@ -38,7 +39,7 @@ public class EntityManagerFactory {
     private static Map<String, EntityLoader<?>> loaderInit(JdbcTemplate jdbcTemplate, List<Class<?>> list) {
         Map<String, EntityLoader<?>> map = new HashMap<>();
 
-        list.forEach(aClass -> map.put(aClass.getName(), new EntityLoader<>(jdbcTemplate, aClass)));
+        list.forEach(aClass -> map.put(aClass.getName(), new EntityLoader<>(jdbcTemplate, aClass, Query.getInstance())));
 
         return map;
     }

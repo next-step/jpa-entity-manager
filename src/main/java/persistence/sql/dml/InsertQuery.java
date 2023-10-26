@@ -4,20 +4,16 @@ import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
-public class InsertQuery {
+class InsertQuery {
     private static final String DEFAULT_INSERT_COLUMN_QUERY = "INSERT INTO %s (%s)";
     private static final String DEFAULT_INSERT_VALUE_QUERY = "VALUES(%s)";
     private TableName tableName;
     private Columns columns;
     private Values values;
 
-    private InsertQuery() { }
+    InsertQuery() { }
 
-    public static InsertQuery create() {
-        return new InsertQuery();
-    }
-
-    public String get(TableName tableName, Columns columns, Values values) {
+    String get(TableName tableName, Columns columns, Values values) {
         this.tableName = tableName;
         this.columns = columns;
         this.values = values;

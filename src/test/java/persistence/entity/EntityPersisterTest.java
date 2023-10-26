@@ -9,6 +9,7 @@ import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
+import domain.SelectPerson;
 import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
@@ -19,16 +20,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import domain.SelectPerson;
-import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
+import persistence.sql.ddl.DmlQuery;
+import persistence.sql.dml.Query;
 
 class EntityPersisterTest {
 
     private static Class<SelectPerson> selectPerson = SelectPerson.class;
     private static EntityPersister entityPersister;
+    private static Query query;
+    private static DmlQuery dmlQuery;
     public static DatabaseServer server;
     public static JdbcTemplate jdbcTemplate;
 
@@ -37,9 +40,12 @@ class EntityPersisterTest {
         server = new H2();
         server.start();
 
+        query = Query.getInstance();
+        dmlQuery = DmlQuery.getInstance();
+
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        entityPersister = new EntityPersister<>(jdbcTemplate, selectPerson);
+        entityPersister = new EntityPersister<>(jdbcTemplate, selectPerson, query);
     }
 
     @BeforeEach
@@ -47,7 +53,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(selectPerson);
         final Columns columns = Columns을_생성함(selectPerson);
 
-        jdbcTemplate.execute(QueryUtil.create().get(tableName, columns));
+        jdbcTemplate.execute(dmlQuery.create(tableName, columns));
     }
 
     @Nested
@@ -180,7 +186,7 @@ class EntityPersisterTest {
 
     @AfterEach
     void after() {
-        jdbcTemplate.execute(QueryUtil.drop().get(TableName을_생성함(selectPerson)));
+        jdbcTemplate.execute(dmlQuery.drop(TableName을_생성함(selectPerson)));
     }
 
     @AfterAll
@@ -194,7 +200,7 @@ class EntityPersisterTest {
         final TableName tableName = TableName을_생성함(clazz);
         final Columns columns = Columns을_생성함(clazz);
 
-        return QueryUtil.select().get("findById", tableName, columns, id);
+        return query.select("findById", tableName, columns, id);
     }
 
     private <T> void 데이터를_저장함(T t) {
@@ -202,6 +208,6 @@ class EntityPersisterTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values을_생성함(t);
 
-        jdbcTemplate.execute(QueryUtil.insert().get(tableName, columns, values));
+        jdbcTemplate.execute(query.insert(tableName, columns, values));
     }
 }

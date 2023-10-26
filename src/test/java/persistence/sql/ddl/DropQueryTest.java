@@ -13,7 +13,7 @@ import domain.NonExistentEntityPerson;
 import persistence.sql.common.meta.TableName;
 
 class DropQueryTest {
-    private final DropQuery dropQuery = DropQuery.create();
+    private final DmlQuery dmlQuery = DmlQuery.getInstance();
 
     @Test
     @DisplayName("Person Entity를 이용한 DROP QUERY가 정확히 생성 되었는지 검증")
@@ -25,7 +25,7 @@ class DropQueryTest {
         final TableName tableName = TableName을_생성함(clazz);
 
         //when
-        final String result = dropQuery.get(tableName);
+        final String result = dmlQuery.drop(tableName);
 
         //then
         assertThat(result).isEqualTo(expectedSql);
@@ -38,7 +38,7 @@ class DropQueryTest {
         Class<NonExistentEntityPerson> personClass = NonExistentEntityPerson.class;
 
         //when & then
-        assertThrows(InvalidEntityException.class, () -> dropQuery.get(TableName을_생성함(personClass)));
+        assertThrows(InvalidEntityException.class, () -> dmlQuery.drop(TableName을_생성함(personClass)));
     }
 
     @Test
@@ -49,7 +49,7 @@ class DropQueryTest {
         final String expectedSql = "DROP TABLE users";
 
         //when
-        final String result = dropQuery.get(TableName을_생성함(personClass));
+        final String result = dmlQuery.drop(TableName을_생성함(personClass));
 
         //then
         assertThat(result).isEqualTo(expectedSql);

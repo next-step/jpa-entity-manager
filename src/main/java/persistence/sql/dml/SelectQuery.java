@@ -6,7 +6,7 @@ import utils.ConditionUtils;
 
 import java.util.List;
 
-public class SelectQuery {
+class SelectQuery {
 
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
 
@@ -15,13 +15,9 @@ public class SelectQuery {
     private Columns columns;
     private Object[] args;
 
-    private SelectQuery() { }
+    SelectQuery() { }
 
-    public static SelectQuery create() {
-        return new SelectQuery();
-    }
-
-    public String get(String methodName, TableName tableName, Columns columns, Object... args) {
+    String get(String methodName, TableName tableName, Columns columns, Object... args) {
         this.methodName = methodName;
         this.tableName = tableName;
         this.columns = columns;

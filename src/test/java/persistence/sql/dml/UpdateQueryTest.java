@@ -7,7 +7,6 @@ import persistence.exception.InvalidEntityException;
 import domain.NonExistentTablePerson;
 import domain.NotEntityPerson;
 import domain.SelectPerson;
-import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
@@ -19,6 +18,8 @@ import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class UpdateQueryTest {
+    private final static Query query = Query.getInstance();
+
     @Test
     @DisplayName("@Table name 및 @Column name대로 쿼리문 생성")
     void updateQuery() {
@@ -32,7 +33,7 @@ class UpdateQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String result = QueryUtil.update().get(values, tableName, columns, 3L);
+        String result = query.update(values, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -51,7 +52,7 @@ class UpdateQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String result = QueryUtil.update().get(values, tableName, columns, 3L);
+        String result = query.update(values, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -70,7 +71,7 @@ class UpdateQueryTest {
         final Values values = Values을_생성함(person);
 
         //when
-        String result = QueryUtil.update().get(values, tableName, columns, 3L);
+        String result = query.update(values, tableName, columns, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -86,6 +87,6 @@ class UpdateQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-                , () -> QueryUtil.update().get(Values을_생성함(person), TableName을_생성함(clazz), Columns을_생성함(clazz), 3L));
+                , () -> query.update(Values을_생성함(person), TableName을_생성함(clazz), Columns을_생성함(clazz), 3L));
     }
 }

@@ -1,13 +1,13 @@
 package persistence.sql.dml;
 
 import domain.Person;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
 import domain.NonExistentTablePerson;
 import domain.NotEntityPerson;
 import domain.SelectPerson;
-import persistence.sql.QueryUtil;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -18,6 +18,13 @@ import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class SelectQueryTest {
 
+    private static Query query;
+
+    @BeforeAll
+    static void beforeAll() {
+        query = Query.getInstance();
+    }
+
     @Test
     @DisplayName("@Entity 없는 클래스 select quert 생성시 오류")
     void notEntity() {
@@ -27,7 +34,7 @@ class SelectQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-            , () -> QueryUtil.select().get(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass), null));
+            , () -> query.select(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass), null));
     }
 
     @Test
@@ -43,10 +50,10 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(aClass);
 
         //when
-        String query = QueryUtil.select().get(methodName, tableName, columns, null);
+        String q = query.select(methodName, tableName, columns, null);
 
         //then
-        assertThat(query).isEqualTo(expectedQuery);
+        assertThat(q).isEqualTo(expectedQuery);
     }
 
     @Test
@@ -61,11 +68,11 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(aClass);
 
         //when
-        String query = QueryUtil.select().get(new Object() {
+        String q = query.select(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns, null);
 
         //then
-        assertThat(query).isEqualTo(expectedQuery);
+        assertThat(q).isEqualTo(expectedQuery);
     }
 
     @Test
@@ -79,9 +86,9 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(clazz);
 
         //when
-        String query = QueryUtil.select().get("findById", tableName, columns, 1L);
+        String q = query.select("findById", tableName, columns, 1L);
 
         //then
-        assertThat(query).isEqualTo(expectedQuery);
+        assertThat(q).isEqualTo(expectedQuery);
     }
 }

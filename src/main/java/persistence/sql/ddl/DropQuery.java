@@ -2,19 +2,19 @@ package persistence.sql.ddl;
 
 import persistence.sql.common.meta.TableName;
 
-public class DropQuery {
+class DropQuery {
 
     private static final String DEFAULT_DROP_QUERY = "DROP TABLE %s";
 
     private TableName tableName;
 
-    private DropQuery() { }
+    DropQuery() { }
 
-    public static DropQuery create() {
+    DropQuery create() {
         return new DropQuery();
     }
 
-    public String get(TableName tableName) {
+    String get(TableName tableName) {
         this.tableName = tableName;
 
         return combineQuery();

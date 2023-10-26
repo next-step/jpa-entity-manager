@@ -22,26 +22,25 @@ import org.junit.jupiter.api.Test;
 import domain.SelectPerson;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.ddl.CreateQuery;
-import persistence.sql.ddl.DropQuery;
+import persistence.sql.ddl.DmlQuery;
 
 class EntityManagerImplTest {
 
     private static final Class<SelectPerson> clazz = SelectPerson.class;
 
     private static DatabaseServer server;
+    private static DmlQuery dmlQuery;
 
     private static EntityManager entityManager;
 
     private static JdbcTemplate jdbcTemplate;
 
-    private final CreateQuery createQuery = CreateQuery.create();
-    private final DropQuery dropQuery = DropQuery.create();
-
     @BeforeAll
     static void beforeInit() throws SQLException {
         server = new H2();
         server.start();
+
+        dmlQuery = DmlQuery.getInstance();
 
         entityManager = EntityManagerFactory.of(server.getConnection());
         jdbcTemplate = new JdbcTemplate(server.getConnection());
@@ -279,11 +278,11 @@ class EntityManagerImplTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        jdbcTemplate.execute(createQuery.get(tableName, columns));
+        jdbcTemplate.execute(dmlQuery.create(tableName, columns));
     }
 
     private <T> void 테이블을_삭제함(Class<T> tClass) {
-        jdbcTemplate.execute(dropQuery.get(TableName을_생성함(tClass)));
+        jdbcTemplate.execute(dmlQuery.drop(TableName을_생성함(tClass)));
     }
 
     private <T> void 데이터를_저장함(T t) {

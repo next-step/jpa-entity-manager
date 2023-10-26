@@ -2,19 +2,22 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
-import persistence.sql.QueryUtil;
+import persistence.sql.dml.Query;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
 import java.util.List;
 
 public class EntityLoader<T> {
+    private final Query query;
     private final JdbcTemplate jdbcTemplate;
     private final ResultMapper<T> resultMapper;
     private final TableName tableName;
     private final Columns columns;
 
-    public EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass) {
+    public EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
+        this.query = query;
+
         this.jdbcTemplate = jdbcTemplate;
         this.resultMapper = new ResultMapper<>(tClass);
 
@@ -23,16 +26,16 @@ public class EntityLoader<T> {
     }
 
     public List<T> findAll() {
-        String query = QueryUtil.select().get(new Object() {
+        String q = query.select(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
-        return jdbcTemplate.query(query, resultMapper);
+        return jdbcTemplate.query(q, resultMapper);
     }
 
     public <I> T findById(I input) {
-        String query = QueryUtil.select().get(new Object() {
+        String q = query.select(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns, input);
 
-        return jdbcTemplate.queryForObject(query, resultMapper);
+        return jdbcTemplate.queryForObject(q, resultMapper);
     }
 }
