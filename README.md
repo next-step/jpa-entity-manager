@@ -61,7 +61,7 @@ public interface PersistenceContext {
 - [ ] 객체의 Id 를 Key 로 엔터티를 관리한다.
 - [ ] getEntity 를 통해 해당 엔터티를 조회한다.
 - [ ] addEntity 를 통해 insert 나 select 시 엔터티를 추가한다.
-- [ ] insert 시에는 key 가 없으므로 statement.getGeneratedKeys 를 이용한다.
+- [x] insert 시에는 key 가 없으므로 statement.getGeneratedKeys 를 이용한다.
 - [ ] removeEntity 를 통해 delete 시 엔터티를 제거한다.
 
 - 요구사항 2 - snapshot 만들기
