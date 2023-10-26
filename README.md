@@ -114,3 +114,21 @@ public interface PersistenceContext {
     - 들어온 entity가 snapshot과 동일한지 확인하고 update한다.
     - update한 후 persistenceContext를 동기화한다.
     - snapshot이 없는 경우 find하여 가져와야 한다.
+
+#### 요구사항3
+```java
+public class CustomJpaRepository<T, ID> {
+    private final EntityManager entityManager;
+    
+    public CustomJpaRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+    
+    public T save(T t) {
+    // 트랜잭션은 신경 쓰지말고 구현해보자
+   }
+...
+}
+```
+- 처음 저장한 entity의 경우 persist한다.
+- 처음 저장한 entity가 아닌 경우 merge한다.
