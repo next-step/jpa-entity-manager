@@ -24,6 +24,7 @@ class EntityManagerImplTest {
     private static JdbcTemplate jdbcTemplate;
     private EntityManagerImpl entityManager;
     private Map<EntityKey, Object> persistenceContextEntities;
+    private Map<EntityKey, EntitySnapshot> persistenceContextSnapshotEntities;
     private static final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
     @BeforeEach
@@ -32,7 +33,7 @@ class EntityManagerImplTest {
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
-                new SimplePersistenceContext(persistenceContextEntities)
+                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities)
         );
     }
 

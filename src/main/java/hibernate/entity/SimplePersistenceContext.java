@@ -6,13 +6,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SimplePersistenceContext implements PersistenceContext {
 
     private final Map<EntityKey, Object> entities;
+    private final Map<EntityKey, EntitySnapshot> snapshotEntities;
 
-    public SimplePersistenceContext(final Map<EntityKey, Object> entities) {
+    public SimplePersistenceContext(final Map<EntityKey, Object> entities, final Map<EntityKey, EntitySnapshot> snapshotEntities) {
         this.entities = entities;
+        this.snapshotEntities = snapshotEntities;
     }
 
     public SimplePersistenceContext() {
-        this(new ConcurrentHashMap<>());
+        this(new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
     }
 
     @Override
@@ -26,7 +28,7 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void removeEntity(Object entity) {
+    public void removeEntity(final Object entity) {
         EntityKey entityKey = entities.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().equals(entity))
@@ -34,5 +36,11 @@ public class SimplePersistenceContext implements PersistenceContext {
                 .map(Map.Entry::getKey)
                 .orElseThrow(() -> new IllegalStateException("영속화되어있지 않은 entity입니다."));
         entities.remove(entityKey);
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(final Object id, final Object entity) {
+        EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
+        return snapshotEntities.put(new EntityKey(id, entity.getClass()), entitySnapshot);
     }
 }

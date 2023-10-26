@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class SimplePersistenceContextTest {
 
@@ -25,7 +26,7 @@ class SimplePersistenceContextTest {
     void getEntity로_저장된_entity를_가져온다() {
         EntityKey givenKey = new EntityKey(1L, TestEntity.class);
         TestEntity givenEntity = new TestEntity(1L);
-        Object actual = new SimplePersistenceContext(Map.of(givenKey, givenEntity)).getEntity(givenKey);
+        Object actual = new SimplePersistenceContext(Map.of(givenKey, givenEntity), Map.of()).getEntity(givenKey);
 
         assertThat(actual).isEqualTo(givenEntity);
     }
@@ -36,7 +37,7 @@ class SimplePersistenceContextTest {
         EntityKey expectedEntityKey = new EntityKey(1L, TestEntity.class);
         TestEntity givenEntity = new TestEntity();
         Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities);
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, Map.of());
 
         // when
         persistenceContext.addEntity(1L, givenEntity);
@@ -61,7 +62,7 @@ class SimplePersistenceContextTest {
         TestEntity givenEntity = new TestEntity();
         Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
         givenEntities.put(givenEntityKey, givenEntity);
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities);
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, Map.of());
 
         // when
         persistenceContext.removeEntity(givenEntity);
@@ -70,17 +71,31 @@ class SimplePersistenceContextTest {
         assertThat(givenEntities).isEmpty();
     }
 
+    @Test
+    void 스냅샷_entity를_저장한다() {
+        // given
+        TestEntity givenEntity = new TestEntity(1L);
+        Map<EntityKey, EntitySnapshot> givenSnapshotEntities = new ConcurrentHashMap<>();
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(Map.of(), givenSnapshotEntities);
+
+        // when
+        persistenceContext.getDatabaseSnapshot(1L, givenEntity);
+
+        // then
+        assertThat(givenSnapshotEntities).hasSize(1);
+    }
+
     @Entity
     static class TestEntity {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id1;
+        private Long id;
 
         public TestEntity() {
         }
 
-        public TestEntity(Long id1) {
-            this.id1 = id1;
+        public TestEntity(Long id) {
+            this.id = id;
         }
     }
 }
