@@ -23,18 +23,14 @@ public class SimpleEntityManager implements EntityManager {
         final EntityLoader<T> entityLoader = entityLoaderProvider.getEntityLoader(clazz);
         final EntityKey entityKey = entityKeyGenerator.generate(clazz, id);
         final Object entity = persistenceContext.getEntity(entityKey)
-                .orElseGet(() -> {
-                    final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey());
-                    persistenceContext.addEntity(entityKey, entityFromDatabase);
-                    persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
-                    return entityFromDatabase;
-                });
+                .orElseGet(() -> initEntity(entityKey, entityLoader));
         return clazz.cast(entity);
     }
 
     @Override
     public void persist(final Object entity) {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+
         if (isNew(entity, entityPersister)) {
             processInsert(entity, entityPersister);
             return;
@@ -47,12 +43,20 @@ public class SimpleEntityManager implements EntityManager {
     public void remove(final Object entity) {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
+
         persistenceContext.removeEntity(entityKeyGenerator.generate(entity.getClass(), idValue));
         entityPersister.delete(entity);
     }
 
     private Object extractId(final Object entity, final EntityPersister entityPersister) {
         return ReflectionUtils.getFieldValue(entity, entityPersister.getIdColumnFieldName());
+    }
+
+    private <T> Object initEntity(final EntityKey entityKey, final EntityLoader<T> entityLoader) {
+        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey());
+        persistenceContext.addEntity(entityKey, entityFromDatabase);
+        persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
+        return entityFromDatabase;
     }
 
     private void processInsert(final Object entity, final EntityPersister entityPersister) {
