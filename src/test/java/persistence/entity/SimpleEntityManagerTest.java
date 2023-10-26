@@ -4,7 +4,10 @@ import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
 import persistence.dialect.DialectFactory;
 import persistence.sql.ddl.CreateQueryBuilder;
@@ -14,7 +17,7 @@ import persistence.sql.metadata.EntityMetadata;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleEntityManagerTest {
     public static EntityManager entityManager;
@@ -33,7 +36,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute(new CreateQueryBuilder(dialect).buildQuery(entityMetadata));
         jdbcTemplate.execute("INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');");
 
-        entityManager = new SimpleEntityManager(jdbcTemplate);
+        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate, entityMetadata));
     }
 
     @DisplayName("EnityManager를 통해 PK 값이 일치하는 Entity를 찾는다.")
