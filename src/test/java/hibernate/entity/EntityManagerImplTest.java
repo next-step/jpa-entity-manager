@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -23,6 +25,7 @@ class EntityManagerImplTest {
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
     private static EntityManagerImpl entityManager;
+    private static Map<EntityKey, Object> persistenceContextEntities;
     private static final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
     @BeforeAll
@@ -30,7 +33,12 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate));
+        persistenceContextEntities = new ConcurrentHashMap<>();
+        entityManager = new EntityManagerImpl(
+                new EntityPersister(jdbcTemplate),
+                new EntityLoader(jdbcTemplate),
+                new SimplePersistenceContext(persistenceContextEntities)
+        );
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery(EntityClass.getInstance(TestEntity.class)));
     }
@@ -60,6 +68,19 @@ class EntityManagerImplTest {
                 () -> assertThat(actual.name).isEqualTo("최진영"),
                 () -> assertThat(actual.age).isEqualTo(19)
         );
+    }
+
+    @Test
+    void 저장된_객체가_PersistenceContext에_있을_경우_바로_꺼내온다() {
+        // given
+        TestEntity givenEntity = new TestEntity();
+        persistenceContextEntities.put(new EntityKey(1L, TestEntity.class), givenEntity);
+
+        // when
+        TestEntity actual = entityManager.find(TestEntity.class, 1L);
+
+        // then
+        assertThat(actual).isEqualTo(givenEntity);
     }
 
     @Test
