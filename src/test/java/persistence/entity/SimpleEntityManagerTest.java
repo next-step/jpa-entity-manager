@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.IntegrationTestEnvironment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -50,6 +51,34 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
         entityManager.persist(newPerson);
 
         assertDoesNotThrow(() -> entityManager.remove(newPerson));
+    }
+
+    @Test
+    @DisplayName("Id 가 없는 Entity 를 Persist 시 Id 가 주입되어있다.")
+    void persistTest() {
+        final Person person = new Person("test", 30, "test@test.com");
+        entityManager.persist(person);
+
+        assertThat(person.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("같은 Id 로 Entity 를 find 시 동일한 객체가 반환된다.")
+    void findIdentityTest() {
+        final Person person1 = entityManager.find(Person.class, 1L);
+        final Person person2 = entityManager.find(Person.class, 1L);
+
+        assertThat(person1 == person2).isTrue();
+    }
+
+    @Test
+    @DisplayName("Entity 를 persist 하고 같은 아이디로 find 시 동일한 객체가 반환된다.")
+    void findIdentityFromPersistTest() {
+        final Person person1 = new Person("test", 30, "test@test.com");
+        entityManager.persist(person1);
+        final Person person2 = entityManager.find(Person.class, person1.getId());
+
+        assertThat(person1 == person2).isTrue();
     }
 
 }

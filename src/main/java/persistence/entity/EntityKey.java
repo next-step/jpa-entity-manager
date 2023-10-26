@@ -26,6 +26,9 @@ public class EntityKey {
         }
     }
 
+    public Object getKey() {
+        return key;
+    }
 
     @Override
     public boolean equals(final Object object) {
