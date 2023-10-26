@@ -22,18 +22,20 @@ public class SimpleEntityManager implements EntityManager {
     public <T> T find(final Class<T> clazz, final Long id) {
         final EntityLoader<T> entityLoader = entityLoaderProvider.getEntityLoader(clazz);
         final EntityKey entityKey = entityKeyGenerator.generate(clazz, id);
-        return (T) persistenceContext.getEntity(entityKey)
+        final Object entity = persistenceContext.getEntity(entityKey)
                 .orElseGet(() -> {
-                    final Object entity = entityLoader.loadById(entityKey.getKey());
-                    persistenceContext.addEntity(entityKeyGenerator.generate(entity.getClass(), entityKey.getKey()), entity);
-                    return entity;
+                    final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey());
+                    persistenceContext.addEntity(entityKey, entityFromDatabase);
+                    persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
+                    return entityFromDatabase;
                 });
+        return clazz.cast(entity);
     }
 
     @Override
     public void persist(final Object entity) {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
-        
+
         Object idValue = ReflectionUtils.getFieldValue(entity, entityPersister.getIdColumnName());
         if (Objects.isNull(idValue)) {
             entityPersister.insert(entity);

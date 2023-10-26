@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.util.ReflectionUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -7,9 +9,11 @@ import java.util.Optional;
 public class SimplePersistenceContext implements PersistenceContext {
 
     private final Map<EntityKey, Object> entities;
+    private final Map<EntityKey, Object> entitySnapshots;
 
     public SimplePersistenceContext() {
         this.entities = new HashMap<>();
+        this.entitySnapshots = new HashMap<>();
     }
 
     @Override
@@ -26,5 +30,16 @@ public class SimplePersistenceContext implements PersistenceContext {
     public void removeEntity(final EntityKey key) {
         entities.remove(key);
     }
+
+    @Override
+    public Object getDatabaseSnapshot(final EntityKey key, final Object entity) {
+        return entitySnapshots.computeIfAbsent(key, entityKey -> ReflectionUtils.shallowCopy(entity));
+    }
+
+    @Override
+    public Object getCachedDatabaseSnapshot(final EntityKey key) {
+        return entitySnapshots.get(key);
+    }
+
 
 }

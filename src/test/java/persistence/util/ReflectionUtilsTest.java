@@ -91,6 +91,14 @@ class ReflectionUtilsTest {
                 .isInstanceOf(PersistenceException.class);
     }
 
+    @Test
+    @DisplayName("shallowCopy 를 통해 객체를 얕은복사 할 수 있다.")
+    void shallowCopyTest() {
+        final Object newFixture = ReflectionUtils.shallowCopy(fixture);
+
+        assertThat(fixture != newFixture).isTrue();
+    }
+
     private static Stream<Arguments> wrongArgumentProvider() {
         return Stream.of(
                 Arguments.of("testString", 1)
