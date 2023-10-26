@@ -47,3 +47,24 @@ public void delete(parameters는 자유롭게)
   - select 쿼리를 실행하여 엔티티 객체에 로드한다.
 - ReflectionRowMapper
   - clazz를 받아 계속 생성하는데, 이미 생성한 ReflectionRowMapper를 캐싱하여 반환할 수 있도록 한다.
+
+### 3단계 - First Level Cache, Dirty Check
+#### 요구사항1
+- PersistenceContext 구현체를 만들고, 1차 캐싱을 적용한다.
+```java
+public interface PersistenceContext {
+
+    Object getEntity(Long id);
+
+    void addEntity(Long id, Object entity);
+
+    void removeEntity(Object entity);
+}
+```
+- PersistenceContext
+  - getEntity
+    - Map에 저장되어있는 entity를 반환한다.
+    - 존재하지 않는다면 예외를 발생한다.
+- EntityManager
+  - find
+    - PersistenceContext에서 검색 후 없으면 EntityLoader에서 검색 후 PersistenceContext에 저장한다.
