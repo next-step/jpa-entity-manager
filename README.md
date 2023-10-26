@@ -67,9 +67,14 @@ public interface PersistenceContext {
     - 존재하지 않는다면 null을 반환한다.
   - addEntity
     - entity를 넣는다.
+  - removeEntity
+    - entity를 삭제한다.
 - EntityManager
   - find
     - PersistenceContext에서 검색 후 없으면 EntityLoader에서 검색 후 PersistenceContext에 저장한다.
   - persist
     - PersistenceContext에 이미 entity가 영속화되어있으면 예외가 발생한다. (이걸 addEntity에서 해야하나?)
     - EntityPersister에서 insert한 후 PersistenceContext에 넣는다.
+  - remove
+    - 영속화 되어있지 않은 entity를 제거하려하는 경우 예외가 발생한다.
+    - EntityPersister에서 제거 및 PersistenceContext에도 제거한다.
