@@ -108,3 +108,9 @@ public interface PersistenceContext {
 - EntitySnapShot
   - EntityColumn과 그에 따른 필드를 가지고 있다.
   - Object인 Entity를 받아 변경된 entity field 데이터를 뽑아낼 수 있다. 
+- EntityManager
+  - snapshot도 entires와 동일하게 동기화해준다.
+  - merge
+    - 들어온 entity가 snapshot과 동일한지 확인하고 update한다.
+    - update한 후 persistenceContext를 동기화한다.
+    - snapshot이 없는 경우 find하여 가져와야 한다.
