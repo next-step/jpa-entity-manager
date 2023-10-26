@@ -42,3 +42,27 @@ public class EntityPersister {
 
 - 요구사항 2 - EntityManager 의 책임 줄여주기
 - [x] 기존 SimpleEntityManager 가 하던 find 로직을 EntityLoader 에게 위임한다.
+
+
+### 3단계 - First Level Cache, Dirty Check
+- 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+엔티티를 어떻게 저장할지 잘 고려해보자
+```java
+public interface PersistenceContext {
+
+    Object getEntity(Long id);
+
+    void addEntity(Long id, Object entity);
+
+    void removeEntity(Object entity);
+}
+```
+- [ ] PersistenceContext 에서는 insert, delete, select 의 엔터티를 저장한다.
+- [ ] 객체의 Id 를 Key 로 엔터티를 관리한다.
+- [ ] getEntity 를 통해 해당 엔터티를 조회한다.
+- [ ] addEntity 를 통해 insert 나 select 시 엔터티를 추가한다.
+- [ ] insert 시에는 key 가 없으므로 statement.getGeneratedKeys 를 이용한다.
+- [ ] removeEntity 를 통해 delete 시 엔터티를 제거한다.
+
+- 요구사항 2 - snapshot 만들기
+- 요구사항 3 - 더티체킹 구현
