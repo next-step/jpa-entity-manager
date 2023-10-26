@@ -26,11 +26,11 @@ class InsertQueryBuilderTest {
     void insert() {
         //given
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        QueryGenerator<Person> query = QueryGenerator.of(entityMeta, dialect);
+        QueryGenerator query = QueryGenerator.of(entityMeta, dialect);
         Person person = new Person("name", 3, "kbh@gm.com");
 
         //when
-        String sql = query.insert(person);
+        String sql = query.insert().build(person);
 
         //then
         assertThat(sql).isEqualTo("INSERT INTO users (nick_name, old, email) VALUES ('name', 3, 'kbh@gm.com')");
@@ -41,11 +41,11 @@ class InsertQueryBuilderTest {
     void insertDirect() {
         //given
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        QueryGenerator<Person> query = QueryGenerator.of(entityMeta, new UpperStringDirect());
+        QueryGenerator query = QueryGenerator.of(entityMeta, new UpperStringDirect());
         Person person = new Person("name", 3, "kbh@gm.com");
 
         //when
-        String sql = query.insert(person);
+        String sql = query.insert().build(person);
 
         //then
         assertThat(sql).isEqualTo("INSERT INTO USERS (nick_name, old, email) VALUES ('name', 3, 'kbh@gm.com')");

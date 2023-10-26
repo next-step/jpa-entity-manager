@@ -5,15 +5,20 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import persistence.dialect.Dialect;
 import persistence.meta.EntityMeta;
+import persistence.sql.QueryGenerator;
 
 
 public class DefaultEntityManager implements EntityManager {
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
 
+    private final PersistenceContext persistenceContext;
+
     public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
-        this.entityLoader = new EntityLoader(jdbcTemplate, entityMeta, dialect);
-        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
+        final QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+        persistenceContext = new DefaultPersistenceContext();
+        this.entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
+        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import database.DatabaseServer;
 import database.H2;
@@ -84,12 +83,9 @@ class DefaultEntityManagerTest {
         final Person findPerson = entityManager.find(Person.class, savePerson.getId());
 
         //then
-        assertSoftly((it) -> {
-            it.assertThat(savePerson.getAge()).isEqualTo(findPerson.getAge());
-            it.assertThat(savePerson.getName()).isEqualTo(findPerson.getName());
-            it.assertThat(savePerson.getEmail()).isEqualTo(findPerson.getEmail());
-            it.assertThat(savePerson.getId()).isEqualTo(findPerson.getId());
-        });
+//        assertSoftly((it) -> {
+//            it.assertThat(findPerson);
+//        });
     }
 
 

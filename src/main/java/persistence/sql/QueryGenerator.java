@@ -10,7 +10,7 @@ import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
-public class QueryGenerator<T> {
+public class QueryGenerator {
     private final EntityMeta entityMeta;
     private final Dialect dialect;
 
@@ -22,36 +22,36 @@ public class QueryGenerator<T> {
         this.dialect = dialect;
     }
 
-    public static <T> QueryGenerator<T> of(Class<T> tClass, Dialect dialect) {
-        return new QueryGenerator<>(new EntityMeta(tClass), dialect);
+    public static QueryGenerator of(Class<?> tClass, Dialect dialect) {
+        return of(new EntityMeta(tClass), dialect);
     }
 
-    public static <T> QueryGenerator<T> of(EntityMeta entityMeta, Dialect dialect) {
-        return new QueryGenerator<>(entityMeta, dialect);
+    public static QueryGenerator of(EntityMeta entityMeta, Dialect dialect) {
+        return new QueryGenerator(entityMeta, dialect);
     }
 
     public String create() {
-        return new CreateQueryBuilder<>(entityMeta, dialect).create();
+        return new CreateQueryBuilder(entityMeta, dialect).create();
     }
 
     public String drop() {
-        return new DropQueryBuilder<>(entityMeta, dialect).drop();
+        return new DropQueryBuilder(entityMeta, dialect).drop();
     }
 
-    public String insert(T object) {
-        return new InsertQueryBuilder<>(entityMeta, dialect).insert(object);
+    public InsertQueryBuilder insert() {
+        return new InsertQueryBuilder(entityMeta, dialect);
     }
 
-    public String delete(Object id) {
-        return new DeleteQueryBuilder<>(entityMeta, dialect).getDeleteQuery(id);
+    public DeleteQueryBuilder delete() {
+        return new DeleteQueryBuilder(entityMeta, dialect);
     }
 
-    public SelectQueryBuilder<T> select() {
-        return new SelectQueryBuilder<>(entityMeta, dialect);
+    public SelectQueryBuilder select() {
+        return new SelectQueryBuilder(entityMeta, dialect);
     }
 
-    public String update(T entity) {
-        return new UpdateQueryBuilder<>(entityMeta, dialect).update(entity);
+    public UpdateQueryBuilder update() {
+        return new UpdateQueryBuilder(entityMeta, dialect);
     }
 
 

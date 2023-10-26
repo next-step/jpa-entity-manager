@@ -27,7 +27,7 @@ class CreateQueryBuilderTest {
     void pkHasCreateQuery() {
         //given
         final EntityMeta entityMeta = new EntityMeta(PkHasPerson.class);
-        final QueryGenerator<PkHasPerson> query = QueryGenerator.of(entityMeta, dialect);
+        final QueryGenerator query = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = query.create();
@@ -47,7 +47,7 @@ class CreateQueryBuilderTest {
     void changColumNameQuery() {
         //given
         final EntityMeta entityMeta = new EntityMeta(ChangColumNamePerson.class);
-        final QueryGenerator<ChangColumNamePerson> query = QueryGenerator.of(entityMeta, dialect);
+        final QueryGenerator query = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = query.create();
@@ -67,7 +67,7 @@ class CreateQueryBuilderTest {
     void transientAndTableQuery() {
         //given
         final EntityMeta entityMeta = new EntityMeta(Person.class);
-        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, dialect);
+        final QueryGenerator ddl = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = ddl.create();
@@ -86,7 +86,7 @@ class CreateQueryBuilderTest {
     void dialectChange() {
         //given
         final EntityMeta entityMeta = new EntityMeta(Person.class);
-        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, new UpperStringDirect());
+        final QueryGenerator ddl = QueryGenerator.of(entityMeta, new UpperStringDirect());
 
         //when
         String sql = ddl.create();

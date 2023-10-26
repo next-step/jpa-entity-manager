@@ -9,11 +9,7 @@ import persistence.meta.EntityMeta;
 import persistence.sql.QueryBuilder;
 
 
-public class CreateQueryBuilder<T> extends QueryBuilder<T> {
-
-    public CreateQueryBuilder(EntityMeta entityMeta) {
-        super(entityMeta);
-    }
+public class CreateQueryBuilder extends QueryBuilder {
 
     public CreateQueryBuilder(EntityMeta entityMeta, Dialect dialect) {
         super(entityMeta, dialect);
@@ -23,7 +19,7 @@ public class CreateQueryBuilder<T> extends QueryBuilder<T> {
         return queryCreate(entityMeta.getTableName())
                 + brace(columnsCreateQuery(entityMeta.getEntityColumns())
                 , primaryKeyConcentrate(entityMeta.getEntityColumns())
-                );
+        );
     }
 
     private String queryCreate(String tableName) {

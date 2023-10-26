@@ -39,10 +39,11 @@ class EntityLoaderTest {
     void findAll() {
         //given
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, dialect);
-        QueryGenerator<Person> q = QueryGenerator.of(Person.class, dialect);
+        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
+
         Person person = new Person("이름", 19, "asd@gmail.com");
-        jdbcTemplate.execute(q.insert(person));
+        jdbcTemplate.execute(queryGenerator.insert().build(person));
 
         //when
         final List<Person> personList = entityLoader.findAll(Person.class);
@@ -58,12 +59,13 @@ class EntityLoaderTest {
     void find() {
         //given
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, dialect);
-        QueryGenerator<Person> q = QueryGenerator.of(Person.class, dialect);
+        QueryGenerator queryGenerator = QueryGenerator.of(Person.class, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
+
         Person person = new Person("이름", 19, "asd@gmail.com");
         Person person2 = new Person("이름", 19, "asd@gmail.com");
-        jdbcTemplate.execute(q.insert(person));
-        jdbcTemplate.execute(q.insert(person));
+        jdbcTemplate.execute(queryGenerator.insert().build(person));
+        jdbcTemplate.execute(queryGenerator.insert().build(person2));
 
         //when
         final List<Person> personList = entityLoader.findAll(Person.class);
@@ -84,7 +86,8 @@ class EntityLoaderTest {
     @DisplayName("없는 데이터를 조회하면 null을 반환한다")
     void test() {
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, dialect);
+        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
 
         Person person = entityLoader.find(Person.class, 1L);
 

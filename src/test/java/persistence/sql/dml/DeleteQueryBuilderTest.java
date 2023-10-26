@@ -24,11 +24,10 @@ class DeleteQueryBuilderTest {
     @DisplayName("삭제하는 구문을 생성한다.")
     void delete() {
         //given
-
-        QueryGenerator<Person> query = QueryGenerator.of(Person.class, dialect);
+        DeleteQueryBuilder query = QueryGenerator.of(Person.class, dialect).delete();
 
         //when
-        final String sql = query.delete(1L);
+        final String sql = query.build(1L);
 
         //then
         assertThat(sql).isEqualTo("DELETE FROM users WHERE id = 1");
@@ -38,11 +37,11 @@ class DeleteQueryBuilderTest {
     @DisplayName("id가 비어있으면 예외가 발생한다.")
     void deleteId() {
         //given
-        QueryGenerator<Person> query = QueryGenerator.of(Person.class, dialect);
+        DeleteQueryBuilder query = QueryGenerator.of(Person.class, dialect).delete();
 
         //when & then
         assertThatExceptionOfType(FieldEmptyException.class)
-                .isThrownBy(() -> query.delete(null));
+                .isThrownBy(() -> query.build(null));
     }
 
 }

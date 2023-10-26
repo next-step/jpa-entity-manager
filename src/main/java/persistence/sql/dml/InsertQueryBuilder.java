@@ -6,12 +6,12 @@ import persistence.dialect.Dialect;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
-public class InsertQueryBuilder<T> extends DMLQueryBuilder<T> {
+public class InsertQueryBuilder extends DMLQueryBuilder {
     public InsertQueryBuilder(EntityMeta entityMeta, Dialect dialect) {
         super(entityMeta, dialect);
     }
 
-    public String insert(T queryValue) {
+    public String build(Object queryValue) {
         return queryInsert(entityMeta.getTableName())
                 + braceWithComma(
                     columnsClause(entityMeta.getEntityColumns())
@@ -28,11 +28,11 @@ public class InsertQueryBuilder<T> extends DMLQueryBuilder<T> {
                 .collect(Collectors.toList());
     }
 
-    private String valueClause(T object) {
+    private String valueClause(Object value) {
         return entityMeta.getEntityColumns()
                 .stream()
                 .filter(column -> !column.hasGeneratedValue())
-                .map(column -> getColumnValueString(column, object))
+                .map(column -> getColumnValueString(column, value))
                 .collect(Collectors.joining(", "));
     }
 

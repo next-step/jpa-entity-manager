@@ -7,7 +7,7 @@ import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryBuilder;
 
-public class DMLQueryBuilder<T> extends QueryBuilder<T>{
+public class DMLQueryBuilder extends QueryBuilder {
     protected DMLQueryBuilder(EntityMeta entityMeta, Dialect dialect) {
         super(entityMeta, dialect);
     }
@@ -31,9 +31,9 @@ public class DMLQueryBuilder<T> extends QueryBuilder<T>{
                 .orElseThrow(() -> new FieldEmptyException("pk가 없습니다."));
     }
 
-    protected String getColumnValueString(EntityColumn column, T object) {
+    protected String getColumnValueString(EntityColumn column, Object entity) {
         final ColumnType columType = column.getColumnType();
-        final Object value = column.getFieldValue(object);
+        final Object value = column.getFieldValue(entity);
         if (value == null) {
             return "null";
         }

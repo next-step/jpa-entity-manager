@@ -39,7 +39,8 @@ class EntityPersisterTest {
     void entitySave() {
         Person person = new Person("이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(person.getClass());
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
+        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
 
         Assertions.assertDoesNotThrow(() -> {
             entityPersister.insert(person);
@@ -51,7 +52,8 @@ class EntityPersisterTest {
     void entityUpdate() {
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
+        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
 
         assertThat(entityPersister.update(person)).isTrue();
     }
@@ -59,7 +61,9 @@ class EntityPersisterTest {
     @Test
     @DisplayName("엔티티가 삭제 된다.")
     void entityDelete() {
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new EntityMeta(Person.class), dialect);
+        final EntityMeta entityMeta = new EntityMeta(Person.class);
+        QueryGenerator queryGenerator = QueryGenerator.of(Person.class, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
 
         Assertions.assertDoesNotThrow(() -> {

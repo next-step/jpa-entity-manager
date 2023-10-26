@@ -8,13 +8,11 @@ import persistence.exception.NoEntityException;
 public class EntityMeta {
     private final String tableName;
     private final EntityColumns entityColumns;
-    private final Class<?> entityClass;
 
     public EntityMeta(Class<?> entityClass) {
         if (entityClass == null || entityClass.getAnnotation(Entity.class) == null) {
             throw new NoEntityException();
         }
-        this.entityClass = entityClass;
         tableName = createTableName(entityClass);
         entityColumns = new EntityColumns(entityClass.getDeclaredFields());
     }
@@ -39,7 +37,4 @@ public class EntityMeta {
                 .getFieldValue(entity);
     }
 
-    public Class<?> getEntityClass() {
-        return entityClass;
-    }
 }

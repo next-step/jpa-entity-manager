@@ -8,7 +8,7 @@ import persistence.dialect.h2.H2Dialect;
 import persistence.meta.EntityMeta;
 
 
-public abstract class QueryBuilder<T> {
+public abstract class QueryBuilder {
     protected static final String DEFAULT_COLUMNS_BRACE = " (%s)";
     protected static final String MARGIN = " ";
     protected static final String EMPTY = "";
