@@ -106,4 +106,12 @@ class SimplePersistenceContextTest {
             softly.assertThat(entity == entity2).isFalse();
         });
     }
+
+    @Test
+    @DisplayName("hasEntity 를 통해 Entity가 context 에 존재하는지 여부를 반환받을 수 있다.")
+    void hasEntityTest() {
+        persistenceContext.addEntity(personEntityKey, person);
+
+        assertThat(persistenceContext.hasEntity(personEntityKey)).isTrue();
+    }
 }

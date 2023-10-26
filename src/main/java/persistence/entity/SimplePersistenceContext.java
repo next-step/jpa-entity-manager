@@ -32,6 +32,11 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
+    public boolean hasEntity(final EntityKey key) {
+        return entities.containsKey(key);
+    }
+
+    @Override
     public Object getDatabaseSnapshot(final EntityKey key, final Object entity) {
         return entitySnapshots.computeIfAbsent(key, entityKey -> ReflectionUtils.shallowCopy(entity));
     }
