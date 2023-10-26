@@ -58,7 +58,7 @@ public interface PersistenceContext {
 }
 ```
 - [ ] PersistenceContext 에서는 insert, delete, select 의 엔터티를 저장한다.
-- [ ] 객체의 Id 를 Key 로 엔터티를 관리한다.
+- [x] 객체의 Id 를 Key 로 엔터티를 관리한다.
 - [ ] getEntity 를 통해 해당 엔터티를 조회한다.
 - [ ] addEntity 를 통해 insert 나 select 시 엔터티를 추가한다.
 - [x] insert 시에는 key 가 없으므로 statement.getGeneratedKeys 를 이용한다.
