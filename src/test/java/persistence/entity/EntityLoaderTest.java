@@ -50,12 +50,7 @@ class EntityLoaderTest {
         final Person findPerson = entityLoader.find(Person.class, firstPerson.getId());
 
         //then
-        assertSoftly((it) -> {
-            it.assertThat(personList).hasSize(1);
-            it.assertThat(firstPerson.getName()).isEqualTo(findPerson.getName());
-            it.assertThat(firstPerson.getAge()).isEqualTo(findPerson.getAge());
-            it.assertThat(firstPerson.getEmail()).isEqualTo(findPerson.getEmail());
-        });
+        assertThat(firstPerson).isEqualTo(findPerson);
     }
 
     @Test
