@@ -19,4 +19,9 @@ public class SimplePersistenceContext implements PersistenceContext {
     public Object getEntity(final Object id) {
         return entities.get(id);
     }
+
+    @Override
+    public void addEntity(final Object id, final Object entity) {
+        entities.put(new EntityKey(id, entity.getClass()), entity);
+    }
 }

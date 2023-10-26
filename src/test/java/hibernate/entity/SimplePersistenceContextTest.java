@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,6 +26,22 @@ class SimplePersistenceContextTest {
         TestEntity givenEntity = new TestEntity(1L);
         Object actual = new SimplePersistenceContext(Map.of(givenKey, givenEntity)).getEntity(givenKey);
 
+        assertThat(actual).isEqualTo(givenEntity);
+    }
+
+    @Test
+    void entity를_저장한다() {
+        // given
+        EntityKey expectedEntityKey = new EntityKey(1L, TestEntity.class);
+        TestEntity givenEntity = new TestEntity();
+        Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities);
+
+        // when
+        persistenceContext.addEntity(1L, givenEntity);
+        Object actual = givenEntities.get(expectedEntityKey);
+
+        // then
         assertThat(actual).isEqualTo(givenEntity);
     }
 
