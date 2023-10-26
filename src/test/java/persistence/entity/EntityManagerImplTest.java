@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.person.SelectPerson;
+import domain.SelectPerson;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.CreateQuery;
@@ -43,7 +43,7 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
 
-        entityManager = new EntityManagerImpl(server.getConnection());
+        entityManager = EntityManagerFactory.of(server.getConnection());
         jdbcTemplate = new JdbcTemplate(server.getConnection());
     }
 

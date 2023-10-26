@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.person.SelectPerson;
+import domain.SelectPerson;
 import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;

@@ -8,8 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import domain.Person;
 import persistence.exception.InvalidEntityException;
-import persistence.person.ExistTablePerson;
-import persistence.person.NonExistentEntityPerson;
+import domain.ExistTablePerson;
+import domain.NonExistentEntityPerson;
 import persistence.sql.common.meta.TableName;
 
 class DropQueryTest {

@@ -3,7 +3,7 @@ package persistence.sql.dml;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.person.SelectPerson;
+import domain.SelectPerson;
 import persistence.sql.QueryUtil;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;

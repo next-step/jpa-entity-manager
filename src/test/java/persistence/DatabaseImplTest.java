@@ -18,7 +18,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import persistence.person.DatabasePerson;
+import domain.DatabasePerson;
 import persistence.sql.QueryUtil;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;

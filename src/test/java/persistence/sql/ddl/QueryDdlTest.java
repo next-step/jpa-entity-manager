@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.person.ExistTablePerson;
-import persistence.person.NonExistentTablePerson;
-import persistence.person.NotEntityPerson;
+import domain.ExistTablePerson;
+import domain.NonExistentTablePerson;
+import domain.NotEntityPerson;
 
 import java.sql.SQLException;
 import persistence.sql.common.meta.Columns;

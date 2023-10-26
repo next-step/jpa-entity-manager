@@ -9,9 +9,9 @@ import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
-import persistence.person.ExistTablePerson;
-import persistence.person.NonExistentEntityPerson;
-import persistence.person.NonExistentTablePerson;
+import domain.ExistTablePerson;
+import domain.NonExistentEntityPerson;
+import domain.NonExistentTablePerson;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
