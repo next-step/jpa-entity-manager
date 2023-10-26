@@ -1,18 +1,18 @@
 package persistence.entity;
 
-import database.MockJdbcTemplate;
 import domain.FixturePerson;
 import domain.Person;
+import mock.MockDmlGenerator;
+import mock.MockJdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.dialect.Dialect;
-import persistence.dialect.h2.H2Dialect;
-import persistence.sql.dml.DmlGenerator;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIterable;
 
 class EntityPersisterTest {
 
@@ -21,16 +21,8 @@ class EntityPersisterTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        final Dialect dialect = new H2Dialect();
-        entityPersister = new EntityPersister(Person.class, new MockJdbcTemplate(), new DmlGenerator(dialect));
+        entityPersister = new EntityPersister(Person.class, new MockDmlGenerator(), new MockJdbcTemplate());
         fixturePerson = FixturePerson.create(1L);
-    }
-
-    @Test
-    @DisplayName("renderSelect 을 이용해 entity 의 select 문을 만들 수 있다.")
-    void renderSelectTest() {
-        final String query = entityPersister.renderSelect(1L);
-        assertThat(query).isEqualTo("select id, nick_name, old, email from users where id=1");
     }
 
     @Test
@@ -53,6 +45,30 @@ class EntityPersisterTest {
     void renderDeleteTest() {
         final String query = entityPersister.renderDelete(fixturePerson);
         assertThat(query).isEqualTo("delete from users where id=1");
+    }
+
+    @Test
+    @DisplayName("getColumnNames 을 이용해 entity 의 column 이름들을 반환 받을 수 있다.")
+    void getColumnNamesTest() {
+        final List<String> columnNames = entityPersister.getColumnNames();
+
+        assertThatIterable(columnNames).containsExactly("id", "nick_name", "old", "email");
+    }
+
+    @Test
+    @DisplayName("getColumnFieldNames 을 이용해 entity 의 필드 이름들을 반환 받을 수 있다.")
+    void getColumnFieldNamesTest() {
+        final List<String> columnFieldNames = entityPersister.getColumnFieldNames();
+
+        assertThatIterable(columnFieldNames).containsExactly("id", "name", "age", "email");
+    }
+
+    @Test
+    @DisplayName("getColumnSize 을 이용해 entity 의 필드 갯수를 반환 받을 수 있다.")
+    void getColumnSizeTest() {
+        final int size = entityPersister.getColumnSize();
+
+        assertThat(size).isEqualTo(4);
     }
 
 }

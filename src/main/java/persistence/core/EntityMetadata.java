@@ -81,4 +81,14 @@ public class EntityMetadata<T> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public EntityColumn getIdColumn() {
+        return this.idColumn;
+    }
+
+    public EntityColumns getInsertableColumn() {
+        return new EntityColumns(
+                this.columns.stream()
+                        .filter(EntityColumn::isInsertable)
+                        .collect(Collectors.toUnmodifiableList()));
+    }
 }

@@ -15,8 +15,9 @@ public class EntityMetadataProvider {
         return InstanceHolder.INSTANCE;
     }
 
-    public EntityMetadata<?> getEntityMetadata(final Class<?> clazz) {
-        return cache.computeIfAbsent(clazz, EntityMetadata::new);
+    @SuppressWarnings("unchecked")
+    public <T> EntityMetadata<T> getEntityMetadata(final Class<T> clazz) {
+        return (EntityMetadata<T>) cache.computeIfAbsent(clazz, EntityMetadata::new);
     }
 
     private static class InstanceHolder {

@@ -1,8 +1,8 @@
 package persistence.core;
 
+import domain.FixtureEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.FixtureEntity;
 import persistence.exception.ColumnNotExistException;
 
 import static org.assertj.core.api.Assertions.*;
@@ -23,7 +23,7 @@ class EntityColumnsTest {
     @DisplayName("Id 컬럼 정보가 존재하지 않으면 EntityColumns 인스턴스 생성에 실패해야한다.")
     void entityColumnsCreateFailureTest() {
         mockClass = FixtureEntity.WithoutId.class;
-        assertThatThrownBy(()->new EntityColumns(mockClass))
+        assertThatThrownBy(() -> new EntityColumns(mockClass))
                 .isInstanceOf(ColumnNotExistException.class);
     }
 
@@ -45,4 +45,21 @@ class EntityColumnsTest {
         assertThatIterable(columns).doesNotContain(idColumn);
     }
 
+    @Test
+    @DisplayName("EntityColumns.getNames 를 통해 컬럼들의 이름들을 조회할 수 있다.")
+    void entityColumnsGetNamesTest() throws Exception {
+        mockClass = FixtureEntity.WithColumn.class;
+        final EntityColumns columns = new EntityColumns(mockClass);
+
+        assertThatIterable(columns.getNames()).containsExactly("id", "test_column", "notNullColumn");
+    }
+
+    @Test
+    @DisplayName("EntityColumns.getFieldNames 를 통해 컬럼들의 필드 이름들을 조회할 수 있다.")
+    void entityColumnsGetFieldNamesTest() throws Exception {
+        mockClass = FixtureEntity.WithColumn.class;
+        final EntityColumns columns = new EntityColumns(mockClass);
+
+        assertThatIterable(columns.getFieldNames()).containsExactly("id", "column", "notNullColumn");
+    }
 }

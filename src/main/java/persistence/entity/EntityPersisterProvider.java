@@ -9,18 +9,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EntityPersisterProvider {
 
     private final Map<Class<?>, EntityPersister> cache;
-    private final JdbcTemplate jdbcTemplate;
     private final DmlGenerator dmlGenerator;
+    private final JdbcTemplate jdbcTemplate;
 
-    public EntityPersisterProvider(final JdbcTemplate jdbcTemplate, final DmlGenerator dmlGenerator) {
-        this.jdbcTemplate = jdbcTemplate;
+    public EntityPersisterProvider(final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         this.dmlGenerator = dmlGenerator;
+        this.jdbcTemplate = jdbcTemplate;
         this.cache = new ConcurrentHashMap<>();
     }
 
     public EntityPersister getEntityPersister(final Class<?> clazz) {
-        return cache.computeIfAbsent(clazz, cls->
-            new EntityPersister(clazz, jdbcTemplate, dmlGenerator)
+        return cache.computeIfAbsent(clazz, cls ->
+                new EntityPersister(clazz, dmlGenerator, jdbcTemplate)
         );
     }
 

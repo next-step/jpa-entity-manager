@@ -1,4 +1,6 @@
-package database;
+package mock;
+
+import database.DatabaseServer;
 
 import java.sql.Connection;
 import java.sql.SQLException;

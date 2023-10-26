@@ -8,5 +8,4 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    void close();
 }

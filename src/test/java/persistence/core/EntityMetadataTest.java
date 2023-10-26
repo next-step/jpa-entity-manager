@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import domain.FixtureEntity;
 import persistence.exception.PersistenceException;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class EntityMetadataTest {
@@ -74,6 +74,27 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata.getColumnFieldNames()).containsExactly("id", "column", "notNullColumn");
         });
     }
+
+    @Test
+    @DisplayName("getIdColumn 를 통해 id column 을 반환 받을 수 있다.")
+    void getIdColumnTest() throws NoSuchFieldException {
+        mockClass = FixtureEntity.WithId.class;
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+        final EntityColumn idColumn = new EntityColumn(mockClass.getDeclaredField("id"));
+
+        assertThat(entityMetadata.getIdColumn()).isEqualTo(idColumn);
+    }
+
+    @Test
+    @DisplayName("getInsertableColumn 를 통해 insertable column 을 반환 받을 수 있다.")
+    void getInsertableColumnTest() throws NoSuchFieldException {
+        mockClass = FixtureEntity.WithColumnNonInsertable.class;
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+        final EntityColumn insertableColumn = new EntityColumn(mockClass.getDeclaredField("insertableColumn"));
+
+        assertThatIterable(entityMetadata.getInsertableColumn()).containsExactly(insertableColumn);
+    }
+
 
     private void assertResult(final EntityMetadata<?> entityMetadata, final String withId, final String id) {
         assertSoftly(softly -> {

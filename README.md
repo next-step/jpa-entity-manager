@@ -14,11 +14,11 @@
 public class EntityPersister {
 - 구현 해보기
 
-public boolean update(parameters는 자유롭게)
+    public boolean update(parameters는 자유롭게)
 
-public void insert(parameters는 자유롭게)
+    public void insert(parameters는 자유롭게)
 
-public void delete(parameters는 자유롭게)
+    public void delete(parameters는 자유롭게)
 ...
 }
 ```
@@ -31,3 +31,14 @@ public void delete(parameters는 자유롭게)
 `EntityManager 의 구현체에서 쿼리 생성 및 데이터 매핑 에 대한 책임을 EntityPersister 로 옮겨주자`
 
 - [x] 기존 SimpleEntityManager 가 하던 find, persist, remove 로직을 EntityPersister 에게 위임한다.
+
+
+### 2단계 - 엔터티 초기화 (EntityLoader)
+`EntityLoader 는 엔터티를 데이터베이스에서 로드하고 로드된 엔터티 상태를 영속성 컨텍스트 내에서 추적 및 관리`
+
+- 요구사항 1 - RowMapper 리팩터링
+- [x] RowMapper 를 클래스로 분리해서 책임을 맡긴다.
+- [x] RowMapper 클래스는 변환할 엔터티의 정보를 미리 가지고 있다가 객체를 받아 처리한다.
+
+- 요구사항 2 - EntityManager 의 책임 줄여주기
+- [x] 기존 SimpleEntityManager 가 하던 find 로직을 EntityLoader 에게 위임한다.
