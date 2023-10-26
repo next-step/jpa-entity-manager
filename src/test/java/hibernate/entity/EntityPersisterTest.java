@@ -3,6 +3,7 @@ package hibernate.entity;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
+import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;

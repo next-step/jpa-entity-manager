@@ -1,4 +1,6 @@
-package hibernate.entity;
+package hibernate.entity.persistencecontext;
+
+import hibernate.entity.meta.EntityClass;
 
 import java.util.Objects;
 

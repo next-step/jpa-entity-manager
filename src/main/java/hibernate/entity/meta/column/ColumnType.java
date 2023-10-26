@@ -1,4 +1,4 @@
-package hibernate.entity.column;
+package hibernate.entity.meta.column;
 
 import java.util.Arrays;
 

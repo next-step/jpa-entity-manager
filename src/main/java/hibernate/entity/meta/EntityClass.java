@@ -1,7 +1,7 @@
-package hibernate.entity;
+package hibernate.entity.meta;
 
-import hibernate.entity.column.EntityColumn;
-import hibernate.entity.column.EntityColumns;
+import hibernate.entity.meta.column.EntityColumn;
+import hibernate.entity.meta.column.EntityColumns;
 import jakarta.persistence.Entity;
 
 import java.lang.reflect.Constructor;

@@ -1,6 +1,7 @@
-package hibernate.entity;
+package hibernate.entity.persistencecontext;
 
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import org.junit.jupiter.api.Test;

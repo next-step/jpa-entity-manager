@@ -2,6 +2,7 @@ package hibernate.entity;
 
 import hibernate.dml.SelectAllQueryBuilder;
 import hibernate.dml.SelectQueryBuilder;
+import hibernate.entity.meta.EntityClass;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
 

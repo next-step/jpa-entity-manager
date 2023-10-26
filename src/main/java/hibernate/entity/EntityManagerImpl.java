@@ -1,6 +1,10 @@
 package hibernate.entity;
 
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
+import hibernate.entity.persistencecontext.EntityKey;
+import hibernate.entity.persistencecontext.EntitySnapshot;
+import hibernate.entity.persistencecontext.PersistenceContext;
 
 import java.util.Map;
 

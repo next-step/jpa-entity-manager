@@ -1,7 +1,7 @@
 package jdbc;
 
-import hibernate.entity.EntityClass;
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

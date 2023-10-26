@@ -1,6 +1,7 @@
-package hibernate.entity;
+package hibernate.entity.persistencecontext;
 
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

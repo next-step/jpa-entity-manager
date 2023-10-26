@@ -1,4 +1,4 @@
-package hibernate.entity;
+package hibernate.entity.meta;
 
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;

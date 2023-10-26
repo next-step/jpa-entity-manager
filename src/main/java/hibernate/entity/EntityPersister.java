@@ -3,7 +3,8 @@ package hibernate.entity;
 import hibernate.dml.DeleteQueryBuilder;
 import hibernate.dml.InsertQueryBuilder;
 import hibernate.dml.UpdateQueryBuilder;
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
 import jdbc.JdbcTemplate;
 
 import java.util.Map;

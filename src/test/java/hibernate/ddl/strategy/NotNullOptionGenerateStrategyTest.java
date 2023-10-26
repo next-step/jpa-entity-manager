@@ -1,6 +1,6 @@
 package hibernate.ddl.strategy;
 
-import hibernate.entity.column.EntityField;
+import hibernate.entity.meta.column.EntityField;
 import jakarta.persistence.Column;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

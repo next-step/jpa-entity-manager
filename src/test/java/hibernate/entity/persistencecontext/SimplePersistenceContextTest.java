@@ -1,4 +1,4 @@
-package hibernate.entity;
+package hibernate.entity.persistencecontext;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

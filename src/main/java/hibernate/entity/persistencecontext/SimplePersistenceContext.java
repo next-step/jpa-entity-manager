@@ -1,4 +1,4 @@
-package hibernate.entity;
+package hibernate.entity.persistencecontext;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

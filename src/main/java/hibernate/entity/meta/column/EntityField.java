@@ -1,4 +1,4 @@
-package hibernate.entity.column;
+package hibernate.entity.meta.column;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
