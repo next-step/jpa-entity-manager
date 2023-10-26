@@ -32,7 +32,7 @@ public class InsertQueryBuilder<T> extends DMLQueryBuilder<T> {
         return entityMeta.getEntityColumns()
                 .stream()
                 .filter(column -> !column.hasGeneratedValue())
-                .map(column -> columnValue(column, object))
+                .map(column -> getColumnValueString(column, object))
                 .collect(Collectors.joining(", "));
     }
 
@@ -41,7 +41,7 @@ public class InsertQueryBuilder<T> extends DMLQueryBuilder<T> {
     }
 
     private String values(String value) {
-        return dialect.values(value);
+        return dialect.valuesQuery(value);
     }
 
 

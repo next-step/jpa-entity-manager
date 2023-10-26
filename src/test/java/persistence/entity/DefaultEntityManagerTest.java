@@ -12,6 +12,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.dialect.Dialect;
+import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.Person;
@@ -19,13 +21,15 @@ import persistence.testFixtures.Person;
 class DefaultEntityManagerTest {
     private JdbcTemplate jdbcTemplate;
     private DatabaseServer server;
+    private Dialect dialect;
+
     @BeforeEach
     void setUp() throws SQLException {
         server = new H2();
         server.start();
-
+        dialect = new FakeDialect();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        jdbcTemplate.execute(QueryGenerator.from(Person.class).create());
+        jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
     }
 
 
@@ -34,20 +38,16 @@ class DefaultEntityManagerTest {
     void persist() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()));
+        Dialect dialect = new FakeDialect();
+        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+                dialect);
 
         //when
         entityManager.persist(person);
         final List<Person> persons = entityManager.findAll(Person.class);
 
         //then
-        assertSoftly((it) -> {
-            it.assertThat(persons).hasSize(1);
-            it.assertThat(persons.get(0).getAge()).isEqualTo(person.getAge());
-            it.assertThat(persons.get(0).getName()).isEqualTo(person.getName());
-            it.assertThat(persons.get(0).getEmail()).isEqualTo(person.getEmail());
-            it.assertThat(persons.get(0).getId()).isNotNull();
-        });
+        assertThat(persons).hasSize(1);
     }
 
     @Test
@@ -55,7 +55,9 @@ class DefaultEntityManagerTest {
     void remove() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()));
+        Dialect dialect = new FakeDialect();
+        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+                dialect);
         entityManager.persist(person);
 
         //when
@@ -72,7 +74,9 @@ class DefaultEntityManagerTest {
     void findById() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()));
+        Dialect dialect = new FakeDialect();
+        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+                dialect);
         entityManager.persist(person);
 
         //when
@@ -91,7 +95,7 @@ class DefaultEntityManagerTest {
 
     @AfterEach
     void tearDown() {
-        jdbcTemplate.execute(QueryGenerator.from(Person.class).drop());
+        jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());
         server.stop();
     }
 

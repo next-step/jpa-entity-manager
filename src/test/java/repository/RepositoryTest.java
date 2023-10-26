@@ -18,6 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
+import persistence.dialect.Dialect;
+import persistence.fake.FakeDialect;
 import persistence.testFixtures.Person;
 
 
@@ -39,8 +41,9 @@ public class RepositoryTest {
     @TestFactory
     @DisplayName("레포지토리를 관리 한다.")
     Stream<DynamicNode> testFactory() {
-        final DDLRepository<Person> ddlRepository = new BaseDDLRepository<>(jdbcTemplate, Person.class);
-        final CrudRepository<Person> crudRepository = new BaseCrudRepository<>(jdbcTemplate, Person.class);
+        Dialect dialect = new FakeDialect();
+        final DDLRepository<Person> ddlRepository = new BaseDDLRepository<>(jdbcTemplate, Person.class, dialect);
+        final CrudRepository<Person> crudRepository = new BaseCrudRepository<>(jdbcTemplate, Person.class, dialect);
 
         return Stream.of(
                 dynamicContainer("테이블이", Stream.of(

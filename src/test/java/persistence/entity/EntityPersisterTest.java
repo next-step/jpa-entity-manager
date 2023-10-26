@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.dialect.Dialect;
+import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.Person;
@@ -19,13 +21,17 @@ class EntityPersisterTest {
 
     private JdbcTemplate jdbcTemplate;
     private DatabaseServer server;
+
+    private Dialect dialect;
+
     @BeforeEach
     void setUp() throws SQLException {
         server = new H2();
         server.start();
+        dialect = new FakeDialect();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        jdbcTemplate.execute(QueryGenerator.from(Person.class).create());
+        jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
     }
 
     @Test
@@ -33,7 +39,7 @@ class EntityPersisterTest {
     void entitySave() {
         Person person = new Person("이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(person.getClass());
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
 
         Assertions.assertDoesNotThrow(() -> {
             entityPersister.insert(person);
@@ -45,7 +51,7 @@ class EntityPersisterTest {
     void entityUpdate() {
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(Person.class);
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, dialect);
 
         assertThat(entityPersister.update(person)).isTrue();
     }
@@ -53,16 +59,17 @@ class EntityPersisterTest {
     @Test
     @DisplayName("엔티티가 삭제 된다.")
     void entityDelete() {
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new EntityMeta(Person.class));
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new EntityMeta(Person.class), dialect);
+        Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
 
         Assertions.assertDoesNotThrow(() -> {
-            entityPersister.delete(1);
+            entityPersister.delete(person);
         });
     }
 
     @AfterEach
     void tearDown() {
-        jdbcTemplate.execute(QueryGenerator.from(Person.class).drop());
+        jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());
         server.stop();
     }
 }
