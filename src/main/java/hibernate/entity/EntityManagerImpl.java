@@ -61,6 +61,7 @@ public class EntityManagerImpl implements EntityManager {
         EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
         Object entityId = entityClass.getEntityId()
                 .getFieldValue(entity);
+        validateNullId(entityId);
         EntitySnapshot snapshot = getSnapshot(entity, entityId);
         Map<EntityColumn, Object> changedColumns = snapshot.changedColumns(entity);
         if (changedColumns.isEmpty()) {
@@ -68,6 +69,12 @@ public class EntityManagerImpl implements EntityManager {
         }
         entityPersister.update(entityClass, entityId, changedColumns);
         persistNewEntity(entity, entityId);
+    }
+
+    private static void validateNullId(Object entityId) {
+        if (entityId == null) {
+            throw new IllegalStateException("id가 없는 entity는 merge할 수 없습니다.");
+        }
     }
 
     private EntitySnapshot getSnapshot(Object entity, Object entityId) {

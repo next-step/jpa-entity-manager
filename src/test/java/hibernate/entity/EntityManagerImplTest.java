@@ -145,6 +145,14 @@ class EntityManagerImplTest {
     }
 
     @Test
+    void id가_없는_entity가_merge하는_경우_예외가_발생한다() {
+        TestEntity givenEntity = new TestEntity(null, "영진최", 19, "jinyoungchoi95@gmail.com");
+        assertThatThrownBy(() -> entityManager.merge(givenEntity))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("id가 없는 entity는 merge할 수 없습니다.");
+    }
+
+    @Test
     void merge할_때_기존_필드와_다르면_업데이트된다() {
         // given
         TestEntity givenEntity = new TestEntity(1L, "영진최", 19, "jinyoungchoi95@gmail.com");
