@@ -79,8 +79,8 @@ public class EntityPersister {
         return tableName;
     }
 
-    public String getIdColumnName() {
-        return idColumn.getName();
+    public String getIdColumnFieldName() {
+        return idColumn.getFieldName();
     }
 
 }

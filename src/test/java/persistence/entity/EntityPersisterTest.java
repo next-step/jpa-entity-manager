@@ -71,4 +71,12 @@ class EntityPersisterTest {
         assertThat(size).isEqualTo(4);
     }
 
+    @Test
+    @DisplayName("getIdColumnFieldName 을 이용해 entity 의 id field 이름을 반환 받을 수 있다.")
+    void getIdColumnFieldNameTest() {
+        String idColumnFieldName = entityPersister.getIdColumnFieldName();
+
+        assertThat(idColumnFieldName).isEqualTo("id");
+    }
+
 }
