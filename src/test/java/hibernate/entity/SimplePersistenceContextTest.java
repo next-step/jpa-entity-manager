@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SimplePersistenceContextTest {
 
@@ -43,6 +44,30 @@ class SimplePersistenceContextTest {
 
         // then
         assertThat(actual).isEqualTo(givenEntity);
+    }
+
+    @Test
+    void 영속되되지_않은_객체를_제거하려하는_경우_예외가_발생한다() {
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext();
+        assertThatThrownBy(() -> persistenceContext.removeEntity(1L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("영속화되어있지 않은 entity입니다.");
+    }
+
+    @Test
+    void 영속화된_객체를_제거한다() {
+        // given
+        EntityKey givenEntityKey = new EntityKey(1L, TestEntity.class);
+        TestEntity givenEntity = new TestEntity();
+        Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
+        givenEntities.put(givenEntityKey, givenEntity);
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities);
+
+        // when
+        persistenceContext.removeEntity(givenEntity);
+
+        // then
+        assertThat(givenEntities).isEmpty();
     }
 
     @Entity

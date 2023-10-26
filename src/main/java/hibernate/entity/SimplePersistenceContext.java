@@ -24,4 +24,15 @@ public class SimplePersistenceContext implements PersistenceContext {
     public void addEntity(final Object id, final Object entity) {
         entities.put(new EntityKey(id, entity.getClass()), entity);
     }
+
+    @Override
+    public void removeEntity(Object entity) {
+        EntityKey entityKey = entities.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(entity))
+                .findAny()
+                .map(Map.Entry::getKey)
+                .orElseThrow(() -> new IllegalStateException("영속화되어있지 않은 entity입니다."));
+        entities.remove(entityKey);
+    }
 }
