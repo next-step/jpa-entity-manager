@@ -88,4 +88,27 @@ public interface PersistenceContext {
 - [x] snapshot 에서 `EntityKey` 를 통해 조회된 객체와 Persistence 의 기존 객체는 동일하지 않다.
 
 > Snapshot은 Persistence Context에서 관리되는 영속성 엔티티의 이전 상태를 나타냅니다. 이전 상태는 변경이 일어나기 이전의 상태를 의미합니다. Snapshot은 영속성 컨텍스트 내부의 데이터를 복사한 것으로, 이를 이용하여 변경 사항을 감지합니다.
-- 요구사항 3 - 더티체킹 구현
+- 요구사항 3 - 더티체킹 구현 
+
+`Snapshot 기반 Dirty Checking`
+```java
+public class CustomJpaRepository<T, ID> {
+    private final EntityManager entityManager;
+    
+    public CustomJpaRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+    
+    public T save(T t) {
+    // 트랜잭션은 신경 쓰지말고 구현해보자
+   }
+...
+}
+```
+엔티티의 상태를 스냅샷으로 저장하여, 변경된 값이 있는지를 비교하는 방식입니다.
+
+1. 엔티티를 조회할 때 스냅샷을 만들어 둔 후,
+2. 엔티티의 상태를 변경할 때마다 스냅샷과 비교하여 변경 내용을 감지합니다.
+
+- [ ] 엔티티 save 가 일어날때마다 엔티티가 변경되었는지 검사한다.
+- [ ] 변경이 감지되면 update 한다.
