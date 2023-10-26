@@ -12,6 +12,10 @@ public class EntityKey {
         this.entityClass = EntityClass.getInstance(clazz);
     }
 
+    public EntityKey(final Object id, final Object object) {
+        this(id, object.getClass());
+    }
+
     @Override
     public boolean equals(final Object entity) {
         if (this == entity) return true;

@@ -1,5 +1,7 @@
 package hibernate.entity;
 
+import hibernate.entity.column.EntityColumn;
+
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityPersister entityPersister;
@@ -30,6 +32,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(final Object entity) {
+        Object id = EntityClass.getInstance(entity.getClass())
+                .getEntityId()
+                .getFieldValue(entity);
+        if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
+            throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
+        }
         entityPersister.insert(entity);
     }
 

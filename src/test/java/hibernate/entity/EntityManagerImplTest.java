@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityManagerImplTest {
@@ -98,6 +99,18 @@ class EntityManagerImplTest {
                 () -> assertThat(actual.name).isEqualTo(givenEntity.name),
                 () -> assertThat(actual.age).isEqualTo(givenEntity.age)
         );
+    }
+
+    @Test
+    void 이미_persist된_객체를_저장하려하는_경우_예외가_발생한다() {
+        // given
+        TestEntity givenEntity = new TestEntity(1L, "최진영", 19, "jinyoungchoi95@gmail.com");
+        persistenceContextEntities.put(new EntityKey(1L, TestEntity.class), givenEntity);
+
+        // when & then
+        assertThatThrownBy(() -> entityManager.persist(givenEntity))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("이미 영속화되어있는 entity입니다.");
     }
 
     @Test
