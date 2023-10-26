@@ -4,6 +4,7 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
+import persistence.sql.dml.builder.UpdateQueryBuilder;
 import persistence.sql.meta.EntityMeta;
 
 public class DmlQueryGenerator {
@@ -30,6 +31,11 @@ public class DmlQueryGenerator {
     public String generateSelectByPkQuery(Class<?> clazz, Object pkObject) {
         EntityMeta entityMeta = EntityMeta.of(clazz);
         return SelectQueryBuilder.of(entityMeta).buildSelectByPkQuery(pkObject);
+    }
+
+    public String generateUpdateQuery(Object entity) {
+        EntityMeta entityMeta = EntityMeta.of(entity.getClass());
+        return UpdateQueryBuilder.of(entityMeta).buildUpdateQuery(entity);
     }
 
     public String generateDeleteAllQuery(Class<?> clazz) {

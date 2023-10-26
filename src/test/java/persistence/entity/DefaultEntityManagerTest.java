@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class JdbcEntityManagerTest {
+class DefaultEntityManagerTest {
 
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
@@ -46,7 +46,7 @@ class JdbcEntityManagerTest {
     @Test
     @DisplayName("엔티티 조회")
     void find() {
-        JdbcEntityManager jdbcEntityManager = JdbcEntityManager.of(jdbcTemplate);
+        DefaultEntityManager jdbcEntityManager = DefaultEntityManager.of(jdbcTemplate);
         PersonFixtureFactory.getFixtures()
                 .forEach(jdbcEntityManager::persist);
 
@@ -57,7 +57,7 @@ class JdbcEntityManagerTest {
     @Test
     @DisplayName("엔티티 생성 테스트")
     void persist() {
-        JdbcEntityManager jdbcEntityManager = JdbcEntityManager.of(jdbcTemplate);
+        DefaultEntityManager jdbcEntityManager = DefaultEntityManager.of(jdbcTemplate);
         jdbcEntityManager.persist(new Person("테스트", 20, "test@domain.com", 1));
 
         Person person = jdbcEntityManager.find(Person.class, 1L);
@@ -67,7 +67,7 @@ class JdbcEntityManagerTest {
     @Test
     @DisplayName("엔티티 삭제 테스트")
     void remove() {
-        JdbcEntityManager jdbcEntityManager = JdbcEntityManager.of(jdbcTemplate);
+        DefaultEntityManager jdbcEntityManager = DefaultEntityManager.of(jdbcTemplate);
         PersonFixtureFactory.getFixtures()
                 .forEach(jdbcEntityManager::persist);
 

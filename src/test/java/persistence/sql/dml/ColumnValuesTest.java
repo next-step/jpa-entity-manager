@@ -55,6 +55,19 @@ class ColumnValuesTest {
     }
 
     @Test
+    @DisplayName("Id Type 제거")
+    void ofFilteredId() {
+        Person 홍길동 = new Person("홍길동", 20, "aaa@bbb.com", 1);
+        ColumnValues columnValues = ColumnValues.ofFilteredId(홍길동);
+        List<String> columns = columnValues.columns();
+        List<String> values = columnValues.values();
+        Assertions.assertAll(
+                () -> assertThat(columns).isEqualTo(Arrays.asList("nick_name", "old", "email")),
+                () -> assertThat(values).isEqualTo(Arrays.asList("'홍길동'", "20", "'aaa@bbb.com'"))
+        );
+    }
+
+    @Test
     @DisplayName("Id 컬럼 추출")
     void ofId() {
         ColumnValues columnValues = ColumnValues.ofId(MetaFactory.get(Person.class), 1L);

@@ -33,6 +33,14 @@ public class ColumnValues {
         return new ColumnValues(elements);
     }
 
+    public static ColumnValues ofFilteredId(Object entity) {
+        Map<ColumnMeta, String> elements = buildElements(entity);
+        Set.copyOf(elements.keySet()).stream()
+                .filter(ColumnMeta::isId)
+                .forEach(elements::remove);
+        return new ColumnValues(elements);
+    }
+
     public static ColumnValues ofId(Object entity) {
         Map<ColumnMeta, String> elements = buildElements(entity);
         Set.copyOf(elements.keySet()).stream()
