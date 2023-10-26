@@ -23,7 +23,7 @@ public class EntityLoader {
         return new EntityLoader(jdbcTemplate, dmlQueryGenerator);
     }
 
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> T selectOne(Class<T> clazz, Long id) {
         String selectByPkQuery = dmlQueryGenerator.generateSelectByPkQuery(clazz, id);
         return jdbcTemplate.queryForObject(selectByPkQuery, new EntityRowMapper<>(clazz));
     }

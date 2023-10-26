@@ -17,7 +17,7 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityLoader.find(clazz, id);
+        return entityLoader.selectOne(clazz, id);
     }
 
     @Override

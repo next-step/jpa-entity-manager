@@ -47,7 +47,7 @@ class EntityLoaderTest {
     void find() {
         EntityLoader entityLoader = EntityLoader.of(jdbcTemplate);
 
-        Person person = entityLoader.find(Person.class, 1L);
+        Person person = entityLoader.selectOne(Person.class, 1L);
         assertThat(person).isNull();
     }
 
