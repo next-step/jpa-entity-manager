@@ -33,7 +33,7 @@ public class EntityManagerImpl implements EntityManager {
         return loadEntity;
     }
 
-    private void persistNewEntity(Object entity, Object entityId) {
+    private void persistNewEntity(final Object entity, final Object entityId) {
         persistenceContext.addEntity(entityId, entity);
         persistenceContext.getDatabaseSnapshot(entityId, entity);
     }
@@ -49,7 +49,7 @@ public class EntityManagerImpl implements EntityManager {
         persistNewEntity(entity, generatedId);
     }
 
-    private void validateAlreadyPersist(Object entity, EntityColumn entityId) {
+    private void validateAlreadyPersist(final Object entity, final EntityColumn entityId) {
         Object id = entityId.getFieldValue(entity);
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
@@ -57,7 +57,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void merge(Object entity) {
+    public void merge(final Object entity) {
         EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
         Object entityId = getNotNullEntityId(entityClass, entity);
         Map<EntityColumn, Object> changedColumns = getSnapshot(entity, entityId).changedColumns(entity);
@@ -77,7 +77,7 @@ public class EntityManagerImpl implements EntityManager {
         return entityId;
     }
 
-    private EntitySnapshot getSnapshot(Object entity, Object entityId) {
+    private EntitySnapshot getSnapshot(final Object entity, final Object entityId) {
         EntityKey entityKey = new EntityKey(entityId, entity.getClass());
         EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(entityKey);
         if (snapshot == null) {
