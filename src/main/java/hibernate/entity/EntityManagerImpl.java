@@ -65,6 +65,8 @@ public class EntityManagerImpl implements EntityManager {
             return;
         }
         entityPersister.update(entityClass, entityId, changedColumns);
+        persistenceContext.addEntity(entityId, entity);
+        persistenceContext.getDatabaseSnapshot(entityId, entity);
     }
 
     @Override
