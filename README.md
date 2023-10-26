@@ -65,4 +65,25 @@ public interface PersistenceContext {
 - [x] removeEntity 를 통해 delete 시 엔터티를 제거한다.
 
 - 요구사항 2 - snapshot 만들기
+1. 영속 컨텍스트 내에서 Entity 를 조회
+2. 조회된 상태의 Entity 를 스냅샷 생성
+3. 트랜잭션 커밋 후 해당 스냅샷과 현재 Entity 를 비교 (데이터베이스 커밋은 신경쓰지 않는다)
+4. 다른 점을 쿼리로 생성
+```java
+public interface PersistenceContext {
+    ...
+    /*
+    스냅샷을 만들 때 Object 가 아니라 EntityPersister 라는 인터페이스를 활용해 엔티티가 영속화 될 때 
+    데이터베이스로 부터 데이터를 pesister.getDatabaseSnapshot 메서드를 통해 가져옴 
+    너무 많은 로직이 있기에 간단하게 구현
+     */
+    Object getDatabaseSnapshot(Long id, Object entity);
+
+    Object getCachedDatabaseSnapshot(Long id);
+    ....
+```
+- [ ] DB 에서 Entity 조회시 snapshot 에 저장한다.
+- [ ] snapshot 에서 `EntityKey` 를 통해 이전 상태의 객체를 조회할 수 있다.
+
+> Snapshot은 Persistence Context에서 관리되는 영속성 엔티티의 이전 상태를 나타냅니다. 이전 상태는 변경이 일어나기 이전의 상태를 의미합니다. Snapshot은 영속성 컨텍스트 내부의 데이터를 복사한 것으로, 이를 이용하여 변경 사항을 감지합니다.
 - 요구사항 3 - 더티체킹 구현
