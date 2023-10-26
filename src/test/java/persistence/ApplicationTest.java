@@ -44,16 +44,16 @@ class ApplicationTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         final PersistenceEnvironment persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
-        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(persistenceEnvironment.getDmlGenerator(), jdbcTemplate);
-        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(persistenceEnvironment, entityPersisterProvider);
-        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
         ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
+        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
+        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate, entityPersisterProvider);
+        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
+
         entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
         final String createDdl = ddlGenerator.generateCreateDdl(entityMetadata);
         jdbcTemplate.execute(createDdl);
         people = createDummyUsers();
-
 
         people.forEach(person -> {
             final List<String> columnNames = entityMetadata.getInsertableColumnNames();
