@@ -13,7 +13,9 @@ import persistence.core.EntityMetadata;
 import persistence.core.EntityMetadataProvider;
 import persistence.core.PersistenceEnvironment;
 import persistence.dialect.h2.H2Dialect;
+import persistence.entity.EntityLoaderProvider;
 import persistence.entity.EntityManager;
+import persistence.entity.EntityPersisterProvider;
 import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dml.DmlGenerator;
@@ -33,6 +35,8 @@ class ApplicationTest {
     private DdlGenerator ddlGenerator;
     private DmlGenerator dmlGenerator;
     private EntityMetadata<?> entityMetadata;
+
+    private EntityManager entityManager;
     private List<Person> people;
 
     @BeforeEach
@@ -40,7 +44,10 @@ class ApplicationTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
+        final PersistenceEnvironment persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
+        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(persistenceEnvironment);
+        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(persistenceEnvironment, entityPersisterProvider);
+        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
         ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
         entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
@@ -86,8 +93,6 @@ class ApplicationTest {
     @Test
     @DisplayName("entityManager.find 를 이용해 특정 객체를 DB 에서 조회할 수 있다.")
     void entityManagerFindTest() {
-        final EntityManager entityManager = new SimpleEntityManager(persistenceEnvironment);
-
         final Person person = entityManager.find(Person.class, 1L);
 
         assertSoftly(softly -> {
@@ -102,7 +107,6 @@ class ApplicationTest {
     @Test
     @DisplayName("entityManager.persist 를 이용해 특정 객체를 DB 에 저장할 수 있다.")
     void entityManagerPersistTest() {
-        final EntityManager entityManager = new SimpleEntityManager(persistenceEnvironment);
         final Person newPerson = new Person("min", 30, "jongmin4943@gmail.com");
 
         assertDoesNotThrow(() -> entityManager.persist(newPerson));
@@ -111,8 +115,6 @@ class ApplicationTest {
     @Test
     @DisplayName("entityManager.remove 를 이용해 특정 객체를 DB 에서 삭제할 수 있다.")
     void entityManagerRemoveTest() {
-        final EntityManager entityManager = new SimpleEntityManager(persistenceEnvironment);
-
         assertDoesNotThrow(() -> entityManager.remove(people.get(0)));
     }
 

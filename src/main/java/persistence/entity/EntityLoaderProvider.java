@@ -11,9 +11,9 @@ public class EntityLoaderProvider {
     private final PersistenceEnvironment persistenceEnvironment;
     private final EntityPersisterProvider entityPersisterProvider;
 
-    public EntityLoaderProvider(final PersistenceEnvironment persistenceEnvironment) {
+    public EntityLoaderProvider(final PersistenceEnvironment persistenceEnvironment, final EntityPersisterProvider entityPersisterProvider) {
         this.persistenceEnvironment = persistenceEnvironment;
-        this.entityPersisterProvider = persistenceEnvironment.getEntityPersisterProvider();
+        this.entityPersisterProvider = entityPersisterProvider;
         this.cache = new ConcurrentHashMap<>();
     }
 

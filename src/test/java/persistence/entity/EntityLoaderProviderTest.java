@@ -14,7 +14,8 @@ class EntityLoaderProviderTest {
 
     @BeforeEach
     void setUp() {
-        entityLoaderProvider = new EntityLoaderProvider(new MockPersistenceEnvironment());
+        final MockPersistenceEnvironment persistenceEnvironment = new MockPersistenceEnvironment();
+        entityLoaderProvider = new EntityLoaderProvider(persistenceEnvironment, new EntityPersisterProvider(persistenceEnvironment));
     }
 
     @Test

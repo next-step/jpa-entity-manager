@@ -1,15 +1,13 @@
 package persistence.entity;
 
-import persistence.core.PersistenceEnvironment;
-
 public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersisterProvider entityPersisterProvider;
     private final EntityLoaderProvider entityLoaderProvider;
 
-    public SimpleEntityManager(final PersistenceEnvironment persistenceEnvironment) {
-        this.entityPersisterProvider = persistenceEnvironment.getEntityPersisterProvider();
-        this.entityLoaderProvider = persistenceEnvironment.getEntityLoaderProvider();
+    public SimpleEntityManager(final EntityPersisterProvider entityPersisterProvider, final EntityLoaderProvider entityLoaderProvider) {
+        this.entityPersisterProvider = entityPersisterProvider;
+        this.entityLoaderProvider = entityLoaderProvider;
     }
 
     @Override
