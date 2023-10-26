@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -28,6 +30,23 @@ class EntitySnapshotTest {
                 () -> assertThat(actual.getSnapshot().get(entityColumn)).isEqualTo("최진영"),
                 () -> assertThat(givenEntity.name).isEqualTo("영진최")
         );
+    }
+
+    @Test
+    void 스냅샷과_비교해_변경된_필드를_반환한다() {
+        EntitySnapshot snapshot = new EntitySnapshot(new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com"));
+        Map<EntityColumn, Object> actual = snapshot.changedColumns(new TestEntity(1L, "영진최", "jinyoungchoi95@gmail.com"));
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual.values()).contains("영진최")
+        );
+    }
+
+    @Test
+    void 스냅샷과_비교해_변경된_필드가_없는_경우_빈_map을_반환한다() {
+        EntitySnapshot snapshot = new EntitySnapshot(new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com"));
+        Map<EntityColumn, Object> actual = snapshot.changedColumns(new TestEntity(1L, "최진영", "jinyoungchoi95@gmail.com"));
+        assertThat(actual).isEmpty();
     }
 
     @Entity

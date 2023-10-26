@@ -27,6 +27,19 @@ public class EntitySnapshot {
                 ));
     }
 
+    public Map<EntityColumn, Object> changedColumns(final Object entity) {
+        return snapshot.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() != entry.getKey().getFieldValue(entity))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toMap(
+                        entityColumn -> entityColumn,
+                        entityColumn -> entityColumn.getFieldValue(entity),
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
+    }
+
     public Map<EntityColumn, Object> getSnapshot() {
         return Collections.unmodifiableMap(snapshot);
     }
