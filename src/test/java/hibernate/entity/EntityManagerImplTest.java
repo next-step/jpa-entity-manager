@@ -7,10 +7,7 @@ import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
 import jdbc.RowMapper;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,22 +22,25 @@ class EntityManagerImplTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private static EntityManagerImpl entityManager;
-    private static Map<EntityKey, Object> persistenceContextEntities;
+    private EntityManagerImpl entityManager;
+    private Map<EntityKey, Object> persistenceContextEntities;
     private static final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
-    @BeforeAll
-    static void beforeAll() throws SQLException {
-        server = new H2();
-        server.start();
-        jdbcTemplate = new JdbcTemplate(server.getConnection());
+    @BeforeEach
+    void beforeEach() {
         persistenceContextEntities = new ConcurrentHashMap<>();
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
                 new SimplePersistenceContext(persistenceContextEntities)
         );
+    }
 
+    @BeforeAll
+    static void beforeAll() throws SQLException {
+        server = new H2();
+        server.start();
+        jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(createQueryBuilder.generateQuery(EntityClass.getInstance(TestEntity.class)));
     }
 
@@ -117,7 +117,7 @@ class EntityManagerImplTest {
     }
 
     @Test
-    void 객체를_제거한다() {
+    void 객체를_영속성_제거_및_db에_제거한다() {
         // given
         TestEntity givenEntity = new TestEntity(1L, "최진영", 19, "jinyoungchoi95@gmail.com");
         entityManager.persist(givenEntity);
@@ -136,7 +136,10 @@ class EntityManagerImplTest {
         });
 
         // then
-        assertThat(actual).isEqualTo(0);
+        assertAll(
+                () -> assertThat(actual).isEqualTo(0),
+                () -> assertThat(persistenceContextEntities).isEmpty()
+        );
     }
 
     @Entity
