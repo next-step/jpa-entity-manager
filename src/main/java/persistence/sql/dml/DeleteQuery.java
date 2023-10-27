@@ -3,7 +3,7 @@ package persistence.sql.dml;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
-public class DeleteQuery {
+class DeleteQuery {
 
     private static final String DEFAULT_DELETE_QUERY = "DELETE FROM %s";
 
@@ -11,13 +11,9 @@ public class DeleteQuery {
     private Columns columns;
     private Object arg;
 
-    private DeleteQuery() { }
+    DeleteQuery() { }
 
-    public static DeleteQuery create() {
-        return new DeleteQuery();
-    }
-
-    public String get(TableName tableName, Columns columns, Object arg) {
+    String get(TableName tableName, Columns columns, Object arg) {
         this.tableName = tableName;
         this.columns = columns;
         this.arg = arg;

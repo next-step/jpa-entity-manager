@@ -1,4 +1,4 @@
-package persistence.person;
+package domain;
 
 public class NotEntityPerson {
     private Long id;

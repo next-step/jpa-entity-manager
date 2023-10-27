@@ -1,4 +1,4 @@
-package persistence.person;
+package domain;
 
 import jakarta.persistence.Id;
 

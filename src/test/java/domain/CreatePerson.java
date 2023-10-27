@@ -1,4 +1,4 @@
-package persistence.person;
+package domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,10 +9,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "DatabasePerson")
-public class DatabasePerson {
+@Table(name = "create_person")
+public class CreatePerson {
     @Id
-    @Column(name = "select_person_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,7 +27,7 @@ public class DatabasePerson {
     @Transient
     private Integer index;
 
-    public DatabasePerson(Long id, String name, Integer age, String email, Integer index) {
+    public CreatePerson(Long id, String name, Integer age, String email, Integer index) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -36,7 +35,6 @@ public class DatabasePerson {
         this.index = index;
     }
 
-    public DatabasePerson() {
-
+    public CreatePerson() {
     }
 }

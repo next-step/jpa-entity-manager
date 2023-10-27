@@ -4,8 +4,8 @@ import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
-import persistence.person.NonExistentTablePerson;
-import persistence.person.NotEntityPerson;
+import domain.NonExistentTablePerson;
+import domain.NotEntityPerson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;

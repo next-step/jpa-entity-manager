@@ -1,30 +1,26 @@
 package persistence.entity;
 
-import java.sql.Connection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jdbc.JdbcTemplate;
 
 public class EntityManagerImpl implements EntityManager {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final Map<String, EntityPersister<?>> persisterMap;
+    private Map<String, EntityPersister<?>> persisterMap;
+    private Map<String, EntityLoader<?>> loaderMap;
 
-
-    public EntityManagerImpl(Connection connection) {
-        this.jdbcTemplate = new JdbcTemplate(connection);
-        this.persisterMap = new HashMap<>();
+    public EntityManagerImpl(Map<String, EntityPersister<?>> persisterMap, Map<String, EntityLoader<?>> loaderMap) {
+        this.persisterMap = persisterMap;
+        this.loaderMap = loaderMap;
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClazz) {
-        return getPersister(tClazz).findAll();
+        return getLoader(tClazz).findAll();
     }
 
     @Override
     public <R, I> R find(Class<R> rClass, I i) {
-        return getPersister(rClass).findById(i);
+        return getLoader(rClass).findById(i);
     }
 
     @Override
@@ -44,12 +40,10 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private <T> EntityPersister<T> getPersister(Class<T> tClass) {
-        String key = tClass.getName();
+        return (EntityPersister<T>) persisterMap.get(tClass.getName());
+    }
 
-        if (persisterMap.get(key) == null) {
-            persisterMap.put(key, new EntityPersister<>(jdbcTemplate, tClass));
-        }
-
-        return (EntityPersister<T>) persisterMap.get(key);
+    private <T> EntityLoader<T> getLoader(Class<T> tClass) {
+        return (EntityLoader<T>) loaderMap.get(tClass.getName());
     }
 }

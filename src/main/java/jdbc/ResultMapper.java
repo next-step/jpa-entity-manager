@@ -36,25 +36,29 @@ public class ResultMapper<T> implements RowMapper<T> {
      */
     private <R> R extracted(ResultSet resultSet, Field field, Class<R> rClass, String columnName) {
         try {
-            if (field.getType().equals(Long.class)) {
+            if (isTypeEquals(field, Long.class)) {
                 return rClass.cast(resultSet.getLong(columnName));
-            } else if (field.getType().equals(Boolean.class)) {
+            } else if (isTypeEquals(field, Boolean.class)) {
                 return rClass.cast(resultSet.getBoolean(columnName));
-            } else if (field.getType().equals(Integer.class)) {
+            } else if (isTypeEquals(field, Integer.class)) {
                 return rClass.cast(resultSet.getInt(columnName));
-            } else if (field.getType().equals(String.class)) {
+            } else if (isTypeEquals(field, String.class)) {
                 return rClass.cast(resultSet.getString(columnName));
-            } else if (field.getType().equals(Double.class)) {
+            } else if (isTypeEquals(field, Double.class)) {
                 return rClass.cast(resultSet.getDouble(columnName));
-            } else if (field.getType().equals(Float.class)) {
+            } else if (isTypeEquals(field, Float.class)) {
                 return rClass.cast(resultSet.getFloat(columnName));
-            } else if (field.getType().equals(Short.class)) {
+            } else if (isTypeEquals(field, Short.class)) {
                 return rClass.cast(resultSet.getShort(columnName));
             }
             return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <I> boolean isTypeEquals(Field field, Class<I> tClass) {
+        return field.getType().equals(tClass);
     }
 
     private T getConstructor() {

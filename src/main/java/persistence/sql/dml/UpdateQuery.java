@@ -4,7 +4,7 @@ import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
-public class UpdateQuery {
+class UpdateQuery {
     private static final String DEFAULT_UPDATE_COLUMN_QUERY = "UPDATE %s SET %s";
 
     private TableName tableName;
@@ -12,13 +12,9 @@ public class UpdateQuery {
     private Values values;
     private Object arg;
 
-    private UpdateQuery() { }
+    UpdateQuery() { }
 
-    public static UpdateQuery create() {
-        return new UpdateQuery();
-    }
-
-    public String get(Values values, TableName tableName, Columns columns, Object args) {
+    String get(Values values, TableName tableName, Columns columns, Object args) {
         this.tableName = tableName;
         this.columns = columns;
         this.values = values;

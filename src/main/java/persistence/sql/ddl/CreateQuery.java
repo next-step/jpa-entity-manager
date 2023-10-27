@@ -3,7 +3,7 @@ package persistence.sql.ddl;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
-public class CreateQuery {
+class CreateQuery {
 
     private static final String DEFAULT_CREATE_QUERY = "CREATE TABLE %s (%s)";
     private static final String DEFAULT_PRIMARY_KEY_QUERY = ", PRIMARY KEY (%s)";
@@ -11,13 +11,13 @@ public class CreateQuery {
     private TableName tableName;
     private Columns columns;
 
-    private CreateQuery() { }
+    CreateQuery() { }
 
-    public static CreateQuery create() {
+    static CreateQuery create() {
         return new CreateQuery();
     }
 
-    public String getQuery(TableName tableName, Columns columns) {
+    String get(TableName tableName, Columns columns) {
         this.tableName = tableName;
         this.columns = columns;
 

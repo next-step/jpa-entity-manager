@@ -2,7 +2,7 @@ package persistence.sql.common.meta;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.person.SelectPerson;
+import domain.SelectPerson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

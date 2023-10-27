@@ -9,9 +9,9 @@ import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidEntityException;
-import persistence.person.ExistTablePerson;
-import persistence.person.NonExistentEntityPerson;
-import persistence.person.NonExistentTablePerson;
+import domain.ExistTablePerson;
+import domain.NonExistentEntityPerson;
+import domain.NonExistentTablePerson;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -35,7 +35,7 @@ class CreateQueryTest {
         final Columns columns = Columns을_생성함(clazz);
 
         //when
-        final String result = createQuery.getQuery(tableName, columns);
+        final String result = createQuery.get(tableName, columns);
 
         //then
         assertThat(result).isEqualTo(expectedSql);
@@ -49,7 +49,7 @@ class CreateQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class,
-            () -> createQuery.getQuery(TableName을_생성함(personClass), Columns을_생성함(personClass)));
+            () -> createQuery.get(TableName을_생성함(personClass), Columns을_생성함(personClass)));
     }
 
     @Test
@@ -70,7 +70,7 @@ class CreateQueryTest {
             + ")", className);
 
         //when
-        final String result = createQuery.getQuery(tableName, columns);
+        final String result = createQuery.get(tableName, columns);
 
         //then
         assertThat(result).isEqualTo(expectedSql);
@@ -92,7 +92,7 @@ class CreateQueryTest {
             + ")";
 
         //when
-        final String result = createQuery.getQuery(tableName, columns);
+        final String result = createQuery.get(tableName, columns);
 
         //then
         assertThat(result).isEqualTo(expectedSql);
