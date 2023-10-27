@@ -8,7 +8,7 @@ import persistence.sql.ddl.converter.SqlConverter;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-public class LongTypeIdAttribute extends IdAttribute {
+public class LongTypeIdAttribute implements IdAttribute {
     private final Field field;
     private final String fieldName;
     private final String columnName;

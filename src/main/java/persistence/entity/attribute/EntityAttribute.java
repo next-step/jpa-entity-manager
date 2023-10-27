@@ -1,19 +1,42 @@
 package persistence.entity.attribute;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import persistence.entity.attribute.id.IdAttribute;
+import persistence.entity.attribute.id.resolver.*;
+import persistence.entity.attribute.resolver.*;
 import persistence.sql.ddl.wrapper.DDLWrapper;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EntityAttribute {
     private final String tableName;
     private final List<GeneralAttribute> generalAttributes;
     private final IdAttribute idAttribute;
+    private static final List<IdAttributeResolver> ID_ATTRIBUTE_RESOLVERS;
+
+    private static final List<IdAttributeResolver> GENERAL_ATTRIBUTE_RESOLVERS;
+
+    static {
+        ID_RESOLVERS = Arrays.asList(
+                new StringTypeGeneralAttributeResolver(),
+                new LongTypeGeneralAttributeResolver(),
+                new IntegerTypeGeneralAttributeResolver()
+        );
+    }
+
+    static {
+        ID_RESOLVERS = Arrays.asList(
+                new StringTypeIdAttributeResolver(),
+                new LongTypeIdAttributeResolver()
+        );
+    }
 
     private EntityAttribute(
             String tableName,
@@ -30,8 +53,32 @@ public class EntityAttribute {
 
         String tableName = Optional.ofNullable(clazz.getAnnotation(Table.class)).map(Table::name).orElse(clazz.getSimpleName());
 
-        List<GeneralAttribute> generalAttributes = AttributeParser.parseGeneralAttributes(clazz);
-        IdAttribute idAttribute = AttributeParser.parseIdAttribute(clazz);
+        List<GeneralAttribute> generalAttributes = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Column.class)
+                        && !field.isAnnotationPresent(Id.class))
+                .map(it -> {
+                    for (GeneralAttributeResolver generalAttributeResolver : GENERAL_ATTRIBUTE_RESOLVERS) {
+                        if (generalAttributeResolver.support(it.getType())) {
+                            return generalAttributeResolver.resolver(it)
+                        }
+                    })
+                }).collect(Collectors.toList());
+
+
+        Field idField = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(String.format("[%s] 엔티티에 @Id가 없습니다", clazz.getSimpleName())));
+
+        IdAttribute idAttribute = null;
+
+        for (IdAttributeResolver idAttributeResolver : ID_RESOLVERS) {
+            if (idAttributeResolver.supports(idField.getType())) {
+                idAttribute = idAttributeResolver.resolve(idField);
+            }
+        }
+
+        assert idAttribute != null;
 
         return new EntityAttribute(tableName, idAttribute, generalAttributes);
     }

@@ -1,6 +1,5 @@
 package persistence.context;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,19 +39,5 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     private <T> Map<String, Object> getOrCreateEntityMap(Class<T> clazz) {
         return FIRST_CACHE.computeIfAbsent(clazz, k -> new HashMap<>());
-    }
-
-    private <T> String getEntityId(T entity, Field idField) {
-        idField.setAccessible(true);
-
-        try {
-            Object idValue = idField.get(entity);
-
-            assert idValue != null;
-
-            return String.valueOf(idValue);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

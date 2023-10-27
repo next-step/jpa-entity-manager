@@ -3,6 +3,9 @@ package persistence.entity.persister;
 import jdbc.JdbcTemplate;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.id.IdAttribute;
+import persistence.entity.attribute.resolver.IdAttributeResolver;
+import persistence.entity.attribute.resolver.IntegerTypeIdAttributeResolver;
+import persistence.entity.attribute.resolver.LongTypeIdAttributeResolver;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 
@@ -12,10 +15,11 @@ import java.util.List;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
-    private static final List<IdTypeHandler> ID_TYPE_HANDLERS = Arrays.asList(
-            new LongIdTypeHandler(),
-            new IntegerIdTypeHandler()
+    private static final List<IdAttributeResolver> ID_ATTRIBUTE_RESOLVERS = Arrays.asList(
+            new LongTypeIdAttributeResolver(),
+            new IntegerTypeIdAttributeResolver()
     );
+
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -48,9 +52,9 @@ public class EntityPersister {
         Field idField = idAttribute.getField();
         Class<?> idType = idField.getType();
 
-        for (IdTypeHandler handler : ID_TYPE_HANDLERS) {
-            if (handler.support(idType)) {
-                handler.setGeneratedIdToEntity(instance, idField, key);
+        for (IdAttributeResolver idAttributeResolver : ID_ATTRIBUTE_RESOLVERS) {
+            if (idAttributeResolver.supports(idType)) {
+                idAttributeResolver.setGeneratedIdToEntity(instance, idField, key);
                 return;
             }
         }
