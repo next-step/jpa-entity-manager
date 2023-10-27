@@ -94,6 +94,25 @@ class EntityLoaderTest {
         assertThat(person).isNull();
     }
 
+    @Test
+    @DisplayName("데이터를 저장하고 키값을 가져온다.")
+    void save() {
+        //given
+        EntityMeta entityMeta = new EntityMeta(Person.class);
+        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+
+
+        Person person = new Person("이름", 19, "asd");
+
+        final Long l = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
+        final Long l2 = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
+        final Long l3 = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
+
+        System.out.println(l);
+        System.out.println(l2);
+        System.out.println(l3);
+    }
+
     @AfterEach
     void cleanUp() throws Exception {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());

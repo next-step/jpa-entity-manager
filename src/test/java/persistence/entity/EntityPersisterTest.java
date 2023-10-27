@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import database.DatabaseServer;
 import database.H2;
@@ -15,6 +16,7 @@ import persistence.dialect.Dialect;
 import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
+import persistence.testFixtures.NoAutoIncrementPerson;
 import persistence.testFixtures.Person;
 
 class EntityPersisterTest {
@@ -35,15 +37,34 @@ class EntityPersisterTest {
     }
 
     @Test
-    @DisplayName("엔티티가 저장이 된다.")
-    void entitySave() {
+    @DisplayName("자동 증가 칼럼을 가진 엔티티가 저장이 된다.")
+    void entityAutoIncrementSave() {
         Person person = new Person("이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(person.getClass());
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
         EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
 
-        Assertions.assertDoesNotThrow(() -> {
-            entityPersister.insert(person);
+        final Person result = entityPersister.insert(person);
+
+        assertSoftly(it -> {
+            it.assertThat(result.getId()).isNotNull();
+            it.assertThat(result).isEqualTo(person);
+        });
+    }
+
+    @Test
+    @DisplayName("엔티티가 저장이 된다.")
+    void entitySave() {
+        NoAutoIncrementPerson person = new NoAutoIncrementPerson(3L,"이름", 3, "dsa@gmil.com");
+        EntityMeta entityMeta = new EntityMeta(person.getClass());
+        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+
+        final NoAutoIncrementPerson result = entityPersister.insert(person);
+
+        assertSoftly(it -> {
+            it.assertThat(result.getId()).isEqualTo(3L);
+            it.assertThat(result).isEqualTo(person);
         });
     }
 
