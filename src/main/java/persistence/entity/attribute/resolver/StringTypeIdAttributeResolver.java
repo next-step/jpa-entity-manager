@@ -9,7 +9,7 @@ public class StringTypeIdAttributeResolver implements IdAttributeResolver {
 
     @Override
     public boolean support(Class<?> clazz) {
-        return clazz == Long.class;
+        return clazz == String.class;
     }
 
     @Override

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static persistence.entity.attribute.resolver.AttributeResolverManager.GENERAL_ATTRIBUTE_RESOLVERS;
 
-public class EntityLoaderImpl {
+public class EntityLoaderImpl implements EntityLoader {
     private final JdbcTemplate jdbcTemplate;
 
     public EntityLoaderImpl(JdbcTemplate jdbcTemplate) {
@@ -37,6 +37,7 @@ public class EntityLoaderImpl {
         }
     }
 
+    @Override
     public <T> T load(Class<T> clazz, String id) {
         EntityAttribute entityAttribute = EntityAttribute.of(clazz);
         IdAttribute idAttribute = entityAttribute.getIdAttribute();

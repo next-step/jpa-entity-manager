@@ -9,6 +9,7 @@ import persistence.DatabaseTest;
 import persistence.context.PersistenceContext;
 import persistence.context.PersistenceContextImpl;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaderImpl;
 import persistence.entity.persister.EntityPersister;
 import persistence.fixture.TestEntityFixture;
@@ -45,11 +46,11 @@ public class EntityManagerTest extends DatabaseTest {
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
                 jdbcTemplate.execute(insertDML);
 
-                EntityPersister entityPersister = new EntityPersister(new JdbcTemplate(server.getConnection()));
-                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate);
-                PersistenceContext persistenceContext = new PersistenceContextImpl();
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoaderImpl, persistenceContext);
                 TestEntityFixture.SampleOneWithValidAnnotation retrieved =
                         entityManager.findById(TestEntityFixture.SampleOneWithValidAnnotation.class, "1");
 
@@ -75,11 +76,10 @@ public class EntityManagerTest extends DatabaseTest {
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
                 jdbcTemplate.execute(insertDML);
 
-                EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
-                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate);
-                PersistenceContext persistenceContext = new PersistenceContextImpl();
-
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoaderImpl, persistenceContext);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
                 TestEntityFixture.SampleTwoWithValidAnnotation retrieved =
                         entityManager.findById(TestEntityFixture.SampleTwoWithValidAnnotation.class, "1");
@@ -103,11 +103,10 @@ public class EntityManagerTest extends DatabaseTest {
 
                 setUpFixtureTable(TestEntityFixture.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
-                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate);
-                PersistenceContext persistenceContext = new PersistenceContextImpl();
-
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoaderImpl, persistenceContext);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
                 TestEntityFixture.SampleOneWithValidAnnotation persisted =
                         entityManager.persist(sample);
@@ -132,11 +131,10 @@ public class EntityManagerTest extends DatabaseTest {
 
                 setUpFixtureTable(TestEntityFixture.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
-                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate);
-                PersistenceContext persistenceContext = new PersistenceContextImpl();
-
-                EntityManagerImpl entityManager = EntityManagerImpl.of(entityPersister, entityLoaderImpl, persistenceContext);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
                 TestEntityFixture.SampleOneWithValidAnnotation inserted = entityManager.persist(sample);
 
