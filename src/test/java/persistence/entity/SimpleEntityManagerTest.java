@@ -36,7 +36,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute(new CreateQueryBuilder(dialect).buildQuery(entityMetadata));
         jdbcTemplate.execute("INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');");
 
-        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate, entityMetadata));
+        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate, entityMetadata), new EntityLoader(jdbcTemplate, entityMetadata));
     }
 
     @DisplayName("EnityManager를 통해 PK 값이 일치하는 Entity를 찾는다.")

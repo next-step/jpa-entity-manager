@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UpdateQueryBuilderTest {
-	private UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+	private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
 
 	private final EntityMetadata entityMetadata = new EntityMetadata(Person.class);
 
