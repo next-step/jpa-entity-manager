@@ -15,7 +15,7 @@ public class EntityLoader<T> {
     private final TableName tableName;
     private final Columns columns;
 
-    public EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
+    EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
         this.query = query;
 
         this.jdbcTemplate = jdbcTemplate;

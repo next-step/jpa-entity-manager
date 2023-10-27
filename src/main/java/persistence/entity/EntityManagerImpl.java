@@ -5,22 +5,20 @@ import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {
 
-    private Map<String, EntityPersister<?>> persisterMap;
-    private Map<String, EntityLoader<?>> loaderMap;
+    private final Map<String, EntityPersister<?>> persisterMap;
 
-    public EntityManagerImpl(Map<String, EntityPersister<?>> persisterMap, Map<String, EntityLoader<?>> loaderMap) {
+    EntityManagerImpl(Map<String, EntityPersister<?>> persisterMap) {
         this.persisterMap = persisterMap;
-        this.loaderMap = loaderMap;
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClazz) {
-        return getLoader(tClazz).findAll();
+        return getPersister(tClazz).findAll();
     }
 
     @Override
-    public <R, I> R find(Class<R> rClass, I i) {
-        return getLoader(rClass).findById(i);
+    public <R, I> R find(Class<R> rClass, I input) {
+        return getPersister(rClass).findById(input);
     }
 
     @Override
@@ -41,9 +39,5 @@ public class EntityManagerImpl implements EntityManager {
 
     private <T> EntityPersister<T> getPersister(Class<T> tClass) {
         return (EntityPersister<T>) persisterMap.get(tClass.getName());
-    }
-
-    private <T> EntityLoader<T> getLoader(Class<T> tClass) {
-        return (EntityLoader<T>) loaderMap.get(tClass.getName());
     }
 }

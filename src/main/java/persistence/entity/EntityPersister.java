@@ -6,8 +6,11 @@ import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
+import java.util.List;
+
 public class EntityPersister<T> {
     private final Query query;
+    private final EntityLoader<T> entityLoader;
 
     private final JdbcTemplate jdbcTemplate;
     private final TableName tableName;
@@ -19,6 +22,16 @@ public class EntityPersister<T> {
         this.tableName = TableName.of(tClass);
         this.columns = Columns.of(tClass.getDeclaredFields());
         this.query = query;
+
+        this.entityLoader = new EntityLoader<>(jdbcTemplate, tClass, query);
+    }
+
+    public List<T> findAll() {
+        return entityLoader.findAll();
+    }
+
+    public <I> T findById(I input) {
+        return entityLoader.findById(input);
     }
 
     public <I> boolean update(I input, Object arg) {
@@ -44,7 +57,7 @@ public class EntityPersister<T> {
         jdbcTemplate.execute(q);
     }
 
-    public <I> Values getValues(I input) {
+    private <I> Values getValues(I input) {
         return Values.of(input);
     }
 }
