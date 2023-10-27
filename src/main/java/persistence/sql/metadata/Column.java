@@ -14,11 +14,14 @@ public class Column {
 
     private final boolean isTransient;
 
-    public Column(Field field) {
+    private final String value;
+
+    public Column(Field field, String value) {
         this.name = findName(field);
         this.type = field.getType();
         this.constraint = new Constraint(field);
         this.isTransient = field.isAnnotationPresent(Transient.class);
+        this.value = findValue(value);
     }
 
     public String getName() {
@@ -29,7 +32,11 @@ public class Column {
         return isTransient;
     }
 
-    public String buildColumnToCreate(Dialect dialect) {
+    public String getValue() {
+        return value;
+    }
+
+    public String buildColumnsWithConstraint(Dialect dialect) {
         return new StringBuilder()
                 .append(name + " " + findType(dialect))
                 .append(constraint.buildNullable())
@@ -39,6 +46,10 @@ public class Column {
     }
 
     public boolean checkPossibleToBeValue() {
+        if("null".equals(value) && isNotNullable()) {
+            return false;
+        }
+
         return !isTransient && !constraint.isPrimaryKey();
     }
 
@@ -46,8 +57,8 @@ public class Column {
         return constraint.isPrimaryKey();
     }
 
-    public boolean isNullable() {
-        return constraint.isNullable();
+    public boolean isNotNullable() {
+        return !constraint.isNullable();
     }
 
     private String findName(Field field) {
@@ -66,5 +77,13 @@ public class Column {
 
     private String findType(Dialect dialect) {
         return dialect.getColumnType(type);
+    }
+
+    private String findValue(String value) {
+        if(type.equals(String.class) && !"null".equals(value)) {
+            value = "'" + value + "'";
+        }
+
+        return value;
     }
 }

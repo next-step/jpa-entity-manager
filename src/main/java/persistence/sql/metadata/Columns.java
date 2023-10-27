@@ -12,17 +12,45 @@ public class Columns {
         this.columns = columns;
     }
 
-    public String buildColumnsToCreate(Dialect dialect) {
+    public String buildColumnsWithConstraint(Dialect dialect) {
         return columns.stream()
                 .filter(x -> !x.isTransient())
-                .map(x -> x.buildColumnToCreate(dialect))
+                .map(x -> x.buildColumnsWithConstraint(dialect))
                 .collect(Collectors.joining(", "));
     }
 
-    public String buildColumnsToInsert() {
+    public String buildColumnsClause() {
         return columns.stream()
+                .filter(Column::checkPossibleToBeValue)
                 .map(Column::getName)
                 .collect(Collectors.joining(", "));
     }
 
+    public String buildValueClause() {
+        return columns.stream()
+                .filter(Column::checkPossibleToBeValue)
+                .map(Column::getValue)
+                .collect(Collectors.joining(","));
+    }
+
+    public String buildSetClause() {
+        return columns.stream()
+                .filter(Column::checkPossibleToBeValue)
+                .map(x -> x.getName() + " = " + x.getValue())
+                .collect(Collectors.joining(", "));
+    }
+
+    public String buildWhereClause() {
+        return columns.stream()
+                .filter(x -> !x.isTransient())
+                .map(x -> x.getName() + " = " + x.getValue())
+                .collect(Collectors.joining(" AND "));
+    }
+
+    public String buildWhereWithPKClause() {
+        return columns.stream()
+                .filter(Column::isPrimaryKey)
+                .map(x -> x.getName() + " = " + x.getValue())
+                .findFirst().get();
+    }
 }

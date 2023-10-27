@@ -24,7 +24,7 @@ public class EntityMapper<T> implements RowMapper<T>{
 
             Field[] fields = clazz.getDeclaredFields();
             for(Field field : fields) {
-                Column column = new Column(field);
+                Column column = new Column(field, null);
 
                 if(column.isTransient()) {
                     continue;
