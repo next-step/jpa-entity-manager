@@ -4,21 +4,15 @@ import jdbc.JdbcTemplate;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.attribute.resolver.IdAttributeResolver;
-import persistence.entity.attribute.resolver.IntegerTypeIdAttributeResolver;
-import persistence.entity.attribute.resolver.LongTypeIdAttributeResolver;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
+
+import static persistence.entity.attribute.resolver.AttributeResolverManager.ID_ATTRIBUTE_RESOLVERS;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
-    private static final List<IdAttributeResolver> ID_ATTRIBUTE_RESOLVERS = Arrays.asList(
-            new LongTypeIdAttributeResolver(),
-            new IntegerTypeIdAttributeResolver()
-    );
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

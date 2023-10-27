@@ -7,9 +7,6 @@ import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.GeneralAttribute;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.attribute.resolver.GeneralAttributeResolver;
-import persistence.entity.attribute.resolver.IntegerTypeGeneralAttributeResolver;
-import persistence.entity.attribute.resolver.LongTypeGeneralAttributeResolver;
-import persistence.entity.attribute.resolver.StringTypeGeneralAttributeResolver;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
 import java.lang.reflect.Constructor;
@@ -20,17 +17,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static persistence.entity.attribute.resolver.AttributeResolverManager.GENERAL_ATTRIBUTE_RESOLVERS;
+
 public class EntityLoaderImpl {
     private final JdbcTemplate jdbcTemplate;
-    private static final List<GeneralAttributeResolver> GENERAL_ATTRIBUTE_RESOLVERS;
-
-    static {
-        GENERAL_ATTRIBUTE_RESOLVERS = Arrays.asList(
-                new StringTypeGeneralAttributeResolver(),
-                new LongTypeGeneralAttributeResolver(),
-                new IntegerTypeGeneralAttributeResolver()
-        );
-    }
 
     public EntityLoaderImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
