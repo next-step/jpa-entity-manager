@@ -5,7 +5,11 @@ import persistence.core.EntityColumn;
 import persistence.core.EntityColumns;
 import persistence.core.EntityMetadata;
 import persistence.core.EntityMetadataProvider;
+import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
+
+import java.util.List;
+import java.util.Optional;
 
 public class EntityLoader<T> {
     private final String tableName;
@@ -25,9 +29,17 @@ public class EntityLoader<T> {
         this.entityRowMapper = new EntityRowMapper<>(clazz);
     }
 
-    public T loadById(final Object id) {
+    public Optional<T> loadById(final Object id) {
         final String query = renderSelect(id);
-        return jdbcTemplate.queryForObject(query, entityRowMapper::mapRow);
+        final List<T> result = jdbcTemplate.query(query, entityRowMapper::mapRow);
+        if (result.size() > 1) {
+            throw new PersistenceException("id 로 조회된 row 가 2개 이상입니다.");
+        }
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(result.get(0));
     }
 
     public String renderSelect(final Object id) {
