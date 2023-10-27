@@ -99,7 +99,7 @@ public class EntityManagerTest extends DatabaseTest {
             @DisplayName("아이디가 매핑된 객체를 반환한다.")
             void returnObject() {
                 TestEntityFixture.SampleOneWithValidAnnotation sample =
-                        new TestEntityFixture.SampleOneWithValidAnnotation(1L, "민준", 29);
+                        new TestEntityFixture.SampleOneWithValidAnnotation("민준", 29);
 
                 setUpFixtureTable(TestEntityFixture.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 

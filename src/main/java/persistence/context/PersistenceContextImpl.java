@@ -3,7 +3,6 @@ package persistence.context;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.persister.EntityPersister;
 
-import java.io.*;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,50 +17,29 @@ public class PersistenceContextImpl implements PersistenceContext {
         this.entityPersister = entityPersister;
     }
 
-    @Override
-    public <T> T getEntity(Class<T> clazz, String id) {
-        Object retrieved = Optional.ofNullable(FIRST_CACHE.get(clazz))
-                .map(it -> it.get(id))
-                .orElse(null);
-        if (retrieved == null) {
-            Object loaded = entityPersister.load(clazz, id);
-
-            Map<String, Object> entityMap = getOrCreateEntityMap(clazz, SNAP_SHOT);
-
-            entityMap.put(id, createDeepCopy(loaded));
-
-            SNAP_SHOT.put(clazz, entityMap);
-
-            return clazz.cast(loaded);
+    public static <T> T createDeepCopy(T original) {
+        try {
+            Class<?> clazz = original.getClass();
+            T copy = (T) clazz.getDeclaredConstructor().newInstance();
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(original);
+                if (value != null && !isPrimitiveOrWrapper(value.getClass())) {
+                    field.set(copy, createDeepCopy(value));
+                } else {
+                    field.set(copy, value);
+                }
+            }
+            return copy;
+        } catch (Exception e) {
+            throw new RuntimeException("딥카피 실패", e);
         }
-        return clazz.cast(retrieved);
     }
 
-    @Override
-    public <T> T addEntity(T instance, IdAttribute idAttribute) {
-        try {
-            String id = Optional.ofNullable(idAttribute.getField().get(instance)).map(String::valueOf).orElse(null);
-
-            T snapshot = null;
-
-            if (id == null) {
-                if (idAttribute.getGenerationType() == null) {
-                    throw new RuntimeException("id가 null이고 generationType이 null 입니다.");
-                }
-
-                return entityPersister.insert(instance);
-            }
-
-            if (idAttribute.getGenerationType() != null) {
-                snapshot = getDatabaseSnapshot(String.valueOf(idAttribute.getField().get(instance)), instance);
-            }
-
-            assert snapshot != null;
-
-            return entityPersister.update(snapshot, instance);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private static boolean isPrimitiveOrWrapper(Class<?> clazz) {
+        return clazz.isPrimitive() || (clazz == Double.class) || (clazz == Float.class) || (clazz == Long.class)
+                || (clazz == Integer.class) || (clazz == Short.class) || (clazz == Character.class)
+                || (clazz == Byte.class) || (clazz == Boolean.class) || (clazz == String.class);
     }
 
     @Override
@@ -113,17 +91,64 @@ public class PersistenceContextImpl implements PersistenceContext {
         }
     }
 
-    private <T> T createDeepCopy(T original) {
+    @Override
+    public <T> T getEntity(Class<T> clazz, String id) {
+        Object retrieved = Optional.ofNullable(FIRST_CACHE.get(clazz))
+                .map(it -> it.get(id))
+                .orElse(null);
+        if (retrieved == null) {
+            Object loaded = entityPersister.load(clazz, id);
+
+            Map<String, Object> entityMap = getOrCreateEntityMap(clazz, SNAP_SHOT);
+
+            if (loaded != null) {
+                entityMap.put(id, createDeepCopy(loaded));
+
+                SNAP_SHOT.put(clazz, entityMap);
+            }
+
+            return clazz.cast(loaded);
+        }
+        return clazz.cast(retrieved);
+    }
+
+    @Override
+    public <T> T addEntity(T instance, IdAttribute idAttribute) {
         try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(original);
-            oos.flush();
-            ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bin);
-            return (T) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("딥카피 실패", e);
+            Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(instance.getClass(), SNAP_SHOT);
+            Map<String, Object> firstcacheEntityMap = getOrCreateEntityMap(instance.getClass(), FIRST_CACHE);
+
+            idAttribute.getField().setAccessible(true);
+
+            String id = Optional.ofNullable(idAttribute.getField().get(instance)).map(String::valueOf).orElse(null);
+
+            T snapshot = null;
+
+            if (id == null) {
+                if (idAttribute.getGenerationType() == null) {
+                    throw new RuntimeException("id가 null이고 generationType이 null 입니다.");
+                }
+
+                T inserted = entityPersister.insert(instance);
+
+                snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), inserted);
+                firstcacheEntityMap.put(getInstanceId(instance, idAttribute.getField()), inserted);
+
+                return inserted;
+            }
+
+            if (idAttribute.getGenerationType() != null) {
+                snapshot = getDatabaseSnapshot(String.valueOf(idAttribute.getField().get(instance)), instance);
+            }
+
+            assert snapshot != null;
+
+            snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), instance);
+            firstcacheEntityMap.put(getInstanceId(instance, idAttribute.getField()), instance);
+
+            return entityPersister.update(snapshot, instance);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }
