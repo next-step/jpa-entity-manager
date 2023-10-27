@@ -1,18 +1,18 @@
 package persistence.entity.attribute.resolver;
 
-import persistence.entity.attribute.StringTypeGeneralAttribute;
-import persistence.entity.attribute.id.IdAttribute;
+import persistence.entity.attribute.GeneralAttribute;
+import persistence.entity.attribute.IntegerTypeGeneralAttribute;
 
 import java.lang.reflect.Field;
 
 public class IntegerTypeGeneralAttributeResolver implements GeneralAttributeResolver {
     @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz == String.class;
+    public boolean support(Class<?> clazz) {
+        return clazz == Integer.class;
     }
 
     @Override
-    public IdAttribute resolve(Field field) {
-        return StringTypeGeneralAttribute.of(field);
+    public GeneralAttribute resolve(Field field) {
+        return IntegerTypeGeneralAttribute.of(field);
     }
 }

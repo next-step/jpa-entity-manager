@@ -53,7 +53,7 @@ public class EntityPersister {
         Class<?> idType = idField.getType();
 
         for (IdAttributeResolver idAttributeResolver : ID_ATTRIBUTE_RESOLVERS) {
-            if (idAttributeResolver.supports(idType)) {
+            if (idAttributeResolver.support(idType)) {
                 idAttributeResolver.setGeneratedIdToEntity(instance, idField, key);
                 return;
             }

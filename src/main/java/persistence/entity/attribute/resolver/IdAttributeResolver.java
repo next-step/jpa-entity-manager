@@ -5,7 +5,7 @@ import persistence.entity.attribute.id.IdAttribute;
 import java.lang.reflect.Field;
 
 public interface IdAttributeResolver {
-    boolean supports(Class<?> clazz);
+    boolean support(Class<?> clazz);
 
     IdAttribute resolve(Field field);
 

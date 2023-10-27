@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import persistence.entity.attribute.id.IdAttribute;
-import persistence.entity.attribute.id.resolver.*;
 import persistence.entity.attribute.resolver.*;
 import persistence.sql.ddl.wrapper.DDLWrapper;
 
@@ -16,15 +15,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EntityAttribute {
-    private final String tableName;
-    private final List<GeneralAttribute> generalAttributes;
-    private final IdAttribute idAttribute;
     private static final List<IdAttributeResolver> ID_ATTRIBUTE_RESOLVERS;
-
-    private static final List<IdAttributeResolver> GENERAL_ATTRIBUTE_RESOLVERS;
+    private static final List<GeneralAttributeResolver> GENERAL_ATTRIBUTE_RESOLVERS;
 
     static {
-        ID_RESOLVERS = Arrays.asList(
+        GENERAL_ATTRIBUTE_RESOLVERS = Arrays.asList(
                 new StringTypeGeneralAttributeResolver(),
                 new LongTypeGeneralAttributeResolver(),
                 new IntegerTypeGeneralAttributeResolver()
@@ -32,11 +27,15 @@ public class EntityAttribute {
     }
 
     static {
-        ID_RESOLVERS = Arrays.asList(
+        ID_ATTRIBUTE_RESOLVERS = Arrays.asList(
                 new StringTypeIdAttributeResolver(),
                 new LongTypeIdAttributeResolver()
         );
     }
+
+    private final String tableName;
+    private final List<GeneralAttribute> generalAttributes;
+    private final IdAttribute idAttribute;
 
     private EntityAttribute(
             String tableName,
@@ -59,11 +58,11 @@ public class EntityAttribute {
                 .map(it -> {
                     for (GeneralAttributeResolver generalAttributeResolver : GENERAL_ATTRIBUTE_RESOLVERS) {
                         if (generalAttributeResolver.support(it.getType())) {
-                            return generalAttributeResolver.resolver(it)
+                            return generalAttributeResolver.resolve(it);
                         }
-                    })
+                    }
+                    throw new RuntimeException("일반 어트리뷰트 파싱 실패 예외");
                 }).collect(Collectors.toList());
-
 
         Field idField = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
@@ -72,8 +71,8 @@ public class EntityAttribute {
 
         IdAttribute idAttribute = null;
 
-        for (IdAttributeResolver idAttributeResolver : ID_RESOLVERS) {
-            if (idAttributeResolver.supports(idField.getType())) {
+        for (IdAttributeResolver idAttributeResolver : ID_ATTRIBUTE_RESOLVERS) {
+            if (idAttributeResolver.support(idField.getType())) {
                 idAttribute = idAttributeResolver.resolve(idField);
             }
         }
