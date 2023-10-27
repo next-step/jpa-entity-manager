@@ -15,6 +15,7 @@ import persistence.dialect.Dialect;
 import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
+import persistence.testFixtures.NoAutoIncrementPerson;
 import persistence.testFixtures.Person;
 
 class DefaultEntityManagerTest {
@@ -72,20 +73,38 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티 매니저에 의해 하나의 데이터만 조회 된다.")
     void findById() {
         //given
-        Person person = new Person("이름", 19, "asd@gmail.com");
+        NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L,"이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
-                dialect);
+        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
         entityManager.persist(person);
 
         //when
-        final Person savePerson = entityManager.findAll(Person.class).get(0);
-        final Person findPerson = entityManager.find(Person.class, savePerson.getId());
+        final NoAutoIncrementPerson savePerson = entityManager.find(NoAutoIncrementPerson.class, 2L);
+
 
         //then
-//        assertSoftly((it) -> {
-//            it.assertThat(findPerson);
-//        });
+        assertThat(savePerson).isEqualTo(person);
+    }
+
+    @Test
+    @DisplayName("1차 캐시에 의해 조회가 된다.")
+    void firstCache() {
+        //given
+        Person person = new Person("이름", 19, "asd@gmail.com");
+        Dialect dialect = new FakeDialect();
+        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
+
+
+        //when
+        final Person person1 = entityManager.persist(person);
+        final Person person2 = entityManager.persist(person);
+        final Person person3 = entityManager.persist(person);
+
+
+        //then
+        assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
+        assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
+        assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
     }
 
 
