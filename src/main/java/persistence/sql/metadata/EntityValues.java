@@ -3,35 +3,41 @@ package persistence.sql.metadata;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Values {
-	private final List<Value> values;
+public class EntityValues {
+	private final List<EntityValue> entityValues;
 
-	public Values(List<Value> values) {
-		this.values = values;
+	public EntityValues(List<EntityValue> entityValues) {
+		this.entityValues = entityValues;
 	}
 
 	public String buildValueClause() {
-		return values.stream()
-				.map(Value::getValue)
+		return entityValues.stream()
+				.map(EntityValue::getValue)
 				.collect(Collectors.joining(","));
 	}
 
 	public String buildColumnsClause() {
 		return new Columns(
-				values.stream()
-				.map(Value::getColumn)
+				entityValues.stream()
+				.map(EntityValue::getColumn)
 				.collect(Collectors.toList())
 			).buildColumnsToInsert();
 	}
 
+	public String buildSetClause() {
+		return entityValues.stream()
+				.map(x -> x.getColumn().getName() + " = " + x.getValue())
+				.collect(Collectors.joining(", "));
+	}
+
 	public String buildWhereClause() {
-		return values.stream()
+		return entityValues.stream()
 				.map(x -> x.getColumn().getName() + " = " + x.getValue())
 				.collect(Collectors.joining(" AND "));
 	}
 
 	public String buildWherePKClause() {
-		return values.stream()
+		return entityValues.stream()
 				.filter(x -> x.getColumn().isPrimaryKey())
 				.map(x -> x.getColumn().getName() + " = " + x.getValue())
 				.findFirst().get();

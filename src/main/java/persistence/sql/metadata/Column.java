@@ -38,12 +38,16 @@ public class Column {
                 .toString();
     }
 
-    public boolean checkPossibleToInsert() {
+    public boolean checkPossibleToBeValue() {
         return !isTransient && !constraint.isPrimaryKey();
     }
 
     public boolean isPrimaryKey() {
         return constraint.isPrimaryKey();
+    }
+
+    public boolean isNullable() {
+        return constraint.isNullable();
     }
 
     private String findName(Field field) {

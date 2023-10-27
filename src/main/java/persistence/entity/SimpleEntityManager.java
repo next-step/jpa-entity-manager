@@ -2,51 +2,40 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import jdbc.EntityMapper;
-import jdbc.JdbcTemplate;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.WhereClauseBuilder;
 import persistence.sql.metadata.EntityMetadata;
-import persistence.sql.metadata.Value;
-import persistence.sql.metadata.Values;
+import persistence.sql.metadata.EntityValue;
+import persistence.sql.metadata.EntityValues;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class SimpleEntityManager implements EntityManager{
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
 
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
-
-    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
-
-    private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-
-    public SimpleEntityManager(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public SimpleEntityManager(EntityPersister entityPersister) {
+        this.entityPersister = entityPersister;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        Values values = new Values(Arrays.stream(clazz.getDeclaredFields())
+        EntityValues entityValues = new EntityValues(Arrays.stream(clazz.getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
-                .map(x -> new Value(x, String.valueOf(id)))
+                .map(x -> new EntityValue(x, String.valueOf(id)))
                 .collect(Collectors.toList()));
 
-        String query = selectQueryBuilder.buildFindByIdQuery(new EntityMetadata(clazz), new WhereClauseBuilder(values));
-        return jdbcTemplate.queryForObject(query, new EntityMapper<>(clazz));
+        String query = new SelectQueryBuilder().buildFindByIdQuery(new EntityMetadata(clazz), new WhereClauseBuilder(entityValues));
+        return entityPersister.getJdbcTemplate().queryForObject(query, new EntityMapper<>(clazz));
     }
 
     @Override
     public void persist(Object entity) {
-        String query = insertQueryBuilder.buildQuery(new EntityMetadata(entity.getClass()), entity);
-        jdbcTemplate.execute(query);
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        String query = deleteQueryBuilder.buildQuery(new EntityMetadata(entity.getClass()), new WhereClauseBuilder(entity));
-        jdbcTemplate.execute(query);
+        entityPersister.delete(entity);
     }
 }

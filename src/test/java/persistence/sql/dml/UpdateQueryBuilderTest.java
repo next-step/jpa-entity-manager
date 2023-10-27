@@ -11,14 +11,16 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class InsertQueryBuilderTest {
+class UpdateQueryBuilderTest {
+	private UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+
 	private final EntityMetadata entityMetadata = new EntityMetadata(Person.class);
 
-	private final Person person = new Person("hhhhhwi", 1, "aab555586@gmail.com", 0);
+	private final Person person = new Person(1L, "update", 2, "update@email.com", 0);
 
-	@DisplayName("Person 객체로 INSERT 쿼리 생성 테스트")
+	@DisplayName("Person 객체로 UPDATE 쿼리 생성 테스트")
 	@Test
 	void test_buildQuery() {
 		Field[] fields = person.getClass().getDeclaredFields();
@@ -28,9 +30,6 @@ class InsertQueryBuilderTest {
 				.filter(EntityValue::checkPossibleToBeValue)
 				.collect(Collectors.toList()));
 
-		assertEquals(
-				new InsertQueryBuilder().buildQuery(entityMetadata, entityValues),
-				"INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');"
-		);
+		assertEquals(updateQueryBuilder.buildByIdQuery(entityMetadata, entityValues, new WhereClauseBuilder(person)), "UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE id = 1;");
 	}
 }
