@@ -20,10 +20,13 @@ public class EntityPersister {
     private final InsertQueryBuilder insertQueryBuilder;
     private final UpdateQueryBuilder updateQueryBuilder;
 
+    private final PersistenceContext persistenceContext;
 
-    public EntityPersister(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, QueryGenerator queryGenerator) {
+
+    public EntityPersister(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate, EntityMeta entityMeta, QueryGenerator queryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityMeta = entityMeta;
+        this.persistenceContext = persistenceContext;
         this.deleteQueryBuilder = queryGenerator.delete();
         this.insertQueryBuilder = queryGenerator.insert();
         this.updateQueryBuilder = queryGenerator.update();
@@ -35,10 +38,11 @@ public class EntityPersister {
         if (entityMeta.isAutoIncrement()) {
             final long id = jdbcTemplate.insertForGenerateKey(query);
             changeValue(entityMeta.getPkColumn(), entity, id);
+            persistenceContext.getDatabaseSnapshot(entityMeta.getPkValue(entity), entity);
             return entity;
         }
-
         jdbcTemplate.execute(query);
+        persistenceContext.getDatabaseSnapshot(entityMeta.getPkValue(entity), entity);
         return entity;
     }
 

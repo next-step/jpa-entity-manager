@@ -19,7 +19,7 @@ public class DefaultEntityManager implements EntityManager {
         this.entityMeta = entityMeta;
         this.persistenceContext = new DefaultPersistenceContext(entityMeta);
         this.entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
-        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        this.entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta, queryGenerator);
     }
 
     @Override
@@ -47,7 +47,8 @@ public class DefaultEntityManager implements EntityManager {
 
         final T entity = entityLoader.find(clazz, id);
         if (entity != null) {
-            persistenceContext.addEntity(getCacheKey(entity), entity);
+            persistenceContext.addEntity(id, entity);
+            persistenceContext.getDatabaseSnapshot(id, entity);
         }
         return entity;
     }
@@ -55,9 +56,10 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
         final List<T> findList = entityLoader.findAll(tClass);
-        findList.forEach((it) ->
-                persistenceContext.addEntity(getCacheKey(it), it)
-        );
+        findList.forEach((it) -> {
+            persistenceContext.addEntity(getCacheKey(it), it);
+            persistenceContext.getDatabaseSnapshot(getCacheKey(it), it);
+        });
         return findList;
     }
 
@@ -65,5 +67,8 @@ public class DefaultEntityManager implements EntityManager {
         return entityMeta.getPkValue(persistEntity);
     }
 
-
+    @Override
+    public void flush() {
+        persistenceContext.clear();
+    }
 }

@@ -61,6 +61,10 @@ public class Person {
         return email;
     }
 
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+
     public Integer getIndex() {
         return index;
     }

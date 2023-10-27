@@ -27,7 +27,7 @@ public class NoAutoIncrementPerson {
     private Integer index;
 
 
-    protected NoAutoIncrementPerson() {
+    public NoAutoIncrementPerson() {
     }
 
     public NoAutoIncrementPerson(Long id ,String name, Integer age, String email) {

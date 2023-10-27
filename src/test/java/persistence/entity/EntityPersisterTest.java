@@ -41,8 +41,10 @@ class EntityPersisterTest {
     void entityAutoIncrementSave() {
         Person person = new Person("이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(person.getClass());
+        PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        EntityPersister entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta,
+                queryGenerator);
 
         final Person result = entityPersister.insert(person);
 
@@ -55,13 +57,17 @@ class EntityPersisterTest {
     @Test
     @DisplayName("엔티티가 저장이 된다.")
     void entitySave() {
+        //given
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(3L,"이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(person.getClass());
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
+        EntityPersister entityPersister = new EntityPersister(persistenceContext,jdbcTemplate, entityMeta, queryGenerator);
 
+        //when
         final NoAutoIncrementPerson result = entityPersister.insert(person);
 
+        //then
         assertSoftly(it -> {
             it.assertThat(result.getId()).isEqualTo(3L);
             it.assertThat(result).isEqualTo(person);
@@ -71,22 +77,28 @@ class EntityPersisterTest {
     @Test
     @DisplayName("엔티티가 업데이트가 된다.")
     void entityUpdate() {
+        //given
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
         EntityMeta entityMeta = new EntityMeta(Person.class);
+        PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        EntityPersister entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta, queryGenerator);
 
+        //when & then
         assertThat(entityPersister.update(person)).isTrue();
     }
 
     @Test
     @DisplayName("엔티티가 삭제 된다.")
     void entityDelete() {
+        //given
         final EntityMeta entityMeta = new EntityMeta(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(Person.class, dialect);
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
+        EntityPersister entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta, queryGenerator);
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
 
+        //then
         Assertions.assertDoesNotThrow(() -> {
             entityPersister.delete(person);
         });

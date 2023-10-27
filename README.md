@@ -28,5 +28,9 @@
 ---
 # 3단계 - First Level Cache, Dirty Check 구현 
  - [X] 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
- - [ ] 요구사항2 - snapshot 만들기
+ - [X] 요구사항2 - snapshot 만들기
+   - [X] snapshot 객체 만들기 
+   - [X] snapshot을 저장할 수 있는 공간 구현 
+   - [X] 변경된 엔터티 조회
+   - [ ] 원본과 스냅샷으로 수정된 쿼리 만들기 
  - [ ] 요구사항3 - Dirty Check 기능을 구현해보자 
