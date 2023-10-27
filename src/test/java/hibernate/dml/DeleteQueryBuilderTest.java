@@ -1,6 +1,6 @@
 package hibernate.dml;
 
-import hibernate.entity.column.EntityField;
+import hibernate.entity.meta.column.EntityField;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 

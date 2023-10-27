@@ -3,8 +3,11 @@ package hibernate.entity;
 import hibernate.dml.DeleteQueryBuilder;
 import hibernate.dml.InsertQueryBuilder;
 import hibernate.dml.UpdateQueryBuilder;
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
 import jdbc.JdbcTemplate;
+
+import java.util.Map;
 
 public class EntityPersister {
 
@@ -17,25 +20,23 @@ public class EntityPersister {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean update(final Object entity) {
-        EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
-        EntityColumn entityId = entityClass.getEntityId();
+    public boolean update(final EntityClass<?> entityClass, final Object entityId, final Map<EntityColumn, Object> updateFields) {
         final String query = updateQueryBuilder.generateQuery(
                 entityClass.tableName(),
-                entityClass.getFieldValues(entity),
-                entityId,
-                entityId.getFieldValue(entity)
+                updateFields,
+                entityClass.getEntityId(),
+                entityId
         );
         return jdbcTemplate.executeUpdate(query);
     }
 
-    public void insert(final Object entity) {
+    public Object insert(final Object entity) {
         EntityClass<?> entityClass = EntityClass.getInstance(entity.getClass());
         final String query = insertQueryBuilder.generateQuery(
                 entityClass.tableName(),
                 entityClass.getFieldValues(entity)
         );
-        jdbcTemplate.execute(query);
+        return jdbcTemplate.executeInsert(query);
     }
 
     public void delete(final Object entity) {

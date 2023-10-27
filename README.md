@@ -47,3 +47,88 @@ public void delete(parameters는 자유롭게)
   - select 쿼리를 실행하여 엔티티 객체에 로드한다.
 - ReflectionRowMapper
   - clazz를 받아 계속 생성하는데, 이미 생성한 ReflectionRowMapper를 캐싱하여 반환할 수 있도록 한다.
+
+### 3단계 - First Level Cache, Dirty Check
+#### 요구사항1
+- PersistenceContext 구현체를 만들고, 1차 캐싱을 적용한다.
+```java
+public interface PersistenceContext {
+
+    Object getEntity(Long id);
+
+    void addEntity(Long id, Object entity);
+
+    void removeEntity(Object entity);
+}
+```
+- PersistenceContext
+  - getEntity
+    - Map에 저장되어있는 entity를 반환한다.
+    - 존재하지 않는다면 null을 반환한다.
+  - addEntity
+    - entity를 넣는다.
+  - removeEntity
+    - entity를 삭제한다.
+- EntityManager
+  - find
+    - PersistenceContext에서 검색 후 없으면 EntityLoader에서 검색 후 PersistenceContext에 저장한다.
+  - persist
+    - PersistenceContext에 이미 entity가 영속화되어있으면 예외가 발생한다. (이걸 addEntity에서 해야하나?)
+    - EntityPersister에서 insert한 후 PersistenceContext에 넣는다.
+  - remove
+    - 영속화 되어있지 않은 entity를 제거하려하는 경우 예외가 발생한다.
+    - EntityPersister에서 제거 및 PersistenceContext에도 제거한다.
+
+#### 요구사항2
+```
+1. 영속 컨텍스트 내에서 Entity 를 조회
+2. 조회된 상태의 Entity 를 스냅샷 생성
+3. 트랜잭션 커밋 후 해당 스냅샷과 현재 Entity 를 비교 (데이터베이스 커밋은 신경쓰지 않는다)
+4. 다른 점을 쿼리로 생성
+```
+```java
+public interface PersistenceContext {
+    // ...
+
+    /*
+    스냅샷을 만들 때 Object 가 아니라 EntityPersister 라는 인터페이스를 활용해 엔티티가 영속화 될 때 
+    데이터베이스로 부터 데이터를 pesister.getDatabaseSnapshot 메서드를 통해 가져옴 
+    너무 많은 로직이 있기에 간단하게 구현
+     */
+    Object getDatabaseSnapshot(Long id, Object entity);
+
+    Object getCachedDatabaseSnapshot(Long id);
+    
+    // ....
+```
+- getDatabaseSnapshot
+  - EntitySnapShot을 저장한다.
+- getCachedDatabaseSnapshot 
+  - 저장된 EntitySnapshot을 가져온다.
+- EntitySnapShot
+  - EntityColumn과 그에 따른 필드를 가지고 있다.
+  - Object인 Entity를 받아 변경된 entity field 데이터를 뽑아낼 수 있다. 
+- EntityManager
+  - snapshot도 entires와 동일하게 동기화해준다.
+  - merge
+    - 들어온 entity가 snapshot과 동일한지 확인하고 update한다.
+    - update한 후 persistenceContext를 동기화한다.
+    - snapshot이 없는 경우 find하여 가져와야 한다.
+
+#### 요구사항3
+```java
+public class CustomJpaRepository<T, ID> {
+    private final EntityManager entityManager;
+    
+    public CustomJpaRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+    
+    public T save(T t) {
+    // 트랜잭션은 신경 쓰지말고 구현해보자
+   }
+...
+}
+```
+- 처음 저장한 entity의 경우 persist한다.
+- 처음 저장한 entity가 아닌 경우 merge한다.

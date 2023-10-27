@@ -1,6 +1,6 @@
 package hibernate.ddl;
 
-import hibernate.entity.EntityClass;
+import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;

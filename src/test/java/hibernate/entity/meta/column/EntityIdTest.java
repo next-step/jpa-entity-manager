@@ -1,5 +1,6 @@
-package hibernate.entity.column;
+package hibernate.entity.meta.column;
 
+import hibernate.entity.meta.column.EntityId;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;

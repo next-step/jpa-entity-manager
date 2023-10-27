@@ -1,5 +1,7 @@
-package hibernate.entity.column;
+package hibernate.entity.meta.column;
 
+import hibernate.entity.meta.column.ColumnType;
+import hibernate.entity.meta.column.EntityField;
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 import org.junit.jupiter.api.Test;

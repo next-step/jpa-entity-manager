@@ -1,6 +1,6 @@
 package jdbc;
 
-import hibernate.entity.EntityClass;
+import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.*;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.Test;

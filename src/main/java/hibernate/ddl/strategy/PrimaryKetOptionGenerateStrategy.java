@@ -1,6 +1,6 @@
 package hibernate.ddl.strategy;
 
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.column.EntityColumn;
 
 public class PrimaryKetOptionGenerateStrategy implements ColumnOptionGenerateStrategy {
 

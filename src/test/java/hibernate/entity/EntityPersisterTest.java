@@ -3,6 +3,7 @@ package hibernate.entity;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
+import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,11 +48,11 @@ class EntityPersisterTest {
     @Test
     void update_쿼리를_실행한다() {
         // given
-        TestEntity givenEntity = new TestEntity(1L, "영진최");
+        EntityClass<TestEntity> entityClass = EntityClass.getInstance(TestEntity.class);
         jdbcTemplate.execute("insert into test_entity (id, nick_name) values (1, '최진영');");
 
         // when
-        boolean actual = entityPersister.update(givenEntity);
+        boolean actual = entityPersister.update(entityClass, 1L, Map.of(entityClass.getEntityColumns().get(1), "영진최"));
 
         // then
         assertThat(actual).isTrue();

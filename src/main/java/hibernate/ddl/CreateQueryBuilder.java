@@ -4,8 +4,8 @@ import hibernate.ddl.strategy.ColumnOptionGenerateStrategy;
 import hibernate.ddl.strategy.IdIdentityOptionGenerateStrategy;
 import hibernate.ddl.strategy.NotNullOptionGenerateStrategy;
 import hibernate.ddl.strategy.PrimaryKetOptionGenerateStrategy;
-import hibernate.entity.EntityClass;
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityColumn;
 
 import java.util.List;
 import java.util.stream.Collectors;

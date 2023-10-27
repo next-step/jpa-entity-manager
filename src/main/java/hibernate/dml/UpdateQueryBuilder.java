@@ -1,7 +1,7 @@
 package hibernate.dml;
 
-import hibernate.entity.column.ColumnType;
-import hibernate.entity.column.EntityColumn;
+import hibernate.entity.meta.column.ColumnType;
+import hibernate.entity.meta.column.EntityColumn;
 
 import java.util.Map;
 import java.util.stream.Collectors;
