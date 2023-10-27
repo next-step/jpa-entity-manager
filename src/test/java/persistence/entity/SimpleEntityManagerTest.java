@@ -5,8 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.IntegrationTestEnvironment;
+import persistence.exception.PersistenceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -83,12 +85,20 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
     }
 
     @Test
-    @DisplayName("Entity 를 변경 후 persist 하면 update 된다.")
-    void updatePersistTest() {
+    @DisplayName("이미 존재하는 Entity 를 persist 하면 Exception 이 던져진다.")
+    void entityExistPersistTest() {
+        final Person test = entityManager.find(Person.class, 1L);
+
+        assertThatThrownBy(() -> entityManager.persist(test)).isInstanceOf(PersistenceException.class);
+    }
+
+    @Test
+    @DisplayName("Entity 를 변경 후 merge 하면 update 된다.")
+    void mergeTest() {
         final Person test = entityManager.find(Person.class, 1L);
 
         test.changeEmail("changed!");
-        entityManager.persist(test);
+        entityManager.merge(test);
 
         final Person testV2 = jdbcTemplate.queryForObject("select * from users where id=1", personRowMapper());
         assertSoftly(softly -> {
@@ -97,6 +107,16 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
             softly.assertThat(test.getAge()).isEqualTo(testV2.getAge());
             softly.assertThat(test.getEmail()).isEqualTo(testV2.getEmail());
         });
+    }
+
+    @Test
+    @DisplayName("id 가 없는 Entity 를 merge 하면 Exception 이 던져진다.")
+    void idNullMergeTest() {
+        final Person test = new Person("hasId", 1, "hasId@id.com");
+
+        test.changeEmail("changed!");
+
+        assertThatThrownBy(() -> entityManager.merge(test)).isInstanceOf(PersistenceException.class);
     }
 
     @Test
