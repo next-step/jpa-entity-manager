@@ -23,6 +23,9 @@ public class AttributeParser {
         if (field.getType().equals(Long.class)) {
             return LongTypeIdAttribute.of(field);
         }
+        if (field.getType().equals(Integer.class)) {
+            return LongTypeIdAttribute.of(field);
+        }
         throw new IllegalStateException(String.format("[%s] 알수없는 필드 타입입니다.", field.getType()));
     }
 

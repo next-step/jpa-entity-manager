@@ -7,15 +7,13 @@ import java.lang.reflect.Field;
 
 
 public class StringTypeGeneralAttribute extends GeneralAttribute {
-    private final Field field;
     private final int length;
     private final String fieldName;
     private final String columnName;
     private final boolean nullable;
 
 
-    private StringTypeGeneralAttribute(Field field, int length, String fieldName, String columnName, boolean nullable) {
-        this.field = field;
+    private StringTypeGeneralAttribute(int length, String fieldName, String columnName, boolean nullable) {
         this.length = length;
         this.fieldName = fieldName;
         this.columnName = columnName;
@@ -25,7 +23,6 @@ public class StringTypeGeneralAttribute extends GeneralAttribute {
     public static StringTypeGeneralAttribute of(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
         return new StringTypeGeneralAttribute(
-                field,
                 column.length(),
                 field.getName(),
                 column.name().isBlank() ? field.getName() : column.name(),
@@ -51,8 +48,4 @@ public class StringTypeGeneralAttribute extends GeneralAttribute {
         return this.fieldName;
     }
 
-    @Override
-    public boolean isNullable() {
-        return this.nullable;
-    }
 }

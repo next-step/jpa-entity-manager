@@ -1,52 +1,73 @@
 package persistence.entity.manager;
 
-import jakarta.persistence.Id;
-import persistence.entity.loader.EntityLoader;
+import persistence.context.PersistenceContext;
+import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.loader.EntityLoaderImpl;
 import persistence.entity.persister.EntityPersister;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
-    private final EntityLoader entityLoader;
+    private final PersistenceContext persistenceContext;
+    private final EntityLoaderImpl entityLoaderImpl;
 
-
-    private EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
-        this.entityLoader = entityLoader;
+    private EntityManagerImpl(EntityPersister entityPersister,
+                              EntityLoaderImpl entityLoaderImpl,
+                              PersistenceContext persistenceContext) {
+        this.entityLoaderImpl = entityLoaderImpl;
         this.entityPersister = entityPersister;
-
+        this.persistenceContext = persistenceContext;
     }
 
-    public static EntityManagerImpl of(EntityPersister entityPersister, EntityLoader entityLoader) {
-        return new EntityManagerImpl(entityPersister, entityLoader);
+    public static EntityManagerImpl of(EntityPersister entityPersister,
+                                       EntityLoaderImpl entityLoaderImpl,
+                                       PersistenceContext persistenceContext) {
+        return new EntityManagerImpl(entityPersister, entityLoaderImpl, persistenceContext);
     }
 
     @Override
     public <T> T findById(Class<T> clazz, String id) {
-        return entityLoader.load(clazz, id);
+        T retrieved = persistenceContext.getEntity(clazz, id);
+
+        if (retrieved == null) {
+            return loadAndManageEntity(clazz, id);
+        }
+
+        return retrieved;
     }
 
     @Override
     public <T> T persist(T instance) {
-        return entityPersister.insert(instance);
+        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass());
+
+        T inserted = entityPersister.insert(instance);
+
+        String instanceId = getInstanceId(instance, entityAttribute.getIdAttribute().getField());
+        persistenceContext.addEntity(inserted, instanceId);
+
+        return inserted;
     }
 
     @Override
-    public <T> void remove(T entity) {
-        entityPersister.remove(entity, getEntityId(entity));
+    public <T> void remove(T instance) {
+        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass());
+        String instanceId = getInstanceId(instance, entityAttribute.getIdAttribute().getField());
+
+        persistenceContext.removeEntity(instance, instanceId);
+
+        entityPersister.remove(instance, instanceId);
     }
 
-    private <T> String getEntityId(T entity) {
-        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("ID 필드를 찾을 수 없습니다."));
+    private <T> T loadAndManageEntity(Class<T> clazz, String id) {
+        return entityLoaderImpl.load(clazz, id);
+    }
 
+    private <T> String getInstanceId(T instance, Field idField) {
         idField.setAccessible(true);
 
         try {
-            Object idValue = idField.get(entity);
+            Object idValue = idField.get(instance);
 
             assert idValue != null;
 

@@ -8,6 +8,4 @@ abstract public class GeneralAttribute {
     abstract public String getColumnName();
 
     abstract public String getFieldName();
-
-    abstract public boolean isNullable();
 }

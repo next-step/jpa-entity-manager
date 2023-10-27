@@ -99,20 +99,56 @@ public class TestEntityFixture {
     }
 
     @Table(name = "entity_with_string_id")
+    @Entity
     public static class EntityWithStringId {
         @Id
         String id;
-        @Id
         @Column(name = "name", length = 200)
         String name;
         @Column(name = "age")
         Integer age;
+
+        public EntityWithStringId() {
+        }
 
         public EntityWithStringId(String id, String name, Integer age) {
             this.id = id;
             this.name = name;
             this.age = age;
         }
+    }
 
+    @Table(name = "entity_with_Integer_id")
+    @Entity
+    public static class EntityWithIntegerId {
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        Integer id;
+        @Column(name = "name", length = 200)
+        String name;
+        @Column(name = "age")
+        Integer age;
+
+        public EntityWithIntegerId(String name, Integer age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public EntityWithIntegerId() {
+
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return "EntityWithIntegerId{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", age=" + age +
+                    '}';
+        }
     }
 }

@@ -7,10 +7,15 @@ import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
-
+    private static final List<IdTypeHandler> ID_TYPE_HANDLERS = Arrays.asList(
+            new LongIdTypeHandler(),
+            new IntegerIdTypeHandler()
+    );
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -43,20 +48,11 @@ public class EntityPersister {
         Field idField = idAttribute.getField();
         Class<?> idType = idField.getType();
 
-        if (idType == Long.class) {
-            setGeneratedIdToEntity(instance, idField, key);
-        }
-        if (idType == Integer.class) {
-            setGeneratedIdToEntity(instance, idField, (int) key);
-        }
-    }
-
-    private <T, U> void setGeneratedIdToEntity(T instance, Field idField, U key) {
-        idField.setAccessible(true);
-        try {
-            idField.set(instance, key);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("인스턴스의 ID 필드에 키 값을 할당하는데 실패했습니다.", e);
+        for (IdTypeHandler handler : ID_TYPE_HANDLERS) {
+            if (handler.support(idType)) {
+                handler.setGeneratedIdToEntity(instance, idField, key);
+                return;
+            }
         }
     }
 }

@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Nested
 @DisplayName("EntityLoader 클래스의")
-public class EntityLoaderTest extends DatabaseTest {
+public class EntityLoaderImplTest extends DatabaseTest {
 
     private final TestEntityFixture.SampleOneWithValidAnnotation sample =
             new TestEntityFixture.SampleOneWithValidAnnotation("민준", 29);
@@ -38,10 +38,10 @@ public class EntityLoaderTest extends DatabaseTest {
                 TestEntityFixture.SampleOneWithValidAnnotation inserted = entityPersister.insert(sample);
 
 
-                EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate);
 
                 TestEntityFixture.SampleOneWithValidAnnotation retrieved =
-                        entityLoader.load(TestEntityFixture.SampleOneWithValidAnnotation.class, inserted.getId().toString());
+                        entityLoaderImpl.load(TestEntityFixture.SampleOneWithValidAnnotation.class, inserted.getId().toString());
 
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
             }
