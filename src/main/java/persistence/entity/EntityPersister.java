@@ -9,17 +9,14 @@ import persistence.sql.metadata.EntityMetadata;
 public class EntityPersister {
 	private final JdbcTemplate jdbcTemplate;
 
-	private final EntityMetadata entityMetadata;
-
 	private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
 
 	private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
 
 	private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
 
-	public EntityPersister(JdbcTemplate jdbcTemplate, EntityMetadata entityMetadata) {
+	public EntityPersister(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
-		this.entityMetadata = entityMetadata;
 	}
 
 	public void insert(Object entity) {
