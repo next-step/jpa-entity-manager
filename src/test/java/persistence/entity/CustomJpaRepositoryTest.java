@@ -10,15 +10,14 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class CustomJpaRepositoryTest extends IntegrationTestEnvironment {
 
-    EntityManager entityManager;
-    CustomJpaRepository<Person, Long> customJpaRepository;
+    private CustomJpaRepository<Person, Long> customJpaRepository;
 
     @BeforeEach
     void setup() {
         final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
         final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
         final EntityKeyGenerator entityKeyGenerator = new EntityKeyGenerator();
-        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider, entityKeyGenerator);
+        final EntityManager entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider, entityKeyGenerator);
         customJpaRepository = new CustomJpaRepository<>(entityManager, Person.class);
     }
 
