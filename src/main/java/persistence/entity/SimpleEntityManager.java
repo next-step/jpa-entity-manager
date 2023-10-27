@@ -71,7 +71,7 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private <T> Object initEntity(final EntityKey entityKey, final EntityLoader<T> entityLoader) {
-        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey());
+        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey()).orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
         persistenceContext.addEntity(entityKey, entityFromDatabase);
         persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
         return entityFromDatabase;
