@@ -2,9 +2,9 @@ package persistence.entity;
 
 public interface PersistenceContext {
 
-    Object getEntity(Long id);
+    <T> T getEntity(Class<T> clazz, Long Id);
 
-    void addEntity(Long id, Object entity);
+    void addEntity(Object entity);
 
     void removeEntity(Object entity);
 }
