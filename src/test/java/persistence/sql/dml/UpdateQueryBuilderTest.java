@@ -21,11 +21,10 @@ class UpdateQueryBuilderTest {
 				"UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE id = 1 AND nick_name = 'update' AND old = 2 AND email = 'update@email.com';");
 	}
 
-		EntityValues entityValues = new EntityValues(Arrays.stream(fields)
-				.map(x -> new EntityValue(x, person))
-				.filter(EntityValue::checkPossibleToBeValue)
-				.collect(Collectors.toList()));
-
-		assertEquals(updateQueryBuilder.buildByIdQuery(entityMetadata, entityValues, new WhereClauseBuilder(person)), "UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE id = 1;");
+	@DisplayName("Person 객체로 PK 조건절을 가진 UPDATE 쿼리 생성 테스트")
+	@Test
+	void test_buildByIdQuery() {
+		assertEquals(updateQueryBuilder.buildByIdQuery(entityMetadata),
+				"UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE id = 1;");
 	}
 }

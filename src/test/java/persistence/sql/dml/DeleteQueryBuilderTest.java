@@ -24,12 +24,12 @@ class DeleteQueryBuilderTest {
 		);
 	}
 
-	@DisplayName("Person 객체로 DELETE 쿼리 생성 테스트")
+	@DisplayName("Person 객체로 PK 조건절이 있는 DELETE 쿼리 생성 테스트")
 	@Test
-	void test_buildQueryWithWhereClause() {
+	void test_buildByIdQuery() {
 		assertEquals(
-				new DeleteQueryBuilder().buildQuery(entityMetadata, new WhereClauseBuilder(person)),
-				"DELETE FROM users WHERE id = 1 AND nick_name = 'hhhhhwi' AND old = 1 AND email = 'aab555586@gmail.com';"
+				new DeleteQueryBuilder().buildByIdQuery((entityMetadata)),
+				"DELETE FROM users WHERE id = 1;"
 		);
 	}
 }

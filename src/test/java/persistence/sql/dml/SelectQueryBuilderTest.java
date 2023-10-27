@@ -25,7 +25,7 @@ class SelectQueryBuilderTest {
 	@DisplayName("Person 객체로 전체 SELECT 쿼리 생성 테스트")
 	@Test
 	void test_buildFindByIdQuery() {
-		assertEquals(new SelectQueryBuilder().buildFindByIdQuery(entityMetadata, new WhereClauseBuilder(person)),
+		assertEquals(new SelectQueryBuilder().buildFindByIdQuery(Person.class, "1"),
 				"SELECT * FROM users WHERE id = 1;"
 		);
 	}

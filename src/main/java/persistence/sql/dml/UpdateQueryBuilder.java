@@ -18,7 +18,7 @@ public class UpdateQueryBuilder {
 		return format(UPDATE_COMMAND, entityMetadata.getTableName(), entityMetadata.buildSetClause() + whereClauseBuilder.buildClause());
 	}
 
-	public String buildByIdQuery(EntityMetadata entityMetadata, EntityValues entityValues, WhereClauseBuilder whereClauseBuilder) {
-		return format(UPDATE_COMMAND, entityMetadata.getTableName(), entityValues.buildSetClause() + whereClauseBuilder.buildPKClause());
+	public String buildByIdQuery(EntityMetadata entityMetadata) {
+		return format(UPDATE_COMMAND, entityMetadata.getTableName(), entityMetadata.buildSetClause() + new WhereClauseBuilder(entityMetadata).buildPKClause());
 	}
 }
