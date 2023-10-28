@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import domain.FixturePerson;
 import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,7 @@ class EntitySnapshotsTest {
     @BeforeEach
     void setUp() {
         entitySnapshots = new EntitySnapshots();
-        fixture = new Person(1L, "test", 0, "test@test.com");
+        fixture = FixturePerson.create(1L);
         fixtureEntityKey = new EntityKey(Person.class, 1L);
     }
 
