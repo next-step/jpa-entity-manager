@@ -1,5 +1,8 @@
 package persistence.entity;
 
+import persistence.exception.DuplicateContextException;
+import persistence.exception.InvalidContextException;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,7 +15,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public Object getEntity(Integer id) {
-        if(contextMap.containsKey(id)) {
+        if(isValidEntity(id)) {
             return contextMap.get(id);
         }
         return null;
@@ -20,11 +23,17 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void addEntity(Integer id, Object entity) {
+        if(isValidEntity(id)) {
+            throw new DuplicateContextException();
+        }
         contextMap.put(id, entity);
     }
 
     @Override
     public void removeEntity(Integer id) {
+        if(!isValidEntity(id)) {
+            throw new InvalidContextException();
+        }
         contextMap.remove(id);
     }
 
