@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.exception.PersistenceException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,5 +19,11 @@ public class EntityEntries {
 
     public Optional<EntityEntry> getEntityEntry(final EntityKey key) {
         return Optional.ofNullable(entityEntries.get(key));
+    }
+
+    public void updateEntityEntryStatus(final EntityKey entityKey, final Status status) {
+        final EntityEntry entityEntry = getEntityEntry(entityKey)
+                .orElseThrow(() -> new PersistenceException("EntityEntry 로 관리되고 있지 않은 Entity 입니다."));
+        entityEntry.updateStatus(status);
     }
 }

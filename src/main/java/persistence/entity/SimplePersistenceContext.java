@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import persistence.exception.PersistenceException;
-
 import java.util.Optional;
 
 public class SimplePersistenceContext implements PersistenceContext {
@@ -53,8 +51,6 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public void updateEntityEntryStatus(final EntityKey entityKey, final Status status) {
-        final EntityEntry entityEntry = getEntityEntry(entityKey)
-                .orElseThrow(() -> new PersistenceException("PersistenceContext 내에 관리되고 있지 않은 Entity 입니다."));
-        entityEntry.updateStatus(status);
+        entityEntries.updateEntityEntryStatus(entityKey, status);
     }
 }

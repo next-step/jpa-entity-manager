@@ -29,8 +29,7 @@ class EntityEntriesTest {
 
         assertSoftly(softly -> {
             softly.assertThat(result).isNotEmpty();
-            final EntityEntry entityEntry = result.get();
-            softly.assertThat(entityEntry.getStatus()).isEqualTo(Status.LOADING);
+            softly.assertThat(result.get().getStatus()).isEqualTo(Status.LOADING);
         });
     }
 
@@ -41,5 +40,21 @@ class EntityEntriesTest {
 
         assertThat(result).isEqualTo(Optional.empty());
     }
+
+    @Test
+    @DisplayName("updateEntityEntryStatus 를 통해 해당 key 의 EntityEntry 의 상태를 변경할 수 있다.")
+    void updateEntityEntryStatusTest() {
+        entityEntries.addEntityEntry(entityKey, Status.LOADING);
+
+        entityEntries.updateEntityEntryStatus(entityKey, Status.MANAGED);
+
+        final Optional<EntityEntry> result = entityEntries.getEntityEntry(entityKey);
+
+        assertSoftly(softly -> {
+            softly.assertThat(result).isNotEmpty();
+            softly.assertThat(result.get().getStatus()).isEqualTo(Status.MANAGED);
+        });
+    }
+
 
 }
