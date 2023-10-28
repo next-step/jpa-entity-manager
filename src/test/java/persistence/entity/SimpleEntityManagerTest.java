@@ -21,8 +21,7 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
     void setUp() {
         final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
         final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
-        final EntityKeyGenerator entityKeyGenerator = new EntityKeyGenerator();
-        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider, entityKeyGenerator);
+        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
     }
 
     @Test
