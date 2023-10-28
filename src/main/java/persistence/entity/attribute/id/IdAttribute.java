@@ -5,14 +5,14 @@ import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 
-public abstract class IdAttribute {
-    abstract public String prepareDDL(SqlConverter sqlConverter);
+public interface IdAttribute {
+    String prepareDDL(SqlConverter sqlConverter);
 
-    abstract public Field getField();
+    Field getField();
 
-    abstract public String getColumnName();
+    String getColumnName();
 
-    abstract public String getFieldName();
+    String getFieldName();
 
-    abstract public GenerationType getGenerationType();
+    GenerationType getGenerationType();
 }

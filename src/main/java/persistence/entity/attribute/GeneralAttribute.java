@@ -2,12 +2,10 @@ package persistence.entity.attribute;
 
 import persistence.sql.ddl.converter.SqlConverter;
 
-abstract public class GeneralAttribute {
-    abstract public String prepareDDL(SqlConverter sqlConverter);
+public interface GeneralAttribute {
+    String prepareDDL(SqlConverter sqlConverter);
 
-    abstract public String getColumnName();
+    String getColumnName();
 
-    abstract public String getFieldName();
-
-    abstract public boolean isNullable();
+    String getFieldName();
 }

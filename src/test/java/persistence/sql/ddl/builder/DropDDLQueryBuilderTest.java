@@ -1,10 +1,10 @@
 package persistence.sql.ddl.builder;
 
+import fixtures.TestEntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
-import persistence.fixture.TestEntityFixture;
 import persistence.sql.ddl.converter.SqlConverter;
 import persistence.sql.infra.H2SqlConverter;
 
@@ -25,7 +25,7 @@ public class DropDDLQueryBuilderTest {
             @Test
             @DisplayName("DROP DDL을 리턴한다.")
             void returnDDL() {
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleTwoWithValidAnnotation.class);
+                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixtures.SampleTwoWithValidAnnotation.class);
 
                 String dropDDL = DDLQueryBuilderFactory.createQueryBuilder(DROP)
                         .prepareStatement(entityAttribute, sqlConverter);

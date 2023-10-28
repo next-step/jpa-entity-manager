@@ -1,10 +1,10 @@
 package persistence.entity.attribute;
 
+import fixtures.TestEntityFixtures;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.fixture.TestEntityFixture;
 import persistence.sql.ddl.converter.SqlConverter;
 import persistence.sql.ddl.wrapper.CreateDDLWrapper;
 import persistence.sql.ddl.wrapper.DropDDLWrapper;
@@ -27,7 +27,7 @@ public class EntityAttributeTest {
             @DisplayName("EntityAttribute를 반환한다.")
             void returnEntityAttribute() {
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(TestEntityFixtures.SampleOneWithValidAnnotation.class);
 
                 Assertions.assertAll(
                         () -> assertThat(entityAttribute.getTableName())
@@ -50,7 +50,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                TestEntityFixture.EntityWithMultiIdAnnotation.class));
+                                TestEntityFixtures.EntityWithMultiIdAnnotation.class));
             }
         }
 
@@ -62,7 +62,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                TestEntityFixture.EntityWithOutEntityAnnotation.class));
+                                TestEntityFixtures.EntityWithOutEntityAnnotation.class));
             }
         }
     }

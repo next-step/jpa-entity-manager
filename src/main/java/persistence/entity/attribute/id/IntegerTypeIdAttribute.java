@@ -8,13 +8,13 @@ import persistence.sql.ddl.converter.SqlConverter;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-public class LongTypeIdAttribute implements IdAttribute {
+public class IntegerTypeIdAttribute implements IdAttribute {
     private final Field field;
     private final String fieldName;
     private final String columnName;
     private final GenerationType generationType;
 
-    public LongTypeIdAttribute(Field field) {
+    public IntegerTypeIdAttribute(Field field) {
         String columnName = Optional.ofNullable(field.getAnnotation(Column.class))
                 .map(Column::name).orElse(field.getName());
 
@@ -30,7 +30,7 @@ public class LongTypeIdAttribute implements IdAttribute {
     @Override
     public String prepareDDL(SqlConverter sqlConverter) {
         String component = (columnName.isBlank() ? fieldName : columnName) + " " +
-                sqlConverter.convert(Long.class) + " " +
+                sqlConverter.convert(Integer.class) + " " +
                 sqlConverter.convert(generationType.getClass());
         return component.trim();
     }

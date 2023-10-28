@@ -5,39 +5,21 @@ import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 
-public class LongTypeGeneralAttribute extends GeneralAttribute {
-    private final Field field;
+public class LongTypeGeneralAttribute implements GeneralAttribute {
     private final Integer scale;
     private final String fieldName;
     private final String columnName;
     private final boolean nullable;
 
-    private LongTypeGeneralAttribute(
-            Field field,
-            int scale,
-            String fieldName,
-            String columnName,
-            boolean nullable
-    ) {
-        this.field = field;
-        this.scale = scale;
-        this.fieldName = fieldName;
-        this.columnName = columnName != null && !columnName.isEmpty() ? columnName : fieldName;
-        this.nullable = nullable;
-    }
-
-    public static LongTypeGeneralAttribute of(Field field) {
+    public LongTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
 
         assert column != null;
 
-        return new LongTypeGeneralAttribute(
-                field,
-                column.scale(),
-                field.getName(),
-                column.name().isBlank() ? field.getName() : column.name(),
-                column.nullable()
-        );
+        this.scale = column.scale();
+        this.fieldName = field.getName();
+        this.columnName = column.name().isBlank() ? field.getName() : column.name();
+        this.nullable = column.nullable();
     }
 
     @Override
@@ -65,8 +47,4 @@ public class LongTypeGeneralAttribute extends GeneralAttribute {
         return this.fieldName;
     }
 
-    @Override
-    public boolean isNullable() {
-        return nullable;
-    }
 }

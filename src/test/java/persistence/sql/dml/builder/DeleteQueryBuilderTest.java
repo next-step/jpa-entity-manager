@@ -1,10 +1,10 @@
 package persistence.sql.dml.builder;
 
+import fixtures.TestEntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
-import persistence.fixture.TestEntityFixture;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -22,7 +22,7 @@ public class DeleteQueryBuilderTest {
             void returnDML() {
                 DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
                 String dml
-                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(TestEntityFixture.SampleTwoWithValidAnnotation.class), String.valueOf(1));
+                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(TestEntityFixtures.SampleTwoWithValidAnnotation.class), String.valueOf(1));
                 assertThat(dml).isEqualTo("DELETE FROM two where id = 1");
             }
         }

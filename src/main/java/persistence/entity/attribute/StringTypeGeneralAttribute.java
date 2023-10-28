@@ -6,31 +6,19 @@ import persistence.sql.ddl.converter.SqlConverter;
 import java.lang.reflect.Field;
 
 
-public class StringTypeGeneralAttribute extends GeneralAttribute {
-    private final Field field;
+public class StringTypeGeneralAttribute implements GeneralAttribute {
     private final int length;
     private final String fieldName;
     private final String columnName;
     private final boolean nullable;
 
-
-    private StringTypeGeneralAttribute(Field field, int length, String fieldName, String columnName, boolean nullable) {
-        this.field = field;
-        this.length = length;
-        this.fieldName = fieldName;
-        this.columnName = columnName;
-        this.nullable = nullable;
-    }
-
-    public static StringTypeGeneralAttribute of(Field field) {
+    public StringTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
-        return new StringTypeGeneralAttribute(
-                field,
-                column.length(),
-                field.getName(),
-                column.name().isBlank() ? field.getName() : column.name(),
-                column.nullable()
-        );
+
+        this.length = column.length();
+        this.fieldName = field.getName();
+        this.columnName = column.name().isBlank() ? field.getName() : column.name();
+        this.nullable = column.nullable();
     }
 
     @Override
@@ -51,8 +39,4 @@ public class StringTypeGeneralAttribute extends GeneralAttribute {
         return this.fieldName;
     }
 
-    @Override
-    public boolean isNullable() {
-        return this.nullable;
-    }
 }

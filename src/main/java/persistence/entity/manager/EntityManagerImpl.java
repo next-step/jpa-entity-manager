@@ -1,58 +1,40 @@
 package persistence.entity.manager;
 
-import jakarta.persistence.Id;
-import persistence.entity.loader.EntityLoader;
-import persistence.entity.persister.EntityPersister;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import persistence.context.PersistenceContext;
 
 public class EntityManagerImpl implements EntityManager {
-    private final EntityPersister entityPersister;
-    private final EntityLoader entityLoader;
+    private final PersistenceContext persistenceContext;
 
-
-    private EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
-        this.entityLoader = entityLoader;
-        this.entityPersister = entityPersister;
-
+    private EntityManagerImpl(PersistenceContext persistenceContext) {
+        this.persistenceContext = persistenceContext;
     }
 
-    public static EntityManagerImpl of(EntityPersister entityPersister, EntityLoader entityLoader) {
-        return new EntityManagerImpl(entityPersister, entityLoader);
+    public static EntityManagerImpl of(PersistenceContext persistenceContext) {
+        return new EntityManagerImpl(persistenceContext);
     }
 
     @Override
     public <T> T findById(Class<T> clazz, String id) {
-        return entityLoader.load(clazz, id);
+        return persistenceContext.getEntity(clazz, id);
     }
 
     @Override
     public <T> T persist(T instance) {
-        return entityPersister.insert(instance);
+        return persistenceContext.addEntity(instance);
     }
 
     @Override
-    public <T> void remove(T entity) {
-        entityPersister.remove(entity, getEntityId(entity));
+    public <T> void remove(T instance) {
+        persistenceContext.removeEntity(instance);
     }
 
-    private <T> String getEntityId(T entity) {
-        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("ID 필드를 찾을 수 없습니다."));
+    @Override
+    public <T, ID> T getDatabaseSnapshot(ID id, T entity) {
+        return null;
+    }
 
-        idField.setAccessible(true);
-
-        try {
-            Object idValue = idField.get(entity);
-
-            assert idValue != null;
-
-            return String.valueOf(idValue);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public <T, ID> T getCachedDatabaseSnapshot(Class<T> clazz, ID id) {
+        return persistenceContext.getCachedDatabaseSnapshot(clazz, String.valueOf(id));
     }
 }

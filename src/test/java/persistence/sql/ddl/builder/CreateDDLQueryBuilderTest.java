@@ -1,11 +1,11 @@
 package persistence.sql.ddl.builder;
 
+import fixtures.TestEntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
 import persistence.entity.attribute.EntityAttribute;
-import persistence.fixture.TestEntityFixture;
 import persistence.sql.infra.H2SqlConverter;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -24,7 +24,7 @@ public class CreateDDLQueryBuilderTest extends DatabaseTest {
             @Test
             @DisplayName("CREATE DDL을 리턴한다.")
             void returnDDL() {
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
+                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixtures.SampleOneWithValidAnnotation.class);
 
                 String ddl = DDLQueryBuilderFactory.createQueryBuilder(CREATE)
                         .prepareStatement(entityAttribute, new H2SqlConverter());
