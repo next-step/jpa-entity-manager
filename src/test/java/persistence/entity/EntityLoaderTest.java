@@ -84,7 +84,7 @@ class EntityLoaderTest {
 
     @Test
     @DisplayName("없는 데이터를 조회하면 null을 반환한다")
-    void test() {
+    void noDataIsNull() {
         EntityMeta entityMeta = new EntityMeta(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
@@ -102,15 +102,18 @@ class EntityLoaderTest {
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
 
 
+        //when
         Person person = new Person("이름", 19, "asd");
-
         final Long l = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
         final Long l2 = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
         final Long l3 = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
 
-        System.out.println(l);
-        System.out.println(l2);
-        System.out.println(l3);
+        //then
+       assertSoftly((it) -> {
+            it.assertThat(l).isEqualTo(1L);
+            it.assertThat(l2).isEqualTo(2L);
+            it.assertThat(l3).isEqualTo(3L);
+        });
     }
 
     @AfterEach
