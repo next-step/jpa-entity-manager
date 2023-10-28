@@ -30,7 +30,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public void removeEntity(Object entity) {
+        final Object pkColumnId = entityMeta.getPkValue(entity);
         context.remove(entityMeta.getPkValue(entity));
+        snapShotContext.remove(pkColumnId);
     }
 
     @Override

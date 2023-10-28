@@ -43,7 +43,7 @@ class EntityPersisterTest {
         EntityMeta entityMeta = new EntityMeta(person.getClass());
         PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityPersister entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta,
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta,
                 queryGenerator);
 
         final Person result = entityPersister.insert(person);
@@ -62,7 +62,7 @@ class EntityPersisterTest {
         EntityMeta entityMeta = new EntityMeta(person.getClass());
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
         PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
-        EntityPersister entityPersister = new EntityPersister(persistenceContext,jdbcTemplate, entityMeta, queryGenerator);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
 
         //when
         final NoAutoIncrementPerson result = entityPersister.insert(person);
@@ -82,7 +82,7 @@ class EntityPersisterTest {
         EntityMeta entityMeta = new EntityMeta(Person.class);
         PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityPersister entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta, queryGenerator);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
 
         //when & then
         assertThat(entityPersister.update(person)).isTrue();
@@ -95,7 +95,7 @@ class EntityPersisterTest {
         final EntityMeta entityMeta = new EntityMeta(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(Person.class, dialect);
         PersistenceContext persistenceContext = new DefaultPersistenceContext(entityMeta);
-        EntityPersister entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta, queryGenerator);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
 
         //then

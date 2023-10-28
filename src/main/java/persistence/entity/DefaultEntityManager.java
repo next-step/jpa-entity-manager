@@ -19,20 +19,20 @@ public class DefaultEntityManager implements EntityManager {
         this.entityMeta = entityMeta;
         this.persistenceContext = new DefaultPersistenceContext(entityMeta);
         this.entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
-        this.entityPersister = new EntityPersister(persistenceContext, jdbcTemplate, entityMeta, queryGenerator);
+        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
     }
 
     @Override
     public <T> T persist(T entity) {
         final T persistEntity = entityPersister.insert(entity);
-        persistenceContext.addEntity(getCacheKey(persistEntity), persistEntity);
-        return entity;
+        final Object id = getEntityId(persistEntity);
+        initSavePersistContext(id, persistEntity);
+        return persistEntity;
     }
 
     @Override
     public void remove(Object entity) {
-        Object cacheKey = getCacheKey(entity);
-
+        Object cacheKey = getEntityId(entity);
         if (persistenceContext.getEntity(cacheKey) != null) {
             persistenceContext.removeEntity(entity);
         }
@@ -40,35 +40,46 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object id) {
+    public <T, ID> T find(Class<T> clazz, ID id) {
         if (persistenceContext.getEntity(id) != null) {
             return (T) persistenceContext.getEntity(id);
         }
 
         final T entity = entityLoader.find(clazz, id);
         if (entity != null) {
-            persistenceContext.addEntity(id, entity);
-            persistenceContext.getDatabaseSnapshot(id, entity);
+            initSavePersistContext(id, entity);
         }
-        return entity;
+
+        return (T) persistenceContext.getEntity(id);
+    }
+
+    private <T> void initSavePersistContext(Object id, T entity) {
+        persistenceContext.getDatabaseSnapshot(id, entity);
+        persistenceContext.addEntity(id, entity);
+
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
         final List<T> findList = entityLoader.findAll(tClass);
         findList.forEach((it) -> {
-            persistenceContext.addEntity(getCacheKey(it), it);
-            persistenceContext.getDatabaseSnapshot(getCacheKey(it), it);
+            Object id = getEntityId(it);
+            persistenceContext.addEntity(id, it);
+            persistenceContext.getDatabaseSnapshot(id, it);
         });
         return findList;
     }
 
-    private <T> Object getCacheKey(T persistEntity) {
+    private <T> Object getEntityId(T persistEntity) {
         return entityMeta.getPkValue(persistEntity);
     }
 
     @Override
     public void flush() {
+        final List<Object> changedEntity = persistenceContext.getChangedEntity();
+
+        changedEntity.forEach(entityPersister::update);
+
         persistenceContext.clear();
     }
 }

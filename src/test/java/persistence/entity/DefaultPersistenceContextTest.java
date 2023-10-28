@@ -21,7 +21,10 @@ class DefaultPersistenceContextTest {
         context.addEntity(1L, person);
 
         //then
-        assertThat(context.getEntity(1L)).isEqualTo(person);
+        assertSoftly((it) -> {
+            it.assertThat(context.getEntity(1L)).isEqualTo(person);
+            it.assertThat(context.getEntity(1L) == person).isTrue();
+        });
     }
 
     @Test
@@ -78,8 +81,11 @@ class DefaultPersistenceContextTest {
         context.getDatabaseSnapshot(2L, person2);
         person.changeEmail("변경이메일@gamil.com");
 
-        //then
-        assertThat(context.getChangedEntity()).contains(person);
-        assertThat(context.getChangedEntity()).doesNotContain(person2);
+        //then.
+        assertSoftly((it -> {
+            it.assertThat(context.getChangedEntity()).hasSize(1);
+            it.assertThat(context.getChangedEntity()).contains(person);
+            it.assertThat(context.getChangedEntity()).doesNotContain(person2);
+        }));
     }
 }

@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import database.DatabaseServer;
 import database.H2;
@@ -105,6 +106,39 @@ class DefaultEntityManagerTest {
         assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
         assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
         assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
+    }
+
+    @Test
+    @DisplayName("엔티티의 상태를 변경한 대상이 데이터가 업데이트가 된다")
+    void dirtyCheck() {
+        //given
+        final String CHANGE_EMAIL_STRING = "change23@gmail.com";
+        Person person = new Person("이름", 19, "asd@gmail.com");
+        Dialect dialect = new FakeDialect();
+        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+                dialect);
+
+        final Person person1 = entityManager.persist(person);
+        final Person person2 = entityManager.persist(person);
+        final Person person3 = entityManager.persist(person);
+
+        //when
+        person1.changeEmail(CHANGE_EMAIL_STRING);
+        person2.changeEmail(CHANGE_EMAIL_STRING);
+        entityManager.flush();
+
+        final Person findPerson1 = entityManager.find(Person.class, person1.getId());
+        final Person findPerson2 = entityManager.find(Person.class, person2.getId());
+        final Person findPerson3 = entityManager.find(Person.class, person3.getId());
+
+
+        //then
+        assertSoftly(it -> {
+            it.assertThat(findPerson1).isEqualTo(person1);
+            it.assertThat(findPerson1.getEmail()).isEqualTo(CHANGE_EMAIL_STRING);
+            it.assertThat(findPerson2.getEmail()).isEqualTo(CHANGE_EMAIL_STRING);
+            it.assertThat(findPerson3.getEmail()).isNotEqualTo(CHANGE_EMAIL_STRING);
+        });
     }
 
 
