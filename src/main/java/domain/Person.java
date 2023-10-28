@@ -51,4 +51,9 @@ public class Person {
     public String getEmail() {
         return email;
     }
+
+    public void changeEmail(final String email) {
+        this.email = email;
+    }
+
 }

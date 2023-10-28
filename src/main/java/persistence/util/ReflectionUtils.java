@@ -49,4 +49,20 @@ public class ReflectionUtils {
             throw new PersistenceException(clazz.getName() + " 필드 주입에 실패했습니다.", e);
         }
     }
+
+    public static Object shallowCopy(final Object original) {
+        final Class<?> targetClazz = original.getClass();
+        try {
+            final Object copy = createInstance(targetClazz);
+
+            for (final Field field : targetClazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                field.set(copy, field.get(original));
+            }
+            return copy;
+        } catch (final Exception e) {
+            throw new PersistenceException(targetClazz.getName() + " 객체 복사를 실패했습니다.", e);
+        }
+    }
+
 }

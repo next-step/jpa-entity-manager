@@ -42,3 +42,73 @@ public class EntityPersister {
 
 - 요구사항 2 - EntityManager 의 책임 줄여주기
 - [x] 기존 SimpleEntityManager 가 하던 find 로직을 EntityLoader 에게 위임한다.
+
+
+### 3단계 - First Level Cache, Dirty Check
+- 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+엔티티를 어떻게 저장할지 잘 고려해보자
+```java
+public interface PersistenceContext {
+
+    Object getEntity(Long id);
+
+    void addEntity(Long id, Object entity);
+
+    void removeEntity(Object entity);
+}
+```
+- [x] PersistenceContext 에서는 insert, delete, select 의 엔터티를 저장한다.
+- [x] 객체의 Id 를 Key 로 엔터티를 관리한다.
+- [x] getEntity 를 통해 해당 엔터티를 조회한다.
+- [x] addEntity 를 통해 insert 나 select 시 엔터티를 추가한다.
+- [x] insert 시에는 key 가 없으므로 statement.getGeneratedKeys 를 이용한다.
+- [x] removeEntity 를 통해 delete 시 엔터티를 제거한다.
+
+
+- 요구사항 2 - snapshot 만들기
+1. 영속 컨텍스트 내에서 Entity 를 조회
+2. 조회된 상태의 Entity 를 스냅샷 생성
+3. 트랜잭션 커밋 후 해당 스냅샷과 현재 Entity 를 비교 (데이터베이스 커밋은 신경쓰지 않는다)
+4. 다른 점을 쿼리로 생성
+```java
+public interface PersistenceContext {
+    ...
+    /*
+    스냅샷을 만들 때 Object 가 아니라 EntityPersister 라는 인터페이스를 활용해 엔티티가 영속화 될 때 
+    데이터베이스로 부터 데이터를 pesister.getDatabaseSnapshot 메서드를 통해 가져옴 
+    너무 많은 로직이 있기에 간단하게 구현
+     */
+    Object getDatabaseSnapshot(Long id, Object entity);
+
+    Object getCachedDatabaseSnapshot(Long id);
+    ....
+```
+- [x] DB 에서 Entity 조회시 snapshot 에 저장한다.
+- [x] snapshot 에서 `EntityKey` 를 통해 이전 상태의 객체를 조회할 수 있다.
+- [x] snapshot 에서 `EntityKey` 를 통해 조회된 객체와 Persistence 의 기존 객체는 동일하지 않다.
+
+> Snapshot은 Persistence Context에서 관리되는 영속성 엔티티의 이전 상태를 나타냅니다. 이전 상태는 변경이 일어나기 이전의 상태를 의미합니다. Snapshot은 영속성 컨텍스트 내부의 데이터를 복사한 것으로, 이를 이용하여 변경 사항을 감지합니다.
+- 요구사항 3 - 더티체킹 구현 
+
+`Snapshot 기반 Dirty Checking`
+```java
+public class CustomJpaRepository<T, ID> {
+    private final EntityManager entityManager;
+    
+    public CustomJpaRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+    
+    public T save(T t) {
+    // 트랜잭션은 신경 쓰지말고 구현해보자
+   }
+...
+}
+```
+엔티티의 상태를 스냅샷으로 저장하여, 변경된 값이 있는지를 비교하는 방식입니다.
+
+1. 엔티티를 조회할 때 스냅샷을 만들어 둔 후,
+2. 엔티티의 상태를 변경할 때마다 스냅샷과 비교하여 변경 내용을 감지합니다.
+
+- [x] 엔티티 save 가 일어날때마다 엔티티가 변경되었는지 검사한다.
+- [x] 변경이 감지되면 update 한다.

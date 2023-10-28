@@ -1,73 +1,14 @@
 package persistence;
 
-import database.DatabaseServer;
-import database.H2;
 import domain.Person;
-import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
-import persistence.core.PersistenceEnvironment;
-import persistence.dialect.h2.H2Dialect;
-import persistence.entity.EntityLoaderProvider;
-import persistence.entity.EntityManager;
-import persistence.entity.EntityPersisterProvider;
-import persistence.entity.SimpleEntityManager;
-import persistence.sql.ddl.DdlGenerator;
-import persistence.sql.dml.DmlGenerator;
-import persistence.util.ReflectionUtils;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class ApplicationTest {
-    private DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
-    private DdlGenerator ddlGenerator;
-    private DmlGenerator dmlGenerator;
-    private EntityMetadata<?> entityMetadata;
-
-    private EntityManager entityManager;
-    private List<Person> people;
-
-    @BeforeEach
-    void setup() throws SQLException {
-        server = new H2();
-        server.start();
-        jdbcTemplate = new JdbcTemplate(server.getConnection());
-        final PersistenceEnvironment persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
-        ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
-        dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
-        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
-        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
-        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
-
-        entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
-        final String createDdl = ddlGenerator.generateCreateDdl(entityMetadata);
-        jdbcTemplate.execute(createDdl);
-        people = createDummyUsers();
-
-        people.forEach(person -> {
-            final List<String> columnNames = entityMetadata.getInsertableColumnNames();
-            final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.getInsertableColumnFieldNames());
-            jdbcTemplate.execute(dmlGenerator.insert(entityMetadata.getTableName(), columnNames, values));
-        });
-    }
-
-    @AfterEach
-    void tearDown() {
-        final String dropDdl = ddlGenerator.generateDropDdl(entityMetadata);
-        jdbcTemplate.execute(dropDdl);
-        server.stop();
-    }
+class ApplicationTest extends IntegrationTestEnvironment {
 
     @Test
     @DisplayName("쿼리 실행을 통해 데이터를 여러 row 를 넣어 정상적으로 나오는지 확인할 수 있다.")
@@ -89,43 +30,4 @@ class ApplicationTest {
         assertThat(result).isNotNull();
     }
 
-    @Test
-    @DisplayName("entityManager.find 를 이용해 특정 객체를 DB 에서 조회할 수 있다.")
-    void entityManagerFindTest() {
-        final Person person = entityManager.find(Person.class, 1L);
-
-        assertSoftly(softly -> {
-            softly.assertThat(person).isNotNull();
-            softly.assertThat(person.getId()).isEqualTo(1L);
-            softly.assertThat(person.getName()).isEqualTo("test00");
-            softly.assertThat(person.getAge()).isEqualTo(0);
-            softly.assertThat(person.getEmail()).isEqualTo("test00@gmail.com");
-        });
-    }
-
-    @Test
-    @DisplayName("entityManager.persist 를 이용해 특정 객체를 DB 에 저장할 수 있다.")
-    void entityManagerPersistTest() {
-        final Person newPerson = new Person("min", 30, "jongmin4943@gmail.com");
-
-        assertDoesNotThrow(() -> entityManager.persist(newPerson));
-    }
-
-    @Test
-    @DisplayName("entityManager.remove 를 이용해 특정 객체를 DB 에서 삭제할 수 있다.")
-    void entityManagerRemoveTest() {
-        assertDoesNotThrow(() -> entityManager.remove(people.get(0)));
-    }
-
-    private RowMapper<Person> personRowMapper() {
-        return rs -> new Person(rs.getLong("id"), rs.getString("nick_name"), rs.getInt("old"), rs.getString("email"));
-    }
-
-    private static List<Person> createDummyUsers() {
-        final Person test00 = new Person("test00", 0, "test00@gmail.com");
-        final Person test01 = new Person("test01", 10, "test01@gmail.com");
-        final Person test02 = new Person("test02", 20, "test02@gmail.com");
-        final Person test03 = new Person("test03", 30, "test03@gmail.com");
-        return List.of(test00, test01, test02, test03);
-    }
 }
