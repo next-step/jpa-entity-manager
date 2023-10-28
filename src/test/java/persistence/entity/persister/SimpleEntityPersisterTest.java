@@ -16,7 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
 @DisplayName("EntityPersister 클래스의")
-public class EntityPersisterTest extends DatabaseTest {
+public class SimpleEntityPersisterTest extends DatabaseTest {
     TestEntityFixtures.SampleOneWithValidAnnotation sample
             = new TestEntityFixtures.SampleOneWithValidAnnotation(1, "test_nick_name", 29);
 
@@ -32,8 +32,8 @@ public class EntityPersisterTest extends DatabaseTest {
                 setUpFixtureTable(TestEntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
-                EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
-                TestEntityFixtures.SampleOneWithValidAnnotation inserted = entityPersister.insert(sample);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                TestEntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
                 assertThat(inserted.toString())
                         .isEqualTo("SampleOneWithValidAnnotation{id=1, name='test_nick_name', age=29}");
             }
@@ -52,13 +52,13 @@ public class EntityPersisterTest extends DatabaseTest {
                 setUpFixtureTable(TestEntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
-                EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
-                TestEntityFixtures.SampleOneWithValidAnnotation inserted = entityPersister.insert(sample);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                TestEntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
                 TestEntityFixtures.SampleOneWithValidAnnotation updatedSample
                         = new TestEntityFixtures.SampleOneWithValidAnnotation(1, "test_nick_name_updated", 29);
 
-                TestEntityFixtures.SampleOneWithValidAnnotation updated = entityPersister.update(inserted, updatedSample);
+                TestEntityFixtures.SampleOneWithValidAnnotation updated = simpleEntityPersister.update(inserted, updatedSample);
 
                 assertThat(updated.toString())
                         .isEqualTo("SampleOneWithValidAnnotation{id=1, name='test_nick_name_updated', age=29}");

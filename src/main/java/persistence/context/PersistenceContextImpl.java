@@ -3,7 +3,7 @@ package persistence.context;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributeHolder;
 import persistence.entity.attribute.id.IdAttribute;
-import persistence.entity.persister.EntityPersister;
+import persistence.entity.persister.SimpleEntityPersister;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -12,12 +12,12 @@ import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
     private final EntityAttributeHolder entityAttributeHolder;
-    private final EntityPersister entityPersister;
+    private final SimpleEntityPersister simpleEntityPersister;
     private final Map<Class<?>, Map<String, Object>> FIRST_CACHE = new HashMap<>();
     private final Map<Class<?>, Map<String, Object>> SNAP_SHOT = new HashMap<>();
 
-    public PersistenceContextImpl(EntityPersister entityPersister, EntityAttributeHolder entityAttributeHolder) {
-        this.entityPersister = entityPersister;
+    public PersistenceContextImpl(SimpleEntityPersister simpleEntityPersister, EntityAttributeHolder entityAttributeHolder) {
+        this.simpleEntityPersister = simpleEntityPersister;
         this.entityAttributeHolder = entityAttributeHolder;
     }
 
@@ -43,7 +43,7 @@ public class PersistenceContextImpl implements PersistenceContext {
             SNAP_SHOT.remove(clazz);
         }
 
-        entityPersister.remove(instance, instanceId);
+        simpleEntityPersister.remove(instance, instanceId);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PersistenceContextImpl implements PersistenceContext {
                 .orElse(null);
 
         if (retrieved == null) {
-            Object loaded = entityPersister.load(clazz, id);
+            Object loaded = simpleEntityPersister.load(clazz, id);
 
             Map<String, Object> firstCacheEntityMap = getOrCreateEntityMap(clazz, FIRST_CACHE);
             Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(clazz, SNAP_SHOT);
@@ -92,7 +92,7 @@ public class PersistenceContextImpl implements PersistenceContext {
                     throw new RuntimeException("id가 null이고 generationType이 null 입니다.");
                 }
 
-                T inserted = entityPersister.insert(instance);
+                T inserted = simpleEntityPersister.insert(instance);
 
                 snapShotEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), createDeepCopy(inserted));
                 firstcacheEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), inserted);
@@ -115,7 +115,7 @@ public class PersistenceContextImpl implements PersistenceContext {
             SNAP_SHOT.put(instance.getClass(), snapShotEntityMap);
             FIRST_CACHE.put(instance.getClass(), firstcacheEntityMap);
 
-            return entityPersister.update(snapshot, instance);
+            return simpleEntityPersister.update(snapshot, instance);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -128,13 +128,21 @@ public class PersistenceContextImpl implements PersistenceContext {
         Object snapshot = entityMap.get(id);
 
         if (snapshot == null) {
-            Object loaded = entityPersister.load(instance.getClass(), id);
+            Object loaded = simpleEntityPersister.load(instance.getClass(), id);
 
             snapshot = createDeepCopy(loaded);
             entityMap.put(id, snapshot);
         }
         return (T) snapshot;
     }
+
+    @Override
+    public <T> T getCachedDatabaseSnapshot(Class<T> clazz, String id) {
+        return (T) Optional.ofNullable(SNAP_SHOT.get(clazz))
+                .map(entityMap -> entityMap.get(id))
+                .orElse(null);
+    }
+
 
     private <T> Map<String, Object> getOrCreateEntityMap(Class<T> clazz, Map<Class<?>, Map<String, Object>> map) {
         return map.computeIfAbsent(clazz, k -> new HashMap<>());

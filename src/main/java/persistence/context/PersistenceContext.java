@@ -9,4 +9,6 @@ public interface PersistenceContext {
     <T> T addEntity(T instance);
 
     <T> T getDatabaseSnapshot(T instance, String id);
+
+    <T> T getCachedDatabaseSnapshot(Class<T> clazz, String id);
 }
