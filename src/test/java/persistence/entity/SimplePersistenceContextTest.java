@@ -83,4 +83,27 @@ class SimplePersistenceContextTest {
 
         assertThat(persistenceContext.hasEntity(personEntityKey)).isTrue();
     }
+
+    @Test
+    @DisplayName("addEntityEntry 를 통해 EntityEntry 를 추가한 뒤 조회할 수 있다.")
+    void addEntityEntryTest() {
+        persistenceContext.addEntityEntry(personEntityKey, Status.LOADING);
+
+        assertThat(persistenceContext.getEntityEntry(personEntityKey)).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("updateEntityEntryStatus 를 통해 EntityEntry 의 상태를 변경할 수 있다.")
+    void updateEntityEntryStatusTest() {
+        persistenceContext.addEntityEntry(personEntityKey, Status.LOADING);
+
+        persistenceContext.updateEntityEntryStatus(personEntityKey, Status.MANAGED);
+
+        assertSoftly(softly -> {
+            softly.assertThat(persistenceContext.getEntityEntry(personEntityKey)).isNotEmpty();
+            final EntityEntry entityEntry = persistenceContext.getEntityEntry(personEntityKey).get();
+            softly.assertThat(entityEntry.getStatus()).isEqualTo(Status.MANAGED);
+        });
+    }
+
 }
