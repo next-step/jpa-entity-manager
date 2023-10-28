@@ -43,7 +43,7 @@ class EntityColumnTest {
         Field field = testEntityClass.getDeclaredField("noneColumnAnnotationField");
         EntityColumn<FakeEntityForEntityColumnTest, Long> entityColumn = new EntityColumn<>(testEntityClass, field);
 
-        assertThat(entityColumn.getName()).isEqualTo("noneColumnAnnotationField");
+        assertThat(entityColumn.getDbColumnName()).isEqualTo("noneColumnAnnotationField");
     }
 
     @DisplayName("EntityColumn 생성 (Column 어노테이션의 기본값)")
@@ -52,7 +52,7 @@ class EntityColumnTest {
         Field field = testEntityClass.getDeclaredField("noneColumnAnnotationValueField");
         EntityColumn<FakeEntityForEntityColumnTest, Long> entityColumn = new EntityColumn<>(testEntityClass, field);
 
-        assertThat(entityColumn.getName()).isEqualTo("noneColumnAnnotationValueField");
+        assertThat(entityColumn.getDbColumnName()).isEqualTo("noneColumnAnnotationValueField");
     }
 
     @DisplayName("EntityColumn 생성 (Column 어노테이션의 name값)")
@@ -61,7 +61,7 @@ class EntityColumnTest {
         Field field = testEntityClass.getDeclaredField("columnAnnotationField");
         EntityColumn<FakeEntityForEntityColumnTest, Long> entityColumn = new EntityColumn<>(testEntityClass, field);
 
-        assertThat(entityColumn.getName()).isEqualTo("this_is_column_name");
+        assertThat(entityColumn.getDbColumnName()).isEqualTo("this_is_column_name");
     }
 
     @DisplayName("EntityColumn 생성 (type = {0}, name = {1})")
@@ -71,7 +71,7 @@ class EntityColumnTest {
         Field field = testEntityClass.getDeclaredField(fieldName);
         EntityColumn<FakeEntityForEntityColumnTest, Long> entityColumn = new EntityColumn<>(testEntityClass, field);
 
-        assertThat(entityColumn.getName()).isEqualTo(fieldName);
+        assertThat(entityColumn.getDbColumnName()).isEqualTo(fieldName);
         assertThat(entityColumn.getType()).isEqualTo(typeClass);
     }
 
@@ -84,6 +84,16 @@ class EntityColumnTest {
 
         assertThat(entityColumn).isEqualTo(entityColumn2);
         assertThat(entityColumn.equals(entityColumn2)).isTrue();
+    }
+
+    @DisplayName("EntityColumn의 dbColumnName과 entityFieldName")
+    @Test
+    void entityFieldNameAndDbColumnName() throws NoSuchFieldException {
+        Field field = testEntityClass.getDeclaredField("columnAnnotationField");
+        EntityColumn<FakeEntityForEntityColumnTest, Long> entityColumn = new EntityColumn<>(testEntityClass, field);
+
+        assertThat(entityColumn.getDbColumnName()).isEqualTo("this_is_column_name");
+        assertThat(entityColumn.getEntityFieldName()).isEqualTo("columnAnnotationField");
     }
 
 

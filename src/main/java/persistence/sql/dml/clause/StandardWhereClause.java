@@ -4,7 +4,6 @@ public interface StandardWhereClause {
     String column();
 
     String operator();
-
     String precedenceOperator();
 
     String value();
