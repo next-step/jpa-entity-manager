@@ -77,37 +77,6 @@ class SimplePersistenceContextTest {
     }
 
     @Test
-    @DisplayName("같은 key로 getCachedDatabaseSnapshot 를 통해 조회한 Entity 는 항상 동일한 객체이다.")
-    void getCachedDatabaseSnapshotTest() {
-        persistenceContext.getDatabaseSnapshot(personEntityKey, person);
-
-        final Object entity = persistenceContext.getCachedDatabaseSnapshot(personEntityKey);
-        final Object entity2 = persistenceContext.getCachedDatabaseSnapshot(personEntityKey);
-
-        assertSoftly(softly -> {
-            softly.assertThat(entity).isNotNull();
-            softly.assertThat(entity2).isNotNull();
-            softly.assertThat(entity == entity2).isTrue();
-        });
-    }
-
-    @Test
-    @DisplayName("같은 key로 getEntity 와 getCachedDatabaseSnapshot 과 를 통해 조회하면 서로 다른 객체이다.")
-    void getCachedDatabaseSnapshotDifferentFromGetEntityTest() {
-        persistenceContext.addEntity(personEntityKey, person);
-        persistenceContext.getDatabaseSnapshot(personEntityKey, person);
-
-        final Object entity = persistenceContext.getEntity(personEntityKey).orElse(null);
-        final Object entity2 = persistenceContext.getCachedDatabaseSnapshot(personEntityKey);
-
-        assertSoftly(softly -> {
-            softly.assertThat(entity).isNotNull();
-            softly.assertThat(entity2).isNotNull();
-            softly.assertThat(entity == entity2).isFalse();
-        });
-    }
-
-    @Test
     @DisplayName("hasEntity 를 통해 Entity가 context 에 존재하는지 여부를 반환받을 수 있다.")
     void hasEntityTest() {
         persistenceContext.addEntity(personEntityKey, person);

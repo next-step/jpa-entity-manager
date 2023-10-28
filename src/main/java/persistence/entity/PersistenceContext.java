@@ -13,5 +13,4 @@ public interface PersistenceContext {
 
     Object getDatabaseSnapshot(EntityKey key, Object entity);
 
-    Object getCachedDatabaseSnapshot(EntityKey key);
 }

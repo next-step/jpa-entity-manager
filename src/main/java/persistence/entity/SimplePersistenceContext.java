@@ -41,10 +41,4 @@ public class SimplePersistenceContext implements PersistenceContext {
         return entitySnapshots.computeIfAbsent(key, entityKey -> ReflectionUtils.shallowCopy(entity));
     }
 
-    @Override
-    public Object getCachedDatabaseSnapshot(final EntityKey key) {
-        return entitySnapshots.get(key);
-    }
-
-
 }

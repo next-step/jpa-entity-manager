@@ -107,11 +107,12 @@ public class SimpleEntityManager implements EntityManager {
     private boolean isDirty(final Object entity) {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
-        final Object cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(entityKeyGenerator.generate(entity.getClass(), idValue));
+        final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
+        final Object databaseSnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
 
         return entityPersister.getColumnFieldNames()
                 .stream()
-                .anyMatch(columnName -> hasDifferentValue(entity, cachedDatabaseSnapshot, columnName));
+                .anyMatch(columnName -> hasDifferentValue(entity, databaseSnapshot, columnName));
     }
 
     private boolean hasDifferentValue(final Object entity, final Object cachedDatabaseSnapshot, final String columnName) {
