@@ -1,5 +1,7 @@
 package persistence.context;
 
+import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributeHolder;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.persister.EntityPersister;
 
@@ -9,21 +11,27 @@ import java.util.Map;
 import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
+    private final EntityAttributeHolder entityAttributeHolder;
     private final EntityPersister entityPersister;
     private final Map<Class<?>, Map<String, Object>> FIRST_CACHE = new HashMap<>();
     private final Map<Class<?>, Map<String, Object>> SNAP_SHOT = new HashMap<>();
 
-    public PersistenceContextImpl(EntityPersister entityPersister) {
+    public PersistenceContextImpl(EntityPersister entityPersister, EntityAttributeHolder entityAttributeHolder) {
         this.entityPersister = entityPersister;
+        this.entityAttributeHolder = entityAttributeHolder;
     }
 
     @Override
-    public <T> void removeEntity(T instance, Field idField) {
+    public <T> void removeEntity(T instance) {
+        EntityAttribute entityAttribute = entityAttributeHolder.findEntityAttribute(instance.getClass());
+
+        Field idField = entityAttribute.getIdAttribute().getField();
+
         Class<?> clazz = instance.getClass();
         Map<String, Object> firstCacheEntityMap = FIRST_CACHE.get(clazz);
         Map<String, Object> snapShotEntityMap = SNAP_SHOT.get(clazz);
 
-        String instanceId = getInstanceId(instance, idField);
+        String instanceId = getInstanceIdAsString(instance, idField);
 
         firstCacheEntityMap.remove(instanceId);
 
@@ -64,8 +72,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> T addEntity(T instance, IdAttribute idAttribute) {
+    public <T> T addEntity(T instance) {
         try {
+            EntityAttribute entityAttribute = entityAttributeHolder.findEntityAttribute(instance.getClass());
+            IdAttribute idAttribute = entityAttribute.getIdAttribute();
+
             Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(instance.getClass(), SNAP_SHOT);
             Map<String, Object> firstcacheEntityMap = getOrCreateEntityMap(instance.getClass(), FIRST_CACHE);
 
@@ -84,8 +95,8 @@ public class PersistenceContextImpl implements PersistenceContext {
 
                 T inserted = entityPersister.insert(instance);
 
-                snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), createDeepCopy(inserted));
-                firstcacheEntityMap.put(getInstanceId(instance, idAttribute.getField()), inserted);
+                snapShotEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), createDeepCopy(inserted));
+                firstcacheEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), inserted);
 
                 SNAP_SHOT.put(inserted.getClass(), snapShotEntityMap);
                 FIRST_CACHE.put(inserted.getClass(), firstcacheEntityMap);
@@ -94,13 +105,13 @@ public class PersistenceContextImpl implements PersistenceContext {
             }
 
             if (idAttribute.getGenerationType() != null) {
-                snapshot = getDatabaseSnapshot(String.valueOf(idAttribute.getField().get(instance)), instance);
+                snapshot = getDatabaseSnapshot(instance, String.valueOf(idAttribute.getField().get(instance)));
             }
 
             assert snapshot != null;
 
-            snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), instance);
-            firstcacheEntityMap.put(getInstanceId(instance, idAttribute.getField()), instance);
+            snapShotEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), instance);
+            firstcacheEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), instance);
 
             SNAP_SHOT.put(instance.getClass(), snapShotEntityMap);
             FIRST_CACHE.put(instance.getClass(), firstcacheEntityMap);
@@ -112,13 +123,13 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> T getDatabaseSnapshot(String id, T entity) {
-        Map<String, Object> entityMap = getOrCreateEntityMap(entity.getClass(), SNAP_SHOT);
+    public <T> T getDatabaseSnapshot(T instance, String id) {
+        Map<String, Object> entityMap = getOrCreateEntityMap(instance.getClass(), SNAP_SHOT);
 
         Object snapshot = entityMap.get(id);
 
         if (snapshot == null) {
-            Object loaded = entityPersister.load(entity.getClass(), id);
+            Object loaded = entityPersister.load(instance.getClass(), id);
 
             snapshot = createDeepCopy(loaded);
             entityMap.put(id, snapshot);
@@ -130,7 +141,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         return map.computeIfAbsent(clazz, k -> new HashMap<>());
     }
 
-    private <T> String getInstanceId(T instance, Field idField) {
+    private <T> String getInstanceIdAsString(T instance, Field idField) {
         idField.setAccessible(true);
 
         try {

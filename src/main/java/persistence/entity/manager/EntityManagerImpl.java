@@ -1,7 +1,6 @@
 package persistence.entity.manager;
 
 import persistence.context.PersistenceContext;
-import persistence.entity.attribute.EntityAttribute;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -25,14 +24,11 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T persist(T instance) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass());
-        return persistenceContext.addEntity(instance, entityAttribute.getIdAttribute());
+        return persistenceContext.addEntity(instance);
     }
 
     @Override
     public <T> void remove(T instance) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass());
-
-        persistenceContext.removeEntity(instance, entityAttribute.getIdAttribute().getField());
+        persistenceContext.removeEntity(instance);
     }
 }

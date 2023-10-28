@@ -58,16 +58,6 @@ public class EntityLoaderImpl implements EntityLoader {
         }
     }
 
-    private <T> void setIdFromResultSet(T instance, IdAttribute idAttribute, ResultSet rs) throws Exception {
-        Field idField = Arrays.stream(instance.getClass().getDeclaredFields())
-                .filter(it -> it.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow();
-
-        idField.setAccessible(true);
-        idField.set(instance, rs.getObject(idAttribute.getColumnName()));
-    }
-
     private <T> T mapResultSetToEntity(Class<T> clazz, IdAttribute idAttribute, ResultSet rs) {
         try {
             if (!rs.next()) {
@@ -82,6 +72,16 @@ public class EntityLoaderImpl implements EntityLoader {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> void setIdFromResultSet(T instance, IdAttribute idAttribute, ResultSet rs) throws Exception {
+        Field idField = Arrays.stream(instance.getClass().getDeclaredFields())
+                .filter(it -> it.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow();
+
+        idField.setAccessible(true);
+        idField.set(instance, rs.getObject(idAttribute.getColumnName()));
     }
 
     private <T> void setGeneralFieldFromResultSet(T instance, ResultSet rs) throws Exception {

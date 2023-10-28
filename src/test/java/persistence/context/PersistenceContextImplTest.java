@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
-import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributeHolder;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaderImpl;
 import persistence.entity.persister.EntityPersister;
@@ -33,17 +33,17 @@ class PersistenceContextImplTest extends DatabaseTest {
 
                 TestEntityFixture.SampleOneWithValidAnnotation sample =
                         new TestEntityFixture.SampleOneWithValidAnnotation("민준", 29);
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
 
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
-                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister, entityAttributeHolder);
 
                 TestEntityFixture.SampleOneWithValidAnnotation instance
                         = persistenceContext.getEntity(TestEntityFixture.SampleOneWithValidAnnotation.class, "1");
                 assertThat(instance).isEqualTo(null);
 
-                persistenceContext.addEntity(sample, entityAttribute.getIdAttribute());
+                persistenceContext.addEntity(sample);
 
                 TestEntityFixture.SampleOneWithValidAnnotation retrieved
                         = persistenceContext.getEntity(TestEntityFixture.SampleOneWithValidAnnotation.class, "1");
@@ -68,12 +68,12 @@ class PersistenceContextImplTest extends DatabaseTest {
                 TestEntityFixture.SampleOneWithValidAnnotation sample =
                         new TestEntityFixture.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
-                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister, entityAttributeHolder);
 
-                persistenceContext.addEntity(sample, entityAttribute.getIdAttribute());
+                persistenceContext.addEntity(sample);
 
                 TestEntityFixture.SampleOneWithValidAnnotation retrieved
                         = persistenceContext.getEntity(TestEntityFixture.SampleOneWithValidAnnotation.class, "1");
@@ -98,18 +98,17 @@ class PersistenceContextImplTest extends DatabaseTest {
                 TestEntityFixture.SampleOneWithValidAnnotation sample =
                         new TestEntityFixture.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityAttribute entityAttribute = EntityAttribute.of(TestEntityFixture.SampleOneWithValidAnnotation.class);
-
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityLoader);
-                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister);
+                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(entityPersister, entityAttributeHolder);
 
-                persistenceContext.addEntity(sample, entityAttribute.getIdAttribute());
+                persistenceContext.addEntity(sample);
 
                 TestEntityFixture.SampleOneWithValidAnnotation retrieved
                         = persistenceContext.getEntity(TestEntityFixture.SampleOneWithValidAnnotation.class, "1");
 
-                persistenceContext.removeEntity(retrieved, entityAttribute.getIdAttribute().getField());
+                persistenceContext.removeEntity(retrieved);
 
                 assertThat(persistenceContext.getEntity(TestEntityFixture.SampleOneWithValidAnnotation.class, "1"))
                         .isEqualTo(null);
