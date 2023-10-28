@@ -6,7 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.attribute.resolver.GeneralAttributeResolver;
-import persistence.entity.attribute.resolver.IdAttributeResolver;
 import persistence.sql.ddl.wrapper.DDLWrapper;
 
 import java.lang.reflect.Field;
@@ -15,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static persistence.entity.attribute.resolver.AttributeResolverManager.GENERAL_ATTRIBUTE_RESOLVERS;
-import static persistence.entity.attribute.resolver.AttributeResolverManager.ID_ATTRIBUTE_RESOLVERS;
+import static persistence.entity.attribute.resolver.AttributeHolder.GENERAL_ATTRIBUTE_RESOLVERS;
+import static persistence.entity.attribute.resolver.AttributeHolder.ID_ATTRIBUTE_RESOLVERS;
 
 public class EntityAttribute {
     private final String tableName;
@@ -41,7 +40,7 @@ public class EntityAttribute {
                         && !field.isAnnotationPresent(Id.class))
                 .map(it -> {
                     for (GeneralAttributeResolver generalAttributeResolver : GENERAL_ATTRIBUTE_RESOLVERS) {
-                        if (generalAttributeResolver.support(it.getType())) {
+                        if (generalAttributeResolver.supports(it.getType())) {
                             return generalAttributeResolver.resolve(it);
                         }
                     }
@@ -53,16 +52,13 @@ public class EntityAttribute {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(String.format("[%s] 엔티티에 @Id가 없습니다", clazz.getSimpleName())));
 
-        IdAttribute idAttribute = null;
 
-        for (IdAttributeResolver idAttributeResolver : ID_ATTRIBUTE_RESOLVERS) {
-            if (idAttributeResolver.support(idField.getType())) {
-                idAttribute = idAttributeResolver.resolve(idField);
-            }
-        }
+        IdAttribute idAttribute = ID_ATTRIBUTE_RESOLVERS.stream()
+                .filter(resolver -> resolver.supports(idField.getType()))
+                .map(resolver -> resolver.resolve(idField))
+                .findFirst().orElseThrow(() -> new IllegalStateException("IdAttribute 파싱에 실패했습니다."));
 
         validate(clazz, idAttribute);
-
 
         return new EntityAttribute(tableName, idAttribute, generalAttributes);
     }

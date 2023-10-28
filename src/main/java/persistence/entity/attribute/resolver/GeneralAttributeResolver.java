@@ -5,7 +5,7 @@ import persistence.entity.attribute.GeneralAttribute;
 import java.lang.reflect.Field;
 
 public interface GeneralAttributeResolver {
-    boolean support(Class<?> clazz);
+    boolean supports(Class<?> clazz);
 
     GeneralAttribute resolve(Field field);
 }

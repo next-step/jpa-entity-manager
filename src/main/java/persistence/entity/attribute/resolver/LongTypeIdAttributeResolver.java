@@ -8,13 +8,13 @@ import java.lang.reflect.Field;
 public class LongTypeIdAttributeResolver implements IdAttributeResolver {
 
     @Override
-    public boolean support(Class<?> clazz) {
+    public boolean supports(Class<?> clazz) {
         return clazz == Long.class;
     }
 
     @Override
     public IdAttribute resolve(Field field) {
-        return LongTypeIdAttribute.of(field);
+        return new LongTypeIdAttribute(field);
     }
 
     @Override

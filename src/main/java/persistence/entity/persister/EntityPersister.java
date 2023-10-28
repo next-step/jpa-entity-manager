@@ -11,7 +11,7 @@ import persistence.sql.dml.builder.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
 
-import static persistence.entity.attribute.resolver.AttributeResolverManager.ID_ATTRIBUTE_RESOLVERS;
+import static persistence.entity.attribute.resolver.AttributeHolder.ID_ATTRIBUTE_RESOLVERS;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
@@ -67,7 +67,7 @@ public class EntityPersister {
         Class<?> idType = idField.getType();
 
         for (IdAttributeResolver idAttributeResolver : ID_ATTRIBUTE_RESOLVERS) {
-            if (idAttributeResolver.support(idType)) {
+            if (idAttributeResolver.supports(idType)) {
                 idAttributeResolver.setGeneratedIdToEntity(instance, idField, key);
                 return;
             }

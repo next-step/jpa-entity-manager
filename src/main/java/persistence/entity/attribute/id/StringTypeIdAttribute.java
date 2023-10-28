@@ -14,31 +14,14 @@ public class StringTypeIdAttribute implements IdAttribute {
     private final String columnName;
     private final GenerationType generateValueStrategy;
 
-    public StringTypeIdAttribute(
-            Field field,
-            String fieldName,
-            Integer length,
-            String columnName,
-            GenerationType generateValueStrategy
-    ) {
-        this.field = field;
-        this.fieldName = fieldName;
-        this.length = length;
-        this.columnName = columnName;
-        this.generateValueStrategy = generateValueStrategy;
-    }
-
-    public static StringTypeIdAttribute of(Field field) {
-
+    public StringTypeIdAttribute(Field field) {
         Optional<Column> columnOptional = Optional.ofNullable(field.getAnnotation(Column.class));
 
-        return new StringTypeIdAttribute(
-                field,
-                field.getName(),
-                columnOptional.map(Column::length).orElse(255),
-                columnOptional.map(Column::name).orElse(field.getName()),
-                null
-        );
+        this.field = field;
+        this.fieldName = field.getName();
+        this.length = columnOptional.map(Column::length).orElse(255);
+        this.columnName = columnOptional.map(Column::name).orElse(field.getName());
+        this.generateValueStrategy = null;
     }
 
     @Override

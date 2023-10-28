@@ -8,13 +8,13 @@ import java.lang.reflect.Field;
 public class IntegerTypeIdAttributeResolver implements IdAttributeResolver {
 
     @Override
-    public boolean support(Class<?> clazz) {
+    public boolean supports(Class<?> clazz) {
         return clazz == Integer.class;
     }
 
     @Override
     public IdAttribute resolve(Field field) {
-        return IntegerTypeIdAttribute.of(field);
+        return new IntegerTypeIdAttribute(field);
     }
 
     @Override

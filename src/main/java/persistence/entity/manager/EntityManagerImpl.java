@@ -5,15 +5,11 @@ import persistence.context.PersistenceContext;
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
 
-    private EntityManagerImpl(
-            PersistenceContext persistenceContext
-    ) {
+    private EntityManagerImpl(PersistenceContext persistenceContext) {
         this.persistenceContext = persistenceContext;
     }
 
-    public static EntityManagerImpl of(
-            PersistenceContext persistenceContext
-    ) {
+    public static EntityManagerImpl of(PersistenceContext persistenceContext) {
         return new EntityManagerImpl(persistenceContext);
     }
 

@@ -6,32 +6,21 @@ import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 
-public class IntegerTypeGeneralAttribute extends GeneralAttribute {
+public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     private final boolean nullable;
     private final int scale;
     private final String fieldName;
     private final String columnName;
 
-    private IntegerTypeGeneralAttribute(
-            int scale,
-            String fieldName,
-            String columnName,
-            boolean nullable
-    ) {
-        this.scale = scale;
-        this.fieldName = fieldName;
-        this.columnName = columnName;
-        this.nullable = nullable;
-    }
-
-    public static IntegerTypeGeneralAttribute of(Field field) {
+    public IntegerTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
-        return new IntegerTypeGeneralAttribute(
-                column.scale(),
-                field.getName(),
-                column.name().isBlank() ? field.getName() : column.name(),
-                field.isAnnotationPresent(Id.class)
-        );
+
+        assert column != null;
+
+        this.scale = column.scale();
+        this.fieldName = field.getName();
+        this.columnName = column.name().isBlank() ? field.getName() : column.name();
+        this.nullable = field.isAnnotationPresent(Id.class);
     }
 
     @Override

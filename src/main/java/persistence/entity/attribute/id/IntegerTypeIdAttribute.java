@@ -14,27 +14,17 @@ public class IntegerTypeIdAttribute implements IdAttribute {
     private final String columnName;
     private final GenerationType generationType;
 
-    private IntegerTypeIdAttribute(
-            Field field,
-            String fieldName,
-            String columnName,
-            GenerationType generationType
-    ) {
+    public IntegerTypeIdAttribute(Field field) {
+        String columnName = Optional.ofNullable(field.getAnnotation(Column.class))
+                .map(Column::name).orElse(field.getName());
+
+        GenerationType generationType = Optional.ofNullable(field.getAnnotation(GeneratedValue.class))
+                .map(GeneratedValue::strategy).orElse(null);
+
         this.field = field;
-        this.fieldName = fieldName;
+        this.fieldName = field.getName();
         this.columnName = columnName;
         this.generationType = generationType;
-    }
-
-    public static IntegerTypeIdAttribute of(Field field) {
-        return new IntegerTypeIdAttribute(
-                field,
-                field.getName(),
-                Optional.ofNullable(field.getAnnotation(Column.class))
-                        .map(Column::name).orElse(field.getName()),
-                Optional.ofNullable(field.getAnnotation(GeneratedValue.class))
-                        .map(GeneratedValue::strategy).orElse(null)
-        );
     }
 
     @Override

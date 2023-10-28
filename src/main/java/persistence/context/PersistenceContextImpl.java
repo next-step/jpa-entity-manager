@@ -80,11 +80,10 @@ public class PersistenceContextImpl implements PersistenceContext {
             Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(instance.getClass(), SNAP_SHOT);
             Map<String, Object> firstcacheEntityMap = getOrCreateEntityMap(instance.getClass(), FIRST_CACHE);
 
-            idAttribute.getField().setAccessible(true);
+            Field idField = idAttribute.getField();
+            idField.setAccessible(true);
 
-            String id = Optional.ofNullable(idAttribute.getField().get(instance))
-                    .map(String::valueOf)
-                    .orElse(null);
+            String id = getInstanceIdAsString(instance, idField);
 
             T snapshot = null;
 
@@ -145,11 +144,8 @@ public class PersistenceContextImpl implements PersistenceContext {
         idField.setAccessible(true);
 
         try {
-            Object idValue = idField.get(instance);
+            return Optional.ofNullable(idField.get(instance)).map(String::valueOf).orElse(null);
 
-            assert idValue != null;
-
-            return String.valueOf(idValue);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

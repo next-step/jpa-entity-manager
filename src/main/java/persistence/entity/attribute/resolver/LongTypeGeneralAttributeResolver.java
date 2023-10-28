@@ -7,12 +7,12 @@ import java.lang.reflect.Field;
 
 public class LongTypeGeneralAttributeResolver implements GeneralAttributeResolver {
     @Override
-    public boolean support(Class<?> clazz) {
+    public boolean supports(Class<?> clazz) {
         return clazz == Long.class;
     }
 
     @Override
     public GeneralAttribute resolve(Field field) {
-        return LongTypeGeneralAttribute.of(field);
+        return new LongTypeGeneralAttribute(field);
     }
 }

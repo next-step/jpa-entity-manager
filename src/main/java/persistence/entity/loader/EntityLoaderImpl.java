@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static persistence.entity.attribute.resolver.AttributeResolverManager.GENERAL_ATTRIBUTE_RESOLVERS;
+import static persistence.entity.attribute.resolver.AttributeHolder.GENERAL_ATTRIBUTE_RESOLVERS;
 
 public class EntityLoaderImpl implements EntityLoader {
     private final JdbcTemplate jdbcTemplate;
@@ -28,7 +28,7 @@ public class EntityLoaderImpl implements EntityLoader {
 
     private static <T> void setGeneralFieldFromResultSet(T instance, ResultSet rs, Field field) throws SQLException, IllegalAccessException {
         for (GeneralAttributeResolver generalAttributeResolver : GENERAL_ATTRIBUTE_RESOLVERS) {
-            if (generalAttributeResolver.support(field.getType())) {
+            if (generalAttributeResolver.supports(field.getType())) {
                 field.setAccessible(true);
                 GeneralAttribute generalAttribute = generalAttributeResolver.resolve(field);
                 Object value = rs.getObject(generalAttribute.getColumnName());
