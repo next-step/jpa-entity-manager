@@ -43,14 +43,13 @@ public class RepositoryTest {
     Stream<DynamicNode> testFactory() {
         Dialect dialect = new FakeDialect();
         final DDLRepository<Person> ddlRepository = new BaseDDLRepository<>(jdbcTemplate, Person.class, dialect);
-        final CrudRepository<Person> crudRepository = new BaseCrudRepository<>(jdbcTemplate, Person.class, dialect);
+        final CrudRepository<Person, Long> crudRepository = new BaseCrudRepository<>(jdbcTemplate, Person.class, dialect);
 
         return Stream.of(
                 dynamicContainer("테이블이", Stream.of(
                         dynamicTest("존재하지 않으면 예외가 발생한다.", () -> {
-                            assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
-                                crudRepository.findAll();
-                            });
+                            assertThatExceptionOfType(RuntimeException.class).isThrownBy(
+                                    crudRepository::findAll);
                         })
                 )),
                 dynamicContainer("테이블을 생성하면", Stream.of(
@@ -63,7 +62,7 @@ public class RepositoryTest {
                             assertThat(crudRepository.findAll()).hasSize(0);
                         }),
                         dynamicTest("단건 조회시 null을 반환 한다", () -> {
-                            assertThat(crudRepository.findById(Person.class, -999)).isNull();
+                            assertThat(crudRepository.findById(Person.class, -999L)).isNull();
                         })
                 )),
                 dynamicContainer("2건을 저장을 하고.", Stream.of(

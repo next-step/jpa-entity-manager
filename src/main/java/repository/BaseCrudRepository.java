@@ -6,7 +6,7 @@ import persistence.dialect.Dialect;
 import persistence.entity.DefaultEntityManager;
 import persistence.entity.EntityManager;
 
-public class BaseCrudRepository<T> extends AbstractRepository<T> implements CrudRepository<T> {
+public class BaseCrudRepository<T, ID> extends AbstractRepository<T, ID> implements CrudRepository<T, ID> {
     private final EntityManager entityManager;
     protected BaseCrudRepository(JdbcTemplate jdbcTemplate, Class<T> tClass, Dialect dialect) {
         super(jdbcTemplate, tClass, dialect);
@@ -21,8 +21,7 @@ public class BaseCrudRepository<T> extends AbstractRepository<T> implements Crud
         entityManager.remove(entity);
     }
 
-
-    public T findById(Class<T> tClass, Object id) {
+    public T findById(Class<T> tClass, ID id) {
         return entityManager.find(tClass, id);
     }
 

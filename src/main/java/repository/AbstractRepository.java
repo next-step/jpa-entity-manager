@@ -4,7 +4,7 @@ import jdbc.JdbcTemplate;
 import persistence.dialect.Dialect;
 import persistence.meta.EntityMeta;
 
-public abstract class AbstractRepository<T> {
+public abstract class AbstractRepository<T, ID> {
 
     protected final JdbcTemplate jdbcTemplate;
     protected final Class<T> tClass;
