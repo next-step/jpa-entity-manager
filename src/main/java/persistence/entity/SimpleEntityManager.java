@@ -62,7 +62,10 @@ public class SimpleEntityManager implements EntityManager {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
 
-        persistenceContext.removeEntity(entityKeyGenerator.generate(entity.getClass(), idValue));
+        final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
+        persistenceContext.removeEntity(entityKey);
+        persistenceContext.updateEntityEntryStatus(entityKey, Status.DELETED);
+
         entityPersister.delete(entity);
     }
 
@@ -71,9 +74,13 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private <T> Object initEntity(final EntityKey entityKey, final EntityLoader<T> entityLoader) {
+        persistenceContext.addEntityEntry(entityKey, Status.LOADING);
+
         final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey()).orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
         persistenceContext.addEntity(entityKey, entityFromDatabase);
         persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
+        persistenceContext.updateEntityEntryStatus(entityKey, Status.MANAGED);
+
         return entityFromDatabase;
     }
 
@@ -86,8 +93,11 @@ public class SimpleEntityManager implements EntityManager {
 
     private void processInsert(final Object entity, final EntityPersister entityPersister) {
         entityPersister.insert(entity);
+
         final Object idValue = extractId(entity, entityPersister);
-        persistenceContext.addEntity(entityKeyGenerator.generate(entity.getClass(), idValue), entity);
+        final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
+        persistenceContext.addEntity(entityKey, entity);
+        persistenceContext.addEntityEntry(entityKey, Status.MANAGED);
     }
 
     private void processUpdate(final Object entity, final EntityPersister entityPersister) {

@@ -120,6 +120,6 @@ public class CustomJpaRepository<T, ID> {
 entityEntry.updateStatus(Status status);
 ```
 
-- [ ] 객체를 insert 할 시 Saving, insert 완료시 Managed 상태가 된다.
-- [ ] 객체를 select 할 시 Loading, select 완료시 Managed 상태가 된다.
-- [ ] 객체를 delete 할 시 Deleted 상태가 된다.
+- [x] 객체를 insert 할 시 Saving (?), insert 완료시 Managed 상태가 된다.
+- [x] 객체를 select 할 시 Loading, select 완료시 Managed 상태가 된다.
+- [x] 객체를 delete 할 시 Deleted 상태가 된다.
