@@ -20,32 +20,22 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> void removeEntity(T instance, Field idField) {
         Class<?> clazz = instance.getClass();
-        Map<String, Object> entityMap = FIRST_CACHE.get(clazz);
+        Map<String, Object> firstCacheEntityMap = FIRST_CACHE.get(clazz);
+        Map<String, Object> snapShotEntityMap = SNAP_SHOT.get(clazz);
 
         String instanceId = getInstanceId(instance, idField);
 
-        entityMap.remove(instanceId);
+        firstCacheEntityMap.remove(instanceId);
 
-        if (entityMap.isEmpty()) {
+        if (firstCacheEntityMap.isEmpty()) {
             FIRST_CACHE.remove(clazz);
         }
 
-        entityPersister.remove(instance, instanceId);
-    }
-
-    @Override
-    public <T> T getDatabaseSnapshot(String id, T entity) {
-        Map<String, Object> entityMap = getOrCreateEntityMap(entity.getClass(), SNAP_SHOT);
-
-        Object snapshot = entityMap.get(id);
-
-        if (snapshot == null) {
-            Object loaded = entityPersister.load(entity.getClass(), id);
-
-            snapshot = createDeepCopy(loaded);
-            entityMap.put(id, snapshot);
+        if (snapShotEntityMap.isEmpty()) {
+            SNAP_SHOT.remove(clazz);
         }
-        return (T) snapshot;
+
+        entityPersister.remove(instance, instanceId);
     }
 
     @Override
@@ -53,15 +43,19 @@ public class PersistenceContextImpl implements PersistenceContext {
         Object retrieved = Optional.ofNullable(FIRST_CACHE.get(clazz))
                 .map(it -> it.get(id))
                 .orElse(null);
+
         if (retrieved == null) {
             Object loaded = entityPersister.load(clazz, id);
 
-            Map<String, Object> entityMap = getOrCreateEntityMap(clazz, SNAP_SHOT);
+            Map<String, Object> firstCacheEntityMap = getOrCreateEntityMap(clazz, FIRST_CACHE);
+            Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(clazz, SNAP_SHOT);
 
             if (loaded != null) {
-                entityMap.put(id, createDeepCopy(loaded));
+                firstCacheEntityMap.put(id, loaded);
+                FIRST_CACHE.put(clazz, firstCacheEntityMap);
 
-                SNAP_SHOT.put(clazz, entityMap);
+                snapShotEntityMap.put(id, createDeepCopy(loaded));
+                SNAP_SHOT.put(clazz, snapShotEntityMap);
             }
 
             return clazz.cast(loaded);
@@ -77,7 +71,9 @@ public class PersistenceContextImpl implements PersistenceContext {
 
             idAttribute.getField().setAccessible(true);
 
-            String id = Optional.ofNullable(idAttribute.getField().get(instance)).map(String::valueOf).orElse(null);
+            String id = Optional.ofNullable(idAttribute.getField().get(instance))
+                    .map(String::valueOf)
+                    .orElse(null);
 
             T snapshot = null;
 
@@ -88,8 +84,11 @@ public class PersistenceContextImpl implements PersistenceContext {
 
                 T inserted = entityPersister.insert(instance);
 
-                snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), inserted);
+                snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), createDeepCopy(inserted));
                 firstcacheEntityMap.put(getInstanceId(instance, idAttribute.getField()), inserted);
+
+                SNAP_SHOT.put(inserted.getClass(), snapShotEntityMap);
+                FIRST_CACHE.put(inserted.getClass(), firstcacheEntityMap);
 
                 return inserted;
             }
@@ -103,10 +102,28 @@ public class PersistenceContextImpl implements PersistenceContext {
             snapShotEntityMap.put(getInstanceId(instance, idAttribute.getField()), instance);
             firstcacheEntityMap.put(getInstanceId(instance, idAttribute.getField()), instance);
 
+            SNAP_SHOT.put(instance.getClass(), snapShotEntityMap);
+            FIRST_CACHE.put(instance.getClass(), firstcacheEntityMap);
+
             return entityPersister.update(snapshot, instance);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public <T> T getDatabaseSnapshot(String id, T entity) {
+        Map<String, Object> entityMap = getOrCreateEntityMap(entity.getClass(), SNAP_SHOT);
+
+        Object snapshot = entityMap.get(id);
+
+        if (snapshot == null) {
+            Object loaded = entityPersister.load(entity.getClass(), id);
+
+            snapshot = createDeepCopy(loaded);
+            entityMap.put(id, snapshot);
+        }
+        return (T) snapshot;
     }
 
     private <T> Map<String, Object> getOrCreateEntityMap(Class<T> clazz, Map<Class<?>, Map<String, Object>> map) {
