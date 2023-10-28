@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class SelectQueryBuilderTest {
 	private final Person person = new Person(1L, "hhhhhwi", 1, "aab555586@gmail.com", 0);
 
-	private final EntityMetadata entityMetadata = new EntityMetadata(Person.class);
+	private final EntityMetadata entityMetadata = new EntityMetadata(person);
 
 	@DisplayName("Person 객체로 SELECT 쿼리 생성 테스트")
 	@Test
 	void test_buildQuery() {
 		assertEquals(
-				new SelectQueryBuilder().buildQuery(entityMetadata, new WhereClauseBuilder(person)),
+				new SelectQueryBuilder().buildQuery(entityMetadata, new WhereClauseBuilder(entityMetadata)),
 				"SELECT * FROM users WHERE id = 1 AND nick_name = 'hhhhhwi' AND old = 1 AND email = 'aab555586@gmail.com';"
 		);
 
@@ -25,7 +25,7 @@ class SelectQueryBuilderTest {
 	@DisplayName("Person 객체로 전체 SELECT 쿼리 생성 테스트")
 	@Test
 	void test_buildFindByIdQuery() {
-		assertEquals(new SelectQueryBuilder().buildFindByIdQuery(entityMetadata, new WhereClauseBuilder(person)),
+		assertEquals(new SelectQueryBuilder().buildFindByIdQuery(Person.class, "1"),
 				"SELECT * FROM users WHERE id = 1;"
 		);
 	}

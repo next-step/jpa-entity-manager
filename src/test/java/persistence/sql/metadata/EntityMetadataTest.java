@@ -13,7 +13,7 @@ class EntityMetadataTest {
     @Test
     void test_getTableName() {
         //Given
-        EntityMetadata entityMetadata = new EntityMetadata(Person.class);
+        EntityMetadata entityMetadata = new EntityMetadata(new Person());
 
         //When & Then
         assertEquals(entityMetadata.getTableName(), "users");
@@ -23,7 +23,7 @@ class EntityMetadataTest {
     @Test
     void test_getColumnsToCreate() {
         //Given
-        EntityMetadata entityMetadata = new EntityMetadata(Person.class);
+        EntityMetadata entityMetadata = new EntityMetadata(new Person());
 
         //When & Then
         assertEquals(entityMetadata.getColumnsToCreate(new H2Dialect()),

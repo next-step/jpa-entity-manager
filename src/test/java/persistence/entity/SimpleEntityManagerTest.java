@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleEntityManagerTest {
+    private final static Person person = new Person("name", 1, "test@email.com", 1);
+
     public static EntityManager entityManager;
 
     @BeforeAll
@@ -30,13 +32,13 @@ class SimpleEntityManagerTest {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         Dialect dialect = DialectFactory.getDialect("H2");
-        EntityMetadata entityMetadata = new EntityMetadata(Person.class);
+        EntityMetadata entityMetadata = new EntityMetadata(new Person());
 
         jdbcTemplate.execute(new DropQueryBuilder().buildQuery(entityMetadata));
         jdbcTemplate.execute(new CreateQueryBuilder(dialect).buildQuery(entityMetadata));
         jdbcTemplate.execute("INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');");
 
-        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate, entityMetadata));
+        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate));
     }
 
     @DisplayName("EnityManager를 통해 PK 값이 일치하는 Entity를 찾는다.")
@@ -52,7 +54,7 @@ class SimpleEntityManagerTest {
     @DisplayName("EntityManager를 통해 Entity를 저장한다.")
     @Test
     void test_persist() {
-        entityManager.persist(new Person("name", 1, "test@email.com", 1));
+        entityManager.persist(person);
         Person resultPerson = entityManager.find(Person.class, 2L);
         Assertions.assertAll(
                 () -> assertTrue(resultPerson.getName().equals("name")),
