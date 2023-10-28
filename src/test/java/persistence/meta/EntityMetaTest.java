@@ -36,4 +36,18 @@ class EntityMetaTest {
             it.assertThat(entityMeta.getEntityColumns()).hasSize(4);
         }));
     }
+
+    @Test
+    @DisplayName("엔티티를 복사 생성한다.")
+    void createEntityInstance() {
+        EntityMeta entityMeta = new EntityMeta(Person.class);
+        Person person = new Person(1L, "이름", 19, "data@gmail.com");
+        final Person copyEntity = entityMeta.createCopyEntity(person);
+
+        assertSoftly((it -> {
+            it.assertThat(copyEntity == person).isFalse();
+            it.assertThat(copyEntity).isEqualTo(person);
+        }));
+    }
+
 }

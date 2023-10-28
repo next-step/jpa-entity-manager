@@ -43,7 +43,7 @@ public class RepositoryTest {
     Stream<DynamicNode> testFactory() {
         Dialect dialect = new FakeDialect();
         final DDLRepository<Person> ddlRepository = new BaseDDLRepository<>(jdbcTemplate, Person.class, dialect);
-        final CrudRepository<Person, Long> crudRepository = new BaseCrudRepository<>(jdbcTemplate, Person.class, dialect);
+        final CrudRepository<Person, Long> crudRepository = new SimpleCrudRepository<>(jdbcTemplate, Person.class, dialect);
 
         return Stream.of(
                 dynamicContainer("테이블이", Stream.of(

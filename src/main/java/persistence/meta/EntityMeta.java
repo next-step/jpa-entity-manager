@@ -3,22 +3,41 @@ package persistence.meta;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import persistence.exception.NoEntityException;
 
 public class EntityMeta {
     private final String tableName;
     private final EntityColumns entityColumns;
-
     private final EntityColumn pkColumn;
+    private final Class<?> entityClass;
 
     public EntityMeta(Class<?> entityClass) {
         if (entityClass == null || entityClass.getAnnotation(Entity.class) == null) {
             throw new NoEntityException();
         }
-        tableName = createTableName(entityClass);
-        entityColumns = new EntityColumns(entityClass.getDeclaredFields());
-        pkColumn = entityColumns.pkColumn();
+
+        this.tableName = createTableName(entityClass);
+        this.entityColumns = new EntityColumns(entityClass.getDeclaredFields());
+        this.pkColumn = entityColumns.pkColumn();
+        this.entityClass = entityClass;
+    }
+
+    public <T> T createCopyEntity(T entity) {
+        try {
+            T newEntity = (T) entityClass.getDeclaredConstructor().newInstance();
+            for (EntityColumn entityColumn : entityColumns.getEntityColumns()) {
+                final Field declaredField = entity.getClass().getDeclaredField(entityColumn.getFieldName());
+                declaredField.setAccessible(true);
+                declaredField.set(newEntity, entityColumn.getFieldValue(entity));
+            }
+            return newEntity;
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException |
+                 NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String createTableName(Class<?> entityClass) {

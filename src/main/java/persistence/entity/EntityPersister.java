@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +39,8 @@ public class EntityPersister {
             final long id = jdbcTemplate.insertForGenerateKey(query);
             changeValue(entityMeta.getPkColumn(), entity, id);
         }
-        return (T) newEntity(entity);
+        return entityMeta.createCopyEntity(entity);
     }
-
 
     public boolean update(Object entity) {
         final String query = updateQueryBuilder.build(entity);
@@ -58,28 +56,6 @@ public class EntityPersister {
         jdbcTemplate.execute(query);
 
     }
-
-    private Object newEntity(Object entity) {
-        try {
-            Object snapShot = entity.getClass().getDeclaredConstructor().newInstance();
-            copyColumns(entity, snapShot);
-            return snapShot;
-        } catch (InstantiationException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void copyColumns(Object entity, Object snapShot) throws NoSuchFieldException, IllegalAccessException {
-        for (EntityColumn entityColumn : entityMeta.getEntityColumns()) {
-            final String fieldName = entityColumn.getFieldName();
-            final Object value = entityColumn.getFieldValue(entity);
-            final Field declaredField = entity.getClass().getDeclaredField(fieldName);
-            declaredField.setAccessible(true);
-            declaredField.set(snapShot, value);
-        }
-    }
-
     private void changeValue(EntityColumn column, Object entity, Object value) {
         try {
             final Field field = entity.getClass().getDeclaredField(column.getFieldName());
