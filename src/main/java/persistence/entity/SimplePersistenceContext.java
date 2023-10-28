@@ -11,12 +11,12 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     private final Map<EntityKey, Object> entities;
     private final Map<EntityKey, Object> entitySnapshots;
-    private final Map<EntityKey, EntityEntry> entityEntries;
+    private final EntityEntries entityEntries;
 
     public SimplePersistenceContext() {
         this.entities = new HashMap<>();
         this.entitySnapshots = new HashMap<>();
-        this.entityEntries = new HashMap<>();
+        this.entityEntries = new EntityEntries();
     }
 
     @Override
@@ -46,12 +46,12 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public void addEntityEntry(final EntityKey key, final Status status) {
-        entityEntries.put(key, new EntityEntry(key, status));
+        entityEntries.addEntityEntry(key, status);
     }
 
     @Override
     public Optional<EntityEntry> getEntityEntry(final EntityKey key) {
-        return Optional.ofNullable(entityEntries.get(key));
+        return entityEntries.getEntityEntry(key);
     }
 
     @Override
