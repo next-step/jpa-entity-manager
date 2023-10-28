@@ -8,14 +8,14 @@ import org.junit.jupiter.api.Test;
 import persistence.meta.EntityMeta;
 import persistence.testFixtures.Person;
 
-class DefaultPersistenceContextTest {
+class SimplePersistenceContextTest {
 
     @Test
     @DisplayName("영속성 컨텍스트에 의해 저장 및 조회가 된다.")
     void getEntity() {
         //given
         Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
-        PersistenceContext context = new DefaultPersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
 
         //when
         context.addEntity(1L, person);
@@ -32,7 +32,7 @@ class DefaultPersistenceContextTest {
     void removeEntity() {
         //given
         Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
-        PersistenceContext context = new DefaultPersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
 
         //when
         context.addEntity(1L, person);
@@ -47,7 +47,7 @@ class DefaultPersistenceContextTest {
     void getDatabaseSnapshot() {
         //given
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
-        PersistenceContext context = new DefaultPersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
 
 
         //when
@@ -71,7 +71,7 @@ class DefaultPersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
         Person person2 = new Person(2L, "이름", 19, "sad@gmail.com");
-        PersistenceContext context = new DefaultPersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
 
 
         //when

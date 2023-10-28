@@ -19,7 +19,7 @@ import persistence.sql.QueryGenerator;
 import persistence.testFixtures.NoAutoIncrementPerson;
 import persistence.testFixtures.Person;
 
-class DefaultEntityManagerTest {
+class SimpleEntityManagerTest {
     private JdbcTemplate jdbcTemplate;
     private DatabaseServer server;
     private Dialect dialect;
@@ -40,7 +40,7 @@ class DefaultEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
                 dialect);
 
         //when
@@ -57,7 +57,7 @@ class DefaultEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
                 dialect);
         entityManager.persist(person);
 
@@ -76,7 +76,7 @@ class DefaultEntityManagerTest {
         //given
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L,"이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
         entityManager.persist(person);
 
         //when
@@ -93,7 +93,7 @@ class DefaultEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
 
 
         //when
@@ -115,7 +115,7 @@ class DefaultEntityManagerTest {
         final String CHANGE_EMAIL_STRING = "change23@gmail.com";
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new DefaultEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
                 dialect);
 
         final Person person1 = entityManager.persist(person);

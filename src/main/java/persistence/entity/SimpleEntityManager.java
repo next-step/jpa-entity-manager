@@ -8,16 +8,16 @@ import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 
 
-public class DefaultEntityManager implements EntityManager {
+public class SimpleEntityManager implements EntityManager {
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
     private final EntityMeta entityMeta;
     private final PersistenceContext persistenceContext;
 
-    public DefaultEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
+    public SimpleEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
         final QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
         this.entityMeta = entityMeta;
-        this.persistenceContext = new DefaultPersistenceContext(entityMeta);
+        this.persistenceContext = new SimplePersistenceContext(entityMeta);
         this.entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
         this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
     }
