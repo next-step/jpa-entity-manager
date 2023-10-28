@@ -38,4 +38,8 @@ public class EntityLoader<T> {
 
         return jdbcTemplate.queryForObject(q, resultMapper);
     }
+
+    public <I> int getHashCode(I input) {
+        return query.select("findById", tableName, columns, input).hashCode();
+    }
 }

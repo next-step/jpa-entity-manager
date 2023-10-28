@@ -57,6 +57,14 @@ public class EntityPersister<T> {
         jdbcTemplate.execute(q);
     }
 
+    public <I> int getHashCode(I input) {
+        return entityLoader.getHashCode(input);
+    }
+
+    public <I> String getIdValue(I input) {
+        return getValues(input).getValue(columns.getIdFieldName());
+    }
+
     private <I> Values getValues(I input) {
         return Values.of(input);
     }

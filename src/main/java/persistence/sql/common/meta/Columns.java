@@ -50,6 +50,14 @@ public class Columns {
             .getName();
     }
 
+    public String getIdFieldName() {
+        return Arrays.stream(value)
+                .filter(Column::isPrimaryKey)
+                .findFirst()
+                .orElseThrow(NotFoundIdException::new)
+                .getFieldName();
+    }
+
     public String getPrimaryKeyWithComma() {
         return StringUtils.withComma(Arrays.stream(value)
             .filter(Column::isPrimaryKey)
