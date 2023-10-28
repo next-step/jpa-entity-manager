@@ -17,31 +17,6 @@ public class PersistenceContextImpl implements PersistenceContext {
         this.entityPersister = entityPersister;
     }
 
-    public static <T> T createDeepCopy(T original) {
-        try {
-            Class<?> clazz = original.getClass();
-            T copy = (T) clazz.getDeclaredConstructor().newInstance();
-            for (Field field : clazz.getDeclaredFields()) {
-                field.setAccessible(true);
-                Object value = field.get(original);
-                if (value != null && !isPrimitiveOrWrapper(value.getClass())) {
-                    field.set(copy, createDeepCopy(value));
-                } else {
-                    field.set(copy, value);
-                }
-            }
-            return copy;
-        } catch (Exception e) {
-            throw new RuntimeException("딥카피 실패", e);
-        }
-    }
-
-    private static boolean isPrimitiveOrWrapper(Class<?> clazz) {
-        return clazz.isPrimitive() || (clazz == Double.class) || (clazz == Float.class) || (clazz == Long.class)
-                || (clazz == Integer.class) || (clazz == Short.class) || (clazz == Character.class)
-                || (clazz == Byte.class) || (clazz == Boolean.class) || (clazz == String.class);
-    }
-
     @Override
     public <T> void removeEntity(T instance, Field idField) {
         Class<?> clazz = instance.getClass();
@@ -71,24 +46,6 @@ public class PersistenceContextImpl implements PersistenceContext {
             entityMap.put(id, snapshot);
         }
         return (T) snapshot;
-    }
-
-    private <T> Map<String, Object> getOrCreateEntityMap(Class<T> clazz, Map<Class<?>, Map<String, Object>> map) {
-        return map.computeIfAbsent(clazz, k -> new HashMap<>());
-    }
-
-    private <T> String getInstanceId(T instance, Field idField) {
-        idField.setAccessible(true);
-
-        try {
-            Object idValue = idField.get(instance);
-
-            assert idValue != null;
-
-            return String.valueOf(idValue);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -150,5 +107,48 @@ public class PersistenceContextImpl implements PersistenceContext {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> Map<String, Object> getOrCreateEntityMap(Class<T> clazz, Map<Class<?>, Map<String, Object>> map) {
+        return map.computeIfAbsent(clazz, k -> new HashMap<>());
+    }
+
+    private <T> String getInstanceId(T instance, Field idField) {
+        idField.setAccessible(true);
+
+        try {
+            Object idValue = idField.get(instance);
+
+            assert idValue != null;
+
+            return String.valueOf(idValue);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> T createDeepCopy(T original) {
+        try {
+            Class<?> clazz = original.getClass();
+            T copy = (T) clazz.getDeclaredConstructor().newInstance();
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(original);
+                if (value != null && !isPrimitiveOrWrapper(value.getClass())) {
+                    field.set(copy, createDeepCopy(value));
+                } else {
+                    field.set(copy, value);
+                }
+            }
+            return copy;
+        } catch (Exception e) {
+            throw new RuntimeException("딥카피 실패", e);
+        }
+    }
+
+    private boolean isPrimitiveOrWrapper(Class<?> clazz) {
+        return clazz.isPrimitive() || (clazz == Double.class) || (clazz == Float.class) || (clazz == Long.class)
+                || (clazz == Integer.class) || (clazz == Short.class) || (clazz == Character.class)
+                || (clazz == Byte.class) || (clazz == Boolean.class) || (clazz == String.class);
     }
 }
