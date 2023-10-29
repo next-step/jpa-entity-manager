@@ -1,25 +1,21 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-import persistence.sql.Query;
 import persistence.sql.entity.EntityData;
 import util.ReflectionUtil;
 
 public class SimpleEntityManager implements EntityManager {
 
-    private final Query query;
-    private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
-    public SimpleEntityManager(Query query, JdbcTemplate jdbcTemplate, EntityPersister entityPersister) {
-        this.query = query;
-        this.jdbcTemplate = jdbcTemplate;
+    public SimpleEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
         this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
 
     @Override
     public <T, K> T find(Class<T> clazz, K id) {
-        return jdbcTemplate.queryForObject(query.findById(clazz, id), new SimpleRowMapper<>(clazz));
+        return entityLoader.selectById(clazz, id);
     }
 
     @Override
