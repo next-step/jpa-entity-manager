@@ -38,7 +38,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
             T entityInstance = entityLoader.selectOne(clazz, entityId);
             entityInstanceMap.put(entityKey, entityInstance);
         }
-        return (T) entityInstanceMap.get(entityKey);
+        return clazz.cast(entityInstanceMap.get(entityKey));
     }
 
     @Override
