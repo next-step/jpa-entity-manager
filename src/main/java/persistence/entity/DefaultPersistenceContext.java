@@ -1,7 +1,7 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
 import persistence.sql.dml.ColumnValues;
+import persistence.sql.util.ObjectUtils;
 import persistence.sql.util.StringConstant;
 
 import java.util.HashMap;
@@ -12,38 +12,29 @@ import static java.util.Objects.nonNull;
 public class DefaultPersistenceContext implements PersistenceContext {
 
     private final Map<String, Object> entityInstanceMap = new HashMap<>();
-
-    private final EntityPersister entityPersister;
-    private final EntityLoader entityLoader;
+    private final Map<String, Object> entitySnapShotMap = new HashMap<>();
 
     private static DefaultPersistenceContext INSTANCE;
 
-    private DefaultPersistenceContext(EntityPersister entityPersister, EntityLoader entityLoader) {
-        this.entityPersister = entityPersister;
-        this.entityLoader = entityLoader;
+    private DefaultPersistenceContext() {
     }
 
-    public static DefaultPersistenceContext of(JdbcTemplate jdbcTemplate) {
+    public static DefaultPersistenceContext getInstance() {
         if (nonNull(INSTANCE)) {
             return INSTANCE;
         }
-        INSTANCE = new DefaultPersistenceContext(EntityPersister.of(jdbcTemplate), EntityLoader.of(jdbcTemplate));
+        INSTANCE = new DefaultPersistenceContext();
         return INSTANCE;
     }
 
     @Override
     public <T> T getEntity(Class<T> clazz, Long entityId) {
         String entityKey = buildEntityKey(clazz, entityId);
-        if (!entityInstanceMap.containsKey(entityKey)) {
-            T entityInstance = entityLoader.selectOne(clazz, entityId);
-            entityInstanceMap.put(entityKey, entityInstance);
-        }
         return clazz.cast(entityInstanceMap.get(entityKey));
     }
 
     @Override
     public void addEntity(Object entity) {
-        entityPersister.insert(entity);
         String entityKey = buildEntityKey(entity);
         entityInstanceMap.put(entityKey, entity);
     }
@@ -52,7 +43,12 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public void removeEntity(Object entity) {
         String entityKey = buildEntityKey(entity);
         entityInstanceMap.remove(entityKey);
-        entityPersister.delete(entity);
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(Long id, Object entity) {
+        String entityKey = buildEntityKey(entity.getClass(), id);
+        return entitySnapShotMap.put(entityKey, ObjectUtils.copy(entity));
     }
 
     private String buildEntityKey(Class<?> clazz, Object entityId) {
