@@ -53,7 +53,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         T snapshot = getDatabaseSnapshot(instance, instanceId);
 
-        T updated = simpleEntityPersister.update(snapshot, instance);
+        T updated = simpleEntityPersister.update(snapshot, instance); // 나중에 쓰기지연 구현
 
         snapShots.putSnapShot(createDeepCopy(instance), instanceId);
         firstCaches.putFirstCache(instance, instanceId);

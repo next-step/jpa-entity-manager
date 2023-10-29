@@ -54,7 +54,7 @@ class FirstCachesTest {
         @DisplayName("인스턴스와 이이디를 받으면")
         class withValidArgs {
             @Test
-            @DisplayName("일차캐시에 인스턴스를 저장한다.")
+            @DisplayName("일차캐시에 인스턴스를 저장하고 엔트리 상태를 PERSISTENT로 변경한다.")
             void putFirstCache() {
                 FirstCaches firstCaches = new FirstCaches();
                 EntityFixtures.SampleOneWithValidAnnotation sample
@@ -72,7 +72,7 @@ class FirstCachesTest {
         @DisplayName("인스턴스와 이이디를 받으면")
         class withValidArgs {
             @Test
-            @DisplayName("일차캐시에 인스턴스를 제거한다.")
+            @DisplayName("엔트리 상태를 REMOVED로 변경한다.")
             void putFirstCache() {
                 FirstCaches firstCaches = new FirstCaches();
                 EntityFixtures.SampleOneWithValidAnnotation sample

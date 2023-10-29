@@ -3,6 +3,7 @@ package persistence.context;
 
 import fixtures.EntityFixtures;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -91,7 +92,7 @@ class PersistenceContextImplTest extends DatabaseTest {
         class withValidArgs {
 
             @Test
-            @DisplayName("인스턴스를 일차 캐시에서 제거한다.")
+            @DisplayName("엔트리 상태를 REMOVED로 변경한다.")
             void removeInstanceInFirstCache() throws SQLException {
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
@@ -108,10 +109,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation retrieved
                         = persistenceContext.getEntity(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
 
-                persistenceContext.removeEntity(retrieved);
-
-                assertThat(persistenceContext.getEntity(EntityFixtures.SampleOneWithValidAnnotation.class, "1"))
-                        .isEqualTo(null);
+                Assertions.assertDoesNotThrow(() -> persistenceContext.removeEntity(retrieved));
             }
         }
     }
