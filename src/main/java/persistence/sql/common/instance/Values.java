@@ -37,7 +37,7 @@ public class Values {
             .collect(Collectors.joining(", "));
     }
 
-    private String getValue(String fieldName) {
+    public String getValue(String fieldName) {
         return Arrays.stream(values)
             .filter(value -> value.isEquals(fieldName))
             .findFirst()

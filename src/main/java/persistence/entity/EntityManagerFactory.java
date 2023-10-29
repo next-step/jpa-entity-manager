@@ -25,21 +25,13 @@ public class EntityManagerFactory {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         List<Class<?>> classList = EntityManagerFactory.getClasses();
 
-        return new EntityManagerImpl(persisterInit(jdbcTemplate, classList), loaderInit(jdbcTemplate, classList));
+        return new EntityManagerImpl(persisterInit(jdbcTemplate, classList));
     }
 
     private static Map<String, EntityPersister<?>> persisterInit(JdbcTemplate jdbcTemplate, List<Class<?>> list) {
         Map<String, EntityPersister<?>> map = new HashMap<>();
 
         list.forEach(aClass -> map.put(aClass.getName(), new EntityPersister<>(jdbcTemplate, aClass, Query.getInstance())));
-
-        return map;
-    }
-
-    private static Map<String, EntityLoader<?>> loaderInit(JdbcTemplate jdbcTemplate, List<Class<?>> list) {
-        Map<String, EntityLoader<?>> map = new HashMap<>();
-
-        list.forEach(aClass -> map.put(aClass.getName(), new EntityLoader<>(jdbcTemplate, aClass, Query.getInstance())));
 
         return map;
     }

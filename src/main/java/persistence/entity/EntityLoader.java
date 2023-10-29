@@ -15,7 +15,7 @@ public class EntityLoader<T> {
     private final TableName tableName;
     private final Columns columns;
 
-    public EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
+    EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
         this.query = query;
 
         this.jdbcTemplate = jdbcTemplate;
@@ -37,5 +37,9 @@ public class EntityLoader<T> {
         }.getClass().getEnclosingMethod().getName(), tableName, columns, input);
 
         return jdbcTemplate.queryForObject(q, resultMapper);
+    }
+
+    public <I> int getHashCode(I input) {
+        return query.select("findById", tableName, columns, input).hashCode();
     }
 }

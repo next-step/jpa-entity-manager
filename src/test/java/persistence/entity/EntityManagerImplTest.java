@@ -47,7 +47,8 @@ class EntityManagerImplTest {
     }
 
     @BeforeEach
-    void init() {
+    void init() throws SQLException {
+        entityManager = EntityManagerFactory.of(server.getConnection());
         테이블을_생성함(clazz);
     }
 
@@ -103,7 +104,7 @@ class EntityManagerImplTest {
         @DisplayName("정상적으로 데이터 단건을 조회해 옴")
         void success() {
             //given
-            final Long id = 3L;
+            final Long id = 1L;
             final String name = "name";
             final int age = 3;
             final String email = "z";
@@ -154,7 +155,7 @@ class EntityManagerImplTest {
         @DisplayName("성공적으로 데이터를 저장함")
         void success() {
             //givne
-            final Long id = 9L;
+            final Long id = 2L;
             final String name = "name";
             final int age = 3;
             final String email = "dd";
@@ -181,7 +182,7 @@ class EntityManagerImplTest {
         @DisplayName("존재하지 않는 테이블에 데이터 저장 시도시 오류")
         void notFoundTable() {
             //given
-            final Person person = new Person(1L, "zz", 3, "xx", 3);
+            final Person person = new Person(3L, "zz", 3, "xx", 3);
 
             //when & then
             assertThrows(RuntimeException.class, () -> entityManager.persist(person));
@@ -196,7 +197,7 @@ class EntityManagerImplTest {
         @DisplayName("데이터를 정상적으로 삭제함")
         void success() {
             //given
-            final Long id = 33L;
+            final Long id = 4L;
             final SelectPerson person = new SelectPerson(id, "zz", 3, "xx", 3);
 
             데이터를_저장함(person);
@@ -214,7 +215,7 @@ class EntityManagerImplTest {
         @DisplayName("존재하지 않는 테이블의 데이터 삭제 시도시 오류")
         void notFoundTable() {
             //given
-            final Long id = 33L;
+            final Long id = 5L;
             final Person person = new Person(id, "zz", 3, "xx", 3);
 
             Class<Person> clazz = Person.class;
@@ -232,7 +233,7 @@ class EntityManagerImplTest {
         @DisplayName("성공적으로 데이터를 수정한다")
         void success() {
             //given
-            final Long id = 3L;
+            final Long id = 6L;
             final String name = "name";
             final int age = 20;
             final String email = "email";
