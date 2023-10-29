@@ -4,25 +4,28 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.dialect.Dialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
-import persistence.sql.dml.SelectQueryBuilder;
 
 public class EntityLoader {
     private final Logger log = LoggerFactory.getLogger(EntityLoader.class);
     private final JdbcTemplate jdbcTemplate;
-    private final SelectQueryBuilder selectBuilder;
-    private final EntityMapper entityMapper;
+    private final Dialect dialect;
 
-    public EntityLoader(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, QueryGenerator queryGenerator) {
+    public EntityLoader(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
-        this.entityMapper = new EntityMapper(entityMeta);
-        this.selectBuilder = queryGenerator.select();
-
+        this.dialect = dialect;
     }
 
     public <T> T find(Class<T> tClass, Object id) {
-        final String query = selectBuilder.findByIdQuery(id);
+        final EntityMeta entityMeta = new EntityMeta(tClass);
+        final EntityMapper entityMapper = new EntityMapper(entityMeta);
+
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .select()
+                .findByIdQuery(id);
+
         log.info(query);
 
         return jdbcTemplate.queryForObject(query,
@@ -30,8 +33,15 @@ public class EntityLoader {
     }
 
     public <T> List<T> findAll(Class<T> tClass) {
-        final String query = selectBuilder.findAllQuery();
+        final EntityMeta entityMeta = new EntityMeta(tClass);
+        final EntityMapper entityMapper = new EntityMapper(entityMeta);
+
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .select()
+                .findAllQuery();
+
         log.info(query);
+
         return jdbcTemplate.query(query,
                 (resultSet) -> entityMapper.resultSetToEntity(tClass, resultSet));
     }

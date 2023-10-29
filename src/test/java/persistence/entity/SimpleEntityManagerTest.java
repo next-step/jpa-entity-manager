@@ -14,7 +14,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
 import persistence.fake.FakeDialect;
-import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.NoAutoIncrementPerson;
 import persistence.testFixtures.Person;
@@ -40,8 +39,7 @@ class SimpleEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
-                dialect);
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
 
         //when
         entityManager.persist(person);
@@ -57,8 +55,8 @@ class SimpleEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
-                dialect);
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+
         entityManager.persist(person);
 
         //when
@@ -74,14 +72,13 @@ class SimpleEntityManagerTest {
     @DisplayName("엔티티 매니저에 의해 하나의 데이터만 조회 된다.")
     void findById() {
         //given
-        NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L,"이름", 19, "asd@gmail.com");
+        NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L, "이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
         entityManager.persist(person);
 
         //when
         final NoAutoIncrementPerson savePerson = entityManager.find(NoAutoIncrementPerson.class, 2L);
-
 
         //then
         assertThat(savePerson).isEqualTo(person);
@@ -93,14 +90,12 @@ class SimpleEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()), dialect);
-
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
 
         //when
         final Person person1 = entityManager.persist(person);
         final Person person2 = entityManager.persist(person);
         final Person person3 = entityManager.persist(person);
-
 
         //then
         assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
@@ -115,8 +110,7 @@ class SimpleEntityManagerTest {
         final String CHANGE_EMAIL_STRING = "change23@gmail.com";
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, new EntityMeta(person.getClass()),
-                dialect);
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
 
         final Person person1 = entityManager.persist(person);
         final Person person2 = entityManager.persist(person);
@@ -130,7 +124,6 @@ class SimpleEntityManagerTest {
         final Person findPerson1 = entityManager.find(Person.class, person1.getId());
         final Person findPerson2 = entityManager.find(Person.class, person2.getId());
         final Person findPerson3 = entityManager.find(Person.class, person3.getId());
-
 
         //then
         assertSoftly(it -> {

@@ -5,21 +5,17 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import persistence.dialect.Dialect;
 import persistence.meta.EntityMeta;
-import persistence.sql.QueryGenerator;
 
 
 public class SimpleEntityManager implements EntityManager {
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
-    private final EntityMeta entityMeta;
     private final PersistenceContext persistenceContext;
 
-    public SimpleEntityManager(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, Dialect dialect) {
-        final QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        this.entityMeta = entityMeta;
-        this.persistenceContext = new SimplePersistenceContext(entityMeta);
-        this.entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
-        this.entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+    public SimpleEntityManager(JdbcTemplate jdbcTemplate , Dialect dialect) {
+        this.persistenceContext = new SimplePersistenceContext();
+        this.entityLoader = new EntityLoader(jdbcTemplate, dialect);
+        this.entityPersister = new EntityPersister(jdbcTemplate, dialect);
     }
 
     @Override
@@ -33,9 +29,11 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public void remove(Object entity) {
         Object cacheKey = getEntityId(entity);
+
         if (persistenceContext.getEntity(cacheKey) != null) {
             persistenceContext.removeEntity(entity);
         }
+
         entityPersister.delete(entity);
     }
 
@@ -71,6 +69,7 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private <T> Object getEntityId(T persistEntity) {
+        EntityMeta entityMeta = new EntityMeta(persistEntity.getClass());
         return entityMeta.getPkValue(persistEntity);
     }
 

@@ -40,7 +40,7 @@ class EntityLoaderTest {
         //given
         EntityMeta entityMeta = new EntityMeta(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
 
         Person person = new Person("이름", 19, "asd@gmail.com");
         jdbcTemplate.execute(queryGenerator.insert().build(person));
@@ -58,9 +58,8 @@ class EntityLoaderTest {
     @DisplayName("데이터를 조회하고 엔티티에 맵핑한다")
     void find() {
         //given
-        EntityMeta entityMeta = new EntityMeta(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(Person.class, dialect);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
 
         Person person = new Person("이름", 19, "asd@gmail.com");
         Person person2 = new Person("이름", 19, "asd@gmail.com");
@@ -85,9 +84,7 @@ class EntityLoaderTest {
     @Test
     @DisplayName("없는 데이터를 조회하면 null을 반환한다")
     void noDataIsNull() {
-        EntityMeta entityMeta = new EntityMeta(Person.class);
-        QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, entityMeta, queryGenerator);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
 
         Person person = entityLoader.find(Person.class, 1L);
 

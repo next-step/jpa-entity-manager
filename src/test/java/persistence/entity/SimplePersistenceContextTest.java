@@ -5,7 +5,6 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.meta.EntityMeta;
 import persistence.testFixtures.Person;
 
 class SimplePersistenceContextTest {
@@ -15,7 +14,7 @@ class SimplePersistenceContextTest {
     void getEntity() {
         //given
         Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
-        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext();
 
         //when
         context.addEntity(1L, person);
@@ -32,11 +31,11 @@ class SimplePersistenceContextTest {
     void removeEntity() {
         //given
         Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
-        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext();
 
         //when
         context.addEntity(1L, person);
-        context.removeEntity(person);
+        context.removeEntity(1L);
 
         //then
         assertThat(context.getEntity(1L)).isNull();
@@ -47,7 +46,7 @@ class SimplePersistenceContextTest {
     void getDatabaseSnapshot() {
         //given
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
-        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext();
 
 
         //when
@@ -71,7 +70,7 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
         Person person2 = new Person(2L, "이름", 19, "sad@gmail.com");
-        PersistenceContext context = new SimplePersistenceContext(new EntityMeta(person.getClass()));
+        PersistenceContext context = new SimplePersistenceContext();
 
 
         //when

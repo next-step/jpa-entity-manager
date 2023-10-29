@@ -10,7 +10,7 @@ public class SimpleCrudRepository<T, ID> extends AbstractRepository<T, ID> imple
     private final EntityManager entityManager;
     protected SimpleCrudRepository(JdbcTemplate jdbcTemplate, Class<T> tClass, Dialect dialect) {
         super(jdbcTemplate, tClass, dialect);
-        this.entityManager = new SimpleEntityManager(jdbcTemplate, entityMeta, dialect);
+        this.entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
     }
 
     public T save(T entity) {

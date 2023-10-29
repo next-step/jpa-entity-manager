@@ -4,35 +4,29 @@ import java.lang.reflect.Field;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.dialect.Dialect;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
 
 
 public class EntityPersister {
     private static final Logger log = LoggerFactory.getLogger(EntityPersister.class);
     private final JdbcTemplate jdbcTemplate;
-    private final EntityMeta entityMeta;
-
-    private final DeleteQueryBuilder deleteQueryBuilder;
-    private final InsertQueryBuilder insertQueryBuilder;
-    private final UpdateQueryBuilder updateQueryBuilder;
+    private final Dialect dialect;
 
     public EntityPersister(JdbcTemplate jdbcTemplate,
-                           EntityMeta entityMeta,
-                           QueryGenerator queryGenerator) {
+                           Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
-        this.entityMeta = entityMeta;
-        this.deleteQueryBuilder = queryGenerator.delete();
-        this.insertQueryBuilder = queryGenerator.insert();
-        this.updateQueryBuilder = queryGenerator.update();
+        this.dialect = dialect;
     }
 
     public <T> T insert(T entity) {
-        final String query = insertQueryBuilder.build(entity);
+        final EntityMeta entityMeta = EntityMeta.form(entity.getClass());
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .insert()
+                .build(entity);
+
         log.info(query);
 
         if (entityMeta.isAutoIncrement()) {
@@ -43,18 +37,26 @@ public class EntityPersister {
     }
 
     public boolean update(Object entity) {
-        final String query = updateQueryBuilder.build(entity);
+        final EntityMeta entityMeta = EntityMeta.form(entity.getClass());
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .update()
+                .build(entity);
+
         log.info(query);
         jdbcTemplate.execute(query);
         return true;
     }
 
     public void delete(Object entity) {
-        Object id = entityMeta.getPkValue(entity);
-        final String query = deleteQueryBuilder.build(id);
-        log.info(query);
-        jdbcTemplate.execute(query);
+        final EntityMeta entityMeta = EntityMeta.form(entity.getClass());
 
+        final String query = QueryGenerator.of(entityMeta, dialect)
+                .delete()
+                .build(entityMeta.getPkValue(entity));
+
+        log.info(query);
+
+        jdbcTemplate.execute(query);
     }
     private void changeValue(EntityColumn column, Object entity, Object value) {
         try {

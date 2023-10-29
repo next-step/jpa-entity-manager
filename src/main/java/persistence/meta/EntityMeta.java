@@ -25,6 +25,10 @@ public class EntityMeta {
         this.entityClass = entityClass;
     }
 
+    public static EntityMeta form(Class<?> entityClass) {
+        return new EntityMeta(entityClass);
+    }
+
     public <T> T createCopyEntity(T entity) {
         try {
             T newEntity = (T) entityClass.getDeclaredConstructor().newInstance();

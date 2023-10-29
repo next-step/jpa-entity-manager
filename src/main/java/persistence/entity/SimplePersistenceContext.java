@@ -9,11 +9,6 @@ import persistence.meta.EntityMeta;
 public class SimplePersistenceContext implements PersistenceContext {
     private final Map<Object, Object> context = new ConcurrentHashMap<>();
     private final Map<Object, Object> snapShotContext = new ConcurrentHashMap<>();
-    private final EntityMeta entityMeta;
-
-    public SimplePersistenceContext(EntityMeta entityMeta) {
-        this.entityMeta = entityMeta;
-    }
 
     @Override
     public Object getEntity(Object id) {
@@ -26,14 +21,14 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void removeEntity(Object entity) {
-        final Object pkColumnId = entityMeta.getPkValue(entity);
-        context.remove(entityMeta.getPkValue(entity));
-        snapShotContext.remove(pkColumnId);
+    public void removeEntity(Object id) {
+        context.remove(id);
+        snapShotContext.remove(id);
     }
 
     @Override
     public Object getDatabaseSnapshot(Object id, Object entity) {
+        EntityMeta entityMeta = new EntityMeta(entity.getClass());
         Object snapShot = entityMeta.createCopyEntity(entity);
         return snapShotContext.put(id, snapShot);
     }
