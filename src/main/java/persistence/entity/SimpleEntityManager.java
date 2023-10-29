@@ -29,7 +29,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        final EntityMeta entityMeta = new EntityMeta(entity.getClass());
+        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
         final EntityKey entityKey = EntityKey.of(entity.getClass(), entityMeta.getPkValue(entity));
 
         if (persistenceContext.getEntity(entityKey) != null) {
@@ -43,12 +43,16 @@ public class SimpleEntityManager implements EntityManager {
     public <T, ID> T find(Class<T> clazz, ID id) {
         EntityKey entityKey = EntityKey.of(clazz, id);
 
-        if (persistenceContext.getEntity(entityKey) == null) {
-            final T entity = entityLoader.find(clazz, id);
+        if (persistenceContext.getEntity(entityKey) != null) {
+            return (T) persistenceContext.getEntity(entityKey);
+        }
+
+        final T entity = entityLoader.find(clazz, id);
+        if (entity != null) {
             persistenceContext.addEntity(entityKey, entity);
         }
 
-        return (T) persistenceContext.getEntity(entityKey);
+        return entity;
     }
 
     @Override

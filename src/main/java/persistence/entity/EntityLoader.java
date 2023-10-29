@@ -19,7 +19,7 @@ public class EntityLoader {
     }
 
     public <T> T find(Class<T> tClass, Object id) {
-        final EntityMeta entityMeta = new EntityMeta(tClass);
+        final EntityMeta entityMeta = EntityMeta.from(tClass);
         final EntityMapper entityMapper = new EntityMapper(entityMeta);
 
         final String query = QueryGenerator.of(entityMeta, dialect)
@@ -33,7 +33,7 @@ public class EntityLoader {
     }
 
     public <T> List<T> findAll(Class<T> tClass) {
-        final EntityMeta entityMeta = new EntityMeta(tClass);
+        final EntityMeta entityMeta = EntityMeta.from(tClass);
         final EntityMapper entityMapper = new EntityMapper(entityMeta);
 
         final String query = QueryGenerator.of(entityMeta, dialect)

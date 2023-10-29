@@ -12,6 +12,9 @@ public class PkHasPerson {
     private String name;
 
     private Integer age;
+    protected PkHasPerson() {
+
+    }
 
     public PkHasPerson(Long id, String name, Integer age) {
         this.id = id;

@@ -23,7 +23,7 @@ public class QueryGenerator {
     }
 
     public static QueryGenerator of(Class<?> tClass, Dialect dialect) {
-        return of(new EntityMeta(tClass), dialect);
+        return of(EntityMeta.from(tClass), dialect);
     }
 
     public static QueryGenerator of(EntityMeta entityMeta, Dialect dialect) {

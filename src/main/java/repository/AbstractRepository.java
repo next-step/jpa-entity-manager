@@ -15,7 +15,7 @@ public abstract class AbstractRepository<T, ID> {
 
     protected AbstractRepository(JdbcTemplate jdbcTemplate, Class<T> tClass, Dialect dialect) {
         this.tClass = tClass;
-        this.entityMeta = new EntityMeta(tClass);
+        this.entityMeta = EntityMeta.from(tClass);
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
     }

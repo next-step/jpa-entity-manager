@@ -22,7 +22,7 @@ public class EntityPersister {
     }
 
     public <T> T insert(T entity) {
-        final EntityMeta entityMeta = EntityMeta.form(entity.getClass());
+        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
         final String query = QueryGenerator.of(entityMeta, dialect)
                 .insert()
                 .build(entity);
@@ -37,7 +37,7 @@ public class EntityPersister {
     }
 
     public boolean update(Object entity) {
-        final EntityMeta entityMeta = EntityMeta.form(entity.getClass());
+        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
         final String query = QueryGenerator.of(entityMeta, dialect)
                 .update()
                 .build(entity);
@@ -48,7 +48,7 @@ public class EntityPersister {
     }
 
     public void delete(Object entity) {
-        final EntityMeta entityMeta = EntityMeta.form(entity.getClass());
+        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
 
         final String query = QueryGenerator.of(entityMeta, dialect)
                 .delete()

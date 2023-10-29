@@ -14,7 +14,7 @@ public class EntityMeta {
     private final EntityColumn pkColumn;
     private final Class<?> entityClass;
 
-    public EntityMeta(Class<?> entityClass) {
+    private EntityMeta(Class<?> entityClass) {
         if (entityClass == null || entityClass.getAnnotation(Entity.class) == null) {
             throw new NoEntityException();
         }
@@ -25,7 +25,7 @@ public class EntityMeta {
         this.entityClass = entityClass;
     }
 
-    public static EntityMeta form(Class<?> entityClass) {
+    public static EntityMeta from(Class<?> entityClass) {
         return new EntityMeta(entityClass);
     }
 

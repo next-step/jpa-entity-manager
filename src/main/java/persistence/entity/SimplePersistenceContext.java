@@ -32,7 +32,7 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public Object getDatabaseSnapshot(EntityKey entityKey, Object entity) {
-        EntityMeta entityMeta = new EntityMeta(entity.getClass());
+        EntityMeta entityMeta = EntityMeta.from(entity.getClass());
         Object snapShot = entityMeta.createCopyEntity(entity);
         return snapShotContext.put(entityKey, snapShot);
     }

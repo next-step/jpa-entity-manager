@@ -27,7 +27,7 @@ class InsertQueryBuilderTest {
     @DisplayName("insert 쿼리를 생성한다.")
     void insert() {
         //given
-        EntityMeta entityMeta = new EntityMeta(Person.class);
+        EntityMeta entityMeta = EntityMeta.from(Person.class);
         QueryGenerator query = QueryGenerator.of(entityMeta, dialect);
         Person person = new Person("name", 3, "kbh@gm.com");
 
@@ -42,7 +42,7 @@ class InsertQueryBuilderTest {
     @DisplayName("다른 방언으로 insert 쿼리를 생성한다.")
     void insertDirect() {
         //given
-        EntityMeta entityMeta = new EntityMeta(Person.class);
+        EntityMeta entityMeta = EntityMeta.from(Person.class);
         QueryGenerator query = QueryGenerator.of(entityMeta, new UpperStringDirect());
         Person person = new Person("name", 3, "kbh@gm.com");
 
@@ -57,7 +57,7 @@ class InsertQueryBuilderTest {
     @DisplayName("id 전략이 자동생성이 아닌 insert 쿼리를 생성한다.")
     void insertNotAutoIncrement() {
         //given
-        EntityMeta entityMeta = new EntityMeta(NoAutoIncrementPerson.class);
+        EntityMeta entityMeta = EntityMeta.from(NoAutoIncrementPerson.class);
         QueryGenerator query = QueryGenerator.of(entityMeta, new UpperStringDirect());
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(3L,"name", 3, "kbh@gm.com");
 
@@ -72,7 +72,7 @@ class InsertQueryBuilderTest {
     @DisplayName("id 전략이 자동생성이 아닌 경우는 id가 필수이다")
     void insertNotAutoIncrementIdNull() {
         //given
-        EntityMeta entityMeta = new EntityMeta(NoAutoIncrementPerson.class);
+        EntityMeta entityMeta = EntityMeta.from(NoAutoIncrementPerson.class);
         QueryGenerator query = QueryGenerator.of(entityMeta, new UpperStringDirect());
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(null,"name", 3, "kbh@gm.com");
 

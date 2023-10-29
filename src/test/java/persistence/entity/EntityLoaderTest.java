@@ -32,13 +32,11 @@ class EntityLoaderTest {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
     }
 
-
-
     @Test
     @DisplayName("데이터를 전체를 조회하고 엔티티에 맵핑한다")
     void findAll() {
         //given
-        EntityMeta entityMeta = new EntityMeta(Person.class);
+        EntityMeta entityMeta = EntityMeta.from(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
 
@@ -95,7 +93,7 @@ class EntityLoaderTest {
     @DisplayName("데이터를 저장하고 키값을 가져온다.")
     void save() {
         //given
-        EntityMeta entityMeta = new EntityMeta(Person.class);
+        EntityMeta entityMeta = EntityMeta.from(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
 
 

@@ -4,8 +4,8 @@ import java.util.Objects;
 import persistence.meta.EntityMeta;
 
 public class EntityKey {
-    private Class<?> clazz;
-    private Object id;
+    private final Class<?> clazz;
+    private final Object id;
 
     private EntityKey(Class<?> clazz, Object id) {
         this.clazz = clazz;
@@ -17,7 +17,7 @@ public class EntityKey {
     }
     public static EntityKey of(Object entity) {
         final Class<?> clazz = entity.getClass();
-        final Object id = new EntityMeta(clazz).getPkValue(entity);
+        final Object id = EntityMeta.from(clazz).getPkValue(entity);
 
         return new EntityKey(clazz, id);
     }
