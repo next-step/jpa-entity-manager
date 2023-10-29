@@ -20,7 +20,10 @@ public class JdbcTemplate {
     }
 
     public Long executeWithGeneratedKey(final String sql) {
-        try (final ResultSet resultSet = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS).getGeneratedKeys()) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.execute();
+            final ResultSet resultSet = preparedStatement.getGeneratedKeys();
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             }
