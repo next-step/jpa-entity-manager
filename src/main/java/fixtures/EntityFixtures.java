@@ -2,7 +2,7 @@ package fixtures;
 
 import jakarta.persistence.*;
 
-public class TestEntityFixtures {
+public class EntityFixtures {
     @Entity
     @Table(name = "entity_name")
     public static class SampleOneWithValidAnnotation {

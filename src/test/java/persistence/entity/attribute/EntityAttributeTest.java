@@ -1,6 +1,6 @@
 package persistence.entity.attribute;
 
-import fixtures.TestEntityFixtures;
+import fixtures.EntityFixtures;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +27,7 @@ public class EntityAttributeTest {
             @DisplayName("EntityAttribute를 반환한다.")
             void returnEntityAttribute() {
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
 
                 Assertions.assertAll(
                         () -> assertThat(entityAttribute.getTableName())
@@ -50,7 +50,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                TestEntityFixtures.EntityWithMultiIdAnnotation.class));
+                                EntityFixtures.EntityWithMultiIdAnnotation.class));
             }
         }
 
@@ -62,7 +62,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                TestEntityFixtures.EntityWithOutEntityAnnotation.class));
+                                EntityFixtures.EntityWithOutEntityAnnotation.class));
             }
         }
     }

@@ -1,70 +1,46 @@
 package persistence.context;
 
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributeHolder;
+import persistence.entity.attribute.EntityAttributeCenter;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.persister.SimpleEntityPersister;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
-    private final EntityAttributeHolder entityAttributeHolder;
+    private final EntityAttributeCenter entityAttributeCenter;
     private final SimpleEntityPersister simpleEntityPersister;
-    private final Map<Class<?>, Map<String, Object>> FIRST_CACHE = new HashMap<>();
-    private final Map<Class<?>, Map<String, Object>> SNAP_SHOT = new HashMap<>();
+    private final FirstCaches firstCaches = new FirstCaches();
+    private final SnapShots snapShots = new SnapShots();
 
-    public PersistenceContextImpl(SimpleEntityPersister simpleEntityPersister, EntityAttributeHolder entityAttributeHolder) {
+    public PersistenceContextImpl(SimpleEntityPersister simpleEntityPersister, EntityAttributeCenter entityAttributeCenter) {
         this.simpleEntityPersister = simpleEntityPersister;
-        this.entityAttributeHolder = entityAttributeHolder;
+        this.entityAttributeCenter = entityAttributeCenter;
     }
 
     @Override
     public <T> void removeEntity(T instance) {
-        EntityAttribute entityAttribute = entityAttributeHolder.findEntityAttribute(instance.getClass());
-
+        EntityAttribute entityAttribute = entityAttributeCenter.findEntityAttribute(instance.getClass());
         Field idField = entityAttribute.getIdAttribute().getField();
-
         Class<?> clazz = instance.getClass();
-        Map<String, Object> firstCacheEntityMap = FIRST_CACHE.get(clazz);
-        Map<String, Object> snapShotEntityMap = SNAP_SHOT.get(clazz);
-
         String instanceId = getInstanceIdAsString(instance, idField);
 
-        firstCacheEntityMap.remove(instanceId);
-
-        if (firstCacheEntityMap.isEmpty()) {
-            FIRST_CACHE.remove(clazz);
-        }
-
-        if (snapShotEntityMap.isEmpty()) {
-            SNAP_SHOT.remove(clazz);
-        }
+        firstCaches.remove(clazz, instanceId);
+        snapShots.remove(clazz, instanceId);
 
         simpleEntityPersister.remove(instance, instanceId);
     }
 
     @Override
     public <T> T getEntity(Class<T> clazz, String id) {
-        Object retrieved = Optional.ofNullable(FIRST_CACHE.get(clazz))
-                .map(it -> it.get(id))
-                .orElse(null);
+        Object retrieved = firstCaches.getFirstCache(clazz, id);
 
         if (retrieved == null) {
-            Object loaded = simpleEntityPersister.load(clazz, id);
+            T loaded = simpleEntityPersister.load(clazz, id);
 
-            Map<String, Object> firstCacheEntityMap = getOrCreateEntityMap(clazz, FIRST_CACHE);
-            Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(clazz, SNAP_SHOT);
-
-            if (loaded != null) {
-                firstCacheEntityMap.put(id, loaded);
-                FIRST_CACHE.put(clazz, firstCacheEntityMap);
-
-                snapShotEntityMap.put(id, createDeepCopy(loaded));
-                SNAP_SHOT.put(clazz, snapShotEntityMap);
-            }
+            firstCaches.putFirstCache(loaded, id);
+            snapShots.putSnapShot(createDeepCopy(loaded), id);
 
             return clazz.cast(loaded);
         }
@@ -73,79 +49,54 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> T addEntity(T instance) {
-        try {
-            EntityAttribute entityAttribute = entityAttributeHolder.findEntityAttribute(instance.getClass());
-            IdAttribute idAttribute = entityAttribute.getIdAttribute();
+        EntityAttribute entityAttribute = entityAttributeCenter.findEntityAttribute(instance.getClass());
+        IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
-            Map<String, Object> snapShotEntityMap = getOrCreateEntityMap(instance.getClass(), SNAP_SHOT);
-            Map<String, Object> firstcacheEntityMap = getOrCreateEntityMap(instance.getClass(), FIRST_CACHE);
+        Field idField = idAttribute.getField();
 
-            Field idField = idAttribute.getField();
-            idField.setAccessible(true);
+        String instanceId = getInstanceIdAsString(instance, idField);
 
-            String id = getInstanceIdAsString(instance, idField);
-
-            T snapshot = null;
-
-            if (id == null) {
-                if (idAttribute.getGenerationType() == null) {
-                    throw new RuntimeException("id가 null이고 generationType이 null 입니다.");
-                }
-
-                T inserted = simpleEntityPersister.insert(instance);
-
-                snapShotEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), createDeepCopy(inserted));
-                firstcacheEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), inserted);
-
-                SNAP_SHOT.put(inserted.getClass(), snapShotEntityMap);
-                FIRST_CACHE.put(inserted.getClass(), firstcacheEntityMap);
-
-                return inserted;
-            }
-
-            if (idAttribute.getGenerationType() != null) {
-                snapshot = getDatabaseSnapshot(instance, String.valueOf(idAttribute.getField().get(instance)));
-            }
-
-            assert snapshot != null;
-
-            snapShotEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), instance);
-            firstcacheEntityMap.put(getInstanceIdAsString(instance, idAttribute.getField()), instance);
-
-            SNAP_SHOT.put(instance.getClass(), snapShotEntityMap);
-            FIRST_CACHE.put(instance.getClass(), firstcacheEntityMap);
-
-            return simpleEntityPersister.update(snapshot, instance);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+        if (isNewInstance(instanceId)) {
+            return insert(instance, idAttribute);
         }
+
+        T snapshot = getDatabaseSnapshot(instance, instanceId);
+
+        T updated = simpleEntityPersister.update(snapshot, instance);
+
+        snapShots.putSnapShot(createDeepCopy(instance), instanceId);
+        firstCaches.putFirstCache(instance, instanceId);
+
+        return updated;
     }
 
     @Override
-    public <T> T getDatabaseSnapshot(T instance, String id) {
-        Map<String, Object> entityMap = getOrCreateEntityMap(instance.getClass(), SNAP_SHOT);
-
-        Object snapshot = entityMap.get(id);
+    public <T> T getDatabaseSnapshot(T instance, String instanceId) {
+        Object snapshot = snapShots.getSnapShotOrNull(instance.getClass(), instanceId);
 
         if (snapshot == null) {
-            Object loaded = simpleEntityPersister.load(instance.getClass(), id);
-
-            snapshot = createDeepCopy(loaded);
-            entityMap.put(id, snapshot);
+            Object loaded = simpleEntityPersister.load(instance.getClass(), instanceId);
+            Object newSnapShot = createDeepCopy(loaded);
+            snapShots.putSnapShot(newSnapShot, instanceId);
+            return (T) newSnapShot;
         }
         return (T) snapshot;
     }
 
-    @Override
-    public <T> T getCachedDatabaseSnapshot(Class<T> clazz, String id) {
-        return (T) Optional.ofNullable(SNAP_SHOT.get(clazz))
-                .map(entityMap -> entityMap.get(id))
-                .orElse(null);
+    private boolean isNewInstance(String instanceId) {
+        return instanceId == null;
     }
 
+    private <T> T insert(T instance, IdAttribute idAttribute) {
+        assert idAttribute.getGenerationType() != null;
 
-    private <T> Map<String, Object> getOrCreateEntityMap(Class<T> clazz, Map<Class<?>, Map<String, Object>> map) {
-        return map.computeIfAbsent(clazz, k -> new HashMap<>());
+        T inserted = simpleEntityPersister.insert(instance);
+        String insertedId = getInstanceIdAsString(instance, idAttribute.getField());
+
+        firstCaches.putFirstCache(inserted, insertedId);
+        snapShots.putSnapShot(createDeepCopy(inserted), insertedId);
+
+        return inserted;
     }
 
     private <T> String getInstanceIdAsString(T instance, Field idField) {

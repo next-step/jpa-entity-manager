@@ -1,6 +1,6 @@
 package persistence.entity.manager;
 
-import fixtures.TestEntityFixtures;
+import fixtures.EntityFixtures;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +10,7 @@ import persistence.DatabaseTest;
 import persistence.context.PersistenceContext;
 import persistence.context.PersistenceContextImpl;
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributeHolder;
+import persistence.entity.attribute.EntityAttributeCenter;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaderImpl;
 import persistence.entity.persister.SimpleEntityPersister;
@@ -35,13 +35,13 @@ public class EntityManagerTest extends DatabaseTest {
             @Test
             @DisplayName("적절한 SampleOneWithValidAnnotation 객체를 반환한다.")
             void returnObject() throws SQLException {
-                setUpFixtureTable(TestEntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                TestEntityFixtures.SampleOneWithValidAnnotation sample =
-                        new TestEntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
+                EntityFixtures.SampleOneWithValidAnnotation sample =
+                        new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
                 String insertDML
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
@@ -49,12 +49,12 @@ public class EntityManagerTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeHolder);
+                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
                 EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
-                TestEntityFixtures.SampleOneWithValidAnnotation retrieved =
-                        entityManager.findById(TestEntityFixtures.SampleOneWithValidAnnotation.class, "1");
+                EntityFixtures.SampleOneWithValidAnnotation retrieved =
+                        entityManager.findById(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
 
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
             }
@@ -66,13 +66,13 @@ public class EntityManagerTest extends DatabaseTest {
             @Test
             @DisplayName("적절한 SampleTwoWithValidAnnotation 객체를 반환한다.")
             void returnObject() {
-                setUpFixtureTable(TestEntityFixtures.SampleTwoWithValidAnnotation.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.SampleTwoWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixtures.SampleTwoWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class);
 
-                TestEntityFixtures.SampleTwoWithValidAnnotation sample =
-                        new TestEntityFixtures.SampleTwoWithValidAnnotation(1L, "민준", 29);
+                EntityFixtures.SampleTwoWithValidAnnotation sample =
+                        new EntityFixtures.SampleTwoWithValidAnnotation(1L, "민준", 29);
 
                 String insertDML
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
@@ -80,12 +80,12 @@ public class EntityManagerTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeHolder);
+                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
                 EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
-                TestEntityFixtures.SampleTwoWithValidAnnotation retrieved =
-                        entityManager.findById(TestEntityFixtures.SampleTwoWithValidAnnotation.class, "1");
+                EntityFixtures.SampleTwoWithValidAnnotation retrieved =
+                        entityManager.findById(EntityFixtures.SampleTwoWithValidAnnotation.class, "1");
 
                 assertThat(retrieved.toString()).isEqualTo("SampleTwoWithValidAnnotation{id=1, name='민준', age=29}");
             }
@@ -101,18 +101,18 @@ public class EntityManagerTest extends DatabaseTest {
             @Test
             @DisplayName("아이디가 매핑된 객체를 반환한다.")
             void returnObject() {
-                fixtures.TestEntityFixtures.SampleOneWithValidAnnotation sample =
-                        new fixtures.TestEntityFixtures.SampleOneWithValidAnnotation("민준", 29);
+                EntityFixtures.SampleOneWithValidAnnotation sample =
+                        new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                setUpFixtureTable(fixtures.TestEntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeHolder);
+                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
                 EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
-                fixtures.TestEntityFixtures.SampleOneWithValidAnnotation persisted =
+                EntityFixtures.SampleOneWithValidAnnotation persisted =
                         entityManager.persist(sample);
 
                 assertThat(persisted.toString())
@@ -130,18 +130,18 @@ public class EntityManagerTest extends DatabaseTest {
             @Test
             @DisplayName("객체를 제거한다.")
             void notThrow() {
-                TestEntityFixtures.SampleOneWithValidAnnotation sample =
-                        new TestEntityFixtures.SampleOneWithValidAnnotation("민준", 29);
+                EntityFixtures.SampleOneWithValidAnnotation sample =
+                        new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                setUpFixtureTable(TestEntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeHolder entityAttributeHolder = new EntityAttributeHolder();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeHolder);
+                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
                 EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
-                TestEntityFixtures.SampleOneWithValidAnnotation inserted = entityManager.persist(sample);
+                EntityFixtures.SampleOneWithValidAnnotation inserted = entityManager.persist(sample);
 
                 Assertions.assertDoesNotThrow(() -> entityManager.remove(inserted));
             }

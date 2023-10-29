@@ -1,7 +1,7 @@
 package persistence.sql.dml.builder;
 
 import entity.Person;
-import fixtures.TestEntityFixtures;
+import fixtures.EntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class InsertQueryBuilderTest {
             void returnStatement() {
                 Person person = new Person(1L, "민준", 29, "민준.com");
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(TestEntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
                 String statement = insertQueryBuilder.prepareStatement(entityAttribute, person);
                 assertThat(statement)
