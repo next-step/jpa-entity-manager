@@ -52,6 +52,7 @@ public class EntityPersister {
                 .orElseThrow(() -> new IllegalStateException("IDENTITY GEN Type 컬럼이 존재하지 않습니다."));
 
         try {
+            autoGenIdField.setAccessible(true);
             autoGenIdField.set(entity, generatedKey);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("Id 컬럼 값 세팅 중 오류가 발생하였습니다.");
