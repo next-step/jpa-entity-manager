@@ -13,4 +13,9 @@ public class PkHasPerson {
 
     private Integer age;
 
+    public PkHasPerson(Long id, String name, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
 }

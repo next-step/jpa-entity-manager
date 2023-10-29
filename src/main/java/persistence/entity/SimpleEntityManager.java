@@ -10,9 +10,9 @@ import persistence.meta.EntityMeta;
 public class SimpleEntityManager implements EntityManager {
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
-    private final PersistenceContext persistenceContext;
+    private final SimplePersistenceContext persistenceContext;
 
-    public SimpleEntityManager(JdbcTemplate jdbcTemplate , Dialect dialect) {
+    public SimpleEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.persistenceContext = new SimplePersistenceContext();
         this.entityLoader = new EntityLoader(jdbcTemplate, dialect);
         this.entityPersister = new EntityPersister(jdbcTemplate, dialect);
@@ -21,16 +21,18 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public <T> T persist(T entity) {
         final T persistEntity = entityPersister.insert(entity);
-        final Object id = getEntityId(persistEntity);
-        initSavePersistContext(id, persistEntity);
+
+        this.persistenceContext.addEntity(EntityKey.of(entity), persistEntity);
+
         return persistEntity;
     }
 
     @Override
     public void remove(Object entity) {
-        Object cacheKey = getEntityId(entity);
+        final EntityMeta entityMeta = new EntityMeta(entity.getClass());
+        final EntityKey entityKey = EntityKey.of(entity.getClass(), entityMeta.getPkValue(entity));
 
-        if (persistenceContext.getEntity(cacheKey) != null) {
+        if (persistenceContext.getEntity(entityKey) != null) {
             persistenceContext.removeEntity(entity);
         }
 
@@ -39,39 +41,25 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T, ID> T find(Class<T> clazz, ID id) {
-        if (persistenceContext.getEntity(id) != null) {
-            return (T) persistenceContext.getEntity(id);
+        EntityKey entityKey = EntityKey.of(clazz, id);
+
+        if (persistenceContext.getEntity(entityKey) == null) {
+            final T entity = entityLoader.find(clazz, id);
+            persistenceContext.addEntity(entityKey, entity);
         }
 
-        final T entity = entityLoader.find(clazz, id);
-        if (entity != null) {
-            initSavePersistContext(id, entity);
-        }
-
-        return (T) persistenceContext.getEntity(id);
-    }
-
-    private <T> void initSavePersistContext(Object id, T entity) {
-        persistenceContext.getDatabaseSnapshot(id, entity);
-        persistenceContext.addEntity(id, entity);
-
+        return (T) persistenceContext.getEntity(entityKey);
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
         final List<T> findList = entityLoader.findAll(tClass);
-        findList.forEach((it) -> {
-            Object id = getEntityId(it);
-            persistenceContext.addEntity(id, it);
-            persistenceContext.getDatabaseSnapshot(id, it);
-        });
+        findList.forEach((it) ->
+                persistenceContext.addEntity(EntityKey.of(it), it)
+        );
         return findList;
     }
 
-    private <T> Object getEntityId(T persistEntity) {
-        EntityMeta entityMeta = new EntityMeta(persistEntity.getClass());
-        return entityMeta.getPkValue(persistEntity);
-    }
 
     @Override
     public void flush() {

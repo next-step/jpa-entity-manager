@@ -15,14 +15,15 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
         PersistenceContext context = new SimplePersistenceContext();
+        final EntityKey entityKey = EntityKey.of(person);
 
         //when
-        context.addEntity(1L, person);
+        context.addEntity(entityKey, person);
 
         //then
         assertSoftly((it) -> {
-            it.assertThat(context.getEntity(1L)).isEqualTo(person);
-            it.assertThat(context.getEntity(1L) == person).isTrue();
+            it.assertThat(context.getEntity(entityKey)).isEqualTo(person);
+            it.assertThat(context.getEntity(entityKey) == person).isTrue();
         });
     }
 
@@ -32,13 +33,14 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
         PersistenceContext context = new SimplePersistenceContext();
+        final EntityKey entityKey = EntityKey.of(person);
 
         //when
-        context.addEntity(1L, person);
-        context.removeEntity(1L);
+        context.addEntity(entityKey, person);
+        context.removeEntity(person);
 
         //then
-        assertThat(context.getEntity(1L)).isNull();
+        assertThat(context.getEntity(entityKey)).isNull();
     }
 
     @Test
@@ -47,14 +49,15 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
         PersistenceContext context = new SimplePersistenceContext();
+        final EntityKey entityKey = EntityKey.of(person);
 
 
         //when
-        context.addEntity(1L, person);
-        context.getDatabaseSnapshot(1L, person);
+        context.addEntity(entityKey, person);
+        context.getDatabaseSnapshot(entityKey, person);
         person.changeEmail("변경이메일@gamil.com");
-        final Person entity = (Person) context.getEntity(1L);
-        final Person snapshot = (Person) context.getCachedDatabaseSnapshot(1L);
+        final Person entity = (Person) context.getEntity(entityKey);
+        final Person snapshot = (Person) context.getDatabaseSnapshot(entityKey, person);
 
         //then
         assertSoftly((it) -> {
@@ -70,14 +73,14 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
         Person person2 = new Person(2L, "이름", 19, "sad@gmail.com");
-        PersistenceContext context = new SimplePersistenceContext();
+        SimplePersistenceContext context = new SimplePersistenceContext();
+        final EntityKey entityKey = EntityKey.of(person);
+        final EntityKey entityKey2 = EntityKey.of(person2);
 
 
         //when
-        context.addEntity(1L, person);
-        context.addEntity(2L, person2);
-        context.getDatabaseSnapshot(1L, person);
-        context.getDatabaseSnapshot(2L, person2);
+        context.addEntity(entityKey, person);
+        context.addEntity(entityKey2, person2);
         person.changeEmail("변경이메일@gamil.com");
 
         //then.

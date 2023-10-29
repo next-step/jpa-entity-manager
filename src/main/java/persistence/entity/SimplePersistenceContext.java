@@ -7,44 +7,44 @@ import java.util.stream.Collectors;
 import persistence.meta.EntityMeta;
 
 public class SimplePersistenceContext implements PersistenceContext {
-    private final Map<Object, Object> context = new ConcurrentHashMap<>();
-    private final Map<Object, Object> snapShotContext = new ConcurrentHashMap<>();
+    private final Map<EntityKey, Object> context = new ConcurrentHashMap<>();
+    private final Map<EntityKey, Object> snapShotContext = new ConcurrentHashMap<>();
 
     @Override
-    public Object getEntity(Object id) {
-        return context.get(id);
+    public Object getEntity(EntityKey entityKey) {
+        return context.get(entityKey);
     }
 
     @Override
-    public void addEntity(Object id, Object entity) {
-        context.put(id, entity);
+    public void addEntity(EntityKey entityKey, Object entity) {
+        if (context.get(entityKey) == null) {
+            this.getDatabaseSnapshot(entityKey, entity);
+        }
+        context.put(entityKey, entity);
     }
 
     @Override
-    public void removeEntity(Object id) {
-        context.remove(id);
-        snapShotContext.remove(id);
+    public void removeEntity(Object entity) {
+        EntityKey key = EntityKey.of(entity);
+        context.remove(key);
+        snapShotContext.remove(key);
     }
 
     @Override
-    public Object getDatabaseSnapshot(Object id, Object entity) {
+    public Object getDatabaseSnapshot(EntityKey entityKey, Object entity) {
         EntityMeta entityMeta = new EntityMeta(entity.getClass());
         Object snapShot = entityMeta.createCopyEntity(entity);
-        return snapShotContext.put(id, snapShot);
+        return snapShotContext.put(entityKey, snapShot);
     }
-    @Override
-    public Object getCachedDatabaseSnapshot(Object id) {
-        return snapShotContext.get(id);
-    }
-    @Override
+
     public List<Object> getChangedEntity() {
-        return context.entrySet().stream()
+        return context.entrySet()
+                .stream()
                 .filter(it -> !it.getValue().equals(snapShotContext.get(it.getKey())))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
 
-    @Override
     public void clear() {
         context.clear();
         snapShotContext.clear();

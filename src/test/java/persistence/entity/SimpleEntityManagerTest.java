@@ -98,9 +98,12 @@ class SimpleEntityManagerTest {
         final Person person3 = entityManager.persist(person);
 
         //then
-        assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
-        assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
-        assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
+        assertSoftly(it -> {
+                it.assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
+                it.assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
+                it.assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
+            }
+        );
     }
 
     @Test
