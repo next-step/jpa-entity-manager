@@ -3,6 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 public class DefaultEntityManager implements EntityManager {
+
     private final DefaultPersistenceContext persistenceContext;
 
     private DefaultEntityManager(DefaultPersistenceContext persistenceContext) {
