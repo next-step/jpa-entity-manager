@@ -43,6 +43,11 @@ public class ColumnMetas implements Iterable<ColumnMeta> {
         return String.join(StringConstant.COLUMN_JOIN, columnNames);
     }
 
+    public boolean hasAutoGenId() {
+        return values.stream()
+                .anyMatch(ColumnMeta::isGenerationTypeIdentity);
+    }
+
     @Override
     public Iterator<ColumnMeta> iterator() {
         return values.iterator();
