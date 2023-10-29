@@ -115,4 +115,32 @@ class PersistenceContextImplTest extends DatabaseTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("getDatabaseSnapshot 메소드는")
+    class getDatabaseSnapshot {
+        @Nested
+        @DisplayName("인스턴스와 아이디가 주어지면")
+        class withInstanceAndId {
+
+            @Test
+            @DisplayName("스냅샷을 반환한다.")
+            void returnIfExists() throws SQLException {
+                setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
+
+                EntityFixtures.SampleOneWithValidAnnotation sample =
+                        new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
+
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
+
+                persistenceContext.addEntity(sample);
+
+                assertThat(persistenceContext.getDatabaseSnapshot(sample, "1").toString())
+                        .isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
+            }
+        }
+    }
 }

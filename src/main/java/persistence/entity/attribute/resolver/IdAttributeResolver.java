@@ -9,5 +9,5 @@ public interface IdAttributeResolver {
 
     IdAttribute resolve(Field field);
 
-    <T> void setGeneratedIdToEntity(T instance, Field idField, long key);
+    <T> void setIdToEntity(T instance, Field idField, long idValue);
 }

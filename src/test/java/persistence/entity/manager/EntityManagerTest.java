@@ -72,7 +72,7 @@ public class EntityManagerTest extends DatabaseTest {
                         EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class);
 
                 EntityFixtures.SampleTwoWithValidAnnotation sample =
-                        new EntityFixtures.SampleTwoWithValidAnnotation(1L, "민준", 29);
+                        new EntityFixtures.SampleTwoWithValidAnnotation(1L, "민준", 29L);
 
                 String insertDML
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);

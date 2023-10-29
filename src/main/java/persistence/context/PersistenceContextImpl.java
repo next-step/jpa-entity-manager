@@ -20,24 +20,15 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> void removeEntity(T instance) {
-        EntityAttribute entityAttribute = entityAttributeCenter.findEntityAttribute(instance.getClass());
-        Field idField = entityAttribute.getIdAttribute().getField();
-        Class<?> clazz = instance.getClass();
-        String instanceId = getInstanceIdAsString(instance, idField);
-
-        firstCaches.remove(clazz, instanceId);
-        snapShots.remove(clazz, instanceId);
-
-        simpleEntityPersister.remove(instance, instanceId);
-    }
-
-    @Override
     public <T> T getEntity(Class<T> clazz, String id) {
-        Object retrieved = firstCaches.getFirstCache(clazz, id);
+        Object retrieved = firstCaches.getFirstCacheOrNull(clazz, id);
 
         if (retrieved == null) {
             T loaded = simpleEntityPersister.load(clazz, id);
+
+            if (loaded == null) {
+                return null;
+            }
 
             firstCaches.putFirstCache(loaded, id);
             snapShots.putSnapShot(createDeepCopy(loaded), id);
@@ -68,6 +59,19 @@ public class PersistenceContextImpl implements PersistenceContext {
         firstCaches.putFirstCache(instance, instanceId);
 
         return updated;
+    }
+
+    @Override
+    public <T> void removeEntity(T instance) {
+        EntityAttribute entityAttribute = entityAttributeCenter.findEntityAttribute(instance.getClass());
+        Field idField = entityAttribute.getIdAttribute().getField();
+        Class<?> clazz = instance.getClass();
+        String instanceId = getInstanceIdAsString(instance, idField);
+
+        firstCaches.remove(clazz, instanceId);
+        snapShots.remove(clazz, instanceId);
+
+        simpleEntityPersister.remove(instance, instanceId);
     }
 
     @Override

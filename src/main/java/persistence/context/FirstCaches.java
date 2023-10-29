@@ -15,7 +15,7 @@ public class FirstCaches {
                 .put(instanceId, instance);
     }
 
-    public Object getFirstCache(Class<?> clazz, String id) {
+    public Object getFirstCacheOrNull(Class<?> clazz, String id) {
         return Optional.ofNullable(firstCaches.get(clazz))
                 .map(firstCache -> firstCache.get(id))
                 .orElse(null);

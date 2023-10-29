@@ -52,13 +52,13 @@ public class EntityFixtures {
         @Column(name = "nick_name", length = 200, nullable = false)
         String name;
         @Column
-        Integer age;
+        Long age;
 
         public SampleTwoWithValidAnnotation() {
 
         }
 
-        public SampleTwoWithValidAnnotation(long id, String nickName, int age) {
+        public SampleTwoWithValidAnnotation(long id, String nickName, Long age) {
             this.id = id;
             this.name = nickName;
             this.age = age;
@@ -122,6 +122,7 @@ public class EntityFixtures {
     @Entity
     public static class EntityWithIntegerId {
         @Id
+        @Column(name = "entity_with_integer_id")
         @GeneratedValue(strategy = GenerationType.AUTO)
         Integer id;
         @Column(name = "name", length = 200)
@@ -130,6 +131,12 @@ public class EntityFixtures {
         Integer age;
 
         public EntityWithIntegerId(String name, Integer age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public EntityWithIntegerId(Integer id, String name, Integer age) {
+            this.id = id;
             this.name = name;
             this.age = age;
         }

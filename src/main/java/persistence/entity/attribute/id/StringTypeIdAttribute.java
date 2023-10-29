@@ -17,6 +17,8 @@ public class StringTypeIdAttribute implements IdAttribute {
     public StringTypeIdAttribute(Field field) {
         Optional<Column> columnOptional = Optional.ofNullable(field.getAnnotation(Column.class));
 
+        validate(field.getType());
+
         this.field = field;
         this.fieldName = field.getName();
         this.length = columnOptional.map(Column::length).orElse(255);
@@ -51,5 +53,11 @@ public class StringTypeIdAttribute implements IdAttribute {
     @Override
     public GenerationType getGenerationType() {
         return this.generateValueStrategy;
+    }
+
+    private void validate(Class<?> type) {
+        if (type != String.class) {
+            throw new IllegalArgumentException("String 타입의 필드만 인자로 받을 수 있습니다.");
+        }
     }
 }

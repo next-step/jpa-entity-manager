@@ -59,8 +59,8 @@ public class SimpleEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> void remove(T entity, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(entity.getClass());
+    public <T> void remove(T instance, String id) {
+        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass());
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         String deleteDML = deleteQueryBuilder.prepareStatement(entityAttribute, id);
         jdbcTemplate.execute(deleteDML);
@@ -72,7 +72,7 @@ public class SimpleEntityPersister implements EntityPersister {
 
         for (IdAttributeResolver idAttributeResolver : ID_ATTRIBUTE_RESOLVERS) {
             if (idAttributeResolver.supports(idType)) {
-                idAttributeResolver.setGeneratedIdToEntity(instance, idField, key);
+                idAttributeResolver.setIdToEntity(instance, idField, key);
                 return;
             }
         }

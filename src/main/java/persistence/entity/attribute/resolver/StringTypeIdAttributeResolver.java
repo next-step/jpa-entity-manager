@@ -18,7 +18,7 @@ public class StringTypeIdAttributeResolver implements IdAttributeResolver {
     }
 
     @Override
-    public <T> void setGeneratedIdToEntity(T instance, Field idField, long key) {
+    public <T> void setIdToEntity(T instance, Field idField, long idValue) {
         throw new UnsupportedOperationException("String 타입에서는 지원하지않습니다");
     }
 }
