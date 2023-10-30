@@ -166,3 +166,8 @@ public enum Status {
 - SAVING
   - 영속성 컨텍스트에 있고 DB에 저장되지 않은 상태
   - 저장작업이 완료되면 MANAGED 상태로 변경된다.
+
+- find
+  - 영속성 컨텍스트에 저장될 때 id를 가지고 EntityEntry를 생성한다.
+    - 이때 EntityEntry는 LOADING 상태이다.
+  - 실제 쿼리가 나가면 managed 상태로 변경한다.
