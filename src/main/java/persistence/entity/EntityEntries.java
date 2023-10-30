@@ -14,7 +14,7 @@ public class EntityEntries {
     }
 
     public void addEntityEntry(final Object entity, final Status status) {
-        entityEntries.put(entity, new EntityEntry(entity, status));
+        entityEntries.put(entity, new EntityEntry(status));
     }
 
     public Optional<EntityEntry> getEntityEntry(final Object entity) {

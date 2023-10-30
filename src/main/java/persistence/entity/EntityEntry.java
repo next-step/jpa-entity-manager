@@ -4,12 +4,10 @@ import java.util.Objects;
 
 public class EntityEntry {
 
-    private final Object entity;
     private Status status;
 
 
-    public EntityEntry(final Object entity, final Status status) {
-        this.entity = entity;
+    public EntityEntry(final Status status) {
         this.status = status;
     }
 
@@ -26,11 +24,11 @@ public class EntityEntry {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         final EntityEntry that = (EntityEntry) object;
-        return Objects.equals(entity, that.entity) && status == that.status;
+        return status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entity, status);
+        return Objects.hash(status);
     }
 }
