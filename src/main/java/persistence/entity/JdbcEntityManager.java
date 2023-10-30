@@ -11,11 +11,12 @@ import persistence.sql.dml.clause.operator.Operator;
 import persistence.sql.entitymetadata.model.EntityColumn;
 import persistence.sql.entitymetadata.model.EntityTable;
 
-public class JdbcTemplateDialectEntityManager implements EntityManager {
+public class JdbcEntityManager implements EntityManager {
+    private EntityPersister entityPersister;
     private JdbcTemplate jdbcTemplate;
     private Dialect dialect;
 
-    public JdbcTemplateDialectEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
+    public JdbcEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
     }
