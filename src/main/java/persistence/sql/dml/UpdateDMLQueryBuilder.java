@@ -42,7 +42,7 @@ public class UpdateDMLQueryBuilder<E> extends DMLQueryBuilder<E> {
     }
 
     private String getEntityColumnUpdateStatement(EntityColumn<E, ?> entityColumn) {
-        String entityColumnName = entityColumn.getDbColumnName();
+        String entityColumnName = createColumnNameDefinition(entityColumn);
 
         if (entityColumn.getType() == String.class) {
             return entityColumnName + " = " + ("'" + entityColumn.getValue(entity) + "'");

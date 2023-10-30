@@ -19,7 +19,7 @@ class UpdateDMLQueryBuilderTest {
         UpdateDMLQueryBuilder<Person> updateDMLQueryBuilder = new UpdateDMLQueryBuilder(Dialect.H2, person);
 
         assertThat(updateDMLQueryBuilder.build()).isEqualTo("UPDATE USERS \n" +
-                "SET nick_name = 'name1', old = 20, email = 'email1' \n" +
+                "SET NICK_NAME = 'name1', OLD = 20, EMAIL = 'email1' \n" +
                 ";");
     }
 
@@ -31,7 +31,7 @@ class UpdateDMLQueryBuilderTest {
                 .where(WhereClause.of("ID", 1L, Operator.EQUALS));
 
         assertThat(updateDMLQueryBuilder.build()).isEqualTo("UPDATE USERS \n" +
-                "SET nick_name = 'name1', old = 20, email = 'email1' \n" +
+                "SET NICK_NAME = 'name1', OLD = 20, EMAIL = 'email1' \n" +
                 "WHERE ID = 1;");
     }
 }
