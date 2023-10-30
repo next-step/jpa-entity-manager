@@ -28,8 +28,8 @@ public class Column {
         return name;
     }
 
-    public boolean isTransient() {
-        return isTransient;
+    public boolean isNotTransient() {
+        return !isTransient;
     }
 
     public String getValue() {
