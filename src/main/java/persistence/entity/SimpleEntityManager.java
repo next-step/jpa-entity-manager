@@ -3,16 +3,16 @@ package persistence.entity;
 public class SimpleEntityManager implements EntityManager{
     private final EntityPersister entityPersister;
 
-    private final EntityLoader entityLoader;
+    private final PersistenceContext persistenceContext;
 
-    public SimpleEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
+    public SimpleEntityManager(EntityPersister entityPersister, PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
-        this.entityLoader = entityLoader;
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityLoader.find(clazz, id);
+        return persistenceContext.getEntity(clazz, id);
     }
 
     @Override
