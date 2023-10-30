@@ -1,5 +1,7 @@
 package hibernate.entity;
 
+import hibernate.EntityEntry;
+import hibernate.Status;
 import hibernate.entity.meta.EntityClass;
 import hibernate.entity.meta.column.EntityColumn;
 import hibernate.entity.persistencecontext.EntityKey;
@@ -7,6 +9,9 @@ import hibernate.entity.persistencecontext.EntitySnapshot;
 import hibernate.entity.persistencecontext.PersistenceContext;
 
 import java.util.Map;
+
+import static hibernate.Status.LOADING;
+import static hibernate.Status.MANAGED;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -26,14 +31,18 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
-        Object persistenceContextEntity = persistenceContext.getEntity(new EntityKey(id, clazz));
+        EntityKey entityKey = new EntityKey(id, clazz);
+        Object persistenceContextEntity = persistenceContext.getEntity(entityKey);
+        EntityEntry entityEntry = new EntityEntry(entityKey, LOADING);
         if (persistenceContextEntity != null) {
+            entityEntry.updateStatus(MANAGED);
             return (T) persistenceContextEntity;
         }
 
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
         persistNewEntity(loadEntity, id);
+        entityEntry.updateStatus(MANAGED);
         return loadEntity;
     }
 

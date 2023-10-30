@@ -11,4 +11,8 @@ public class EntityEntry {
         this.entityKey = entityKey;
         this.status = status;
     }
+
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
 }
