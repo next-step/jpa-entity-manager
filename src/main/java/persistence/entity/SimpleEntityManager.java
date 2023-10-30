@@ -81,7 +81,6 @@ public class SimpleEntityManager implements EntityManager {
         persistenceContext.addEntity(entityKey, entityFromDatabase);
         persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
 
-        persistenceContext.updateEntityEntryStatus(entityFromDatabase, Status.MANAGED);
         return entityFromDatabase;
     }
 
@@ -100,20 +99,28 @@ public class SimpleEntityManager implements EntityManager {
         final Object idValue = extractId(entity, entityPersister);
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
         persistenceContext.addEntity(entityKey, entity);
-        persistenceContext.updateEntityEntryStatus(entity, Status.MANAGED);
     }
 
     private void processUpdate(final Object entity, final EntityPersister entityPersister) {
         final Object idValue = extractId(entity, entityPersister);
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
 
+        Object foundEntity = null;
         if (!persistenceContext.hasEntity(entityKey)) {
-            find(entity.getClass(), idValue);
+            foundEntity = find(entity.getClass(), idValue);
         }
 
         if (isDirty(entity)) {
+            updateEntityEntry(foundEntity, entity);
             entityPersister.update(entity);
             persistenceContext.addEntity(entityKey, entity);
+        }
+    }
+
+    private void updateEntityEntry(final Object foundEntity, final Object entity) {
+        if(Objects.nonNull(foundEntity)) {
+            persistenceContext.updateEntityEntryStatus(foundEntity, Status.GONE);
+            persistenceContext.addEntityEntry(entity, Status.SAVING);
         }
     }
 

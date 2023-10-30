@@ -22,6 +22,7 @@ public class SimplePersistenceContext implements PersistenceContext {
     @Override
     public void addEntity(final EntityKey key, final Object entity) {
         entities.add(key, entity);
+        updateEntityEntryStatus(entity, Status.MANAGED);
     }
 
     @Override

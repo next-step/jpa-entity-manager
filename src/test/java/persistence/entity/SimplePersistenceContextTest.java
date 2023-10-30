@@ -22,6 +22,7 @@ class SimplePersistenceContextTest {
         entityKeyGenerator = new EntityKeyGenerator();
         personEntityKey = entityKeyGenerator.generate(Person.class, 1L);
         person = FixturePerson.create(1L);
+        persistenceContext.addEntityEntry(person, Status.LOADING);
     }
 
     @Test
