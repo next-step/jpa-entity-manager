@@ -1,5 +1,5 @@
 package persistence.entity.entry;
 
 public enum Status {
-    TRANSIENT, PERSISTENT, DETACHED, REMOVED
+    MANAGED, READ_ONLY, GONE, LOADING, DELETED, SAVING,
 }

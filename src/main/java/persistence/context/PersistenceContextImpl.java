@@ -3,14 +3,19 @@ package persistence.context;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributeCenter;
 import persistence.entity.attribute.id.IdAttribute;
+import persistence.entity.entry.EntityEntries;
+import persistence.entity.entry.Status;
 import persistence.entity.persister.SimpleEntityPersister;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import static persistence.entity.entry.Status.*;
+
 public class PersistenceContextImpl implements PersistenceContext {
     private final EntityAttributeCenter entityAttributeCenter;
     private final SimpleEntityPersister simpleEntityPersister;
+    private final EntityEntries entityEntries = new EntityEntries();
     private final FirstCaches firstCaches = new FirstCaches();
     private final SnapShots snapShots = new SnapShots();
 
@@ -21,21 +26,23 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> T getEntity(Class<T> clazz, String id) {
-        Object retrieved = firstCaches.getFirstCacheOrNull(clazz, id);
+        Status currentStatus = entityEntries.getEntityEntry(clazz, id).getStatus();
 
-        if (retrieved == null) {
-            T loaded = simpleEntityPersister.load(clazz, id);
-
-            if (loaded == null) {
-                return null;
-            }
-
-            firstCaches.putFirstCache(loaded, id);
-            snapShots.putSnapShot(createDeepCopy(loaded), id);
-
-            return clazz.cast(loaded);
+        if (currentStatus == MANAGED) {
+            return clazz.cast(firstCaches.getFirstCacheOrNull(clazz, id));
         }
-        return clazz.cast(retrieved);
+
+        T loaded = simpleEntityPersister.load(clazz, id);
+
+        if (loaded == null) {
+            return null;
+        }
+
+        firstCaches.putFirstCache(loaded, id);
+        snapShots.putSnapShot(loaded, id);
+        entityEntries.changeOrSetStatus(MANAGED, clazz, id);
+
+        return clazz.cast(loaded);
     }
 
     @Override
@@ -52,11 +59,11 @@ public class PersistenceContextImpl implements PersistenceContext {
         }
 
         T snapshot = getDatabaseSnapshot(instance, instanceId);
-
         T updated = simpleEntityPersister.update(snapshot, instance); // 나중에 쓰기지연 구현
 
-        snapShots.putSnapShot(createDeepCopy(instance), instanceId);
+        snapShots.putSnapShot(instance, instanceId);
         firstCaches.putFirstCache(instance, instanceId);
+        entityEntries.changeOrSetStatus(MANAGED, instance.getClass(), instanceId);
 
         return updated;
     }
@@ -70,8 +77,10 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         firstCaches.remove(clazz, instanceId);
         snapShots.remove(clazz, instanceId);
+        entityEntries.changeOrSetStatus(DELETED, instance.getClass(), instanceId);
 
         simpleEntityPersister.remove(instance, instanceId);
+        entityEntries.changeOrSetStatus(GONE, instance.getClass(), instanceId);
     }
 
     @Override
@@ -79,10 +88,12 @@ public class PersistenceContextImpl implements PersistenceContext {
         Object snapshot = snapShots.getSnapShotOrNull(instance.getClass(), instanceId);
 
         if (snapshot == null) {
+            entityEntries.changeOrSetStatus(LOADING, instance.getClass(), instanceId);
             Object loaded = simpleEntityPersister.load(instance.getClass(), instanceId);
-            Object newSnapShot = createDeepCopy(loaded);
-            snapShots.putSnapShot(newSnapShot, instanceId);
-            return (T) newSnapShot;
+
+            T newSnapShot = (T) snapShots.putSnapShot(loaded, instanceId);
+            entityEntries.changeOrSetStatus(MANAGED, instance.getClass(), instanceId);
+            return newSnapShot;
         }
         return (T) snapshot;
     }
@@ -98,7 +109,8 @@ public class PersistenceContextImpl implements PersistenceContext {
         String insertedId = getInstanceIdAsString(instance, idAttribute.getField());
 
         firstCaches.putFirstCache(inserted, insertedId);
-        snapShots.putSnapShot(createDeepCopy(inserted), insertedId);
+        snapShots.putSnapShot(inserted, insertedId);
+        entityEntries.changeOrSetStatus(MANAGED, instance.getClass(), insertedId);
 
         return inserted;
     }
@@ -112,30 +124,5 @@ public class PersistenceContextImpl implements PersistenceContext {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private <T> T createDeepCopy(T original) {
-        try {
-            Class<?> clazz = original.getClass();
-            T copy = (T) clazz.getDeclaredConstructor().newInstance();
-            for (Field field : clazz.getDeclaredFields()) {
-                field.setAccessible(true);
-                Object value = field.get(original);
-                if (value != null && !isPrimitiveOrWrapper(value.getClass())) {
-                    field.set(copy, createDeepCopy(value));
-                } else {
-                    field.set(copy, value);
-                }
-            }
-            return copy;
-        } catch (Exception e) {
-            throw new RuntimeException("딥카피 실패", e);
-        }
-    }
-
-    private boolean isPrimitiveOrWrapper(Class<?> clazz) {
-        return clazz.isPrimitive() || (clazz == Double.class) || (clazz == Float.class) || (clazz == Long.class)
-                || (clazz == Integer.class) || (clazz == Short.class) || (clazz == Character.class)
-                || (clazz == Byte.class) || (clazz == Boolean.class) || (clazz == String.class);
     }
 }

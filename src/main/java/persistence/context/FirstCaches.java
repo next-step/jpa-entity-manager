@@ -1,35 +1,32 @@
 package persistence.context;
 
-import persistence.entity.entry.EntityWrap;
-import persistence.entity.entry.SimpleEntityEntry;
-import persistence.entity.entry.Status;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class FirstCaches {
-    private final Map<Class<?>, Map<String, EntityWrap>> firstCaches = new HashMap<>();
+    private final Map<Class<?>, Map<String, Object>> firstCaches = new HashMap<>();
 
     public void putFirstCache(Object instance, String instanceId) {
         if (instance == null) {
             return;
         }
         firstCaches.computeIfAbsent(instance.getClass(), k -> new HashMap<>())
-                .put(instanceId, new EntityWrap(instance, new SimpleEntityEntry(Status.PERSISTENT)));
+                .put(instanceId, instance);
     }
 
     public Object getFirstCacheOrNull(Class<?> clazz, String id) {
         return Optional.ofNullable(firstCaches.get(clazz))
-                .map(firstCache -> firstCache.get(id).getInstance())
+                .map(firstCache -> firstCache.get(id))
                 .orElse(null);
     }
 
     public void remove(Class<?> clazz, String instanceId) {
-        Optional.ofNullable(firstCaches.get(clazz)).ifPresent(firstCache -> {
-            EntityWrap wrap = firstCache.get(instanceId);
-            if (wrap != null) {
-                wrap.getEntry().updateStatus(Status.REMOVED);
+        Optional.ofNullable(firstCaches.get(clazz)).ifPresent(firstCacheMap -> {
+            Object firstCache = firstCacheMap.get(instanceId);
+            if (firstCache == null) {
+                throw new IllegalArgumentException(
+                        String.format("Class: %s Id: %s 에 해당하는 일차 캐시가 없습니다.", clazz.getSimpleName(), instanceId));
             }
         });
     }

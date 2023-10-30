@@ -1,5 +1,6 @@
 package persistence.context;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -23,11 +24,42 @@ public class SnapShots {
                 });
     }
 
-    public void putSnapShot(Object instance, String instanceId) {
+    public Object putSnapShot(Object instance, String instanceId) {
         if (instance == null) {
-            return;
+            return null;
         }
+
+        Object newSnapshot = createDeepCopy(instance);
+
         snapShots.computeIfAbsent(instance.getClass(), k -> new HashMap<>())
-                .put(instanceId, instance);
+                .put(instanceId, newSnapshot);
+
+        return newSnapshot;
+    }
+
+
+    private <T> T createDeepCopy(T original) {
+        try {
+            Class<?> clazz = original.getClass();
+            T copy = (T) clazz.getDeclaredConstructor().newInstance();
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(original);
+                if (value != null && !isPrimitiveOrWrapper(value.getClass())) {
+                    field.set(copy, createDeepCopy(value));
+                } else {
+                    field.set(copy, value);
+                }
+            }
+            return copy;
+        } catch (Exception e) {
+            throw new RuntimeException("딥카피 실패", e);
+        }
+    }
+
+    private boolean isPrimitiveOrWrapper(Class<?> clazz) {
+        return clazz.isPrimitive() || (clazz == Double.class) || (clazz == Float.class) || (clazz == Long.class)
+                || (clazz == Integer.class) || (clazz == Short.class) || (clazz == Character.class)
+                || (clazz == Byte.class) || (clazz == Boolean.class) || (clazz == String.class);
     }
 }

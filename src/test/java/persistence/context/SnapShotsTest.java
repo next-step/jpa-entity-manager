@@ -54,13 +54,14 @@ class SnapShotsTest {
         @DisplayName("인스턴스와 이이디를 받으면")
         class withValidArgs {
             @Test
-            @DisplayName("일차캐시에 인스턴스를 저장한다.")
+            @DisplayName("스냅샷에 인스턴스의 복사본을 저장한고 반환한다.")
             void putSnapShot() {
                 SnapShots snapShots = new SnapShots();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
-                Assertions.assertDoesNotThrow(() -> snapShots.putSnapShot(sample, "1"));
+                assertThat(snapShots.putSnapShot(sample, "1").toString())
+                        .isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
             }
         }
     }
