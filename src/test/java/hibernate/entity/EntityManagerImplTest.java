@@ -2,6 +2,7 @@ package hibernate.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import hibernate.EntityEntry;
 import hibernate.ddl.CreateQueryBuilder;
 import hibernate.entity.meta.EntityClass;
 import hibernate.entity.persistencecontext.EntityKey;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static hibernate.Status.MANAGED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -28,6 +30,7 @@ class EntityManagerImplTest {
     private static JdbcTemplate jdbcTemplate;
     private EntityManagerImpl entityManager;
     private Map<EntityKey, Object> persistenceContextEntities;
+    private Map<Object, EntityEntry> entityEntryContextEntities;
     private Map<EntityKey, EntitySnapshot> persistenceContextSnapshotEntities;
     private static final CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.INSTANCE;
 
@@ -35,10 +38,12 @@ class EntityManagerImplTest {
     void beforeEach() {
         persistenceContextEntities = new ConcurrentHashMap<>();
         persistenceContextSnapshotEntities = new ConcurrentHashMap<>();
+        entityEntryContextEntities = new ConcurrentHashMap<>();
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
-                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities)
+                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities),
+                new EntityEntryContext(entityEntryContextEntities)
         );
     }
 
@@ -83,6 +88,7 @@ class EntityManagerImplTest {
         // given
         TestEntity givenEntity = new TestEntity();
         persistenceContextEntities.put(new EntityKey(1L, TestEntity.class), givenEntity);
+        entityEntryContextEntities.put(givenEntity, new EntityEntry(MANAGED));
 
         // when
         TestEntity actual = entityManager.find(TestEntity.class, 1L);

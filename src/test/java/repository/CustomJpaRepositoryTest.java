@@ -3,6 +3,7 @@ package repository;
 import database.DatabaseServer;
 import database.H2;
 import hibernate.ddl.CreateQueryBuilder;
+import hibernate.entity.EntityEntryContext;
 import hibernate.entity.EntityLoader;
 import hibernate.entity.EntityManagerImpl;
 import hibernate.entity.EntityPersister;
@@ -40,7 +41,8 @@ class CustomJpaRepositoryTest {
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
-                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities)
+                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities),
+                new EntityEntryContext(new ConcurrentHashMap<>())
         );
         customJpaRepository = new CustomJpaRepository<>(entityManager);
     }

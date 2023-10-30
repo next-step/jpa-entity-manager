@@ -1,7 +1,6 @@
 package hibernate.entity;
 
 import hibernate.EntityEntry;
-import hibernate.Status;
 import hibernate.entity.meta.EntityClass;
 import hibernate.entity.meta.column.EntityColumn;
 import hibernate.entity.persistencecontext.EntityKey;
@@ -17,27 +16,31 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
     private final PersistenceContext persistenceContext;
+    private final EntityEntryContext entityEntryContext;
 
     public EntityManagerImpl(
             final EntityPersister entityPersister,
             final EntityLoader entityLoader,
-            final PersistenceContext persistenceContext
+            final PersistenceContext persistenceContext,
+            final EntityEntryContext entityEntryContext
     ) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
         this.persistenceContext = persistenceContext;
+        this.entityEntryContext = entityEntryContext;
     }
 
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
         EntityKey entityKey = new EntityKey(id, clazz);
         Object persistenceContextEntity = persistenceContext.getEntity(entityKey);
-        EntityEntry entityEntry = new EntityEntry(entityKey, LOADING);
         if (persistenceContextEntity != null) {
-            entityEntry.updateStatus(MANAGED);
+            entityEntryContext.getEntityEntry(persistenceContextEntity)
+                    .updateStatus(MANAGED);
             return (T) persistenceContextEntity;
         }
 
+        EntityEntry entityEntry = new EntityEntry(SAVING);
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
         persistNewEntity(loadEntity, id);
@@ -56,10 +59,12 @@ public class EntityManagerImpl implements EntityManager {
                 .getEntityId();
         Object id = entityId.getFieldValue(entity);
         if (id == null) {
+            entityEntryContext.addEntityEntry(entity, new EntityEntry(SAVING));
             Object generatedId = entityPersister.insert(entity);
             entityId.assignFieldValue(entity, generatedId);
             persistNewEntity(entity, generatedId);
-            EntityEntry entityEntry = new EntityEntry(new EntityKey(generatedId, entity), MANAGED);
+            entityEntryContext.getEntityEntry(entity)
+                    .updateStatus(MANAGED);
             return;
         }
 
@@ -67,9 +72,10 @@ public class EntityManagerImpl implements EntityManager {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
         persistNewEntity(entity, id);
-        EntityEntry entityEntry = new EntityEntry(new EntityKey(id, entity), SAVING);
+        entityEntryContext.addEntityEntry(entity, new EntityEntry(SAVING));
         entityPersister.insert(entity);
-        entityEntry.updateStatus(MANAGED);
+        entityEntryContext.getEntityEntry(entity)
+                .updateStatus(MANAGED);
     }
 
     @Override
@@ -109,7 +115,7 @@ public class EntityManagerImpl implements EntityManager {
         Object id = EntityClass.getInstance(entity.getClass())
                 .getEntityId()
                 .getFieldValue(entity);
-        EntityEntry entityEntry = new EntityEntry(new EntityKey(id, entity), DELETED);
+        EntityEntry entityEntry = new EntityEntry(DELETED);
         entityPersister.delete(entity);
         entityEntry.updateStatus(GONE);
     }
