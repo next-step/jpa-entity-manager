@@ -5,7 +5,7 @@ import fixtures.EntityFixtures;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityAttributeCenter {
+public class EntityAttributes {
     //TODO Entity Scan 구현
     private static final Map<Class<?>, EntityAttribute> entityAttributeCenter = new HashMap<>();
 

@@ -1,7 +1,7 @@
 package persistence.context;
 
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributeCenter;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.entry.EntityEntries;
 import persistence.entity.entry.Status;
@@ -13,15 +13,15 @@ import java.util.Optional;
 import static persistence.entity.entry.Status.*;
 
 public class PersistenceContextImpl implements PersistenceContext {
-    private final EntityAttributeCenter entityAttributeCenter;
+    private final EntityAttributes entityAttributes;
     private final SimpleEntityPersister simpleEntityPersister;
     private final EntityEntries entityEntries = new EntityEntries();
     private final FirstCaches firstCaches = new FirstCaches();
     private final SnapShots snapShots = new SnapShots();
 
-    public PersistenceContextImpl(SimpleEntityPersister simpleEntityPersister, EntityAttributeCenter entityAttributeCenter) {
+    public PersistenceContextImpl(SimpleEntityPersister simpleEntityPersister, EntityAttributes entityAttributes) {
         this.simpleEntityPersister = simpleEntityPersister;
-        this.entityAttributeCenter = entityAttributeCenter;
+        this.entityAttributes = entityAttributes;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> T addEntity(T instance) {
-        EntityAttribute entityAttribute = entityAttributeCenter.findEntityAttribute(instance.getClass());
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(instance.getClass());
         IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
         Field idField = idAttribute.getField();
@@ -70,7 +70,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> void removeEntity(T instance) {
-        EntityAttribute entityAttribute = entityAttributeCenter.findEntityAttribute(instance.getClass());
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(instance.getClass());
         Field idField = entityAttribute.getIdAttribute().getField();
         Class<?> clazz = instance.getClass();
         String instanceId = getInstanceIdAsString(instance, idField);

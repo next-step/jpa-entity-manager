@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
-import persistence.entity.attribute.EntityAttributeCenter;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaderImpl;
 import persistence.entity.persister.SimpleEntityPersister;
@@ -37,8 +37,8 @@ class PersistenceContextImplTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
 
                 EntityFixtures.SampleOneWithValidAnnotation instance
                         = persistenceContext.getEntity(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
@@ -71,8 +71,8 @@ class PersistenceContextImplTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
 
                 persistenceContext.addEntity(sample);
 
@@ -101,8 +101,8 @@ class PersistenceContextImplTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
 
                 persistenceContext.addEntity(sample);
 
@@ -131,8 +131,8 @@ class PersistenceContextImplTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
 
                 persistenceContext.addEntity(sample);
 

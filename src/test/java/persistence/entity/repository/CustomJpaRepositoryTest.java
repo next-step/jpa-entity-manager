@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
 import persistence.context.PersistenceContext;
 import persistence.context.PersistenceContextImpl;
-import persistence.entity.attribute.EntityAttributeCenter;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaderImpl;
 import persistence.entity.manager.EntityManagerImpl;
@@ -34,8 +34,8 @@ class CustomJpaRepositoryTest extends DatabaseTest {
 
                 EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
-                EntityAttributeCenter entityAttributeCenter = new EntityAttributeCenter();
-                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributeCenter);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
                 EntityManagerImpl entityManager = EntityManagerImpl.of(persistenceContext);
 
                 CustomJpaRepository customJpaRepository = new CustomJpaRepository(entityManager);
