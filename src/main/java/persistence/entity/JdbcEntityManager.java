@@ -9,13 +9,17 @@ import persistence.sql.dml.clause.operator.Operator;
 import persistence.sql.entitymetadata.model.EntityColumn;
 import persistence.sql.entitymetadata.model.EntityTable;
 
+import java.util.Objects;
+
 public class JdbcEntityManager implements EntityManager {
     private JdbcTemplate jdbcTemplate;
     private Dialect dialect;
+    private EntityPersisterCachePool entityPersisterCache;
 
     public JdbcEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
+        this.entityPersisterCache = new EntityPersisterCachePool();
     }
 
     @Override
@@ -63,11 +67,13 @@ public class JdbcEntityManager implements EntityManager {
     }
 
     private EntityPersister<Object> createEntityPersister(Class<?> clazz) {
-        /**
-         * TODO 매번 EntityPersister의 인스턴스를 생성하지 않고, 캐싱할 수 있도록 수정 필요
-         * (일단 지금은 매번 생성하도록 구현)
-         */
+        EntityPersister cachedEntityPersister = entityPersisterCache.lookup(clazz);
 
-        return (EntityPersister<Object>) new EntityPersister<>(clazz, jdbcTemplate, dialect);
+        if (Objects.isNull(cachedEntityPersister)) {
+            cachedEntityPersister = new EntityPersister<>(clazz, jdbcTemplate, dialect);
+            entityPersisterCache.register(clazz, cachedEntityPersister);
+        }
+
+        return cachedEntityPersister;
     }
 }
