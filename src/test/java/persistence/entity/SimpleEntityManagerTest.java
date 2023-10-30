@@ -140,7 +140,7 @@ class SimpleEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티 매니저에 의해 저장 된다.")
+    @DisplayName("하나의 엔티티 매니저에 여러 엔터티가 저장 된다.")
     void multiDomainPersist() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
