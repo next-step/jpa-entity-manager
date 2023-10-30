@@ -132,3 +132,37 @@ public class CustomJpaRepository<T, ID> {
 ```
 - 처음 저장한 entity의 경우 persist한다.
 - 처음 저장한 entity가 아닌 경우 merge한다.
+
+### 4단계 - EntityEntry
+```
+EntityEntry 클래스는 엔터티의 영속성 상태와 상태 변화, 생명주기와 변경감지에 중요한 역할
+```
+#### 요구사항4
+- CRUD 작업 수행 시 Entity의 상태를 추가한다.
+```
+public enum Status {
+	MANAGED,
+	READ_ONLY,
+	DELETED,
+	GONE,
+	LOADING,
+	SAVING
+}
+``` 
+- MANAGED
+  - 영속성 컨텍스트에서 관리되고 있는 상태
+- READ_ONLY
+  - 읽기 전용 상태
+  - 변경된 내용이 데이터베이스에 반영되지 않는다.
+    - READ_ONLY인 상태를 데이터베이스에 merge하려고하면 예외가 발생한다.
+- DELETED
+  - 영속성 컨텍스트에서 삭제될 것임을 명시
+  - 더티체킹이 발생하더라도 무시되며, 데이터베이스 동기화를 통해 레코드가 삭제될 것임을 명시한다.
+- GONE
+  - 영속성 컨텍스트에서 삭제된 상태
+- LOADING
+  - 영속성 컨텍스트에서 저장되었으나 데이터베이스에서 로드되지 않은 상태
+  - 로드작업이 완료되면 MANAGED 상태로 변경된다.
+- SAVING
+  - 영속성 컨텍스트에 있고 DB에 저장되지 않은 상태
+  - 저장작업이 완료되면 MANAGED 상태로 변경된다.
