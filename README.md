@@ -171,3 +171,9 @@ public enum Status {
   - 영속성 컨텍스트에 저장될 때 id를 가지고 EntityEntry를 생성한다.
     - 이때 EntityEntry는 LOADING 상태이다.
   - 실제 쿼리가 나가면 managed 상태로 변경한다.
+- persist
+  1. 영속성 컨텍스트에 저장
+  2. EntityEntry의 상태값 SAVING
+  3. insert 요청
+  4. id값 assign (id가 null이라면)
+  5. EntityEntry의 상태값 MANAGED
