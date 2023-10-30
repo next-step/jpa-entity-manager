@@ -64,7 +64,8 @@ public class SimpleEntityManager implements EntityManager {
 
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
         persistenceContext.removeEntity(entityKey);
-        persistenceContext.updateEntityEntryStatus(entityKey, Status.DELETED);
+
+        persistenceContext.updateEntityEntryStatus(entity, Status.DELETED);
 
         entityPersister.delete(entity);
     }
@@ -74,13 +75,13 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private <T> Object initEntity(final EntityKey entityKey, final EntityLoader<T> entityLoader) {
-        persistenceContext.addEntityEntry(entityKey, Status.LOADING);
-
-        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey()).orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
+        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey())
+                .orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
+        persistenceContext.addEntityEntry(entityFromDatabase, Status.LOADING);
         persistenceContext.addEntity(entityKey, entityFromDatabase);
         persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
-        persistenceContext.updateEntityEntryStatus(entityKey, Status.MANAGED);
 
+        persistenceContext.updateEntityEntryStatus(entityFromDatabase, Status.MANAGED);
         return entityFromDatabase;
     }
 
@@ -92,12 +93,14 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private void processInsert(final Object entity, final EntityPersister entityPersister) {
+        persistenceContext.addEntityEntry(entity, Status.SAVING);
+
         entityPersister.insert(entity);
 
         final Object idValue = extractId(entity, entityPersister);
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
         persistenceContext.addEntity(entityKey, entity);
-        persistenceContext.addEntityEntry(entityKey, Status.MANAGED);
+        persistenceContext.updateEntityEntryStatus(entity, Status.MANAGED);
     }
 
     private void processUpdate(final Object entity, final EntityPersister entityPersister) {

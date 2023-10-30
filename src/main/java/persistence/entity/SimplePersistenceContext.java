@@ -40,17 +40,17 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void addEntityEntry(final EntityKey key, final Status status) {
-        entityEntries.addEntityEntry(key, status);
+    public void addEntityEntry(final Object entity, final Status status) {
+        entityEntries.addEntityEntry(entity, status);
     }
 
     @Override
-    public Optional<EntityEntry> getEntityEntry(final EntityKey key) {
-        return entityEntries.getEntityEntry(key);
+    public Optional<EntityEntry> getEntityEntry(final Object entity) {
+        return entityEntries.getEntityEntry(entity);
     }
 
     @Override
-    public void updateEntityEntryStatus(final EntityKey entityKey, final Status status) {
-        entityEntries.updateEntityEntryStatus(entityKey, status);
+    public void updateEntityEntryStatus(final Object entity, final Status status) {
+        entityEntries.updateEntityEntryStatus(entity, status);
     }
 }

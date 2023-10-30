@@ -13,9 +13,9 @@ public interface PersistenceContext {
 
     Object getDatabaseSnapshot(EntityKey key, Object entity);
 
-    void addEntityEntry(EntityKey key, Status status);
+    void addEntityEntry(Object entity, Status status);
 
-    Optional<EntityEntry> getEntityEntry(EntityKey key);
+    Optional<EntityEntry> getEntityEntry(Object entity);
 
-    void updateEntityEntryStatus(EntityKey entityKey, Status status);
+    void updateEntityEntryStatus(Object entity, Status status);
 }
