@@ -23,6 +23,7 @@ class SimpleEntityManagerTest {
     private JdbcTemplate jdbcTemplate;
     private DatabaseServer server;
     private Dialect dialect;
+    private EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -32,6 +33,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
         jdbcTemplate.execute(QueryGenerator.of(DifferentPerson.class, dialect).create());
+        entityManagerFactory = new EntityManagerFactory("persistence.testFixtures", jdbcTemplate, dialect);
     }
 
 
@@ -40,8 +42,7 @@ class SimpleEntityManagerTest {
     void persist() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when
         entityManager.persist(person);
@@ -56,8 +57,7 @@ class SimpleEntityManagerTest {
     void remove() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         entityManager.persist(person);
 
@@ -76,7 +76,7 @@ class SimpleEntityManagerTest {
         //given
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L, "이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.persist(person);
 
         //when
@@ -91,8 +91,7 @@ class SimpleEntityManagerTest {
     void firstCache() {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when
         final Person person1 = entityManager.persist(person);
@@ -101,10 +100,10 @@ class SimpleEntityManagerTest {
 
         //then
         assertSoftly(it -> {
-                it.assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
-                it.assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
-                it.assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
-            }
+                    it.assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
+                    it.assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
+                    it.assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
+                }
         );
     }
 
@@ -115,7 +114,7 @@ class SimpleEntityManagerTest {
         final String CHANGE_EMAIL_STRING = "change23@gmail.com";
         Person person = new Person("이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         final Person person1 = entityManager.persist(person);
         final Person person2 = entityManager.persist(person);
@@ -146,7 +145,7 @@ class SimpleEntityManagerTest {
         Person person = new Person("이름", 19, "asd@gmail.com");
         DifferentPerson noAutoIncrementPerson = new DifferentPerson(2L, "이름", 19, "asd@gmail.com");
         Dialect dialect = new FakeDialect();
-        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when
         entityManager.persist(person);

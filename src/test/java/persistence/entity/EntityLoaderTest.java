@@ -38,7 +38,8 @@ class EntityLoaderTest {
         //given
         EntityMeta entityMeta = EntityMeta.from(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
+        EntityMapper entityMapper = new EntityMapper(entityMeta);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, entityMapper);
 
         Person person = new Person("이름", 19, "asd@gmail.com");
         jdbcTemplate.execute(queryGenerator.insert().build(person));
@@ -57,7 +58,8 @@ class EntityLoaderTest {
     void find() {
         //given
         QueryGenerator queryGenerator = QueryGenerator.of(Person.class, dialect);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator,
+                new EntityMapper(EntityMeta.from(Person.class)));
 
         Person person = new Person("이름", 19, "asd@gmail.com");
         Person person2 = new Person("이름", 19, "asd@gmail.com");
@@ -82,7 +84,8 @@ class EntityLoaderTest {
     @Test
     @DisplayName("없는 데이터를 조회하면 null을 반환한다")
     void noDataIsNull() {
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, QueryGenerator.of(Person.class, dialect),
+                new EntityMapper(EntityMeta.from(Person.class)));
 
         Person person = entityLoader.find(Person.class, 1L);
 
@@ -96,7 +99,6 @@ class EntityLoaderTest {
         EntityMeta entityMeta = EntityMeta.from(Person.class);
         QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
 
-
         //when
         Person person = new Person("이름", 19, "asd");
         final Long l = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
@@ -104,7 +106,7 @@ class EntityLoaderTest {
         final Long l3 = jdbcTemplate.insertForGenerateKey(queryGenerator.insert().build(person));
 
         //then
-       assertSoftly((it) -> {
+        assertSoftly((it) -> {
             it.assertThat(l).isEqualTo(1L);
             it.assertThat(l2).isEqualTo(2L);
             it.assertThat(l3).isEqualTo(3L);

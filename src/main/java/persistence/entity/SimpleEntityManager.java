@@ -2,24 +2,28 @@ package persistence.entity;
 
 
 import java.util.List;
-import jdbc.JdbcTemplate;
-import persistence.dialect.Dialect;
-import persistence.meta.EntityMeta;
 
 
 public class SimpleEntityManager implements EntityManager {
-    private final EntityLoader entityLoader;
-    private final EntityPersister entityPersister;
+    private final EntityLoaderContext entityLoaderContext;
+    private final EntityPersisteContext entityPersisterContenxt;
     private final SimplePersistenceContext persistenceContext;
 
-    public SimpleEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
+    private SimpleEntityManager(EntityPersisteContext entityPersisterContenxt,
+                                EntityLoaderContext entityLoaderContext) {
         this.persistenceContext = new SimplePersistenceContext();
-        this.entityLoader = new EntityLoader(jdbcTemplate, dialect);
-        this.entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        this.entityPersisterContenxt = entityPersisterContenxt;
+        this.entityLoaderContext = entityLoaderContext;
+    }
+
+    public static SimpleEntityManager of(EntityPersisteContext entityPersisterContenxt,
+                                         EntityLoaderContext entityLoaderContext) {
+        return new SimpleEntityManager(entityPersisterContenxt, entityLoaderContext);
     }
 
     @Override
     public <T> T persist(T entity) {
+        EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
         final T persistEntity = entityPersister.insert(entity);
 
         this.persistenceContext.addEntity(EntityKey.of(entity), persistEntity);
@@ -29,8 +33,8 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
-        final EntityKey entityKey = EntityKey.of(entity.getClass(), entityMeta.getPkValue(entity));
+        EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
+        EntityKey entityKey = EntityKey.of(entity);
 
         if (persistenceContext.getEntity(entityKey) != null) {
             persistenceContext.removeEntity(entity);
@@ -41,6 +45,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T, ID> T find(Class<T> clazz, ID id) {
+        EntityLoader entityLoader = entityLoaderContext.getEntityLoader(clazz);
         EntityKey entityKey = EntityKey.of(clazz, id);
 
         if (persistenceContext.getEntity(entityKey) != null) {
@@ -57,7 +62,10 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
+        EntityLoader entityLoader = entityLoaderContext.getEntityLoader(tClass);
+
         final List<T> findList = entityLoader.findAll(tClass);
+
         findList.forEach((it) ->
                 persistenceContext.addEntity(EntityKey.of(it), it)
         );
@@ -69,7 +77,10 @@ public class SimpleEntityManager implements EntityManager {
     public void flush() {
         final List<Object> changedEntity = persistenceContext.getChangedEntity();
 
-        changedEntity.forEach(entityPersister::update);
+        changedEntity.forEach((it) -> {
+            EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(it.getClass());
+            entityPersister.update(it);
+        });
 
         persistenceContext.clear();
     }

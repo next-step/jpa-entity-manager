@@ -1,16 +1,15 @@
 package repository;
 
 import java.util.List;
-import jdbc.JdbcTemplate;
-import persistence.dialect.Dialect;
-import persistence.entity.SimpleEntityManager;
 import persistence.entity.EntityManager;
 
-public class SimpleCrudRepository<T, ID> extends AbstractRepository<T, ID> implements CrudRepository<T, ID> {
+public class SimpleCrudRepository<T, ID> implements CrudRepository<T, ID> {
     private final EntityManager entityManager;
-    protected SimpleCrudRepository(JdbcTemplate jdbcTemplate, Class<T> tClass, Dialect dialect) {
-        super(jdbcTemplate, tClass, dialect);
-        this.entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+    private final Class<T> tClass;
+
+    public SimpleCrudRepository(EntityManager entityManager, Class<T> tClass) {
+        this.entityManager = entityManager;
+        this.tClass = tClass;
     }
 
     public T save(T entity) {

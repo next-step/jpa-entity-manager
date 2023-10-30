@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.dialect.Dialect;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
@@ -13,19 +12,17 @@ import persistence.sql.QueryGenerator;
 public class EntityPersister {
     private static final Logger log = LoggerFactory.getLogger(EntityPersister.class);
     private final JdbcTemplate jdbcTemplate;
-    private final Dialect dialect;
+    private final EntityMeta entityMeta;
+    private final QueryGenerator queryGenerator;
 
-    public EntityPersister(JdbcTemplate jdbcTemplate,
-                           Dialect dialect) {
+    public EntityPersister(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, QueryGenerator queryGenerator) {
         this.jdbcTemplate = jdbcTemplate;
-        this.dialect = dialect;
+        this.entityMeta = entityMeta;
+        this.queryGenerator = queryGenerator;
     }
 
     public <T> T insert(T entity) {
-        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
-        final String query = QueryGenerator.of(entityMeta, dialect)
-                .insert()
-                .build(entity);
+        final String query = queryGenerator.insert().build(entity);
 
         log.info(query);
 
@@ -37,10 +34,7 @@ public class EntityPersister {
     }
 
     public boolean update(Object entity) {
-        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
-        final String query = QueryGenerator.of(entityMeta, dialect)
-                .update()
-                .build(entity);
+        final String query = queryGenerator.update().build(entity);
 
         log.info(query);
         jdbcTemplate.execute(query);
@@ -50,7 +44,7 @@ public class EntityPersister {
     public void delete(Object entity) {
         final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
 
-        final String query = QueryGenerator.of(entityMeta, dialect)
+        final String query = queryGenerator
                 .delete()
                 .build(entityMeta.getPkValue(entity));
 
@@ -58,6 +52,7 @@ public class EntityPersister {
 
         jdbcTemplate.execute(query);
     }
+
     private void changeValue(EntityColumn column, Object entity, Object value) {
         try {
             final Field field = entity.getClass().getDeclaredField(column.getFieldName());

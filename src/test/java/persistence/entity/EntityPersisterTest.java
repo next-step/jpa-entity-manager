@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
 import persistence.fake.FakeDialect;
+import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.NoAutoIncrementPerson;
 import persistence.testFixtures.Person;
@@ -40,7 +41,8 @@ class EntityPersisterTest {
     void entityAutoIncrementSave() {
         Person person = new Person("이름", 3, "dsa@gmil.com");
 
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
+                QueryGenerator.of(Person.class, dialect));
 
         final Person result = entityPersister.insert(person);
 
@@ -54,9 +56,11 @@ class EntityPersisterTest {
     @DisplayName("엔티티가 저장이 된다.")
     void entitySave() {
         //given
-        NoAutoIncrementPerson person = new NoAutoIncrementPerson(3L,"이름", 3, "dsa@gmil.com");
+        NoAutoIncrementPerson person = new NoAutoIncrementPerson(3L, "이름", 3, "dsa@gmil.com");
 
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate,
+                EntityMeta.from(NoAutoIncrementPerson.class),
+                QueryGenerator.of(Person.class, dialect));
 
         //when
         final NoAutoIncrementPerson result = entityPersister.insert(person);
@@ -73,7 +77,8 @@ class EntityPersisterTest {
     void entityUpdate() {
         //given
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
+                QueryGenerator.of(Person.class, dialect));
 
         //when & then
         assertThat(entityPersister.update(person)).isTrue();
@@ -83,7 +88,8 @@ class EntityPersisterTest {
     @DisplayName("엔티티가 삭제 된다.")
     void entityDelete() {
         //given
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
+                QueryGenerator.of(Person.class, dialect));
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
 
         //then

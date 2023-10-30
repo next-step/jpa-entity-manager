@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
 import persistence.dialect.Dialect;
+import persistence.entity.EntityManagerFactory;
 import persistence.fake.FakeDialect;
 import persistence.testFixtures.Person;
 
@@ -29,27 +30,33 @@ public class RepositoryTest {
     private static JdbcTemplate jdbcTemplate;
     private Person person = new Person("이름", 30, "email@odna");
     private Person person2 = new Person("이름2", 32, "email2@odna");
+    private Dialect dialect;
+    EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     void setUp() throws SQLException {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+        dialect = new FakeDialect();
+        entityManagerFactory = new EntityManagerFactory("persistence.testFixtures", jdbcTemplate, dialect);
 
     }
 
     @TestFactory
     @DisplayName("레포지토리를 관리 한다.")
     Stream<DynamicNode> testFactory() {
-        Dialect dialect = new FakeDialect();
+
         final DDLRepository<Person> ddlRepository = new BaseDDLRepository<>(jdbcTemplate, Person.class, dialect);
-        final CrudRepository<Person, Long> crudRepository = new SimpleCrudRepository<>(jdbcTemplate, Person.class, dialect);
+        final CrudRepository<Person, Long> crudRepository = new SimpleCrudRepository<>(
+                entityManagerFactory.createEntityManager(), Person.class);
 
         return Stream.of(
                 dynamicContainer("테이블이", Stream.of(
                         dynamicTest("존재하지 않으면 예외가 발생한다.", () -> {
                             assertThatExceptionOfType(RuntimeException.class).isThrownBy(
-                                    crudRepository::findAll);
+                                    () -> crudRepository.findAll()
+                            );
                         })
                 )),
                 dynamicContainer("테이블을 생성하면", Stream.of(
