@@ -10,8 +10,7 @@ import hibernate.entity.persistencecontext.PersistenceContext;
 
 import java.util.Map;
 
-import static hibernate.Status.LOADING;
-import static hibernate.Status.MANAGED;
+import static hibernate.Status.*;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -55,18 +54,22 @@ public class EntityManagerImpl implements EntityManager {
     public void persist(final Object entity) {
         EntityColumn entityId = EntityClass.getInstance(entity.getClass())
                 .getEntityId();
-        validateAlreadyPersist(entity, entityId);
-
-        Object generatedId = entityPersister.insert(entity);
-        entityId.assignFieldValue(entity, generatedId);
-        persistNewEntity(entity, generatedId);
-    }
-
-    private void validateAlreadyPersist(final Object entity, final EntityColumn entityId) {
         Object id = entityId.getFieldValue(entity);
+        if (id == null) {
+            Object generatedId = entityPersister.insert(entity);
+            entityId.assignFieldValue(entity, generatedId);
+            persistNewEntity(entity, generatedId);
+            EntityEntry entityEntry = new EntityEntry(new EntityKey(generatedId, entity), MANAGED);
+            return;
+        }
+
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
+        persistNewEntity(entity, id);
+        EntityEntry entityEntry = new EntityEntry(new EntityKey(id, entity), SAVING);
+        entityPersister.insert(entity);
+        entityEntry.updateStatus(MANAGED);
     }
 
     @Override
