@@ -3,30 +3,29 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 public class DefaultEntityManager implements EntityManager {
-    private final EntityPersister entityPersister;
-    private final EntityLoader entityLoader;
 
-    private DefaultEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
-        this.entityPersister = entityPersister;
-        this.entityLoader = entityLoader;
+    private final DefaultPersistenceContext persistenceContext;
+
+    private DefaultEntityManager(DefaultPersistenceContext persistenceContext) {
+        this.persistenceContext = persistenceContext;
     }
 
     public static DefaultEntityManager of(JdbcTemplate jdbcTemplate) {
-        return new DefaultEntityManager(EntityPersister.of(jdbcTemplate), EntityLoader.of(jdbcTemplate));
+        return new DefaultEntityManager(DefaultPersistenceContext.of(jdbcTemplate));
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityLoader.selectOne(clazz, id);
+        return persistenceContext.getEntity(clazz, id);
     }
 
     @Override
     public void persist(Object entity) {
-        entityPersister.insert(entity);
+        persistenceContext.addEntity(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 }
