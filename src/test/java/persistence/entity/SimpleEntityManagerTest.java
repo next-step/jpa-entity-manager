@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
 import persistence.fake.FakeDialect;
 import persistence.sql.QueryGenerator;
+import persistence.testFixtures.DifferentPerson;
 import persistence.testFixtures.NoAutoIncrementPerson;
 import persistence.testFixtures.Person;
 
@@ -30,6 +31,7 @@ class SimpleEntityManagerTest {
         dialect = new FakeDialect();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
+        jdbcTemplate.execute(QueryGenerator.of(DifferentPerson.class, dialect).create());
     }
 
 
@@ -137,10 +139,33 @@ class SimpleEntityManagerTest {
         });
     }
 
+    @Test
+    @DisplayName("엔티티 매니저에 의해 저장 된다.")
+    void multiDomainPersist() {
+        //given
+        Person person = new Person("이름", 19, "asd@gmail.com");
+        DifferentPerson noAutoIncrementPerson = new DifferentPerson(2L, "이름", 19, "asd@gmail.com");
+        Dialect dialect = new FakeDialect();
+        EntityManager entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+
+        //when
+        entityManager.persist(person);
+        entityManager.persist(noAutoIncrementPerson);
+        final List<Person> persons = entityManager.findAll(Person.class);
+        final List<DifferentPerson> differentPerson = entityManager.findAll(DifferentPerson.class);
+
+        //then
+        assertSoftly(it -> {
+            it.assertThat(persons).hasSize(1);
+            it.assertThat(differentPerson).hasSize(1);
+        });
+    }
+
 
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());
+        jdbcTemplate.execute(QueryGenerator.of(DifferentPerson.class, dialect).drop());
         server.stop();
     }
 
