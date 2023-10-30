@@ -40,7 +40,7 @@ public class EntityManagerImpl implements EntityManager {
             return (T) persistenceContextEntity;
         }
 
-        EntityEntry entityEntry = new EntityEntry(SAVING);
+        EntityEntry entityEntry = new EntityEntry(LOADING);
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
         persistNewEntity(loadEntity, id);
