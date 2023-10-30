@@ -174,9 +174,10 @@ public enum Status {
 - persist
   - id가 null이라면
     1. 영속성 컨텍스트에 저장
-    2. insert 요청
-    3. id값 assign (id가 null이라면)
-    4. EntityEntry의 상태값 MANAGED
+    2. EntityEntry값 SAVING
+    3. insert 요청
+    4. id값 assign
+    5. EntityEntry의 상태값 MANAGED
   - id가 null이 아니라면
     1. 영속성 컨텍스트에 저장
     2. EntityEntry의 상태값 SAVING
