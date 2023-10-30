@@ -182,3 +182,6 @@ public enum Status {
     2. EntityEntry의 상태값 SAVING
     3. insert 요청
     4. EntityEntry의 상태값 MANAGED
+- remove
+  - 영속성 컨텍스트에서 삭제된 후 EntityEntry의 상태는 DELETE다.
+  - Persister에서 쿼리가 날아간 후 EntityEntry의 상태는 GONE이다. 
