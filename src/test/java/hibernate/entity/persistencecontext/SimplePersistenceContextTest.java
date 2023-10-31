@@ -35,16 +35,21 @@ class SimplePersistenceContextTest {
     void entity를_저장한다() {
         // given
         EntityKey expectedEntityKey = new EntityKey(1L, TestEntity.class);
-        TestEntity givenEntity = new TestEntity();
+        TestEntity givenEntity = new TestEntity(1L);
         Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, Map.of());
+        Map<EntityKey, EntitySnapshot> givenSnapshotEntities = new ConcurrentHashMap<>();
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, givenSnapshotEntities);
 
         // when
         persistenceContext.addEntity(1L, givenEntity);
         Object actual = givenEntities.get(expectedEntityKey);
+        Object actualSnapshot = givenSnapshotEntities.get(expectedEntityKey);
 
         // then
-        assertThat(actual).isEqualTo(givenEntity);
+        assertAll(
+                () -> assertThat(actual).isEqualTo(givenEntity),
+                () -> assertThat(actualSnapshot).isNotNull()
+        );
     }
 
     @Test
@@ -59,10 +64,12 @@ class SimplePersistenceContextTest {
     void 영속화된_객체를_제거한다() {
         // given
         EntityKey givenEntityKey = new EntityKey(1L, TestEntity.class);
-        TestEntity givenEntity = new TestEntity();
+        TestEntity givenEntity = new TestEntity(1L);
         Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
         givenEntities.put(givenEntityKey, givenEntity);
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, Map.of());
+        Map<EntityKey, EntitySnapshot> givenSnapshotEntities = new ConcurrentHashMap<>();
+        givenSnapshotEntities.put(givenEntityKey, new EntitySnapshot(givenEntity));
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, givenSnapshotEntities);
 
         // when
         persistenceContext.removeEntity(givenEntity);
@@ -72,24 +79,10 @@ class SimplePersistenceContextTest {
     }
 
     @Test
-    void 스냅샷_entity를_저장한다() {
-        // given
-        TestEntity givenEntity = new TestEntity(1L);
-        Map<EntityKey, EntitySnapshot> givenSnapshotEntities = new ConcurrentHashMap<>();
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(Map.of(), givenSnapshotEntities);
-
-        // when
-        persistenceContext.getDatabaseSnapshot(1L, givenEntity);
-
-        // then
-        assertThat(givenSnapshotEntities).hasSize(1);
-    }
-
-    @Test
     void 저장된_스냅샷_entity를_가져온다() {
         EntityKey givenKey = new EntityKey(1L, TestEntity.class);
         EntitySnapshot givenSnapshot = new EntitySnapshot(new TestEntity(1L));
-        Object actual = new SimplePersistenceContext(Map.of(), Map.of(givenKey, givenSnapshot)).getCachedDatabaseSnapshot(givenKey);
+        Object actual = new SimplePersistenceContext(Map.of(), Map.of(givenKey, givenSnapshot)).getDatabaseSnapshot(givenKey);
 
         assertThat(actual).isEqualTo(givenSnapshot);
     }

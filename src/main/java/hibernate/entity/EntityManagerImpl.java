@@ -43,14 +43,9 @@ public class EntityManagerImpl implements EntityManager {
         EntityEntry entityEntry = new EntityEntry(LOADING);
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
-        persistNewEntity(loadEntity, id);
+        persistenceContext.addEntity(id, loadEntity);
         entityEntry.updateStatus(MANAGED);
         return loadEntity;
-    }
-
-    private void persistNewEntity(final Object entity, final Object entityId) {
-        persistenceContext.addEntity(entityId, entity);
-        persistenceContext.getDatabaseSnapshot(entityId, entity);
     }
 
     @Override
@@ -62,7 +57,7 @@ public class EntityManagerImpl implements EntityManager {
             entityEntryContext.addEntityEntry(entity, new EntityEntry(SAVING));
             Object generatedId = entityPersister.insert(entity);
             entityId.assignFieldValue(entity, generatedId);
-            persistNewEntity(entity, generatedId);
+            persistenceContext.addEntity(generatedId, entity);
             entityEntryContext.getEntityEntry(entity)
                     .updateStatus(MANAGED);
             return;
@@ -71,7 +66,7 @@ public class EntityManagerImpl implements EntityManager {
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
-        persistNewEntity(entity, id);
+        persistenceContext.addEntity(id, entity);
         entityEntryContext.addEntityEntry(entity, new EntityEntry(SAVING));
         entityPersister.insert(entity);
         entityEntryContext.getEntityEntry(entity)
@@ -87,7 +82,7 @@ public class EntityManagerImpl implements EntityManager {
             return;
         }
         entityPersister.update(entityClass, entityId, changedColumns);
-        persistNewEntity(entity, entityId);
+        persistenceContext.addEntity(entityId, entity);
     }
 
     private Object getNotNullEntityId(final EntityClass<?> entityClass, final Object entity) {
@@ -101,10 +96,10 @@ public class EntityManagerImpl implements EntityManager {
 
     private EntitySnapshot getSnapshot(final Object entity, final Object entityId) {
         EntityKey entityKey = new EntityKey(entityId, entity.getClass());
-        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(entityKey);
         if (snapshot == null) {
             find(entity.getClass(), entityId);
-            return persistenceContext.getCachedDatabaseSnapshot(entityKey);
+            return persistenceContext.getDatabaseSnapshot(entityKey);
         }
         return snapshot;
     }

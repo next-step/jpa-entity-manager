@@ -25,6 +25,8 @@ public class SimplePersistenceContext implements PersistenceContext {
     @Override
     public void addEntity(final Object id, final Object entity) {
         entities.put(new EntityKey(id, entity.getClass()), entity);
+        EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
+        snapshotEntities.put(new EntityKey(id, entity.getClass()), entitySnapshot);
     }
 
     @Override
@@ -36,16 +38,11 @@ public class SimplePersistenceContext implements PersistenceContext {
                 .map(Map.Entry::getKey)
                 .orElseThrow(() -> new IllegalStateException("영속화되어있지 않은 entity입니다."));
         entities.remove(entityKey);
+        snapshotEntities.remove(entityKey);
     }
 
     @Override
-    public Object getDatabaseSnapshot(final Object id, final Object entity) {
-        EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
-        return snapshotEntities.put(new EntityKey(id, entity.getClass()), entitySnapshot);
-    }
-
-    @Override
-    public EntitySnapshot getCachedDatabaseSnapshot(final EntityKey id) {
+    public EntitySnapshot getDatabaseSnapshot(final EntityKey id) {
         return snapshotEntities.get(id);
     }
 }
