@@ -7,7 +7,9 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    <T> T find(Class<T> clazz, Object id);
+    <T, ID> T find(Class<T> clazz, ID id);
 
     <T> List<T> findAll(Class<T> tClass);
+
+    void flush();
 }

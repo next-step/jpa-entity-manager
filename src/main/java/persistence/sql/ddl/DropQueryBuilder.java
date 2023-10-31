@@ -4,7 +4,7 @@ import persistence.dialect.Dialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryBuilder;
 
-public class DropQueryBuilder<T> extends QueryBuilder<T> {
+public class DropQueryBuilder extends QueryBuilder {
     public DropQueryBuilder(EntityMeta entityMeta, Dialect dialect) {
         super(entityMeta, dialect);
     }

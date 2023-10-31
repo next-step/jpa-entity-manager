@@ -2,19 +2,16 @@ package persistence.testFixtures;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.Objects;
 
-@Table(name = "users")
 @Entity
-public class Person {
+@Table(name = "users")
+public class NoAutoIncrementPerson {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "nick_name")
@@ -29,16 +26,11 @@ public class Person {
     @Transient
     private Integer index;
 
-    public Person() {
+
+    public NoAutoIncrementPerson() {
     }
 
-    public Person(String name, Integer age, String email) {
-        this.name = name;
-        this.age = age;
-        this.email = email;
-    }
-
-    public Person(Long id, String name, Integer age, String email) {
+    public NoAutoIncrementPerson(Long id ,String name, Integer age, String email) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -61,10 +53,6 @@ public class Person {
         return email;
     }
 
-    public void changeEmail(String email) {
-        this.email = email;
-    }
-
     public Integer getIndex() {
         return index;
     }
@@ -74,13 +62,13 @@ public class Person {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Person)) {
+        if (!(object instanceof NoAutoIncrementPerson)) {
             return false;
         }
-        Person person = (Person) object;
-        return Objects.equals(id, person.id) && Objects.equals(name, person.name)
-                && Objects.equals(age, person.age) && Objects.equals(email, person.email)
-                && Objects.equals(index, person.index);
+        NoAutoIncrementPerson that = (NoAutoIncrementPerson) object;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name)
+                && Objects.equals(age, that.age) && Objects.equals(email, that.email)
+                && Objects.equals(index, that.index);
     }
 
     @Override

@@ -9,9 +9,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.Objects;
 
-@Table(name = "users")
+@Table(name = "person")
 @Entity
-public class Person {
+public class DifferentPerson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +29,16 @@ public class Person {
     @Transient
     private Integer index;
 
-    public Person() {
+    public DifferentPerson() {
     }
 
-    public Person(String name, Integer age, String email) {
+    public DifferentPerson(String name, Integer age, String email) {
         this.name = name;
         this.age = age;
         this.email = email;
     }
 
-    public Person(Long id, String name, Integer age, String email) {
+    public DifferentPerson(Long id, String name, Integer age, String email) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -74,10 +74,10 @@ public class Person {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Person)) {
+        if (!(object instanceof DifferentPerson)) {
             return false;
         }
-        Person person = (Person) object;
+        DifferentPerson person = (DifferentPerson) object;
         return Objects.equals(id, person.id) && Objects.equals(name, person.name)
                 && Objects.equals(age, person.age) && Objects.equals(email, person.email)
                 && Objects.equals(index, person.index);

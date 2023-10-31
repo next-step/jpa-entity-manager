@@ -24,3 +24,15 @@
 - [X] 요구사항 1 - RowMapper 리팩터링
   -  [X] 동적으로 생성하는 엔터티로더(`EntityLoader`) 생성
 - [X] 요구사항 2 - EntityManager 의 책임 줄여주기
+
+---
+# 3단계 - First Level Cache, Dirty Check 구현 
+ - [X] 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+ - [X] 요구사항2 - snapshot 만들기
+   - [X] snapshot 객체 만들기 
+   - [X] snapshot을 저장할 수 있는 공간 구현 
+   - [X] 변경된 엔터티 조회
+   - [X] 원본과 스냅샷으로 수정된 쿼리 만들기 
+ - [X] 요구사항3 - Dirty Check 기능을 구현해보자
+   - [X] 클래스로더 만들기 
+   - [X] 엔티티매니저 팩토리를 만들고 캐싱하기

@@ -7,13 +7,13 @@ import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
 
-public class UpdateQueryBuilder<T> extends DMLQueryBuilder<T> {
+public class UpdateQueryBuilder extends DMLQueryBuilder {
 
     private static final String EQUAL = "=";
     public UpdateQueryBuilder(EntityMeta entityMeta, Dialect dialect) {
         super(entityMeta, dialect);
     }
-    public String update(T entity) {
+    public String build(Object entity) {
         return updateQuery(entityMeta.getTableName())
                 + updateValues(entityMeta.getEntityColumns(), entity)
                 + whereId(getPkColumn(), getPkColumn().getFieldValue(entity));
@@ -23,7 +23,7 @@ public class UpdateQueryBuilder<T> extends DMLQueryBuilder<T> {
         return dialect.updateForTableQuery(tableName);
     }
 
-    private String updateValues(List<EntityColumn> entityColumns, T entity) {
+    private String updateValues(List<EntityColumn> entityColumns, Object entity) {
          return entityColumns
                 .stream()
                 .filter((it) -> !it.isPk())

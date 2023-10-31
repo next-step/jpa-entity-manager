@@ -39,7 +39,7 @@ class DropQueryBuilderTest {
         @DisplayName("@Table 어노테이션이 없는 경우")
         void noTable() {
             //given
-            QueryGenerator<PkHasPerson> ddl = QueryGenerator.of(PkHasPerson.class, dialect);
+            QueryGenerator ddl = QueryGenerator.of(PkHasPerson.class, dialect);
 
             //when
             String sql = ddl.drop();
@@ -51,9 +51,8 @@ class DropQueryBuilderTest {
         @Test
         @DisplayName("@Table 어노테이션이 있는 경우 이름을 치환한다.")
         void hasTable() {
-
             //given
-            QueryGenerator<Person> ddl = QueryGenerator.of(Person.class, dialect);
+            QueryGenerator ddl = QueryGenerator.of(Person.class, dialect);
 
             //when
             String sql = ddl.drop();

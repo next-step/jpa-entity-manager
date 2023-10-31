@@ -26,8 +26,8 @@ class CreateQueryBuilderTest {
     @DisplayName("요구사항 1 - @id를 가진 create 쿼리 만들기 ")
     void pkHasCreateQuery() {
         //given
-        final EntityMeta entityMeta = new EntityMeta(PkHasPerson.class);
-        final QueryGenerator<PkHasPerson> query = QueryGenerator.of(entityMeta, dialect);
+        final EntityMeta entityMeta = EntityMeta.from(PkHasPerson.class);
+        final QueryGenerator query = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = query.create();
@@ -46,8 +46,8 @@ class CreateQueryBuilderTest {
     @DisplayName("요구사항 2 - 칼럼이름이 변경되는 create 쿼리 만들어보기")
     void changColumNameQuery() {
         //given
-        final EntityMeta entityMeta = new EntityMeta(ChangColumNamePerson.class);
-        final QueryGenerator<ChangColumNamePerson> query = QueryGenerator.of(entityMeta, dialect);
+        final EntityMeta entityMeta = EntityMeta.from(ChangColumNamePerson.class);
+        final QueryGenerator query = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = query.create();
@@ -66,8 +66,8 @@ class CreateQueryBuilderTest {
     @DisplayName("요구사항 3 - @Transient와 @Table 이름이 변경되는 create 쿼리 만들어보기")
     void transientAndTableQuery() {
         //given
-        final EntityMeta entityMeta = new EntityMeta(Person.class);
-        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, dialect);
+        final EntityMeta entityMeta = EntityMeta.from(Person.class);
+        final QueryGenerator ddl = QueryGenerator.of(entityMeta, dialect);
 
         //when
         String sql = ddl.create();
@@ -85,8 +85,8 @@ class CreateQueryBuilderTest {
     @DisplayName("Create 쿼리가 방언이 바뀌면 이에 맞게 바뀐다.")
     void dialectChange() {
         //given
-        final EntityMeta entityMeta = new EntityMeta(Person.class);
-        final QueryGenerator<Person> ddl = QueryGenerator.of(entityMeta, new UpperStringDirect());
+        final EntityMeta entityMeta = EntityMeta.from(Person.class);
+        final QueryGenerator ddl = QueryGenerator.of(entityMeta, new UpperStringDirect());
 
         //when
         String sql = ddl.create();

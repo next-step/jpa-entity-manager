@@ -6,7 +6,7 @@ import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
 
-public class SelectQueryBuilder<T> extends DMLQueryBuilder<T> {
+public class SelectQueryBuilder extends DMLQueryBuilder {
     public SelectQueryBuilder(EntityMeta entityMeta, Dialect dialect) {
         super(entityMeta, dialect);
     }
