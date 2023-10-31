@@ -1,5 +1,8 @@
 package hibernate.entity.persistencecontext;
 
+import hibernate.EntityEntry;
+import hibernate.Status;
+import hibernate.entity.EntityEntryContext;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +29,7 @@ class SimplePersistenceContextTest {
     void getEntity로_저장된_entity를_가져온다() {
         EntityKey givenKey = new EntityKey(1L, TestEntity.class);
         TestEntity givenEntity = new TestEntity(1L);
-        Object actual = new SimplePersistenceContext(Map.of(givenKey, givenEntity), Map.of()).getEntity(givenKey);
+        Object actual = new SimplePersistenceContext(Map.of(givenKey, givenEntity), Map.of(), new EntityEntryContext()).getEntity(givenKey);
 
         assertThat(actual).isEqualTo(givenEntity);
     }
@@ -38,7 +41,7 @@ class SimplePersistenceContextTest {
         TestEntity givenEntity = new TestEntity(1L);
         Map<EntityKey, Object> givenEntities = new ConcurrentHashMap<>();
         Map<EntityKey, EntitySnapshot> givenSnapshotEntities = new ConcurrentHashMap<>();
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, givenSnapshotEntities);
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, givenSnapshotEntities, new EntityEntryContext());
 
         // when
         persistenceContext.addEntity(1L, givenEntity);
@@ -69,7 +72,9 @@ class SimplePersistenceContextTest {
         givenEntities.put(givenEntityKey, givenEntity);
         Map<EntityKey, EntitySnapshot> givenSnapshotEntities = new ConcurrentHashMap<>();
         givenSnapshotEntities.put(givenEntityKey, new EntitySnapshot(givenEntity));
-        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, givenSnapshotEntities);
+        Map<Object, EntityEntry> givenEntityEntries = new ConcurrentHashMap<>();
+        givenEntityEntries.put(givenEntity, new EntityEntry(Status.MANAGED));
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext(givenEntities, givenSnapshotEntities, new EntityEntryContext(givenEntityEntries));
 
         // when
         persistenceContext.removeEntity(givenEntity);
@@ -82,7 +87,7 @@ class SimplePersistenceContextTest {
     void 저장된_스냅샷_entity를_가져온다() {
         EntityKey givenKey = new EntityKey(1L, TestEntity.class);
         EntitySnapshot givenSnapshot = new EntitySnapshot(new TestEntity(1L));
-        Object actual = new SimplePersistenceContext(Map.of(), Map.of(givenKey, givenSnapshot)).getDatabaseSnapshot(givenKey);
+        Object actual = new SimplePersistenceContext(Map.of(), Map.of(givenKey, givenSnapshot), new EntityEntryContext()).getDatabaseSnapshot(givenKey);
 
         assertThat(actual).isEqualTo(givenSnapshot);
     }

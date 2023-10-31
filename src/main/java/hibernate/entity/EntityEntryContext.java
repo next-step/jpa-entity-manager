@@ -3,6 +3,7 @@ package hibernate.entity;
 import hibernate.EntityEntry;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityEntryContext {
 
@@ -10,6 +11,10 @@ public class EntityEntryContext {
 
     public EntityEntryContext(final Map<Object, EntityEntry> entityEntries) {
         this.entityEntries = entityEntries;
+    }
+
+    public EntityEntryContext() {
+        this(new ConcurrentHashMap<>());
     }
 
     public EntityEntry addEntityEntry(final Object entity, final EntityEntry entityEntry) {

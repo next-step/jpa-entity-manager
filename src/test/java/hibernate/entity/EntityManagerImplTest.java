@@ -42,8 +42,7 @@ class EntityManagerImplTest {
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
-                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities),
-                new EntityEntryContext(entityEntryContextEntities)
+                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities, new EntityEntryContext(entityEntryContextEntities))
         );
     }
 

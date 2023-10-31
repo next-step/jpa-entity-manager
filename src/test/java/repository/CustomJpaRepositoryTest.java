@@ -41,8 +41,7 @@ class CustomJpaRepositoryTest {
         entityManager = new EntityManagerImpl(
                 new EntityPersister(jdbcTemplate),
                 new EntityLoader(jdbcTemplate),
-                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities),
-                new EntityEntryContext(new ConcurrentHashMap<>())
+                new SimplePersistenceContext(persistenceContextEntities, persistenceContextSnapshotEntities, new EntityEntryContext(new ConcurrentHashMap<>()))
         );
         customJpaRepository = new CustomJpaRepository<>(entityManager);
     }

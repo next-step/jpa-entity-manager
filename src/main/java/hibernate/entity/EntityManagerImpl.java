@@ -16,18 +16,15 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
     private final PersistenceContext persistenceContext;
-    private final EntityEntryContext entityEntryContext;
 
     public EntityManagerImpl(
             final EntityPersister entityPersister,
             final EntityLoader entityLoader,
-            final PersistenceContext persistenceContext,
-            final EntityEntryContext entityEntryContext
+            final PersistenceContext persistenceContext
     ) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
         this.persistenceContext = persistenceContext;
-        this.entityEntryContext = entityEntryContext;
     }
 
     @Override
@@ -35,8 +32,6 @@ public class EntityManagerImpl implements EntityManager {
         EntityKey entityKey = new EntityKey(id, clazz);
         Object persistenceContextEntity = persistenceContext.getEntity(entityKey);
         if (persistenceContextEntity != null) {
-            entityEntryContext.getEntityEntry(persistenceContextEntity)
-                    .updateStatus(MANAGED);
             return (T) persistenceContextEntity;
         }
 
@@ -44,7 +39,6 @@ public class EntityManagerImpl implements EntityManager {
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
         persistenceContext.addEntity(id, loadEntity);
-        entityEntry.updateStatus(MANAGED);
         return loadEntity;
     }
 
@@ -54,23 +48,19 @@ public class EntityManagerImpl implements EntityManager {
                 .getEntityId();
         Object id = entityId.getFieldValue(entity);
         if (id == null) {
-            entityEntryContext.addEntityEntry(entity, new EntityEntry(SAVING));
+            persistenceContext.addEntityEntry(entity, SAVING);
             Object generatedId = entityPersister.insert(entity);
             entityId.assignFieldValue(entity, generatedId);
             persistenceContext.addEntity(generatedId, entity);
-            entityEntryContext.getEntityEntry(entity)
-                    .updateStatus(MANAGED);
             return;
         }
 
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
-        persistenceContext.addEntity(id, entity);
-        entityEntryContext.addEntityEntry(entity, new EntityEntry(SAVING));
+        EntityEntry entityEntry = persistenceContext.addEntity(id, entity, SAVING);
         entityPersister.insert(entity);
-        entityEntryContext.getEntityEntry(entity)
-                .updateStatus(MANAGED);
+        entityEntry.updateStatus(MANAGED);
     }
 
     @Override
@@ -107,11 +97,6 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void remove(final Object entity) {
         persistenceContext.removeEntity(entity);
-        Object id = EntityClass.getInstance(entity.getClass())
-                .getEntityId()
-                .getFieldValue(entity);
-        EntityEntry entityEntry = new EntityEntry(DELETED);
         entityPersister.delete(entity);
-        entityEntry.updateStatus(GONE);
     }
 }
