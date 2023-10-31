@@ -19,7 +19,7 @@ public class MockDatabaseServer implements DatabaseServer {
     }
 
     @Override
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() {
         return null;
     }
 }

@@ -1,13 +1,19 @@
 package persistence.entity;
 
 import domain.FixtureEntity;
+import jdbc.JdbcTemplate;
 import mock.MockDmlGenerator;
 import mock.MockJdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.Application;
+import persistence.sql.dml.DmlGenerator;
 
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +23,16 @@ class EntityLoaderProviderTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        entityLoaderProvider = new EntityLoaderProvider(new MockDmlGenerator(), new MockJdbcTemplate());
+        entityLoaderProvider = new EntityLoaderProvider(initEntityLoaders(new MockDmlGenerator(), new MockJdbcTemplate()));
+    }
+
+    private Map<Class<?>, EntityLoader<?>> initEntityLoaders(final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        final EntityScanner entityScanner = new EntityScanner(Application.class);
+        return entityScanner.getEntityClasses().stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        clazz -> new EntityLoader<>(clazz, dmlGenerator, jdbcTemplate)
+                ));
     }
 
     @Test

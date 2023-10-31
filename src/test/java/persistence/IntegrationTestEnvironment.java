@@ -4,7 +4,6 @@ import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import persistence.core.EntityMetadata;
@@ -24,6 +23,7 @@ public abstract class IntegrationTestEnvironment {
     protected DmlGenerator dmlGenerator;
     protected EntityMetadata<?> entityMetadata;
     protected JdbcTemplate jdbcTemplate;
+    protected PersistenceEnvironment persistenceEnvironment;
     protected List<Person> people;
 
     @BeforeEach
@@ -31,7 +31,7 @@ public abstract class IntegrationTestEnvironment {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        final PersistenceEnvironment persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
+        persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
         ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
 
@@ -62,7 +62,4 @@ public abstract class IntegrationTestEnvironment {
         return List.of(test00, test01, test02, test03);
     }
 
-    protected RowMapper<Person> personRowMapper() {
-        return rs -> new Person(rs.getLong("id"), rs.getString("nick_name"), rs.getInt("old"), rs.getString("email"));
-    }
 }
