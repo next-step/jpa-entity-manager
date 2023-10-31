@@ -1,5 +1,7 @@
 package persistence.sql.schema;
 
+import java.util.Objects;
+
 public class ValueMeta {
 
     private static final String STRING_TYPE_FORMAT = "'%s'";
@@ -31,5 +33,22 @@ public class ValueMeta {
         }
 
         return String.valueOf(object);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ValueMeta valueMeta = (ValueMeta) o;
+        return Objects.equals(value, valueMeta.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

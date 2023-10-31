@@ -3,6 +3,7 @@ package persistence.sql.schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import persistence.sql.dialect.ColumnType;
@@ -23,12 +24,14 @@ public class ColumnMeta {
 
     private final boolean isPrimaryKey;
 
+    private final Class<?> columnTypeClass;
 
-    private ColumnMeta(String columnName, String columnTypeName, String columnConstraint, boolean isPrimaryKey) {
+    private ColumnMeta(String columnName, String columnTypeName, String columnConstraint, boolean isPrimaryKey, Class<?> columnTypeClass) {
         this.columnName = columnName;
         this.columnType = columnTypeName;
         this.columnConstraint = columnConstraint;
         this.isPrimaryKey = isPrimaryKey;
+        this.columnTypeClass = columnTypeClass;
     }
 
     public static ColumnMeta of(Field field, ColumnType columnType) {
@@ -38,7 +41,9 @@ public class ColumnMeta {
             joiningConstraint(
                 new PrimaryKeyConstraint(field, columnType), new NotNullConstraint(field)
             ),
-            PrimaryKeyConstraint.isPrimaryKey(field));
+            PrimaryKeyConstraint.isPrimaryKey(field),
+            field.getType()
+        );
     }
 
     public String getColumn() {
@@ -51,6 +56,10 @@ public class ColumnMeta {
 
     public String getColumnName() {
         return columnName;
+    }
+
+    public Class<?> getColumnType() {
+        return columnTypeClass;
     }
 
     public static boolean isTransient(Field field) {
@@ -82,5 +91,22 @@ public class ColumnMeta {
             .map(Constraint::getConstraint)
             .filter(constraint -> !constraint.isEmpty())
             .collect(Collectors.joining(" "));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ColumnMeta that = (ColumnMeta) o;
+        return Objects.equals(columnName, that.columnName) && Objects.equals(columnType, that.columnType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(columnName, columnType);
     }
 }

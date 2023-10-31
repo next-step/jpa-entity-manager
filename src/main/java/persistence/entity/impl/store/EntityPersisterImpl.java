@@ -2,13 +2,13 @@ package persistence.entity.impl.store;
 
 import java.sql.Connection;
 import jdbc.JdbcTemplate;
+import persistence.entity.impl.EntityRowMapper;
 import persistence.sql.dialect.ColumnType;
 import persistence.sql.dml.clause.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.statement.DeleteStatementBuilder;
 import persistence.sql.dml.statement.InsertStatementBuilder;
 import persistence.sql.dml.statement.UpdateStatementBuilder;
-import persistence.sql.schema.EntityClassMappingMeta;
 import persistence.sql.schema.EntityObjectMappingMeta;
 
 public class EntityPersisterImpl implements EntityPersister {
@@ -20,25 +20,25 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public void store(Object entity, ColumnType columnType) {
+    public Object store(Object entity, ColumnType columnType) {
         final InsertStatementBuilder insertStatementBuilder = new InsertStatementBuilder(columnType);
-        final String insertSql = insertStatementBuilder.insert(entity);
-        jdbcTemplate.execute(insertSql);
+        final String insertSql = insertStatementBuilder.insertReturning(entity);
+        return jdbcTemplate.executeReturning(insertSql, new EntityRowMapper<>(entity.getClass(), columnType));
     }
 
     @Override
-    public boolean update(Object entity, ColumnType columnType) {
+    public void update(Object entity, ColumnType columnType) {
         final String updateSql = UpdateStatementBuilder.builder()
             .update(entity, columnType)
             .equalById()
             .build();
-        return jdbcTemplate.executeUpdate(updateSql);
+
+        jdbcTemplate.executeUpdate(updateSql);
     }
 
     @Override
     public void delete(Object entity, ColumnType columnType) {
-        final EntityClassMappingMeta classMappingMeta = EntityClassMappingMeta.of(entity.getClass(), columnType);
-        final EntityObjectMappingMeta objectMappingMeta = EntityObjectMappingMeta.of(entity, classMappingMeta);
+        final EntityObjectMappingMeta objectMappingMeta = EntityObjectMappingMeta.of(entity, columnType);
 
         final String deleteSql = DeleteStatementBuilder.builder()
             .delete(entity.getClass(), columnType)

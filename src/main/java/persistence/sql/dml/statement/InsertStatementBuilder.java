@@ -10,6 +10,7 @@ import persistence.sql.schema.EntityObjectMappingMeta;
 public class InsertStatementBuilder {
 
     private static final String INSERT_FORMAT = "INSERT INTO %s (%s) values (%s)";
+    private static final String INSERT_RETURNING_FORMAT = "SELECT * FROM FINAL TABLE (%s)";
 
     private final ColumnType columnType;
 
@@ -18,14 +19,25 @@ public class InsertStatementBuilder {
     }
 
     public String insert(Object object) {
-        final EntityClassMappingMeta entityClassMappingMeta = EntityClassMappingMeta.of(object.getClass(), columnType);
-        final EntityObjectMappingMeta entityObjectMappingMeta = EntityObjectMappingMeta.of(object, entityClassMappingMeta);
+        final EntityObjectMappingMeta entityObjectMappingMeta = EntityObjectMappingMeta.of(object, columnType);
 
         return String.format(INSERT_FORMAT,
-            entityClassMappingMeta.tableClause(),
+            entityObjectMappingMeta.tableClause(),
             columnClause(entityObjectMappingMeta),
             valueClause(entityObjectMappingMeta)
         );
+    }
+
+    public String insertReturning(Object object) {
+        final EntityObjectMappingMeta entityObjectMappingMeta = EntityObjectMappingMeta.of(object, columnType);
+
+        final String insertSql = String.format(INSERT_FORMAT,
+            entityObjectMappingMeta.tableClause(),
+            columnClause(entityObjectMappingMeta),
+            valueClause(entityObjectMappingMeta)
+        );
+
+        return String.format(INSERT_RETURNING_FORMAT, insertSql);
     }
 
     private String columnClause(EntityObjectMappingMeta entityObjectMappingMeta) {

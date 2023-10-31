@@ -32,14 +32,9 @@ public class UpdateStatementBuilder {
             throw new PreconditionRequiredException("update() method must be called only once");
         }
 
-        EntityClassMappingMeta entityClassMappingMeta = EntityClassMappingMeta.of(entity.getClass(), columnType);
-        entityObjectMappingMeta = EntityObjectMappingMeta.of(entity, entityClassMappingMeta);
+        entityObjectMappingMeta = EntityObjectMappingMeta.of(entity, columnType);
 
-        if (entityObjectMappingMeta.getIdValue() == null) {
-            throw new PreconditionRequiredException("entity must be saved to update");
-        }
-
-        updateStatementBuilder.append(String.format(UPDATE_FORMAT, entityClassMappingMeta.tableClause(), formatColumnWithUpdatedValue(entityObjectMappingMeta)));
+        updateStatementBuilder.append(String.format(UPDATE_FORMAT, entityObjectMappingMeta.tableClause(), formatColumnWithUpdatedValue(entityObjectMappingMeta)));
         return this;
     }
 
