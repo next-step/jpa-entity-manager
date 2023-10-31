@@ -10,7 +10,7 @@ public interface PersistenceContext {
 
     void removeEntity(Integer id);
 
-    boolean isValidEntity(Integer id);
+    boolean isEntityInContext(Integer id);
 
     <T, I> void getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input);
 

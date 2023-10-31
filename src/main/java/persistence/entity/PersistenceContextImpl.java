@@ -17,7 +17,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public Object getEntity(Integer id) {
-        if (isValidEntity(id)) {
+        if (isEntityInContext(id)) {
             return contextMap.get(id).getObject();
         }
         return null;
@@ -30,14 +30,13 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void removeEntity(Integer key) {
-        if (!isValidEntity(key)) {
+        if (!isEntityInContext(key)) {
             throw new InvalidContextException();
         }
         contextMap.remove(key);
     }
 
-    @Override
-    public boolean isValidEntity(Integer id) {
+    public boolean isEntityInContext(Integer id) {
         return contextMap.containsKey(id);
     }
 
@@ -53,11 +52,11 @@ public class PersistenceContextImpl implements PersistenceContext {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
         snapshotMap.forEach((id, snapshot) -> {
-            if (isValidEntity(id) && snapshot.getValues().equals(contextMap.get(id).getValues())) {
+            if (isEntityInContext(id) && snapshot.getValues().equals(contextMap.get(id).getValues())) {
                 return;
             }
 
-            if (isValidEntity(id)) {
+            if (isEntityInContext(id)) {
                 result.put(id, contextMap.get(id));
             }
 

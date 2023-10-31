@@ -22,7 +22,7 @@ public class EntityManagerImpl implements EntityManager {
         final EntityPersister<?> persister = getPersister(rClass);
         int key = persister.getHashCode(input);
 
-        if(!persistenceContext.isValidEntity(key)) {
+        if(!persistenceContext.isEntityInContext(key)) {
             persistenceContext.addEntity(key, input, persister.findById(input));
         }
 
@@ -37,7 +37,7 @@ public class EntityManagerImpl implements EntityManager {
         Object id = persister.getIdValue(t);
         int key = persister.getHashCode(id);
 
-        if(persistenceContext.isValidEntity(key)) {
+        if(persistenceContext.isEntityInContext(key)) {
             throw new IllegalArgumentException();
         }
 
@@ -68,7 +68,7 @@ public class EntityManagerImpl implements EntityManager {
 
     public void flush() {
         persistenceContext.comparison().forEach((id, data) -> {
-            if(!persistenceContext.isValidEntity(id)) {
+            if(!persistenceContext.isEntityInContext(id)) {
                 getPersister(data.getObjectClass()).delete(data.getId());
                 return;
             }
