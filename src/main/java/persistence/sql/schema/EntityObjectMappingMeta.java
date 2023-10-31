@@ -37,7 +37,7 @@ public class EntityObjectMappingMeta {
             valueMap.put(entityClassMappingMeta.getColumnMeta(field), getFieldValueAsObject(field, instance))
         );
 
-        final EntityIdentifier entityIdentifier = initEntityIdentifier(valueMap.entrySet().stream().toList());
+        final EntityIdentifier entityIdentifier = initEntityIdentifier(new ArrayList<>(valueMap.entrySet()));
 
         return new EntityObjectMappingMeta(entityClassMappingMeta, entityIdentifier, valueMap);
     }
