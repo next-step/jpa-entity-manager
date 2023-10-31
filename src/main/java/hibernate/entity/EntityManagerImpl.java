@@ -1,5 +1,6 @@
 package hibernate.entity;
 
+import hibernate.EntityEntry;
 import hibernate.entity.meta.EntityClass;
 import hibernate.entity.meta.column.EntityColumn;
 import hibernate.entity.persistencecontext.EntityKey;
@@ -7,6 +8,8 @@ import hibernate.entity.persistencecontext.EntitySnapshot;
 import hibernate.entity.persistencecontext.PersistenceContext;
 
 import java.util.Map;
+
+import static hibernate.Status.*;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -26,38 +29,36 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
-        Object persistenceContextEntity = persistenceContext.getEntity(new EntityKey(id, clazz));
+        EntityKey entityKey = new EntityKey(id, clazz);
+        Object persistenceContextEntity = persistenceContext.getEntity(entityKey);
         if (persistenceContextEntity != null) {
             return (T) persistenceContextEntity;
         }
 
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
-        persistNewEntity(loadEntity, id);
+        persistenceContext.addEntity(id, loadEntity, LOADING);
         return loadEntity;
-    }
-
-    private void persistNewEntity(final Object entity, final Object entityId) {
-        persistenceContext.addEntity(entityId, entity);
-        persistenceContext.getDatabaseSnapshot(entityId, entity);
     }
 
     @Override
     public void persist(final Object entity) {
         EntityColumn entityId = EntityClass.getInstance(entity.getClass())
                 .getEntityId();
-        validateAlreadyPersist(entity, entityId);
-
-        Object generatedId = entityPersister.insert(entity);
-        entityId.assignFieldValue(entity, generatedId);
-        persistNewEntity(entity, generatedId);
-    }
-
-    private void validateAlreadyPersist(final Object entity, final EntityColumn entityId) {
         Object id = entityId.getFieldValue(entity);
+        if (id == null) {
+            persistenceContext.addEntityEntry(entity, SAVING);
+            Object generatedId = entityPersister.insert(entity);
+            entityId.assignFieldValue(entity, generatedId);
+            persistenceContext.addEntity(generatedId, entity);
+            return;
+        }
+
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
+        persistenceContext.addEntity(id, entity, SAVING);
+        entityPersister.insert(entity);
     }
 
     @Override
@@ -68,8 +69,8 @@ public class EntityManagerImpl implements EntityManager {
         if (changedColumns.isEmpty()) {
             return;
         }
+        persistenceContext.addEntity(entityId, entity);
         entityPersister.update(entityClass, entityId, changedColumns);
-        persistNewEntity(entity, entityId);
     }
 
     private Object getNotNullEntityId(final EntityClass<?> entityClass, final Object entity) {
@@ -83,17 +84,18 @@ public class EntityManagerImpl implements EntityManager {
 
     private EntitySnapshot getSnapshot(final Object entity, final Object entityId) {
         EntityKey entityKey = new EntityKey(entityId, entity.getClass());
-        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(entityKey);
+        EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(entityKey);
         if (snapshot == null) {
             find(entity.getClass(), entityId);
-            return persistenceContext.getCachedDatabaseSnapshot(entityKey);
+            return persistenceContext.getDatabaseSnapshot(entityKey);
         }
         return snapshot;
     }
 
     @Override
     public void remove(final Object entity) {
-        persistenceContext.removeEntity(entity);
+        persistenceContext.addEntityEntry(entity, DELETED);
         entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 }
