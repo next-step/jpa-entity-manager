@@ -39,6 +39,14 @@ public class SelectPerson {
     public SelectPerson() {
     }
 
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeIndex(Integer index) {
+        this.index = index;
+    }
+
     public Long getId() {
         return id;
     }

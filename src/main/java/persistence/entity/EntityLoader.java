@@ -1,14 +1,14 @@
 package persistence.entity;
 
+import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
-import persistence.sql.dml.Query;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-
-import java.util.List;
+import persistence.sql.dml.Query;
 
 public class EntityLoader<T> {
+
     private final Query query;
     private final JdbcTemplate jdbcTemplate;
     private final ResultMapper<T> resultMapper;

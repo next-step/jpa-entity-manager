@@ -1,6 +1,7 @@
 package persistence.sql.common.instance;
 
 import jakarta.persistence.Transient;
+import java.util.Objects;
 import utils.StringUtils;
 
 import java.lang.reflect.Field;
@@ -48,5 +49,22 @@ public class Value {
 
     public boolean isEquals(String fieldName) {
         return this.fieldName.equals(fieldName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Value value1 = (Value) o;
+        return Objects.equals(fieldName, value1.fieldName) && Objects.equals(value, value1.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldName, value);
     }
 }
