@@ -25,8 +25,7 @@ class EntityObjectMappingMetaTest {
     void canReadObjectMappingMetaFieldAndValue() {
         ObjectMappingTestFixture objectMappingTestFixture = new ObjectMappingTestFixture("james", "james@gmail.com");
 
-        final EntityClassMappingMeta classMappingMeta = EntityClassMappingMeta.of(objectMappingTestFixture.getClass(), columnType);
-        final EntityObjectMappingMeta objectMappingMeta = EntityObjectMappingMeta.of(objectMappingTestFixture, classMappingMeta);
+        final EntityObjectMappingMeta objectMappingMeta = EntityObjectMappingMeta.of(objectMappingTestFixture, columnType);
 
         final Map<String, Object> valueMapByColumnName = objectMappingMeta.getValueMapByColumnName();
 
