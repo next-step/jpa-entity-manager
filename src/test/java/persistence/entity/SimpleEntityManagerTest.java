@@ -1,9 +1,11 @@
 package persistence.entity;
 
-import domain.Person;
+import domain.FixtureEntity.Person;
+import jdbc.RowMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.Application;
 import persistence.IntegrationTestEnvironment;
 import persistence.exception.PersistenceException;
 
@@ -19,9 +21,8 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
 
     @BeforeEach
     void setUp() {
-        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
-        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
-        entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
+        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(new EntityScanner(Application.class), persistenceEnvironment);
+        entityManager = entityManagerFactory.createEntityManager();
     }
 
     @Test
@@ -140,4 +141,7 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
         });
     }
 
+    private RowMapper<Person> personRowMapper() {
+        return rs -> new Person(rs.getLong("id"), rs.getString("nick_name"), rs.getInt("old"), rs.getString("email"));
+    }
 }

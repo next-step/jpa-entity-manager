@@ -112,3 +112,14 @@ public class CustomJpaRepository<T, ID> {
 
 - [x] 엔티티 save 가 일어날때마다 엔티티가 변경되었는지 검사한다.
 - [x] 변경이 감지되면 update 한다.
+
+### 4단계 - EntityEntry
+`EntityEntry 클래스는 엔터티의 영속성 상태와 상태 변화, 생명주기와 변경감지에 중요한 역할`
+- 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자
+```java
+entityEntry.updateStatus(Status status);
+```
+
+- [x] 객체를 insert 할 시 Saving (?), insert 완료시 Managed 상태가 된다.
+- [x] 객체를 select 할 시 Loading, select 완료시 Managed 상태가 된다.
+- [x] 객체를 delete 할 시 Deleted 상태가 된다.

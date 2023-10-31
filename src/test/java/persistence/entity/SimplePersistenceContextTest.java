@@ -22,6 +22,7 @@ class SimplePersistenceContextTest {
         entityKeyGenerator = new EntityKeyGenerator();
         personEntityKey = entityKeyGenerator.generate(Person.class, 1L);
         person = FixturePerson.create(1L);
+        persistenceContext.addEntityEntry(person, Status.LOADING);
     }
 
     @Test
@@ -77,41 +78,33 @@ class SimplePersistenceContextTest {
     }
 
     @Test
-    @DisplayName("같은 key로 getCachedDatabaseSnapshot 를 통해 조회한 Entity 는 항상 동일한 객체이다.")
-    void getCachedDatabaseSnapshotTest() {
-        persistenceContext.getDatabaseSnapshot(personEntityKey, person);
-
-        final Object entity = persistenceContext.getCachedDatabaseSnapshot(personEntityKey);
-        final Object entity2 = persistenceContext.getCachedDatabaseSnapshot(personEntityKey);
-
-        assertSoftly(softly -> {
-            softly.assertThat(entity).isNotNull();
-            softly.assertThat(entity2).isNotNull();
-            softly.assertThat(entity == entity2).isTrue();
-        });
-    }
-
-    @Test
-    @DisplayName("같은 key로 getEntity 와 getCachedDatabaseSnapshot 과 를 통해 조회하면 서로 다른 객체이다.")
-    void getCachedDatabaseSnapshotDifferentFromGetEntityTest() {
-        persistenceContext.addEntity(personEntityKey, person);
-        persistenceContext.getDatabaseSnapshot(personEntityKey, person);
-
-        final Object entity = persistenceContext.getEntity(personEntityKey).orElse(null);
-        final Object entity2 = persistenceContext.getCachedDatabaseSnapshot(personEntityKey);
-
-        assertSoftly(softly -> {
-            softly.assertThat(entity).isNotNull();
-            softly.assertThat(entity2).isNotNull();
-            softly.assertThat(entity == entity2).isFalse();
-        });
-    }
-
-    @Test
     @DisplayName("hasEntity 를 통해 Entity가 context 에 존재하는지 여부를 반환받을 수 있다.")
     void hasEntityTest() {
         persistenceContext.addEntity(personEntityKey, person);
 
         assertThat(persistenceContext.hasEntity(personEntityKey)).isTrue();
     }
+
+    @Test
+    @DisplayName("addEntityEntry 를 통해 EntityEntry 를 추가한 뒤 조회할 수 있다.")
+    void addEntityEntryTest() {
+        persistenceContext.addEntityEntry(personEntityKey, Status.LOADING);
+
+        assertThat(persistenceContext.getEntityEntry(personEntityKey)).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("updateEntityEntryStatus 를 통해 EntityEntry 의 상태를 변경할 수 있다.")
+    void updateEntityEntryStatusTest() {
+        persistenceContext.addEntityEntry(personEntityKey, Status.LOADING);
+
+        persistenceContext.updateEntityEntryStatus(personEntityKey, Status.MANAGED);
+
+        assertSoftly(softly -> {
+            softly.assertThat(persistenceContext.getEntityEntry(personEntityKey)).isNotEmpty();
+            final EntityEntry entityEntry = persistenceContext.getEntityEntry(personEntityKey).get();
+            softly.assertThat(entityEntry.getStatus()).isEqualTo(Status.MANAGED);
+        });
+    }
+
 }

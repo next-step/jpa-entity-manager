@@ -1,29 +1,28 @@
 package persistence.entity;
 
-import persistence.util.ReflectionUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class SimplePersistenceContext implements PersistenceContext {
 
-    private final Map<EntityKey, Object> entities;
-    private final Map<EntityKey, Object> entitySnapshots;
+    private final EntityCache entities;
+    private final EntitySnapshots entitySnapshots;
+    private final EntityEntries entityEntries;
 
     public SimplePersistenceContext() {
-        this.entities = new HashMap<>();
-        this.entitySnapshots = new HashMap<>();
+        this.entities = new EntityCache();
+        this.entitySnapshots = new EntitySnapshots();
+        this.entityEntries = new EntityEntries();
     }
 
     @Override
     public Optional<Object> getEntity(final EntityKey key) {
-        return Optional.ofNullable(entities.get(key));
+        return entities.get(key);
     }
 
     @Override
     public void addEntity(final EntityKey key, final Object entity) {
-        entities.put(key, entity);
+        entities.add(key, entity);
+        updateEntityEntryStatus(entity, Status.MANAGED);
     }
 
     @Override
@@ -38,13 +37,21 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public Object getDatabaseSnapshot(final EntityKey key, final Object entity) {
-        return entitySnapshots.computeIfAbsent(key, entityKey -> ReflectionUtils.shallowCopy(entity));
+        return entitySnapshots.getDatabaseSnapshot(key, entity);
     }
 
     @Override
-    public Object getCachedDatabaseSnapshot(final EntityKey key) {
-        return entitySnapshots.get(key);
+    public void addEntityEntry(final Object entity, final Status status) {
+        entityEntries.addEntityEntry(entity, status);
     }
 
+    @Override
+    public Optional<EntityEntry> getEntityEntry(final Object entity) {
+        return entityEntries.getEntityEntry(entity);
+    }
 
+    @Override
+    public void updateEntityEntryStatus(final Object entity, final Status status) {
+        entityEntries.updateEntityEntryStatus(entity, status);
+    }
 }

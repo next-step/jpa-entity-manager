@@ -62,7 +62,11 @@ public class SimpleEntityManager implements EntityManager {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
 
-        persistenceContext.removeEntity(entityKeyGenerator.generate(entity.getClass(), idValue));
+        final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
+        persistenceContext.removeEntity(entityKey);
+
+        persistenceContext.updateEntityEntryStatus(entity, Status.DELETED);
+
         entityPersister.delete(entity);
     }
 
@@ -71,9 +75,12 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private <T> Object initEntity(final EntityKey entityKey, final EntityLoader<T> entityLoader) {
-        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey()).orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
+        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey())
+                .orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
+        persistenceContext.addEntityEntry(entityFromDatabase, Status.LOADING);
         persistenceContext.addEntity(entityKey, entityFromDatabase);
         persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
+
         return entityFromDatabase;
     }
 
@@ -85,33 +92,47 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private void processInsert(final Object entity, final EntityPersister entityPersister) {
+        persistenceContext.addEntityEntry(entity, Status.SAVING);
+
         entityPersister.insert(entity);
+
         final Object idValue = extractId(entity, entityPersister);
-        persistenceContext.addEntity(entityKeyGenerator.generate(entity.getClass(), idValue), entity);
+        final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
+        persistenceContext.addEntity(entityKey, entity);
     }
 
     private void processUpdate(final Object entity, final EntityPersister entityPersister) {
         final Object idValue = extractId(entity, entityPersister);
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
 
+        Object foundEntity = null;
         if (!persistenceContext.hasEntity(entityKey)) {
-            find(entity.getClass(), idValue);
+            foundEntity = find(entity.getClass(), idValue);
         }
 
         if (isDirty(entity)) {
+            updateEntityEntry(foundEntity, entity);
             entityPersister.update(entity);
             persistenceContext.addEntity(entityKey, entity);
+        }
+    }
+
+    private void updateEntityEntry(final Object foundEntity, final Object entity) {
+        if(Objects.nonNull(foundEntity)) {
+            persistenceContext.updateEntityEntryStatus(foundEntity, Status.GONE);
+            persistenceContext.addEntityEntry(entity, Status.SAVING);
         }
     }
 
     private boolean isDirty(final Object entity) {
         final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
-        final Object cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(entityKeyGenerator.generate(entity.getClass(), idValue));
+        final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
+        final Object databaseSnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
 
         return entityPersister.getColumnFieldNames()
                 .stream()
-                .anyMatch(columnName -> hasDifferentValue(entity, cachedDatabaseSnapshot, columnName));
+                .anyMatch(columnName -> hasDifferentValue(entity, databaseSnapshot, columnName));
     }
 
     private boolean hasDifferentValue(final Object entity, final Object cachedDatabaseSnapshot, final String columnName) {

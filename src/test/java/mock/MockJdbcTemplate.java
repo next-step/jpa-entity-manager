@@ -2,11 +2,9 @@ package mock;
 
 import jdbc.JdbcTemplate;
 
-import java.sql.SQLException;
-
 public class MockJdbcTemplate extends JdbcTemplate {
 
-    public MockJdbcTemplate() throws SQLException {
+    public MockJdbcTemplate(){
         super(new MockDatabaseServer().getConnection());
     }
 }

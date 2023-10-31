@@ -126,5 +126,39 @@ public class FixtureEntity {
         @Transient
         private Integer index;
 
+        protected Person() {
+        }
+
+        public Person(final Long id, final String name, final Integer age, final String email) {
+            this.id = id;
+            this.name = name;
+            this.age = age;
+            this.email = email;
+        }
+
+        public Person(final String name, final Integer age, final String email) {
+            this(null, name, age, email);
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Integer getAge() {
+            return age;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void changeEmail(final String email) {
+            this.email = email;
+        }
+
     }
 }

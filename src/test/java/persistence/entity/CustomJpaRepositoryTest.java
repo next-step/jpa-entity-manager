@@ -1,9 +1,11 @@
 package persistence.entity;
 
-import domain.Person;
+import domain.FixtureEntity.Person;
+import jdbc.RowMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.Application;
 import persistence.IntegrationTestEnvironment;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -14,9 +16,8 @@ class CustomJpaRepositoryTest extends IntegrationTestEnvironment {
 
     @BeforeEach
     void setup() {
-        final EntityPersisterProvider entityPersisterProvider = new EntityPersisterProvider(dmlGenerator, jdbcTemplate);
-        final EntityLoaderProvider entityLoaderProvider = new EntityLoaderProvider(dmlGenerator, jdbcTemplate);
-        final EntityManager entityManager = new SimpleEntityManager(entityPersisterProvider, entityLoaderProvider);
+        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(new EntityScanner(Application.class), persistenceEnvironment);
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
         customJpaRepository = new CustomJpaRepository<>(entityManager, Person.class);
     }
 
@@ -61,5 +62,9 @@ class CustomJpaRepositoryTest extends IntegrationTestEnvironment {
             softly.assertThat(fixture.getAge()).isEqualTo(testV2.getAge());
             softly.assertThat(fixture.getEmail()).isEqualTo(testV2.getEmail());
         });
+    }
+
+    private RowMapper<Person> personRowMapper() {
+        return rs -> new Person(rs.getLong("id"), rs.getString("nick_name"), rs.getInt("old"), rs.getString("email"));
     }
 }
