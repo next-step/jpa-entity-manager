@@ -9,7 +9,7 @@ public interface PersistenceContext {
 
     void addEntity(Object id, Object entity);
 
-    EntityEntry addEntity(Object id, Object entity, Status status);
+    void addEntity(Object id, Object entity, Status status);
 
     void addEntityEntry(Object entity, Status status);
 

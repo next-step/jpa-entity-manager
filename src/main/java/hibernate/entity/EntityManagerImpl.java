@@ -35,10 +35,9 @@ public class EntityManagerImpl implements EntityManager {
             return (T) persistenceContextEntity;
         }
 
-        EntityEntry entityEntry = new EntityEntry(LOADING);
         EntityClass<T> entityClass = EntityClass.getInstance(clazz);
         T loadEntity = entityLoader.find(entityClass, id);
-        persistenceContext.addEntity(id, loadEntity);
+        persistenceContext.addEntity(id, loadEntity, LOADING);
         return loadEntity;
     }
 
@@ -58,9 +57,8 @@ public class EntityManagerImpl implements EntityManager {
         if (persistenceContext.getEntity(new EntityKey(id, entity)) != null) {
             throw new IllegalStateException("이미 영속화되어있는 entity입니다.");
         }
-        EntityEntry entityEntry = persistenceContext.addEntity(id, entity, SAVING);
+        persistenceContext.addEntity(id, entity, SAVING);
         entityPersister.insert(entity);
-        entityEntry.updateStatus(MANAGED);
     }
 
     @Override
@@ -71,8 +69,8 @@ public class EntityManagerImpl implements EntityManager {
         if (changedColumns.isEmpty()) {
             return;
         }
-        entityPersister.update(entityClass, entityId, changedColumns);
         persistenceContext.addEntity(entityId, entity);
+        entityPersister.update(entityClass, entityId, changedColumns);
     }
 
     private Object getNotNullEntityId(final EntityClass<?> entityClass, final Object entity) {

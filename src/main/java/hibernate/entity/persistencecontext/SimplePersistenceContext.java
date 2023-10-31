@@ -38,13 +38,11 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public EntityEntry addEntity(Object id, Object entity, Status status) {
+    public void addEntity(Object id, Object entity, Status status) {
+        entityEntryContext.addEntityEntry(entity, new EntityEntry(status));
         entities.put(new EntityKey(id, entity.getClass()), entity);
-        EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
-        snapshotEntities.put(new EntityKey(id, entity.getClass()), entitySnapshot);
-        EntityEntry entityEntry = new EntityEntry(status);
-        entityEntryContext.addEntityEntry(entity, entityEntry);
-        return entityEntry;
+        snapshotEntities.put(new EntityKey(id, entity.getClass()), new EntitySnapshot(entity));
+        entityEntryContext.addEntityEntry(entity, new EntityEntry(Status.MANAGED));
     }
 
     @Override
