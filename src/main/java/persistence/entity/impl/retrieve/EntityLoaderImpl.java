@@ -2,7 +2,7 @@ package persistence.entity.impl.retrieve;
 
 import java.sql.Connection;
 import jdbc.JdbcTemplate;
-import persistence.entity.EntityRowMapper;
+import persistence.entity.impl.EntityRowMapper;
 import persistence.sql.dialect.ColumnType;
 import persistence.sql.dml.clause.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;

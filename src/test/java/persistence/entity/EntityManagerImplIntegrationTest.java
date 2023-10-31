@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import database.DatabaseServer;
 import database.H2;
+import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.impl.EntityManagerImpl;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
 import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.ddl.generator.fixture.PersonV3;
@@ -26,6 +28,8 @@ class EntityManagerImplIntegrationTest {
 
     private Database jdbcTemplate;
 
+    private Connection connection;
+
     private EntityManager entityManager;
 
     @BeforeEach
@@ -33,7 +37,9 @@ class EntityManagerImplIntegrationTest {
         server = new H2();
         server.start();
 
-        entityManager = new EntityManagerImpl(server.getConnection(), new H2ColumnType());
+        connection = server.getConnection();
+
+        entityManager = new EntityManagerImpl(connection, new H2ColumnType());
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(new H2ColumnType());
@@ -41,9 +47,10 @@ class EntityManagerImplIntegrationTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         DropDDLQueryGenerator dropDDLQueryGenerator = new DropDDLQueryGenerator(new H2ColumnType());
         jdbcTemplate.execute(dropDDLQueryGenerator.drop(PersonV3.class));
+        entityManager.close();
         server.stop();
     }
 

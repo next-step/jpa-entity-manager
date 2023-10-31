@@ -23,8 +23,11 @@ public class EntityClassMappingMeta {
 
     private final Map<Field, ColumnMeta> columnMetaMap = new LinkedHashMap<>();
 
-    private EntityClassMappingMeta(TableMeta tableMeta, Map<Field, ColumnMeta> columnMetaMap) {
+    private final ColumnType columnType;
+
+    private EntityClassMappingMeta(TableMeta tableMeta, Map<Field, ColumnMeta> columnMetaMap, ColumnType columnType) {
         this.tableMeta = tableMeta;
+        this.columnType = columnType;
         this.columnMetaMap.putAll(columnMetaMap);
     }
 
@@ -32,7 +35,7 @@ public class EntityClassMappingMeta {
         validateEntityAnnotationIsPresent(entityClazz);
         validateHasIdAnnotation(entityClazz);
 
-        return new EntityClassMappingMeta(TableMeta.of(entityClazz), getColumnMetasFromEntity(entityClazz, columnType));
+        return new EntityClassMappingMeta(TableMeta.of(entityClazz), getColumnMetasFromEntity(entityClazz, columnType), columnType);
     }
 
     public String tableClause() {
@@ -59,6 +62,14 @@ public class EntityClassMappingMeta {
 
     public ColumnMeta getColumnMeta(Field field) {
         return columnMetaMap.get(field);
+    }
+
+    public ColumnMeta getIdColumnMeta() {
+        return columnMetaMap.entrySet().stream()
+            .filter(entry -> PrimaryKeyConstraint.isPrimaryKey(entry.getKey()))
+            .map(Entry::getValue)
+            .findAny()
+            .orElseThrow(() -> new RequiredAnnotationException("@Id annotation is required in entity"));
     }
 
     public String getMappingColumnName(Field field) {

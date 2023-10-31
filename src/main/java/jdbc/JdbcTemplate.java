@@ -23,9 +23,21 @@ public class JdbcTemplate {
         }
     }
 
-    public boolean executeUpdate(final String sql) {
+    public <T> T executeReturning(final String sql, final RowMapper<T> rowMapper) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            if (!resultSet.next()) {
+                throw new SQLException();
+            }
+
+            return rowMapper.mapRow(resultSet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void executeUpdate(final String sql) {
         try (final Statement statement = connection.createStatement()) {
-            return statement.execute(sql);
+            statement.execute(sql);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

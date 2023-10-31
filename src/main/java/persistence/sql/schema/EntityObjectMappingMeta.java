@@ -7,27 +7,39 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import persistence.entity.impl.EntityIdentifier;
+import persistence.sql.dialect.ColumnType;
+import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.exception.AccessRequiredException;
 import persistence.sql.exception.ColumnNotFoundException;
 
 public class EntityObjectMappingMeta {
 
-    private final EntityClassMappingMeta entityClassMappingMeta;
     private final Map<ColumnMeta, ValueMeta> objectValueMap = new LinkedHashMap<>();
+    private final EntityClassMappingMeta entityClassMappingMeta;
+    private final EntityIdentifier entityIdentifier;
 
-    private EntityObjectMappingMeta(Map<ColumnMeta, ValueMeta> valueMap, EntityClassMappingMeta entityClassMappingMeta) {
+    private EntityObjectMappingMeta(
+        EntityClassMappingMeta entityClassMappingMeta, EntityIdentifier entityIdentifier, Map<ColumnMeta, ValueMeta> valueMap
+    ) {
         this.entityClassMappingMeta = entityClassMappingMeta;
+        this.entityIdentifier = entityIdentifier;
         this.objectValueMap.putAll(valueMap);
     }
 
-    public static EntityObjectMappingMeta of(Object instance, EntityClassMappingMeta entityClassMappingMeta) {
+    public static EntityObjectMappingMeta of(Object instance, ColumnType columnType) {
         final Map<ColumnMeta, ValueMeta> valueMap = new LinkedHashMap<>();
+
+        final EntityClassMappingMeta entityClassMappingMeta = EntityClassMappingMeta.of(instance.getClass(), columnType);
 
         entityClassMappingMeta.getMappingFieldList().forEach(field ->
             valueMap.put(entityClassMappingMeta.getColumnMeta(field), getFieldValueAsObject(field, instance))
         );
 
-        return new EntityObjectMappingMeta(valueMap, entityClassMappingMeta);
+        final EntityIdentifier entityIdentifier = initEntityIdentifier(new ArrayList<>(valueMap.entrySet()));
+
+        return new EntityObjectMappingMeta(entityClassMappingMeta, entityIdentifier, valueMap);
     }
 
     public List<ColumnMeta> getColumnMetaList() {
@@ -66,6 +78,12 @@ public class EntityObjectMappingMeta {
         return idValueMeta.getValue();
     }
 
+    public static <T> boolean isNew(T t) {
+        final EntityObjectMappingMeta objectMappingMeta = EntityObjectMappingMeta.of(t, new H2ColumnType());
+
+        return objectMappingMeta.getIdValue() == null;
+    }
+
     private static ValueMeta getFieldValueAsObject(Field field, Object object) {
         field.setAccessible(true);
         try {
@@ -73,5 +91,29 @@ public class EntityObjectMappingMeta {
         } catch (IllegalAccessException e) {
             throw new AccessRequiredException(e);
         }
+    }
+
+    private static EntityIdentifier initEntityIdentifier(
+        List<Map.Entry<ColumnMeta, ValueMeta>> valueMapEntry
+    ) {
+        return valueMapEntry.stream()
+            .filter(entry -> entry.getKey().isPrimaryKey())
+            .map(entry -> EntityIdentifier.fromIdColumnMetaWithValueMeta(entry.getKey(), entry.getValue()))
+            .findAny()
+            .orElseThrow(() -> new ColumnNotFoundException("Id Column not found"));
+    }
+
+    public EntityIdentifier getEntityIdentifier() {
+        return entityIdentifier;
+    }
+
+    public Object tableClause() {
+        return entityClassMappingMeta.tableClause();
+    }
+
+    public List<Map.Entry<ColumnMeta, ValueMeta>> getDifferMetaEntryList(EntityObjectMappingMeta objectMappingMeta) {
+        return objectValueMap.entrySet().stream()
+            .filter(entry -> !objectMappingMeta.getMetaEntryList().contains(entry))
+            .collect(Collectors.toList());
     }
 }
