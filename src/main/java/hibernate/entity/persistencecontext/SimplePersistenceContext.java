@@ -61,10 +61,9 @@ public class SimplePersistenceContext implements PersistenceContext {
                 .map(Map.Entry::getKey)
                 .orElseThrow(() -> new IllegalStateException("영속화되어있지 않은 entity입니다."));
         EntityEntry entityEntry = entityEntryContext.getEntityEntry(entity);
-        entityEntry.updateStatus(Status.DELETED);
+        entityEntry.updateStatus(Status.GONE);
         entities.remove(entityKey);
         snapshotEntities.remove(entityKey);
-        entityEntry.updateStatus(Status.GONE);
     }
 
     @Override

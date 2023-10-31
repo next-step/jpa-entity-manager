@@ -96,7 +96,8 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(final Object entity) {
-        persistenceContext.removeEntity(entity);
+        persistenceContext.addEntityEntry(entity, DELETED);
         entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 }
