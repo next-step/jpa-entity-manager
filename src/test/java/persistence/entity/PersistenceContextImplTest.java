@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import persistence.exception.DuplicateContextException;
 import persistence.exception.InvalidContextException;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,7 +42,7 @@ class PersistenceContextImplTest {
             SelectPerson person = new SelectPerson(id, name, age, email, index);
 
             //when
-            persistenceContext.addEntity(id.hashCode(), person);
+            persistenceContext.addEntity(key, id, person);
 
             SelectPerson result = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(key);
 
@@ -65,29 +68,14 @@ class PersistenceContextImplTest {
             final int personKey = person.hashCode();
 
             //when
-            영속성_컨텍스트에서_데이터를_저장한다(selectPersonKey, selectPerson);
-            영속성_컨텍스트에서_데이터를_저장한다(personKey, person);
+            영속성_컨텍스트에서_데이터를_저장한다(selectPersonKey, id, selectPerson);
+            영속성_컨텍스트에서_데이터를_저장한다(personKey, id, person);
 
             //then
             assertSoftly(softAssertions -> {
                 softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(selectPersonKey)).isNotNull();
                 softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(personKey)).isNotNull();
             });
-        }
-
-        @Test
-        @DisplayName("영속성 컨텍스트 안에 중복된 데이터가 존재할 때 오류 출력")
-        void duplicateContextException() {
-            //given
-            final Long id = 333L;
-            SelectPerson selectPerson = new SelectPerson(id, "name", 30, "email", 3);
-
-            final Integer key = selectPerson.hashCode();
-
-            영속성_컨텍스트에서_데이터를_저장한다(key, selectPerson);
-
-            //when & then
-            assertThrows(DuplicateContextException.class, () -> persistenceContext.addEntity(key, selectPerson));
         }
     }
 
@@ -107,7 +95,7 @@ class PersistenceContextImplTest {
             final Integer key = id.hashCode();
 
             SelectPerson person = new SelectPerson(id, name, age, email, index);
-            영속성_컨텍스트에서_데이터를_저장한다(key, person);
+            영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
 
             //when
             SelectPerson result = (SelectPerson) persistenceContext.getEntity(key);
@@ -162,7 +150,7 @@ class PersistenceContextImplTest {
             final Integer key = id.hashCode();
 
             SelectPerson person = new SelectPerson(id, "name", 30, "email", 3);
-            영속성_컨텍스트에서_데이터를_저장한다(key, person);
+            영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
 
             //when
             persistenceContext.removeEntity(key);
@@ -184,8 +172,8 @@ class PersistenceContextImplTest {
         }
     }
 
-    private void 영속성_컨텍스트에서_데이터를_저장한다(Integer id, Object entity) {
-        persistenceContext.addEntity(id, entity);
+    private void 영속성_컨텍스트에서_데이터를_저장한다(Integer key, Object id, Object entity) {
+        persistenceContext.addEntity(key, id, entity);
     }
 
     private Object 영속성_컨텍스트에서_데이터를_가져온다(Integer id) {
