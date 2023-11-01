@@ -53,4 +53,11 @@ public class Columns {
                 .map(x -> x.getName() + " = " + x.getValue())
                 .findFirst().get();
     }
+
+    public Column getPrimaryKey() {
+        return columns.stream()
+                .filter(Column::isPrimaryKey)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+    }
 }

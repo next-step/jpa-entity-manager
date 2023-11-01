@@ -13,17 +13,21 @@ public class EntityMetadata {
 
     private final Columns columns;
 
+    private final Column primaryKey;
+
     public EntityMetadata(Object entity) {
         if (!entity.getClass().isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("Entity 클래스가 아닙니다.");
         }
         this.table = new Table(entity.getClass());
         this.columns = new Columns(convertEntityToColumnList(entity));
+        this.primaryKey = columns.getPrimaryKey();
     }
 
     public EntityMetadata(Table table, Columns columns) {
         this.table = table;
         this.columns = columns;
+        this.primaryKey = columns.getPrimaryKey();
     }
 
     private List<Column> convertEntityToColumnList(Object entity) {
@@ -48,6 +52,10 @@ public class EntityMetadata {
 
     public String getTableName() {
         return table.getName();
+    }
+
+    public Long getPKValue() {
+        return Long.parseLong(primaryKey.getValue());
     }
 
     public String getColumnsToCreate(Dialect dialect) {
