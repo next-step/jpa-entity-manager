@@ -44,10 +44,16 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public void addEntity(Object entity) {
-        entityPersister.insert(entity);
         EntityKey entityKey = EntityKey.from(entity);
-        entityInstanceMap.put(entityKey, entity);
+        if (Objects.isNull(entityInstanceMap.get(entityKey))) {
+            entityPersister.insert(entity);
+            entityKey = EntityKey.from(entity);
+        }
+        if (Objects.nonNull(entityInstanceMap.get(entityKey))) {
+            entityPersister.update(entity);
+        }
         entitySnapShotMap.put(entityKey, ObjectUtils.copy(entity));
+        entityInstanceMap.put(entityKey, entity);
     }
 
     @Override
