@@ -1,9 +1,11 @@
 package persistence.entity;
 
 public interface PersistenceContext {
-	<T> T getEntity(Class<T> clazz, Long id);
+	<T> T getEntity(Class<T> clazz, Object id);
 
-	void addEntity(Long id, Object entity);
+	void addEntity(Object id, Object entity);
+
+	void removeEntity(Object id, Object entity);
 
 	Snapshot getDatabaseSnapshot(Object id, Object entity);
 

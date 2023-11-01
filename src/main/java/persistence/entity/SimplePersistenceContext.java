@@ -12,18 +12,19 @@ public class SimplePersistenceContext implements PersistenceContext {
 	}
 
 	@Override
-	public <T> T getEntity(Class<T> clazz, Long id) {
+	public <T> T getEntity(Class<T> clazz, Object id) {
 		return clazz.cast(firstLevelCache.get(new EntityKey(clazz, id)));
 	}
 
 	@Override
-	public void addEntity(Long id, Object entity) {
+	public void addEntity(Object id, Object entity) {
 		EntityKey key = new EntityKey(entity.getClass(), id);
 		firstLevelCache.put(key, entity);
+		snapshots.put(key, new Snapshot(entity));
 	}
 
 	@Override
-	public void removeEntity(Long id, Object entity) {
+	public void removeEntity(Object id, Object entity) {
 		EntityKey key = new EntityKey(entity.getClass(), id);
 		firstLevelCache.remove(key);
 		snapshots.remove(key);
@@ -39,4 +40,5 @@ public class SimplePersistenceContext implements PersistenceContext {
 		EntityKey key = new EntityKey(entity.getClass(), id);
 		return snapshots.get(key);
 	}
+
 }

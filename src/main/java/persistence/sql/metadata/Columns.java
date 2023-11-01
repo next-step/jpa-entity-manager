@@ -76,7 +76,7 @@ public class Columns {
                     x.setAccessible(true);
 
                     try {
-                        return new Column(x, String.valueOf(x.get(entity)));
+                        return new Column(x, x.get(entity));
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }

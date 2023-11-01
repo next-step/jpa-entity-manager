@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import java.util.Objects;
+
 public class EntityKey {
 	private final Class<?> clazz;
 
@@ -8,5 +10,23 @@ public class EntityKey {
 	public EntityKey(Class<?> clazz, Object id) {
 		this.clazz = clazz;
 		this.id = id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null) {
+			return false;
+		}
+
+		if (!(obj instanceof EntityKey entityKey)) {
+			return false;
+		}
+
+		return id.equals(entityKey.id) && clazz.equals(entityKey.clazz);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(clazz, id);
 	}
 }
