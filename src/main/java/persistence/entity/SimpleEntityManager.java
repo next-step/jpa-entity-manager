@@ -2,6 +2,8 @@ package persistence.entity;
 
 import persistence.sql.metadata.EntityMetadata;
 
+import java.lang.reflect.Field;
+
 public class SimpleEntityManager implements EntityManager{
     private final EntityPersister entityPersister;
 
@@ -29,12 +31,31 @@ public class SimpleEntityManager implements EntityManager{
 
     @Override
     public void persist(Object entity) {
-        persistenceContext.addEntity(new EntityMetadata(entity).getPKValue(), entity);
-        entityPersister.insert(entity);
+        persistenceContext.addEntity(entityPersister.insert(entity), entity);
     }
 
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
+    }
+
+    @Override
+    public void merge(Object entity) {
+        Object id = new EntityMetadata(entity).getId();
+        Snapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(id, entity);
+
+        if(snapshot == null) {
+            persist(entity);
+            return;
+        }
+
+        Field[] fields = snapshot.getChangedColumns(entity);
+
+        if(fields.length == 0) {
+            return;
+        }
+
+        persistenceContext.addEntity(id, entity);
+        entityPersister.update(fields, entity);
     }
 }

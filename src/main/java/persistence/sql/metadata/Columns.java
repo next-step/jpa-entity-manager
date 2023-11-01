@@ -53,7 +53,8 @@ public class Columns {
         return columns.stream()
                 .filter(Column::isPrimaryKey)
                 .map(x -> x.getName() + " = " + x.getConvertedValue())
-                .findFirst().get();
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     public Column getId() {
