@@ -13,7 +13,7 @@ class EntityManagerFactoryTest {
     @DisplayName("엔티티 메니저를 생성한다.")
     void createEntityManager() throws Exception {
         //given
-        EntityManagerFactory entityManagerFactory = new EntityManagerFactory("persistence.testFixtures",
+        EntityManagerFactory entityManagerFactory = EntityManagerFactory.of("persistence.testFixtures",
                 new MockJdbcTemplate(), new FakeDialect());
 
         //when

@@ -33,7 +33,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
         jdbcTemplate.execute(QueryGenerator.of(DifferentPerson.class, dialect).create());
-        entityManagerFactory = new EntityManagerFactory("persistence.testFixtures", jdbcTemplate, dialect);
+        entityManagerFactory = EntityManagerFactory.of("persistence.testFixtures", jdbcTemplate, dialect);
     }
 
 

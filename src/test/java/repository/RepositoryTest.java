@@ -39,7 +39,7 @@ public class RepositoryTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         dialect = new FakeDialect();
-        entityManagerFactory = new EntityManagerFactory("persistence.testFixtures", jdbcTemplate, dialect);
+        entityManagerFactory = EntityManagerFactory.of("persistence.testFixtures", jdbcTemplate, dialect);
 
     }
 
