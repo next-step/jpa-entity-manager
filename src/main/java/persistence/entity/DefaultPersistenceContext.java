@@ -11,7 +11,7 @@ import static java.util.Objects.nonNull;
 
 public class DefaultPersistenceContext implements PersistenceContext {
 
-    private final Map<EntityKey, Object> entityInstanceMap = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityInstanceMap = new HashMap<>();
     private final Map<EntityKey, Object> entitySnapShotMap = new HashMap<>();
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
@@ -34,34 +34,43 @@ public class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public <T> T getEntity(Class<T> clazz, Long entityId) {
         EntityKey entityKey = EntityKey.of(clazz, entityId);
-        Object entity = entityInstanceMap.get(entityKey);
-        if (Objects.isNull(entity)) {
-            entity = entityLoader.selectOne(clazz, entityId);
-            entityInstanceMap.put(entityKey, entity);
+        EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        if (Objects.isNull(entityEntry)) {
+            Object entity = entityLoader.selectOne(clazz, entityId);
+            entityEntry = EntityEntry.from(entity);
+            entityInstanceMap.put(entityKey, entityEntry);
+            entityEntry.manage();
         }
-        return clazz.cast(entityInstanceMap.get(entityKey));
+        return clazz.cast(entityEntry.getEntity());
     }
 
     @Override
     public void addEntity(Object entity) {
         EntityKey entityKey = EntityKey.from(entity);
-        if (Objects.isNull(entityInstanceMap.get(entityKey))) {
-            entityPersister.insert(entity);
-            entityKey = EntityKey.from(entity);
-        }
-        if (Objects.nonNull(entityInstanceMap.get(entityKey))) {
+        EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        if (Objects.nonNull(entityEntry)) {
+            entityEntry.save();
             entityPersister.update(entity);
         }
+        if (Objects.isNull(entityEntry)) {
+            entityPersister.insert(entity);
+            entityKey = EntityKey.from(entity);
+            entityEntry = EntityEntry.from(entity);
+        }
         entitySnapShotMap.put(entityKey, ObjectUtils.copy(entity));
-        entityInstanceMap.put(entityKey, entity);
+        entityInstanceMap.put(entityKey, entityEntry);
+        entityEntry.manage();
     }
 
     @Override
     public void removeEntity(Object entity) {
         EntityKey entityKey = EntityKey.from(entity);
+        EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        entityEntry.delete();
         entityInstanceMap.remove(entityKey);
         entitySnapShotMap.remove(entityKey);
         entityPersister.delete(entity);
+        entityEntry.gone();
     }
 
     @Override

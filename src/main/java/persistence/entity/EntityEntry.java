@@ -14,4 +14,24 @@ public class EntityEntry {
         return new EntityEntry(entity, EntityStatus.LOADING);
     }
 
+    public Object getEntity() {
+        return entity;
+    }
+
+    public void manage() {
+        this.entityStatus = EntityStatus.MANAGED;
+    }
+
+    public void save() {
+        this.entityStatus = EntityStatus.SAVING;
+    }
+
+    public void delete() {
+        this.entityStatus = EntityStatus.DELETED;
+    }
+
+
+    public void gone() {
+        this.entityStatus = EntityStatus.GONE;
+    }
 }
