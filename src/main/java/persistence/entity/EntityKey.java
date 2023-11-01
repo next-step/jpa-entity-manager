@@ -16,7 +16,7 @@ public class EntityKey {
     }
 
     public static EntityKey of(Class<?> clazz, Object entityId) {
-        return new EntityKey(clazz, entityId);
+        return new EntityKey(clazz, entityId.toString());
     }
 
     public static EntityKey from(Object entity) {
