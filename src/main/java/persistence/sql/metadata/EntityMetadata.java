@@ -20,7 +20,7 @@ public class EntityMetadata {
             throw new IllegalArgumentException("Entity 클래스가 아닙니다.");
         }
         this.table = new Table(entity.getClass());
-        this.columns = new Columns(convertEntityToColumnList(entity));
+        this.columns = Columns.convertEntityToColumnList(entity);
         this.primaryKey = columns.getPrimaryKey();
     }
 
@@ -28,26 +28,6 @@ public class EntityMetadata {
         this.table = table;
         this.columns = columns;
         this.primaryKey = columns.getPrimaryKey();
-    }
-
-    private List<Column> convertEntityToColumnList(Object entity) {
-        if(entity == null) {
-            return null;
-        }
-
-        Field[] fields = entity.getClass().getDeclaredFields();
-
-        return Arrays.stream(fields)
-                .map(x -> {
-                    x.setAccessible(true);
-
-                    try {
-                        return new Column(x, String.valueOf(x.get(entity)));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
     }
 
     public String getTableName() {
