@@ -58,10 +58,12 @@ class DefaultPersistenceContextTest {
     @DisplayName("엔티티를 생성해 영속화한 후 생성한 엔티티를 재조회하여 존재여부를 확인한다")
     void addEntity() {
         DefaultPersistenceContext persistenceContext = DefaultPersistenceContext.of(jdbcTemplate);
-        persistenceContext.addEntity(new Person("테스트", 20, "test@domain.com", 1));
+        Person persistTarget = new Person("테스트", 20, "test@domain.com", 1);
+        persistenceContext.addEntity(persistTarget);
 
         Person person = persistenceContext.getEntity(Person.class, 1L);
         assertThat(person).isNotNull();
+        assertThat(person).isEqualTo(persistTarget);
     }
 
     @Test
