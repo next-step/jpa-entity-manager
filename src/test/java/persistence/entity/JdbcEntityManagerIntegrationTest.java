@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static persistence.entity.PersonFixtures.fixture;
 import static persistence.entity.PersonFixtures.fixtureById;
 
-class JdbcTemplateDialectEntityManagerIntegrationTest extends TestQueryExecuteSupport {
+class JdbcEntityManagerIntegrationTest extends TestQueryExecuteSupport {
     private EntityManager entityManager;
 
     @BeforeEach
@@ -27,7 +27,7 @@ class JdbcTemplateDialectEntityManagerIntegrationTest extends TestQueryExecuteSu
                 fixture(3L, "name3", 20, "email3")
         ));
 
-        entityManager = new JdbcTemplateDialectEntityManager(jdbcTemplate, Dialect.H2);
+        entityManager = new JdbcEntityManager(jdbcTemplate, Dialect.H2);
     }
 
     @Test
