@@ -1,6 +1,6 @@
 package persistence.sql.dml.builder;
 
-import fixtures.TestEntityFixtures;
+import fixtures.EntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class SelectInsertQueryBuilderTest {
             @Test
             @DisplayName("적절한 DML을 리턴한다.")
             void returnDmlWithWhereClause() {
-                String dml = SelectQueryBuilder.of(EntityAttribute.of(TestEntityFixtures.SampleOneWithValidAnnotation.class))
+                String dml = SelectQueryBuilder.of(EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class))
                         .where("id", "1").prepareStatement();
                 assertThat(dml).isEqualTo("SELECT * FROM entity_name WHERE id = '1'");
             }

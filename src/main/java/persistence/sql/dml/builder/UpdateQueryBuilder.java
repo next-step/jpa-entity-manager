@@ -19,8 +19,8 @@ public class UpdateQueryBuilder {
         this.entityAttribute = entityAttribute;
     }
 
-    public static UpdateQueryBuilder of(Object old, Object updated, EntityAttribute entityAttribute) {
-        return new UpdateQueryBuilder(old, updated, entityAttribute);
+    public static UpdateQueryBuilder of(Object oldObject, Object newObjectToUpdate, EntityAttribute entityAttribute) {
+        return new UpdateQueryBuilder(oldObject, newObjectToUpdate, entityAttribute);
     }
 
     public String prepareStatement() {

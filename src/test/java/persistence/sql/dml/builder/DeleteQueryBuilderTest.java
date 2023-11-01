@@ -1,6 +1,6 @@
 package persistence.sql.dml.builder;
 
-import fixtures.TestEntityFixtures;
+import fixtures.EntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class DeleteQueryBuilderTest {
             void returnDML() {
                 DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
                 String dml
-                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(TestEntityFixtures.SampleTwoWithValidAnnotation.class), String.valueOf(1));
+                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class), String.valueOf(1));
                 assertThat(dml).isEqualTo("DELETE FROM two where id = 1");
             }
         }

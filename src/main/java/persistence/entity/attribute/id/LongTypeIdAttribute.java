@@ -15,6 +15,8 @@ public class LongTypeIdAttribute implements IdAttribute {
     private final GenerationType generationType;
 
     public LongTypeIdAttribute(Field field) {
+        validate(field.getType());
+
         String columnName = Optional.ofNullable(field.getAnnotation(Column.class))
                 .map(Column::name).orElse(field.getName());
 
@@ -53,5 +55,11 @@ public class LongTypeIdAttribute implements IdAttribute {
     @Override
     public GenerationType getGenerationType() {
         return this.generationType;
+    }
+
+    private void validate(Class<?> type) {
+        if (type != Long.class) {
+            throw new IllegalArgumentException("String 타입의 필드만 인자로 받을 수 있습니다.");
+        }
     }
 }

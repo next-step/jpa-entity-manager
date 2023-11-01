@@ -15,7 +15,7 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     public IntegerTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
 
-        assert column != null;
+        validate(field.getType(), column);
 
         this.scale = column.scale();
         this.fieldName = field.getName();
@@ -46,5 +46,14 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     @Override
     public String getFieldName() {
         return this.fieldName;
+    }
+
+    private void validate(Class<?> type, Column column) {
+        if (type != Integer.class) {
+            throw new IllegalArgumentException("Integer 타입의 필드만 인자로 받을 수 있습니다.");
+        }
+        if (column == null) {
+            throw new IllegalArgumentException("Column 어노테이션이 붙은 필드만 인자로 받을 수 있습니다.");
+        }
     }
 }
