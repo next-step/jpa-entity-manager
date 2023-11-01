@@ -31,32 +31,32 @@ public class Columns {
     public String buildValueClause() {
         return columns.stream()
                 .filter(Column::checkPossibleToBeValue)
-                .map(Column::getValue)
+                .map(Column::getConvertedValue)
                 .collect(Collectors.joining(","));
     }
 
     public String buildSetClause() {
         return columns.stream()
                 .filter(Column::checkPossibleToBeValue)
-                .map(x -> x.getName() + " = " + x.getValue())
+                .map(x -> x.getName() + " = " + x.getConvertedValue())
                 .collect(Collectors.joining(", "));
     }
 
     public String buildWhereClause() {
         return columns.stream()
                 .filter(Column::isNotTransient)
-                .map(x -> x.getName() + " = " + x.getValue())
+                .map(x -> x.getName() + " = " + x.getConvertedValue())
                 .collect(Collectors.joining(" AND "));
     }
 
     public String buildWhereWithPKClause() {
         return columns.stream()
                 .filter(Column::isPrimaryKey)
-                .map(x -> x.getName() + " = " + x.getValue())
+                .map(x -> x.getName() + " = " + x.getConvertedValue())
                 .findFirst().get();
     }
 
-    public Column getPrimaryKey() {
+    public Column getId() {
         return columns.stream()
                 .filter(Column::isPrimaryKey)
                 .findFirst()

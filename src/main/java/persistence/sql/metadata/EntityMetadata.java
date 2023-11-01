@@ -13,7 +13,7 @@ public class EntityMetadata {
 
     private final Columns columns;
 
-    private final Column primaryKey;
+    private final Column id;
 
     public EntityMetadata(Object entity) {
         if (!entity.getClass().isAnnotationPresent(Entity.class)) {
@@ -21,21 +21,25 @@ public class EntityMetadata {
         }
         this.table = new Table(entity.getClass());
         this.columns = Columns.convertEntityToColumnList(entity);
-        this.primaryKey = columns.getPrimaryKey();
+        this.id = columns.getId();
     }
 
     public EntityMetadata(Table table, Columns columns) {
         this.table = table;
         this.columns = columns;
-        this.primaryKey = columns.getPrimaryKey();
+        this.id = columns.getId();
     }
 
     public String getTableName() {
         return table.getName();
     }
 
-    public Long getPKValue() {
-        return Long.parseLong(primaryKey.getValue());
+    public Object getId() {
+        return id.getValue();
+    }
+
+    public boolean isNewEntity() {
+        return id.getValue() == null;
     }
 
     public String getColumnsToCreate(Dialect dialect) {

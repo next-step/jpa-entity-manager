@@ -14,14 +14,17 @@ public class Column {
 
     private final boolean isTransient;
 
-    private final String value;
+    private final String convertedValue;
 
-    public Column(Field field, String value) {
+    private final Object value;
+
+    public Column(Field field, Object value) {
         this.name = findName(field);
         this.type = field.getType();
         this.constraint = new Constraint(field);
         this.isTransient = field.isAnnotationPresent(Transient.class);
-        this.value = findValue(value);
+        this.convertedValue = convertValueToString(value);
+        this.value = value;
     }
 
     public String getName() {
@@ -32,7 +35,11 @@ public class Column {
         return !isTransient;
     }
 
-    public String getValue() {
+    public String getConvertedValue() {
+        return convertedValue;
+    }
+
+    public Object getValue() {
         return value;
     }
 
@@ -79,11 +86,11 @@ public class Column {
         return dialect.getColumnType(type);
     }
 
-    private String findValue(String value) {
-        if(type.equals(String.class) && !"null".equals(value)) {
+    private String convertValueToString(Object value) {
+        if(type.equals(String.class) && value != null) {
             value = "'" + value + "'";
         }
 
-        return value;
+        return String.valueOf(value);
     }
 }
