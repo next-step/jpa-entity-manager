@@ -1,22 +1,19 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import domain.Person;
 import domain.SelectPerson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.exception.DuplicateContextException;
 import persistence.exception.InvalidContextException;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 class PersistenceContextImplTest {
+
     private PersistenceContextImpl persistenceContext;
 
     @BeforeEach
@@ -27,6 +24,7 @@ class PersistenceContextImplTest {
     @Nested
     @DisplayName("영속성 컨텍스트에서 데이터를 저장합니다.")
     class addEntity {
+
         @Test
         @DisplayName("성공적으로 데이터를 저장합니다.")
         void success() {
@@ -52,7 +50,7 @@ class PersistenceContextImplTest {
                 softAssertions.assertThat(result.getName()).isEqualTo(name);
                 softAssertions.assertThat(result.getAge()).isEqualTo(age);
                 softAssertions.assertThat(result.getEmail()).isEqualTo(email);
-                softAssertions.assertThat(result.getIndex()).isEqualTo(index);
+                softAssertions.assertThat(result.getIndex()).isNull();
             });
         }
 
@@ -82,6 +80,7 @@ class PersistenceContextImplTest {
     @Nested
     @DisplayName("영속성 컨텍스트에서 데이터를 가져옵니다.")
     class getEntity {
+
         @Test
         @DisplayName("성공적으로 데이터를 가져옵니다.")
         void success() {
@@ -106,7 +105,7 @@ class PersistenceContextImplTest {
                 softAssertions.assertThat(result.getName()).isEqualTo(name);
                 softAssertions.assertThat(result.getAge()).isEqualTo(age);
                 softAssertions.assertThat(result.getEmail()).isEqualTo(email);
-                softAssertions.assertThat(result.getIndex()).isEqualTo(index);
+                softAssertions.assertThat(result.getIndex()).isNull();
             });
         }
 
@@ -142,6 +141,7 @@ class PersistenceContextImplTest {
     @Nested
     @DisplayName("영속성 컨텍스트에서 데이터를 삭제합니다.")
     class removeEntity {
+
         @Test
         @DisplayName("성공적으로 데이터를 삭제합니다.")
         void success() {

@@ -5,7 +5,6 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
-import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 import database.DatabaseServer;
 import database.H2;
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
-import persistence.sql.dml.Query;
 
 class EntityManagerImplTest {
 
@@ -241,12 +239,13 @@ class EntityManagerImplTest {
 
             final String changeName = "홍길동";
 
-            데이터를_저장함(request);
-            SelectPerson before = 데이터를_조회함(clazz, id);
+            SelectPerson insertResult = 데이터를_저장함(request);
 
             //when
-            before.changeName(changeName);
-            entityManager.update(before, id);
+            insertResult.changeName(changeName);
+            entityManager.persist(insertResult);
+
+            entityManager.flush();
 
             SelectPerson after = 데이터를_조회함(clazz, id);
 
@@ -264,6 +263,7 @@ class EntityManagerImplTest {
     @Nested
     @DisplayName("스냅샷 관련")
     class snapshot {
+
         @Test
         @DisplayName("최종적으로 영속성 컨텍스트에 데이터 없는것으로 판단하여 삭제 쿼리만 실행")
         void dd() {
@@ -275,7 +275,7 @@ class EntityManagerImplTest {
             selectPerson.changeName("김이박");
 
             //when
-            entityManager.update(selectPerson, id);
+            entityManager.persist(selectPerson);
             entityManager.remove(selectPerson, id); // 최종 remove만 실행 되어야 함
             entityManager.flush();
 
@@ -297,7 +297,7 @@ class EntityManagerImplTest {
             selectPerson.changeName(changeName);
 
             //when
-            entityManager.update(selectPerson, id);
+            entityManager.persist(selectPerson);
             entityManager.flush();
 
             SelectPerson result = entityManager.find(selectPerson.getClass(), id);
@@ -324,7 +324,7 @@ class EntityManagerImplTest {
             selectPerson.changeIndex(2);
 
             //when
-            entityManager.update(selectPerson, id);
+            entityManager.persist(selectPerson);
             entityManager.flush();
 
             //then
@@ -357,8 +357,8 @@ class EntityManagerImplTest {
         jdbcTemplate.execute(dmlQuery.drop(TableName을_생성함(tClass)));
     }
 
-    private <T> void 데이터를_저장함(T t) {
-        jdbcTemplate.execute(Query.getInstance().insert(TableName을_생성함(t), Columns을_생성함(t), Values을_생성함(t)));
-        //entityManager.persist(t);
+    private <T> T 데이터를_저장함(T t) {
+        //jdbcTemplate.execute(Query.getInstance().insert(TableName을_생성함(t), Columns을_생성함(t), Values을_생성함(t)));
+        return entityManager.persist(t);
     }
 }

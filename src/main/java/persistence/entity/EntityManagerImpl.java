@@ -23,10 +23,8 @@ public class EntityManagerImpl implements EntityManager {
         int key = persister.getHashCode(input);
 
         if(!persistenceContext.isEntityInContext(key)) {
-            persistenceContext.addEntity(key, input, persister.findById(input));
+            persistenceContext.addEntity(key, input, persistenceContext.getDatabaseSnapshot(key, persister, input));
         }
-
-        persistenceContext.getDatabaseSnapshot(key, persister, input);
 
         return (R) persistenceContext.getEntity(key);
     }
@@ -37,13 +35,12 @@ public class EntityManagerImpl implements EntityManager {
         Object id = persister.getIdValue(t);
         int key = persister.getHashCode(id);
 
-        if(persistenceContext.isEntityInContext(key)) {
-            throw new IllegalArgumentException();
+        if(!persistenceContext.isEntityInContext(key)) {
+            getPersister(t.getClass()).insert(t);
+            persistenceContext.getDatabaseSnapshot(key, persister, id);
         }
 
-        getPersister(t.getClass()).insert(t);
-        persistenceContext.addEntity(key, id, persister.findById(id));
-        persistenceContext.getDatabaseSnapshot(key, persister, id);
+        persistenceContext.addEntity(key, id, t);
 
         return (T) persistenceContext.getEntity(key);
     }
@@ -54,16 +51,6 @@ public class EntityManagerImpl implements EntityManager {
         int id = persister.getHashCode(arg);
 
         persistenceContext.removeEntity(id);
-    }
-
-    @Override
-    public <T> void update(T t, Object arg) {
-        final EntityPersister<?> persister = getPersister(t.getClass());
-        int key = persister.getHashCode(arg);
-
-        if(persistenceContext.getEntity(key) != null) {
-            persistenceContext.addEntity(key, arg, t);
-        }
     }
 
     public void flush() {

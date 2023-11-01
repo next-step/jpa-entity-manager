@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import java.util.List;
-import java.util.Map;
 
 public interface EntityManager {
 
@@ -12,8 +11,6 @@ public interface EntityManager {
     <T> T persist(T t);
 
     <T> void remove(T t, Object arg);
-
-    <T> void update(T t, Object arg);
 
     void flush();
 }

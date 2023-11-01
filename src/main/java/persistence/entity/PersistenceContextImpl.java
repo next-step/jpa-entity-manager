@@ -41,10 +41,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T, I> void getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
+    public <T, I> T getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
         if (!snapshotMap.containsKey(key)) {
-            snapshotMap.put(key, new Snapshot(input, persister.findById(input)));
+            return (T) snapshotMap.put(key, new Snapshot(input, persister.findById(input)));
         }
+        return null;
     }
 
     @Override
@@ -56,12 +57,12 @@ public class PersistenceContextImpl implements PersistenceContext {
                 return;
             }
 
-            if (isEntityInContext(id)) {
-                result.put(id, contextMap.get(id));
-            }
-
             if (snapshotMap.containsKey(id)) {
                 result.put(id, snapshot);
+            }
+
+            if (isEntityInContext(id)) {
+                result.put(id, contextMap.get(id));
             }
         });
 
