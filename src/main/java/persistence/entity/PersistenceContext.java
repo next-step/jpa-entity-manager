@@ -11,6 +11,8 @@ public interface PersistenceContext {
 
     void removeEntity(Integer id);
 
+    boolean isEntityInSnapshot(Integer id);
+
     boolean isEntityInContext(Integer id);
 
     <T, I> T getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input);

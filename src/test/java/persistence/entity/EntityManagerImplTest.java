@@ -67,6 +67,7 @@ class EntityManagerImplTest {
                 SelectPerson selectPerson = new SelectPerson(i, "z", 3, "z", 1);
                 데이터를_저장함(selectPerson);
             }
+            entityManager.flush();
 
             //when
             List<SelectPerson> result = entityManager.findAll(clazz);
@@ -184,8 +185,11 @@ class EntityManagerImplTest {
             //given
             final Person person = new Person(3L, "zz", 3, "xx", 3);
 
-            //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.persist(person));
+            //when
+            entityManager.persist(person);
+
+            // then
+            assertThrows(RuntimeException.class, () -> entityManager.flush());
         }
     }
 
@@ -295,9 +299,9 @@ class EntityManagerImplTest {
             entityManager.persist(selectPerson);
 
             selectPerson.changeName(changeName);
+            entityManager.persist(selectPerson);
 
             //when
-            entityManager.persist(selectPerson);
             entityManager.flush();
 
             SelectPerson result = entityManager.find(selectPerson.getClass(), id);

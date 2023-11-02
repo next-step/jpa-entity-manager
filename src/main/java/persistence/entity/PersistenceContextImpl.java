@@ -36,24 +36,36 @@ public class PersistenceContextImpl implements PersistenceContext {
         contextMap.remove(key);
     }
 
+    @Override
+    public boolean isEntityInSnapshot(Integer id) {
+        return snapshotMap.containsKey(id);
+    }
+
     public boolean isEntityInContext(Integer id) {
         return contextMap.containsKey(id);
     }
 
     @Override
     public <T, I> T getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
-        if (!snapshotMap.containsKey(key)) {
-            return (T) snapshotMap.put(key, new Snapshot(input, persister.findById(input)));
-        }
-        return null;
+        Object data = persister.findById(input);
+        return (T) snapshotMap.put(key, new Snapshot(input, data));
     }
 
     @Override
     public Map<Integer, Snapshot> comparison() {
+        if(snapshotMap.size() > contextMap.size()) {
+            exploreInSnapshot();
+        }
+
+        return exploreInContext();
+    }
+
+    private Map<Integer, Snapshot> exploreInSnapshot() {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
         snapshotMap.forEach((id, snapshot) -> {
-            if (isEntityInContext(id) && snapshot.getValues().equals(contextMap.get(id).getValues())) {
+            if (isEntityInContext(id)
+                    && snapshot.getValues().equals(contextMap.get(id).getValues())) {
                 return;
             }
 
@@ -63,6 +75,26 @@ public class PersistenceContextImpl implements PersistenceContext {
 
             if (isEntityInContext(id)) {
                 result.put(id, contextMap.get(id));
+            }
+        });
+
+        return result;
+    }
+
+    private Map<Integer, Snapshot> exploreInContext() {
+        Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
+
+        contextMap.forEach((id, snapshot) -> {
+            if (isEntityInSnapshot(id) && snapshot.getValues().equals(snapshotMap.get(id).getValues())) {
+                return;
+            }
+
+            if (contextMap.containsKey(id)) {
+                result.put(id, snapshot);
+            }
+
+            if (isEntityInSnapshot(id)) {
+                result.put(id, snapshotMap.get(id));
             }
         });
 

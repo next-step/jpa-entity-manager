@@ -35,11 +35,6 @@ public class EntityManagerImpl implements EntityManager {
         Object id = persister.getIdValue(t);
         int key = persister.getHashCode(id);
 
-        if(!persistenceContext.isEntityInContext(key)) {
-            getPersister(t.getClass()).insert(t);
-            persistenceContext.getDatabaseSnapshot(key, persister, id);
-        }
-
         persistenceContext.addEntity(key, id, t);
 
         return (T) persistenceContext.getEntity(key);
@@ -55,12 +50,19 @@ public class EntityManagerImpl implements EntityManager {
 
     public void flush() {
         persistenceContext.comparison().forEach((id, data) -> {
-            if(!persistenceContext.isEntityInContext(id)) {
-                getPersister(data.getObjectClass()).delete(data.getId());
+            final EntityPersister<?> persister = getPersister(data.getObjectClass());
+
+            if(!persistenceContext.isEntityInSnapshot(id)) {
+                persister.insert(data.getObject());
                 return;
             }
 
-            getPersister(data.getObjectClass()).update(data, data.getId());
+            if(!persistenceContext.isEntityInContext(id)) {
+                persister.delete(data.getId());
+                return;
+            }
+
+            persister.update(data, data.getId());
         });
     }
 
