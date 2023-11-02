@@ -1,14 +1,10 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dbms.Dialect;
 import persistence.testutils.ReflectionTestSupport;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,7 +27,7 @@ class EntityPersisterTest {
 
         entityPersister.insert(person);
 
-        assertThat(mockJdbcTemplate.latestExecutionSql)
+        assertThat(mockJdbcTemplate.latestExecutionSqlResult)
                 .isEqualTo("INSERT INTO USERS (ID, NICK_NAME, OLD, EMAIL) VALUES (1, 'name1', 20, 'email1');");
     }
 
@@ -40,7 +36,7 @@ class EntityPersisterTest {
         Person person = fixture(1L, "name1", 20, "email1");
 
         entityPersister.update(person);
-        assertThat(mockJdbcTemplate.latestExecutionSql)
+        assertThat(mockJdbcTemplate.latestExecutionSqlResult)
                 .isEqualTo("UPDATE USERS \n" +
                         "SET NICK_NAME = 'name1', OLD = 20, EMAIL = 'email1' \n" +
                         "WHERE id = 1;");
@@ -56,7 +52,7 @@ class EntityPersisterTest {
         assertThatThrownBy(() -> entityPersister.update(idNullPerson))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("id column value is null, entity = Person");
-        assertThat(mockJdbcTemplate.latestExecutionSql).isNull();
+        assertThat(mockJdbcTemplate.latestExecutionSqlResult).isNull();
     }
 
     @Test
@@ -65,7 +61,7 @@ class EntityPersisterTest {
 
         entityPersister.delete(person);
 
-        assertThat(mockJdbcTemplate.latestExecutionSql)
+        assertThat(mockJdbcTemplate.latestExecutionSqlResult)
                 .isEqualTo("DELETE FROM USERS \n" +
                         "  WHERE id = 1;");
     }
@@ -80,29 +76,6 @@ class EntityPersisterTest {
         assertThatThrownBy(() -> entityPersister.delete(idNullPerson))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("id column value is null, entity = Person");
-        assertThat(mockJdbcTemplate.latestExecutionSql).isNull();
-    }
-
-    static class FakeJdbcTemplate extends JdbcTemplate {
-        String latestExecutionSql;
-
-        public FakeJdbcTemplate() {
-            super(null);
-        }
-
-        @Override
-        public void execute(String sql) {
-            this.latestExecutionSql = sql;
-        }
-
-        @Override
-        public <T> T queryForObject(String sql, RowMapper<T> rowMapper) {
-            return null;
-        }
-
-        @Override
-        public <T> List<T> query(String sql, RowMapper<T> rowMapper) {
-            return null;
-        }
+        assertThat(mockJdbcTemplate.latestExecutionSqlResult).isNull();
     }
 }
