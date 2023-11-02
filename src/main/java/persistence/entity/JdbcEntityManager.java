@@ -21,7 +21,7 @@ public class JdbcEntityManager implements EntityManager {
     MetaEntity<T> metaEntity = MetaEntity.of(clazz);
 
     MetaDataColumn primaryKeyColumn = metaEntity.getPrimaryKeyColumn();
-    String targetColumn = primaryKeyColumn.getSimpleName();
+    String targetColumn = primaryKeyColumn.getDBColumnName();
 
     SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
     String query = selectQueryBuilder.createSelectByFieldQuery(metaEntity.getColumnClauseWithId(), metaEntity.getTableName(), targetColumn, id);
@@ -44,7 +44,7 @@ public class JdbcEntityManager implements EntityManager {
     MetaEntity<?> metaEntity = MetaEntity.of(entity.getClass());
 
     MetaDataColumn primaryKeyColumn = metaEntity.getPrimaryKeyColumn();
-    String targetColumn = primaryKeyColumn.getSimpleName();
+    String targetColumn = primaryKeyColumn.getDBColumnName();
     Object fieldValue = primaryKeyColumn.getFieldValue(entity);
 
     DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();

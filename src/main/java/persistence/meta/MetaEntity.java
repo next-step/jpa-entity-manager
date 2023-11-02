@@ -79,7 +79,7 @@ public class MetaEntity<T> {
   }
 
   public List<String> getEntityColumns() {
-    return metaDataColumns.getSimpleColumns();
+    return metaDataColumns.getDBColumnsWithoutId();
   }
 
   public List<String> getEntityFields() {

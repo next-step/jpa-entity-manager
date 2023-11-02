@@ -67,10 +67,10 @@ public class DeleteQueryBuilderTest {
     SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
     Long targetId = 1L;
 
-    String queryDelete = deleteQueryBuilder.createDeleteQuery(meta.getTableName(), meta.getPrimaryKeyColumn().getSimpleName(), targetId);
+    String queryDelete = deleteQueryBuilder.createDeleteQuery(meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetId);
     jdbcTemplate.execute(queryDelete);
 
-    String querySelect = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClause(), meta.getTableName(), meta.getPrimaryKeyColumn().getSimpleName(), targetId);
+    String querySelect = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClause(), meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetId);
     List<Object> people = jdbcTemplate.query(querySelect, (rs) ->
             new PersonFixtureStep3(
                     rs.getLong("id"),
