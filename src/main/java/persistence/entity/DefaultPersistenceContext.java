@@ -49,6 +49,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         EntityKey entityKey = EntityKey.from(entity);
         EntityEntry entityEntry = entityInstanceMap.get(entityKey);
         if (Objects.nonNull(entityEntry)) {
+            validateReadOnly(entityEntry);
             entityEntry.save();
             entityPersister.update(entity);
         }
@@ -66,6 +67,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public void removeEntity(Object entity) {
         EntityKey entityKey = EntityKey.from(entity);
         EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        validateReadOnly(entityEntry);
         entityEntry.delete();
         entityInstanceMap.remove(entityKey);
         entitySnapShotMap.remove(entityKey);
@@ -77,6 +79,12 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public Object getDatabaseSnapshot(Long id, Object entity) {
         EntityKey entityKey = EntityKey.of(entity.getClass(), id);
         return entitySnapShotMap.put(entityKey, ObjectUtils.copy(entity));
+    }
+
+    private void validateReadOnly(EntityEntry entityEntry) {
+        if (entityEntry.isReadOnly()) {
+            throw new IllegalStateException("해당 엔티티는 읽기 전용입니다. 쓰기작업을 실행할 수 없습니다.");
+        }
     }
 
 }
