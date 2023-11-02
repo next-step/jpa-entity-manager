@@ -22,7 +22,7 @@ public class EntityKey {
 			return false;
 		}
 
-		return id.equals(entityKey.id) && clazz.equals(entityKey.clazz);
+		return hashCode() == entityKey.hashCode();
 	}
 
 	@Override
