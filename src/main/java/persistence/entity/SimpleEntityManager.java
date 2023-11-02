@@ -9,12 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SimpleEntityManager implements EntityManager {
     private final EntityLoaderContext entityLoaderContext;
     private final EntityPersisteContext entityPersisterContenxt;
-    private final Map<EntityKey, EntityEntry> entityKeyEntityEntrycontext = new ConcurrentHashMap<>();
+    private final EntityEntryContext entityEntryContext;
     private final SimplePersistenceContext persistenceContext;
 
     private SimpleEntityManager(EntityPersisteContext entityPersisterContenxt,
                                 EntityLoaderContext entityLoaderContext) {
         this.persistenceContext = new SimplePersistenceContext();
+        this.entityEntryContext = new EntityEntryContext();
         this.entityPersisterContenxt = entityPersisterContenxt;
         this.entityLoaderContext = entityLoaderContext;
     }
@@ -26,27 +27,24 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
-        EntityKey entityKey = EntityKey.of(entity);
         EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
-        EntityEntry entityEntry = entityKeyEntityEntrycontext.getOrDefault(entityKey, new EntityEntry(entityKey));
+        EntityKey entityKey = EntityKey.of(entity);
+        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
 
-        final Object persistEntity = entityEntry.saving(entityPersister, entity);
+        final Object saveEntity = entityEntry.saving(entityPersister, entity);
 
-        entityEntry.managed(persistenceContext, persistEntity);
+        entityEntry.managed(persistenceContext, saveEntity);
+        entityEntryContext.addEntityEntry(entityKey, entityEntry);
 
-        return (T) persistEntity;
+        return (T) saveEntity;
     }
 
     @Override
     public void remove(Object entity) {
-        EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
         EntityKey entityKey = EntityKey.of(entity);
+        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
 
-        if (persistenceContext.getEntity(entityKey) != null) {
-            persistenceContext.removeEntity(entity);
-        }
-
-        entityPersister.delete(entity);
+        entityEntry.deleted(persistenceContext, entity);
     }
 
     @Override

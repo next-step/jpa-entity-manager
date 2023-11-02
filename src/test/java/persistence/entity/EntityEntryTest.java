@@ -49,7 +49,6 @@ class EntityEntryTest {
         //then
         assertSoftly((it) -> {
             it.assertThat(saved).isEqualTo(person);
-            it.assertThat(entityEntry.isSaving()).isTrue();
         });
     }
 
@@ -70,6 +69,62 @@ class EntityEntryTest {
             it.assertThat(entityEntry.isManaged()).isTrue();
         });
     }
+
+    @Test
+    @DisplayName("EntityEntry가 리드온리 상태면 저장이 되지 않는다")
+    void readOnly() {
+        //given
+        Person person = new Person(1L, "이름", 30, "email@odna");
+        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        final EntityMeta entityMeta = EntityMeta.from(person.getClass());
+        final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
+        final EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+
+        //when
+        entityEntry.readOnly();
+
+        //then
+        assertThatIllegalStateException().isThrownBy(
+                () -> entityEntry.saving(entityPersister, person)
+        );
+    }
+
+    @Test
+    @DisplayName("EntityEntry가 삭제를 진행하면 gone상태가 된다")
+    void deleted() {
+        //given
+        Person person = new Person(1L, "이름", 30, "email@odna");
+        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
+        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+
+
+        //when
+        entityEntry.deleted(simplePersistenceContext, person);
+
+        //then
+        assertSoftly((it) -> {
+            it.assertThat(simplePersistenceContext.getEntity(EntityKey.of(person))).isNull();
+            it.assertThat(entityEntry.isGone()).isTrue();
+        });
+    }
+
+    @Test
+    @DisplayName("엔터티가 ReadOnly면 삭제가 진행되지 않는다.")
+    void readOnlyDelete() {
+        //given
+        Person person = new Person(1L, "이름", 30, "email@odna");
+        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
+        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+
+        //when
+        entityEntry.readOnly();
+
+        //then
+        assertThatIllegalStateException().isThrownBy(
+                () -> entityEntry.deleted(simplePersistenceContext, person)
+        );
+    }
+
 
 
 

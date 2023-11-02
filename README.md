@@ -44,16 +44,17 @@
   - SAVING 상태는 save, persist 메서드가 호출되어 데이터 베이스에 저장하기 시작했을때 를 의미
   - 아직 DB에는 저장되지 않은 상태 
   - 저장 되면 MANAGED 상태로 변경된다.
-- [X] SAVING에 대응 되게 구현  
-
-
+- [X] SAVING에 대응 되게 구현
 - [X] MANAGED 상태 이해하기
     - [X] 영속성 컨텍스트 내에서 관리되고 있는 상태
 - [X] MANAGED 구현하기
-- 
-- [ ] DETACHED 상태 이해하기
-- [ ] REMOVED 상태 이해하기
-- [ ] PERSISTENT 상태 이해하기
+
+- [X] DELETE 구현하기
+   > Status.DELETED는 Hibernate에서 엔터티가 영속성 컨텍스트 내에서 삭제된 상태를 나타냅니다.
+   > (DELETED 상태로 변환 후 -> 영속성 컨텍스트 제거 -> GONE 으로 변환)
+  
+
+
  
 
 
