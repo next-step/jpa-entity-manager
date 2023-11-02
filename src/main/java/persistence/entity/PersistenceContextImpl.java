@@ -63,7 +63,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public Map<Integer, Snapshot> comparison() {
         if(snapshotMap.size() >= contextMap.size()) {
-            exploreInSnapshot();
+            return exploreInSnapshot();
         }
 
         return exploreInContext();
