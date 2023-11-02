@@ -18,6 +18,10 @@ public class EntityEntry {
         return entity;
     }
 
+    public boolean isReadOnly() {
+        return this.entityStatus == EntityStatus.READ_ONLY;
+    }
+
     public void manage() {
         this.entityStatus = EntityStatus.MANAGED;
     }
