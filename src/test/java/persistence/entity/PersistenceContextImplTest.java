@@ -1,11 +1,13 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import domain.Person;
 import domain.SelectPerson;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +26,24 @@ class PersistenceContextImplTest {
     @Nested
     @DisplayName("영속성 컨텍스트에서 데이터를 저장합니다.")
     class addEntity {
+
+        @Test
+        @DisplayName("객체가 null일때 처리되지 않도록 처리")
+        void entityIsNull() {
+            //given
+            final Long id = 9898L;
+            SelectPerson person = null;
+
+            final Integer key = id.hashCode();
+
+            //when
+            persistenceContext.addEntity(key, id, person);
+
+            Object result = persistenceContext.getEntity(key);
+
+            //then
+            assertThat(result).isNull();
+        }
 
         @Test
         @DisplayName("성공적으로 데이터를 저장합니다.")

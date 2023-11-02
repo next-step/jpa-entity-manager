@@ -25,7 +25,16 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void addEntity(Integer key, Object id, Object entity) {
-        contextMap.put(key, new Snapshot(id, entity));
+        if (entity == null) {
+            return;
+        }
+
+        addEntity(key, new Snapshot(id, entity));
+    }
+
+    @Override
+    public void addEntity(Integer key, Snapshot snapshot) {
+        contextMap.put(key, snapshot);
     }
 
     @Override
@@ -46,14 +55,14 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T, I> T getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
+    public <T, I> Snapshot getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
         Object data = persister.findById(input);
-        return (T) snapshotMap.put(key, new Snapshot(input, data));
+        return snapshotMap.put(key, new Snapshot(input, data));
     }
 
     @Override
     public Map<Integer, Snapshot> comparison() {
-        if(snapshotMap.size() > contextMap.size()) {
+        if(snapshotMap.size() >= contextMap.size()) {
             exploreInSnapshot();
         }
 

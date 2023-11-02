@@ -22,9 +22,7 @@ public class EntityManagerImpl implements EntityManager {
         final EntityPersister<?> persister = getPersister(rClass);
         int key = persister.getHashCode(input);
 
-        if(!persistenceContext.isEntityInContext(key)) {
-            persistenceContext.addEntity(key, input, persistenceContext.getDatabaseSnapshot(key, persister, input));
-        }
+        persistenceContext.addEntity(key, persistenceContext.getDatabaseSnapshot(key, persister, input));
 
         return (R) persistenceContext.getEntity(key);
     }
@@ -54,6 +52,7 @@ public class EntityManagerImpl implements EntityManager {
 
             if(!persistenceContext.isEntityInSnapshot(id)) {
                 persister.insert(data.getObject());
+                persistenceContext.getDatabaseSnapshot(id, persister, data.getId());
                 return;
             }
 
@@ -63,6 +62,7 @@ public class EntityManagerImpl implements EntityManager {
             }
 
             persister.update(data, data.getId());
+            persistenceContext.getDatabaseSnapshot(id, persister, data.getId());
         });
     }
 

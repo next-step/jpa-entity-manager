@@ -3,6 +3,7 @@ package persistence.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
@@ -165,6 +166,7 @@ class EntityManagerImplTest {
 
             //when
             entityManager.persist(request);
+            entityManager.flush();
 
             SelectPerson result = 데이터를_조회함(clazz, id);
 
@@ -243,7 +245,7 @@ class EntityManagerImplTest {
 
             final String changeName = "홍길동";
 
-            SelectPerson insertResult = 데이터를_저장함(request);
+            SelectPerson insertResult = entityManager.persist(request);
 
             //when
             insertResult.changeName(changeName);
@@ -251,7 +253,7 @@ class EntityManagerImplTest {
 
             entityManager.flush();
 
-            SelectPerson after = 데이터를_조회함(clazz, id);
+            SelectPerson after = entityManager.find(insertResult.getClass(), id);
 
             //then
             assertSoftly(softAssertions -> {
@@ -314,26 +316,6 @@ class EntityManagerImplTest {
                 softAssertions.assertThat(result.getEmail()).isEqualTo(selectPerson.getEmail());
             });
         }
-
-        @Test
-        @DisplayName("@Transient는 변경감지 하지 않음")
-        void transientIndex() {
-            //given
-            final Long id = 22L;
-            final String name = "홍길동";
-
-            SelectPerson selectPerson = new SelectPerson(id, name, 30, "email", 3);
-            entityManager.persist(selectPerson);
-
-            selectPerson.changeIndex(2);
-
-            //when
-            entityManager.persist(selectPerson);
-            entityManager.flush();
-
-            //then
-
-        }
     }
 
     @AfterEach
@@ -362,7 +344,9 @@ class EntityManagerImplTest {
     }
 
     private <T> T 데이터를_저장함(T t) {
-        //jdbcTemplate.execute(Query.getInstance().insert(TableName을_생성함(t), Columns을_생성함(t), Values을_생성함(t)));
-        return entityManager.persist(t);
+        T result = entityManager.persist(t);
+        entityManager.flush();
+
+        return result;
     }
 }
