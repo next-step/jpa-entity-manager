@@ -23,7 +23,7 @@ class CustomJpaRepositoryTest {
 
 	public static EntityManager entityManager;
 
-	public static CustomJpaRepository customJpaRepository;
+	public static CustomJpaRepository<Person> customJpaRepository;
 
 	@BeforeAll
 	static void setJdbcTemplate() throws SQLException {
@@ -40,7 +40,7 @@ class CustomJpaRepositoryTest {
 
 		persistenceContext = new SimplePersistenceContext();
 		entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate), persistenceContext);
-		customJpaRepository = new CustomJpaRepository(entityManager);
+		customJpaRepository = new CustomJpaRepository<>(entityManager);
 	}
 
 	@DisplayName("엔티티가 저장이 되면 영속성 컨텍스트에 저장된다.")
