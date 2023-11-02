@@ -4,9 +4,9 @@ import jdbc.JdbcTemplate;
 
 public class DefaultEntityManager implements EntityManager {
 
-    private final DefaultPersistenceContext persistenceContext;
+    private final PersistenceContext persistenceContext;
 
-    private DefaultEntityManager(DefaultPersistenceContext persistenceContext) {
+    private DefaultEntityManager(PersistenceContext persistenceContext) {
         this.persistenceContext = persistenceContext;
     }
 

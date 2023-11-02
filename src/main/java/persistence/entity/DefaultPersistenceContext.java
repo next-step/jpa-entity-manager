@@ -1,9 +1,7 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.ColumnValues;
 import persistence.sql.util.ObjectUtils;
-import persistence.sql.util.StringConstant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +11,8 @@ import static java.util.Objects.nonNull;
 
 public class DefaultPersistenceContext implements PersistenceContext {
 
-    private final Map<String, Object> entityInstanceMap = new HashMap<>();
-    private final Map<String, Object> entitySnapShotMap = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityInstanceMap = new HashMap<>();
+    private final Map<EntityKey, Object> entitySnapShotMap = new HashMap<>();
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
@@ -35,45 +33,58 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public <T> T getEntity(Class<T> clazz, Long entityId) {
-        String entityKey = buildEntityKey(clazz, entityId);
-        Object entity = entityInstanceMap.get(entityKey);
-        if (Objects.isNull(entity)) {
-            entity = entityLoader.selectOne(clazz, entityId);
-            entityInstanceMap.put(entityKey, entity);
+        EntityKey entityKey = EntityKey.of(clazz, entityId);
+        EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        if (Objects.isNull(entityEntry)) {
+            Object entity = entityLoader.selectOne(clazz, entityId);
+            entityEntry = EntityEntry.from(entity);
+            entityInstanceMap.put(entityKey, entityEntry);
+            entityEntry.manage();
         }
-        return clazz.cast(entityInstanceMap.get(entityKey));
+        return clazz.cast(entityEntry.getEntity());
     }
 
     @Override
     public void addEntity(Object entity) {
-        String entityKey = buildEntityKey(entity);
-        entityPersister.insert(entity);
-        entityInstanceMap.put(entityKey, entity);
+        EntityKey entityKey = EntityKey.from(entity);
+        EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        if (Objects.nonNull(entityEntry)) {
+            validateReadOnly(entityEntry);
+            entityEntry.save();
+            entityPersister.update(entity);
+        }
+        if (Objects.isNull(entityEntry)) {
+            entityPersister.insert(entity);
+            entityKey = EntityKey.from(entity);
+            entityEntry = EntityEntry.from(entity);
+        }
         entitySnapShotMap.put(entityKey, ObjectUtils.copy(entity));
+        entityInstanceMap.put(entityKey, entityEntry);
+        entityEntry.manage();
     }
 
     @Override
     public void removeEntity(Object entity) {
-        String entityKey = buildEntityKey(entity);
+        EntityKey entityKey = EntityKey.from(entity);
+        EntityEntry entityEntry = entityInstanceMap.get(entityKey);
+        validateReadOnly(entityEntry);
+        entityEntry.delete();
         entityInstanceMap.remove(entityKey);
         entitySnapShotMap.remove(entityKey);
         entityPersister.delete(entity);
+        entityEntry.gone();
     }
 
     @Override
     public Object getDatabaseSnapshot(Long id, Object entity) {
-        String entityKey = buildEntityKey(entity.getClass(), id);
+        EntityKey entityKey = EntityKey.of(entity.getClass(), id);
         return entitySnapShotMap.put(entityKey, ObjectUtils.copy(entity));
     }
 
-    private String buildEntityKey(Class<?> clazz, Object entityId) {
-        return clazz.getName() + entityId.toString();
-    }
-
-    private String buildEntityKey(Object entity) {
-        ColumnValues idValues = ColumnValues.ofId(entity);
-        String entityId = String.join(StringConstant.EMPTY_STRING, idValues.values());
-        return buildEntityKey(entity.getClass(), entityId);
+    private void validateReadOnly(EntityEntry entityEntry) {
+        if (entityEntry.isReadOnly()) {
+            throw new IllegalStateException("해당 엔티티는 읽기 전용입니다. 쓰기작업을 실행할 수 없습니다.");
+        }
     }
 
 }
