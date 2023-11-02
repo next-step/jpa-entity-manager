@@ -17,19 +17,19 @@ public class Snapshot {
     }
 
     private Object initObject(Object object) {
+        Object destination;
         try {
-            Object destination = object.getClass().getDeclaredConstructor().newInstance();
+            destination = object.getClass().getDeclaredConstructor().newInstance();
             for (Field field : object.getClass().getDeclaredFields()) {
                 if (!field.isAnnotationPresent(Transient.class)) {
                     field.setAccessible(true);
                     field.set(destination, field.get(object));
                 }
             }
-            return destination;
         } catch (Exception e) {
-            e.printStackTrace(); // 예외 처리 추가
-            return null;
+            throw new RuntimeException(e);
         }
+        return destination;
     }
 
     public Object getId() {
