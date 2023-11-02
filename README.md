@@ -36,3 +36,27 @@
  - [X] 요구사항3 - Dirty Check 기능을 구현해보자
    - [X] 클래스로더 만들기 
    - [X] 엔티티매니저 팩토리를 만들고 캐싱하기
+
+# 4단계 - EntityEntry 구현
+> EntityEntry 클래스는 엔터티의 영속성 상태와 상태 변화, 생명주기와 변경감지에 중요한 역할
+
+- [X] SAVING 상태 이해하기
+  - SAVING 상태는 save, persist 메서드가 호출되어 데이터 베이스에 저장하기 시작했을때 를 의미
+  - 아직 DB에는 저장되지 않은 상태 
+  - 저장 되면 MANAGED 상태로 변경된다.
+- [X] SAVING에 대응 되게 구현  
+
+
+- [X] MANAGED 상태 이해하기
+    - [X] 영속성 컨텍스트 내에서 관리되고 있는 상태
+- [X] MANAGED 구현하기
+- 
+- [ ] DETACHED 상태 이해하기
+- [ ] REMOVED 상태 이해하기
+- [ ] PERSISTENT 상태 이해하기
+ 
+
+
+
+
+

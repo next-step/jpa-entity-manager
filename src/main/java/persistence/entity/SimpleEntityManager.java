@@ -2,11 +2,14 @@ package persistence.entity;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class SimpleEntityManager implements EntityManager {
     private final EntityLoaderContext entityLoaderContext;
     private final EntityPersisteContext entityPersisterContenxt;
+    private final Map<EntityKey, EntityEntry> entityKeyEntityEntrycontext = new ConcurrentHashMap<>();
     private final SimplePersistenceContext persistenceContext;
 
     private SimpleEntityManager(EntityPersisteContext entityPersisterContenxt,
@@ -23,12 +26,15 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
+        EntityKey entityKey = EntityKey.of(entity);
         EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
-        final T persistEntity = entityPersister.insert(entity);
+        EntityEntry entityEntry = entityKeyEntityEntrycontext.getOrDefault(entityKey, new EntityEntry(entityKey));
 
-        this.persistenceContext.addEntity(EntityKey.of(entity), persistEntity);
+        final Object persistEntity = entityEntry.saving(entityPersister, entity);
 
-        return persistEntity;
+        entityEntry.managed(persistenceContext, persistEntity);
+
+        return (T) persistEntity;
     }
 
     @Override
