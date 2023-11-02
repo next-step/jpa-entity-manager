@@ -64,6 +64,7 @@ class SimpleEntityManagerTest {
         //when
         final List<Person> persons = entityManager.findAll(Person.class);
         entityManager.remove(persons.get(0));
+        entityManager.flush();
         final List<Person> resultPersons = entityManager.findAll(Person.class);
 
         //then
@@ -75,7 +76,6 @@ class SimpleEntityManagerTest {
     void findById() {
         //given
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L, "이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.persist(person);
 
@@ -113,7 +113,6 @@ class SimpleEntityManagerTest {
         //given
         final String CHANGE_EMAIL_STRING = "change23@gmail.com";
         Person person = new Person("이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         final Person person1 = entityManager.persist(person);
@@ -144,7 +143,6 @@ class SimpleEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         DifferentPerson noAutoIncrementPerson = new DifferentPerson(2L, "이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when

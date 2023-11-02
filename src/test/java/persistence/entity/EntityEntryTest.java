@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import database.DatabaseServer;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
+import persistence.exception.ObjectNotFoundException;
 import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
@@ -125,6 +128,24 @@ class EntityEntryTest {
         );
     }
 
+    @Test
+    @DisplayName("gone 상태이면 로드가 되지 않는다.")
+    void goneIsNotLoad() {
+        //given
+        Person person = new Person(1L, "이름", 30, "email@odna");
+        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
+        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        final EntityMeta entityMeta = EntityMeta.from(person.getClass());
+        final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, new EntityMapper(entityMeta));
+
+        //when
+        entityEntry.deleted(simplePersistenceContext, person);
+
+        //then
+        assertThatExceptionOfType(ObjectNotFoundException.class)
+                .isThrownBy(() -> entityEntry.loading(entityLoader, Person.class, 1L));
+    }
 
 
 

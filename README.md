@@ -52,9 +52,13 @@
 - [X] DELETE 구현하기
    > Status.DELETED는 Hibernate에서 엔터티가 영속성 컨텍스트 내에서 삭제된 상태를 나타냅니다.
    > (DELETED 상태로 변환 후 -> 영속성 컨텍스트 제거 -> GONE 으로 변환)
-  
+   - [X] flush 이후 삭제한다.
 
+- [X] GONE 구현하기 
+   > Status.GONE은 Hibernate에서 엔터티가 영속성 컨텍스트 내에서 삭제되고, 해당 엔터티를 다시 로드할 수 없는 상태를 나타냅니다.
 
+- [X] Load 구현하기
+  - gone 상태이면 로드가 되지 않는다.
  
 
 

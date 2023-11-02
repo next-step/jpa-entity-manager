@@ -98,6 +98,20 @@ class EntityPersisterTest {
         });
     }
 
+    @Test
+    @DisplayName("엔티티가 삭제 된다.")
+    void entityDeleteByKey() {
+        //given
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
+                QueryGenerator.of(Person.class, dialect));
+        Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
+
+        //then
+        Assertions.assertDoesNotThrow(() -> {
+            entityPersister.deleteByKey(EntityKey.of(person));
+        });
+    }
+
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());

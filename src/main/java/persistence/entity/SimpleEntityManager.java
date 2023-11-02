@@ -2,8 +2,6 @@ package persistence.entity;
 
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class SimpleEntityManager implements EntityManager {
@@ -45,47 +43,61 @@ public class SimpleEntityManager implements EntityManager {
         EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
 
         entityEntry.deleted(persistenceContext, entity);
+        entityEntryContext.addEntityEntry(entityKey, entityEntry);
+        System.out.println(entityEntry);
     }
 
     @Override
     public <T, ID> T find(Class<T> clazz, ID id) {
         EntityLoader entityLoader = entityLoaderContext.getEntityLoader(clazz);
         EntityKey entityKey = EntityKey.of(clazz, id);
+        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
 
-        if (persistenceContext.getEntity(entityKey) != null) {
+        if (entityEntry.isManaged()) {
             return (T) persistenceContext.getEntity(entityKey);
         }
 
-        final T entity = entityLoader.find(clazz, id);
-        if (entity != null) {
-            persistenceContext.addEntity(entityKey, entity);
+        final T loading = entityEntry.loading(entityLoader, clazz, id);
+        if (loading != null) {
+            entityEntry.managed(persistenceContext, loading);
         }
-
-        return entity;
+        return loading;
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
         EntityLoader entityLoader = entityLoaderContext.getEntityLoader(tClass);
-
         final List<T> findList = entityLoader.findAll(tClass);
 
-        findList.forEach((it) ->
-                persistenceContext.addEntity(EntityKey.of(it), it)
-        );
+        findList.forEach((it) -> {
+            EntityEntry entityEntry = entityEntryContext.getEntityEntry(EntityKey.of(it));
+            entityEntry.managed(persistenceContext, it);
+        });
         return findList;
     }
 
 
     @Override
     public void flush() {
-        final List<Object> changedEntity = persistenceContext.getChangedEntity();
+        deleteEntity();
+        dutyCheck();
+    }
 
-        changedEntity.forEach((it) -> {
+    private void deleteEntity() {
+        entityEntryContext
+                .getDeletedEntityKey()
+                .forEach((it) -> {
+                    EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(it.getClazz());
+                    entityPersister.deleteByKey(it);
+                });
+        entityEntryContext.clear();
+    }
+
+    private void dutyCheck() {
+        persistenceContext.getChangedEntity().forEach((it) -> {
             EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(it.getClass());
             entityPersister.update(it);
         });
-
         persistenceContext.clear();
     }
 }

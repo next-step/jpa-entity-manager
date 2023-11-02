@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.exception.ObjectNotFoundException;
+
 public class EntityEntry {
     private EntityKey entityKey;
     private EntityStatus entityStatus;
@@ -29,8 +31,12 @@ public class EntityEntry {
         entityStatus = EntityStatus.MANAGED;
     }
 
-    public boolean isSaving() {
-        return entityStatus == EntityStatus.SAVING;
+    public <T> T loading(EntityLoader entityLoader, Class<T> tClass, Object id) {
+        if (entityStatus.isGone()) {
+            throw new ObjectNotFoundException();
+        }
+        entityStatus = EntityStatus.LOADING;
+        return entityLoader.find(tClass, id);
     }
 
     public void deleted(PersistenceContext persistenceContext, Object entity) {
@@ -54,4 +60,8 @@ public class EntityEntry {
         return entityStatus == EntityStatus.GONE;
     }
 
+
+    public EntityKey getEntityKey() {
+        return entityKey;
+    }
 }
