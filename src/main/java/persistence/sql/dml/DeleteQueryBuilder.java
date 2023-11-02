@@ -1,17 +1,15 @@
 package persistence.sql.dml;
 
 import persistence.sql.metadata.EntityMetadata;
-import persistence.sql.QueryBuilder;
 
 import static java.lang.String.format;
 
-public class DeleteQueryBuilder implements QueryBuilder {
+public class DeleteQueryBuilder {
 	private static final String DELETE_COMMAND = "DELETE FROM %s;";
 
 	public DeleteQueryBuilder() {
 	}
 
-	@Override
 	public String buildQuery(EntityMetadata entityMetadata) {
 		return format(DELETE_COMMAND, entityMetadata.getTableName());
 	}

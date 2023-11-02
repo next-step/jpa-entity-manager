@@ -3,51 +3,38 @@ package persistence.sql.metadata;
 import jakarta.persistence.Entity;
 import persistence.dialect.Dialect;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class EntityMetadata {
     private final Table table;
 
     private final Columns columns;
+
+    private final Column id;
 
     public EntityMetadata(Object entity) {
         if (!entity.getClass().isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("Entity 클래스가 아닙니다.");
         }
         this.table = new Table(entity.getClass());
-        this.columns = new Columns(convertEntityToColumnList(entity));
+        this.columns = Columns.convertEntityToColumnList(entity);
+        this.id = columns.getId();
     }
 
     public EntityMetadata(Table table, Columns columns) {
         this.table = table;
         this.columns = columns;
-    }
-
-    private List<Column> convertEntityToColumnList(Object entity) {
-        if(entity == null) {
-            return null;
-        }
-
-        Field[] fields = entity.getClass().getDeclaredFields();
-
-        return Arrays.stream(fields)
-                .map(x -> {
-                    x.setAccessible(true);
-
-                    try {
-                        return new Column(x, String.valueOf(x.get(entity)));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        this.id = columns.getId();
     }
 
     public String getTableName() {
         return table.getName();
+    }
+
+    public Object getId() {
+        return id.getValue();
+    }
+
+    public boolean isNewEntity() {
+        return id.getValue() == null;
     }
 
     public String getColumnsToCreate(Dialect dialect) {

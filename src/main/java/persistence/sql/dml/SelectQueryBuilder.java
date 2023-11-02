@@ -3,7 +3,6 @@ package persistence.sql.dml;
 import persistence.sql.metadata.Column;
 import persistence.sql.metadata.Columns;
 import persistence.sql.metadata.EntityMetadata;
-import persistence.sql.QueryBuilder;
 import persistence.sql.metadata.Table;
 
 import java.util.Arrays;
@@ -11,12 +10,12 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class SelectQueryBuilder implements QueryBuilder {
+public class SelectQueryBuilder {
 	private static final String SELECT_COMMAND = "SELECT %s FROM %s;";
 
 	public SelectQueryBuilder() {
 	}
-	@Override
+
 	public String buildQuery(EntityMetadata entityMetadata) {
 		return format(SELECT_COMMAND, "*", entityMetadata.getTableName());
 	}

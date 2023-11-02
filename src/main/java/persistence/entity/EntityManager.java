@@ -7,4 +7,6 @@ public interface EntityManager {
     void persist(Object clazz);
 
     void remove(Object entity);
+
+    void merge(Object entity);
 }
