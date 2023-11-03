@@ -6,6 +6,7 @@ import java.util.Map;
 public class SimplePersistenceContext implements PersistenceContext {
 
     private static final Map<EntityKey, Object> entityMap = new HashMap<>();
+    private static final Map<EntityKey, Object> entitySnapshotMap = new HashMap<>();
 
     @Override
     public Object getEntity(EntityKey entityKey) {
@@ -21,6 +22,15 @@ public class SimplePersistenceContext implements PersistenceContext {
     @Override
     public void removeEntity(EntityKey entityKey) {
         entityMap.remove(entityKey);
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(EntityKey entityKey, Object entity) {
+        Object snapshot = entitySnapshotMap.get(entityKey);
+        if (snapshot != null) {
+            return snapshot;
+        }
+        return entitySnapshotMap.put(entityKey, entity);
     }
 
 }

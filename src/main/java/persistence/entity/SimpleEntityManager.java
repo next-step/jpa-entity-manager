@@ -7,15 +7,30 @@ public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
+    private final PersistenceContext persistenceContext;
 
-    public SimpleEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
+    public SimpleEntityManager(
+            EntityPersister entityPersister,
+            EntityLoader entityLoader,
+            PersistenceContext persistenceContext
+    ) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
     public <T, K> T find(Class<T> clazz, K id) {
-        return entityLoader.selectById(clazz, id);
+        Object cached = persistenceContext.getEntity(new EntityKey(clazz, id));
+
+        if (cached != null) {
+            return (T) cached;
+        }
+
+        T selected = entityLoader.selectById(clazz, id);
+        persistenceContext.addEntity(new EntityKey(selected), selected);
+        persistenceContext.getDatabaseSnapshot(new EntityKey(selected), selected);
+        return selected;
     }
 
     @Override
