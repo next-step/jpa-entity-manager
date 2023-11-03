@@ -14,63 +14,59 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> List<T> findAll(Class<T> tClazz) {
-        return getPersister(tClazz).findAll();
+        return (List<T>) getPersister(tClazz).findAll();
     }
 
     @Override
     public <R, I> R find(Class<R> rClass, I input) {
-        EntityPersister<R> persister = getPersister(rClass);
-        int id = persister.getHashCode(input);
+        final EntityPersister<?> persister = getPersister(rClass);
+        int key = persister.getHashCode(input);
 
-        if(!persistenceContext.isValidEntity(id)) {
-            persistenceContext.addEntity(id, persister.findById(input));
-        }
+        persistenceContext.addEntity(key, persistenceContext.getDatabaseSnapshot(key, persister, input));
 
-        return (R) persistenceContext.getEntity(id);
+        return (R) persistenceContext.getEntity(key);
     }
 
     @Override
     public <T> T persist(T t) {
-        final EntityPersister<T> persister = (EntityPersister<T>) getPersister(t.getClass());
-        final String value =  persister.getIdValue(t);
-        int contextId = persister.getHashCode(value);
+        final EntityPersister<?> persister = getPersister(t.getClass());
+        Object id = persister.getIdValue(t);
+        int key = persister.getHashCode(id);
 
-        if(persistenceContext.isValidEntity(contextId)) {
-            throw new IllegalArgumentException();
-        }
+        persistenceContext.addEntity(key, id, persister.getEntity(t));
 
-        getPersister(t.getClass()).insert(t);
-        persistenceContext.addEntity(contextId, persister.findById(value));
-
-        return (T) persistenceContext.getEntity(contextId);
+        return (T) persistenceContext.getEntity(key);
     }
 
     @Override
-    public <T> void remove(Class<T> tClass, Object arg) {
-        final EntityPersister<T> persister = getPersister(tClass);
+    public <T> void remove(T t, Object arg) {
+        final EntityPersister<?> persister = getPersister(t.getClass());
         int id = persister.getHashCode(arg);
 
-        if(!persistenceContext.isValidEntity(id)) {
-            throw new RuntimeException();
-        }
-
-        getPersister(tClass).delete(arg);
         persistenceContext.removeEntity(id);
     }
 
-    @Override
-    public <T> void update(T t, Object arg) {
-        final EntityPersister<T> persister = (EntityPersister<T>) getPersister(t.getClass());
-        int id = persister.getHashCode(arg);
+    public void flush() {
+        persistenceContext.comparison().forEach((id, data) -> {
+            final EntityPersister<?> persister = getPersister(data.getObjectClass());
 
-        if(persistenceContext.getEntity(id) != null) {
-            getPersister(t.getClass()).update(t, arg);
-            persistenceContext.removeEntity(id);
-            persistenceContext.addEntity(id, persister.findById(arg));
-        }
+            if(!persistenceContext.isEntityInSnapshot(id)) {
+                persister.insert(data.getObject());
+                persistenceContext.getDatabaseSnapshot(id, persister, data.getId());
+                return;
+            }
+
+            if(!persistenceContext.isEntityInContext(id)) {
+                persister.delete(data.getId());
+                return;
+            }
+
+            persister.update(data, data.getId());
+            persistenceContext.getDatabaseSnapshot(id, persister, data.getId());
+        });
     }
 
-    private <T> EntityPersister<T> getPersister(Class<T> tClass) {
-        return (EntityPersister<T>) persisterMap.get(tClass.getName());
+    private <T> EntityPersister<?> getPersister(Class<T> tClass) {
+        return persisterMap.get(tClass.getName());
     }
 }

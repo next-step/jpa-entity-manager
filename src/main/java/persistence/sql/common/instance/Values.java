@@ -44,4 +44,21 @@ public class Values {
             .orElseThrow(NotFoundValueException::new)
             .getValue();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Values values1 = (Values) o;
+        return Arrays.equals(values, values1.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
+    }
 }

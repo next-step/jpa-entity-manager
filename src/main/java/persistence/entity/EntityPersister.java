@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import jakarta.persistence.Transient;
+import java.util.Arrays;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.Query;
 import persistence.sql.common.instance.Values;
@@ -63,6 +65,28 @@ public class EntityPersister<T> {
 
     public <I> String getIdValue(I input) {
         return getValues(input).getValue(columns.getIdFieldName());
+    }
+
+    public <I> T getEntity(I input) {
+        T destination;
+        try {
+            destination = (T) input.getClass().getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Arrays.stream(input.getClass().getDeclaredFields())
+            .filter(field -> !field.isAnnotationPresent(Transient.class))
+            .forEach(field -> {
+                field.setAccessible(true);
+                try {
+                    field.set(destination, field.get(input));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        return destination;
     }
 
     private <I> Values getValues(I input) {
