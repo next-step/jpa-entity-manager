@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -145,6 +146,17 @@ class EntityEntryTest {
         //then
         assertThatExceptionOfType(ObjectNotFoundException.class)
                 .isThrownBy(() -> entityEntry.loading(entityLoader, Person.class, 1L));
+    }
+
+    @Test
+    @DisplayName("EntityEntry의 초기 상태는 Loading 상태이다")
+    void initLoading() {
+        //given
+        Person person = new Person(1L, "이름", 30, "email@odna");
+        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+
+        //when & then
+         assertThat(entityEntry.isLoading()).isTrue();
     }
 
 

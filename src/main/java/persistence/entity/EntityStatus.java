@@ -20,4 +20,8 @@ public enum EntityStatus {
     public boolean isManaged() {
         return this == MANAGED;
     }
+
+    public boolean isLoading() {
+        return this == LOADING;
+    }
 }

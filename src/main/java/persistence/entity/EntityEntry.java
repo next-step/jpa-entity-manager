@@ -8,7 +8,7 @@ public class EntityEntry {
 
     public EntityEntry(EntityKey entityKey) {
         this.entityKey = entityKey;
-        this.entityStatus = EntityStatus.NEW;
+        this.entityStatus = EntityStatus.LOADING;
     }
 
     public void readOnly() {
@@ -58,6 +58,10 @@ public class EntityEntry {
 
     public boolean isGone() {
         return entityStatus.isGone();
+    }
+
+    public boolean isLoading() {
+        return entityStatus.isLoading();
     }
 
 

@@ -47,4 +47,17 @@ class EntityStatusTest {
         assertTrue(managed);
     }
 
+    @Test
+    @DisplayName("LOADING 상태인지 확인한다.")
+    void isLoading() {
+        //given
+        EntityStatus entityStatus = EntityStatus.LOADING;
+
+        //when
+        final boolean loading = entityStatus.isLoading();
+
+        //then
+        assertTrue(loading);
+    }
+
 }
