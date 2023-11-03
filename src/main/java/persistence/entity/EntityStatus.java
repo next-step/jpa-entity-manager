@@ -16,4 +16,8 @@ public enum EntityStatus {
     public boolean isReadOnly() {
         return this == READ_ONLY;
     }
+
+    public boolean isManaged() {
+        return this == MANAGED;
+    }
 }

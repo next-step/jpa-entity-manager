@@ -34,4 +34,17 @@ class EntityStatusTest {
     }
 
 
+    @Test
+    @DisplayName("READ ONLY 상태인지 확인한다.")
+    void isManged() {
+        //given
+        EntityStatus entityStatus = EntityStatus.MANAGED;
+
+        //when
+        final boolean managed = entityStatus.isManaged();
+
+        //then
+        assertTrue(managed);
+    }
+
 }

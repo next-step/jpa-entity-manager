@@ -53,11 +53,11 @@ public class EntityEntry {
     }
 
     public boolean isManaged() {
-        return entityStatus == EntityStatus.MANAGED;
+        return entityStatus.isManaged();
     }
 
     public boolean isGone() {
-        return entityStatus == EntityStatus.GONE;
+        return entityStatus.isGone();
     }
 
 
