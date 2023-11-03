@@ -66,7 +66,7 @@ public class SelectQueryBuilderTest {
     SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
     Long targetValue = 1L;
 
-    String query = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClauseWithId(), meta.getTableName(), meta.getPrimaryKeyColumn().getSimpleName(), targetValue);
+    String query = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClauseWithId(), meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetValue);
 
     assertThat(query).isEqualTo("SELECT id,nick_name,old,email FROM USERS WHERE id=1;");
   }
@@ -77,7 +77,7 @@ public class SelectQueryBuilderTest {
     SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
     Long targetValue = 1L;
 
-    String query = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClauseWithId(), meta.getTableName(), meta.getPrimaryKeyColumn().getSimpleName(), targetValue);
+    String query = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClauseWithId(), meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetValue);
 
     List<Object> people = jdbcTemplate.query(query, (rs) ->
             new PersonFixtureStep3(

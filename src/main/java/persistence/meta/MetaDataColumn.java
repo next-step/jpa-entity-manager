@@ -31,10 +31,10 @@ public class MetaDataColumn {
             .sorted(Comparator.comparing(MetaDataColumnConstraint::getConstraint).reversed())
             .collect(Collectors.toList());
 
-    return new MetaDataColumn(getColumnName(field), columnType, field.getName(), field, constraints);
+    return new MetaDataColumn(getDBColumnName(field), columnType, field.getName(), field, constraints);
   }
 
-  public String getColumn() {
+  public String getDBColumnsClause() {
 
     StringBuilder sb = new StringBuilder();
     sb.append(String.format(COLUMN_DATA_TYPE, name, type));
@@ -46,7 +46,7 @@ public class MetaDataColumn {
     return sb.toString();
   }
 
-  private static String getColumnName(Field field) {
+  private static String getDBColumnName(Field field) {
 
     if (field.isAnnotationPresent(Column.class)
             && !field.getAnnotation(Column.class).name().isEmpty()) {
@@ -70,7 +70,7 @@ public class MetaDataColumn {
     }
   }
 
-  public String getSimpleName() {
+  public String getDBColumnName() {
     return name;
   }
 

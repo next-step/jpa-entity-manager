@@ -20,7 +20,7 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
     T entityInstance = metaEntity.createInstance();
 
     for (MetaDataColumn metaDataColumn : metaEntity.getMetaDataColumns()) {
-      String fieldName = metaDataColumn.getSimpleName();
+      String fieldName = metaDataColumn.getDBColumnName();
       metaDataColumn.setFieldValue(entityInstance, resultSet.getObject(fieldName));
     }
     return entityInstance;
