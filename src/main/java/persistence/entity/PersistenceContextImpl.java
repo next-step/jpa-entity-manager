@@ -73,8 +73,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
         snapshotMap.forEach((id, snapshot) -> {
-            if (isEntityInContext(id)
-                    && snapshot.getValues().equals(contextMap.get(id).getValues())) {
+            if (isEntityInContext(id) && snapshot.getObject().equals(contextMap.get(id).getObject())) {
                 return;
             }
 
@@ -94,7 +93,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
         contextMap.forEach((id, snapshot) -> {
-            if (isEntityInSnapshot(id) && snapshot.getValues().equals(snapshotMap.get(id).getValues())) {
+            if (isEntityInSnapshot(id) && snapshot.getObject().equals(snapshotMap.get(id).getObject())) {
                 return;
             }
 

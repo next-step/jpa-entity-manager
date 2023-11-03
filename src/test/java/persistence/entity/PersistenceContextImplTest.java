@@ -1,18 +1,21 @@
 package persistence.entity;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import database.DatabaseServer;
+import database.H2;
 import domain.Person;
 import domain.SelectPerson;
-import org.assertj.core.api.Assertions;
+import java.sql.SQLException;
+import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.exception.InvalidContextException;
+import persistence.sql.dml.Query;
 
 class PersistenceContextImplTest {
 
@@ -47,7 +50,7 @@ class PersistenceContextImplTest {
 
         @Test
         @DisplayName("성공적으로 데이터를 저장합니다.")
-        void success() {
+        void success() throws SQLException {
             //given
             final Long id = 9898L;
             final String name = "name";
@@ -60,7 +63,7 @@ class PersistenceContextImplTest {
             SelectPerson person = new SelectPerson(id, name, age, email, index);
 
             //when
-            persistenceContext.addEntity(key, id, person);
+            영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
 
             SelectPerson result = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(key);
 
@@ -76,7 +79,7 @@ class PersistenceContextImplTest {
 
         @Test
         @DisplayName("서로 다른 객체가 영속성 컨텍스트에 저장이 된다")
-        void differentEntitySave() {
+        void differentEntitySave() throws SQLException {
             //given
             final Long id = 333L;
             SelectPerson selectPerson = new SelectPerson(id, "name", 30, "email", 3);
@@ -103,7 +106,7 @@ class PersistenceContextImplTest {
 
         @Test
         @DisplayName("성공적으로 데이터를 가져옵니다.")
-        void success() {
+        void success() throws SQLException {
             //given
             final Long id = 3333L;
             final String name = "name";
@@ -164,7 +167,7 @@ class PersistenceContextImplTest {
 
         @Test
         @DisplayName("성공적으로 데이터를 삭제합니다.")
-        void success() {
+        void success() throws SQLException {
             //given
             final Long id = 5555L;
             final Integer key = id.hashCode();
@@ -192,8 +195,14 @@ class PersistenceContextImplTest {
         }
     }
 
-    private void 영속성_컨텍스트에서_데이터를_저장한다(Integer key, Object id, Object entity) {
-        persistenceContext.addEntity(key, id, entity);
+    private void 영속성_컨텍스트에서_데이터를_저장한다(Integer key, Object id, Object entity) throws SQLException {
+        EntityPersister<SelectPerson> entityPersister;
+
+        DatabaseServer server = new H2();
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+        entityPersister = new EntityPersister<>(jdbcTemplate, SelectPerson.class, Query.getInstance());
+
+        persistenceContext.addEntity(key, id, entityPersister.getEntity(entity));
     }
 
     private Object 영속성_컨텍스트에서_데이터를_가져온다(Integer id) {

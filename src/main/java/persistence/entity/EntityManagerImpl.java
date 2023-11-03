@@ -33,7 +33,7 @@ public class EntityManagerImpl implements EntityManager {
         Object id = persister.getIdValue(t);
         int key = persister.getHashCode(id);
 
-        persistenceContext.addEntity(key, id, t);
+        persistenceContext.addEntity(key, id, persister.getEntity(t));
 
         return (T) persistenceContext.getEntity(key);
     }
