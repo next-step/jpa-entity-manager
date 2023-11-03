@@ -42,7 +42,7 @@ UPDATE USERS[TABLE] SET nick_name[COLUMN] = 'value2'[VALUE] WHERE ID[COLUMN] = 6
   - EntityManager에서 EntityPersister로 책임이 이관되면서 refactoring?
   - Cache 구현을 hibernate 내에서 어떻게 진행하는지 보여주기?
   - Connection을 EntityManager가 관리하고 Persister는 받아서 사용하는게 맞아 보인다.
-    - hibernate 코드를 읽어야 되는 부분인것같다.
+    - hibernate 코드를 읽어야 되는 부분인것같다.(어딜봐야될까?)
     - SessionImpl 가 session을 관리하는것으로 보이니깐. (connection)을 받아오자
 
 

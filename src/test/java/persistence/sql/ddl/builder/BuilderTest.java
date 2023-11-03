@@ -2,6 +2,7 @@ package persistence.sql.ddl.builder;
 
 import database.DatabaseServer;
 import database.H2;
+import java.sql.Connection;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeAll;
 import persistence.meta.MetaEntity;
@@ -18,13 +19,15 @@ public class BuilderTest {
   public static MetaEntity<PersonFixtureStep3> meta;
   public static CreateQueryBuilder createQueryBuilder;
   public static InsertQueryBuilder insertQueryBuilder;
+  public static Connection connection;
   @BeforeAll
   static void setup() throws SQLException {
     person = PersonFixtureStep3.class;
     meta = MetaEntity.of(person);
     server = new H2();
     server.start();
-    jdbcTemplate = new JdbcTemplate(server.getConnection());
+    connection = server.getConnection();
+    jdbcTemplate = new JdbcTemplate(connection);
 
     insertQueryBuilder = new InsertQueryBuilder();
     createQueryBuilder = new CreateQueryBuilder();
