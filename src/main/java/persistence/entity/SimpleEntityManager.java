@@ -41,14 +41,18 @@ public class SimpleEntityManager implements EntityManager {
         Object idValue = ReflectionUtil.getValueFrom(entityData.getEntityColumns().getIdColumn().getField(), entity);
         if (idValue == null) {
             entityPersister.insert(entity);
+            persistenceContext.addEntity(new EntityKey(entity), entity);
             return;
         }
 
         Object foundEntity = find(entityClass, idValue);
         if (foundEntity == null) {
             entityPersister.insert(entity);
+            persistenceContext.addEntity(new EntityKey(entity), entity);
         } else {
             entityPersister.update(entity);
+            persistenceContext.removeEntity(new EntityKey(entity));
+            persistenceContext.addEntity(new EntityKey(entity), entity);
         }
     }
 
