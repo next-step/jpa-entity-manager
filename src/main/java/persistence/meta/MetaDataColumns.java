@@ -15,18 +15,20 @@ public class MetaDataColumns {
   public static final String DELIMITER = ",";
   private final List<MetaDataColumn> columns = new ArrayList<>();
   private final MetaDataColumn primaryColumn;
+
   private MetaDataColumns(List<MetaDataColumn> metaColumns, MetaDataColumn primaryColumn) {
     this.primaryColumn = primaryColumn;
     columns.addAll(metaColumns);
   }
 
-  public static MetaDataColumns of(Class<?> clazz, Dialect dialect){
+  public static MetaDataColumns of(Class<?> clazz, Dialect dialect) {
     List<MetaDataColumn> metaColumns = Arrays.stream(clazz.getDeclaredFields())
-            .filter(field -> isNotTransient(List.of(field.getAnnotations())))
-            .map(field -> MetaDataColumn.of(field, dialect.convertToColumn(field)))
-            .collect(Collectors.toList());
+        .filter(field -> isNotTransient(List.of(field.getAnnotations())))
+        .map(field -> MetaDataColumn.of(field, dialect.convertToColumn(field)))
+        .collect(Collectors.toList());
 
-    MetaDataColumn primaryKeyColumn = metaColumns.stream().filter(column -> !column.isNotPrimaryKey())
+    MetaDataColumn primaryKeyColumn = metaColumns.stream()
+        .filter(column -> !column.isNotPrimaryKey())
         .findFirst().orElseThrow(() -> new RuntimeException("ID 필드가 없습니다."));
 
     return new MetaDataColumns(metaColumns, primaryKeyColumn);
@@ -34,47 +36,65 @@ public class MetaDataColumns {
 
   public String getColumns() {
     return columns.stream()
-            .map(MetaDataColumn::getDBColumnsClause)
-            .collect(Collectors.joining(DELIMITER));
+        .map(MetaDataColumn::getDBColumnsClause)
+        .collect(Collectors.joining(DELIMITER));
   }
 
   private static boolean isNotTransient(List<Annotation> annotations) {
     return annotations.stream()
-            .noneMatch(annotation -> annotation.annotationType().equals(Transient.class));
+        .noneMatch(annotation -> annotation.annotationType().equals(Transient.class));
   }
 
-  public List<String> getDBColumnsWithoutId(){
+  public List<String> getDBColumnsWithoutId() {
     return columns.stream()
-            .filter(MetaDataColumn::isNotPrimaryKey)
-            .map(MetaDataColumn::getDBColumnName)
-            .collect(Collectors.toList());
+        .filter(MetaDataColumn::isNotPrimaryKey)
+        .map(MetaDataColumn::getDBColumnName)
+        .collect(Collectors.toList());
   }
 
-  public Map<String, String> getFieldToDBColumnMap(){
+  public String getClause(List<String> entries) {
+
+    return String.join(DELIMITER, entries);
+  }
+
+  public List<String> getFieldValuesWithoutId(Object entity) {
     return columns.stream()
-            .collect(Collectors.toMap(
-                    MetaDataColumn::getDBColumnName,
-                    MetaDataColumn::getFieldName
-            ));
+        .filter(MetaDataColumn::isNotPrimaryKey)
+        .map(column -> String.valueOf(column.getFieldValue(entity)))
+        .collect(Collectors.toList());
   }
 
-  public List<String> getFields(){
+  public Map<String, String> getFieldToDBColumnMap() {
+    return columns.stream()
+        .collect(Collectors.toMap(
+            MetaDataColumn::getDBColumnName,
+            MetaDataColumn::getFieldName
+        ));
+  }
+
+  public List<String> getFields() {
     return columns.stream()
         .filter(MetaDataColumn::isNotPrimaryKey)
         .map(MetaDataColumn::getFieldName)
         .collect(Collectors.toList());
   }
 
-  public List<String> getColumnsWithId(){
+  public List<String> getColumnsWithId() {
     return columns.stream()
         .map(MetaDataColumn::getDBColumnName)
         .collect(Collectors.toList());
   }
-  public MetaDataColumn getPrimaryColumn(){
+
+  public MetaDataColumn getPrimaryColumn() {
     return primaryColumn;
   }
 
-  public List<MetaDataColumn> getMetaDataColumns(){
+  public List<MetaDataColumn> getMetaDataColumns() {
     return columns;
+  }
+
+  public MetaDataColumn getColumnByFieldName(String fieldName) {
+    return columns.stream().filter(column -> column.getFieldName().equals(fieldName)).findFirst()
+        .orElseThrow(() -> new RuntimeException("해당 field가 없습니다."));
   }
 }
