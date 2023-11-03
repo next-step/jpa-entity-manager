@@ -60,4 +60,17 @@ class EntityStatusTest {
         assertTrue(loading);
     }
 
+    @Test
+    @DisplayName("DELETED 상태인지 확인한다.")
+    void isDeleted() {
+        //given
+        EntityStatus entityStatus = EntityStatus.DELETED;
+
+        //when
+        final boolean deleted = entityStatus.isDeleted();
+
+        //then
+        assertTrue(deleted);
+    }
+
 }

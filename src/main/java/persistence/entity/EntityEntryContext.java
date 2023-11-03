@@ -14,7 +14,7 @@ public class EntityEntryContext {
 
     public List<EntityKey> getDeletedEntityKey() {
         return context.values().stream()
-                .filter(EntityEntry::isGone)
+                .filter(EntityEntry::isDeleted)
                 .map(EntityEntry::getEntityKey)
                 .collect(Collectors.toList());
     }

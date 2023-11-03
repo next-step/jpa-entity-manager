@@ -112,6 +112,16 @@ class EntityPersisterTest {
         });
     }
 
+
+    @Test
+    @DisplayName("저장이 된다")
+    void saving() {
+
+    }
+
+
+
+
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());

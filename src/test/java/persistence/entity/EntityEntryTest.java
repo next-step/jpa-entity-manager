@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import database.DatabaseServer;
 import database.H2;
@@ -61,17 +62,13 @@ class EntityEntryTest {
     void manged() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
+        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
 
         //when
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
-        entityEntry.managed(simplePersistenceContext, person);
+        entityEntry.managed();
 
         //then
-        assertSoftly((it) -> {
-            it.assertThat(simplePersistenceContext.getEntity(EntityKey.of(person))).isEqualTo(person);
-            it.assertThat(entityEntry.isManaged()).isTrue();
-        });
+        assertThat(entityEntry.isManaged()).isTrue();
     }
 
     @Test
@@ -94,22 +91,17 @@ class EntityEntryTest {
     }
 
     @Test
-    @DisplayName("EntityEntry가 삭제를 진행하면 gone상태가 된다")
+    @DisplayName("EntityEntry가 deleted상태가 된다")
     void deleted() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
         EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
 
-
         //when
-        entityEntry.deleted(simplePersistenceContext, person);
+        entityEntry.deleted();
 
         //then
-        assertSoftly((it) -> {
-            it.assertThat(simplePersistenceContext.getEntity(EntityKey.of(person))).isNull();
-            it.assertThat(entityEntry.isGone()).isTrue();
-        });
+        assertTrue(entityEntry.isDeleted());
     }
 
     @Test
@@ -117,16 +109,14 @@ class EntityEntryTest {
     void readOnlyDelete() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
         EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
 
         //when
         entityEntry.readOnly();
 
         //then
-        assertThatIllegalStateException().isThrownBy(
-                () -> entityEntry.deleted(simplePersistenceContext, person)
-        );
+        assertThatIllegalStateException()
+                .isThrownBy(entityEntry::deleted);
     }
 
     @Test
@@ -134,14 +124,13 @@ class EntityEntryTest {
     void goneIsNotLoad() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
         EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
         final EntityMeta entityMeta = EntityMeta.from(person.getClass());
         final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, new EntityMapper(entityMeta));
 
         //when
-        entityEntry.deleted(simplePersistenceContext, person);
+        entityEntry.gone();
 
         //then
         assertThatExceptionOfType(ObjectNotFoundException.class)
@@ -156,9 +145,8 @@ class EntityEntryTest {
         EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
 
         //when & then
-         assertThat(entityEntry.isLoading()).isTrue();
+        assertThat(entityEntry.isLoading()).isTrue();
     }
-
 
 
     @AfterEach

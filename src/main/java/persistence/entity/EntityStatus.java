@@ -24,4 +24,8 @@ public enum EntityStatus {
     public boolean isLoading() {
         return this == LOADING;
     }
+
+    public boolean isDeleted() {
+        return this == DELETED;
+    }
 }

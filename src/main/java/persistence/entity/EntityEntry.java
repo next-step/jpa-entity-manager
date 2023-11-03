@@ -26,8 +26,7 @@ public class EntityEntry {
         return entity;
     }
 
-    public void managed(PersistenceContext persistenceContext, Object entity) {
-        persistenceContext.addEntity(entityKey, entity);
+    public void managed() {
         entityStatus = EntityStatus.MANAGED;
     }
 
@@ -39,16 +38,15 @@ public class EntityEntry {
         return entityLoader.find(tClass, id);
     }
 
-    public void deleted(PersistenceContext persistenceContext, Object entity) {
+    public void deleted() {
         if (entityStatus.isReadOnly()) {
             throw new IllegalStateException("읽기 전용 상태입니다.");
         }
 
         entityStatus = EntityStatus.DELETED;
-        if (persistenceContext.getEntity(entityKey) != null) {
-            persistenceContext.removeEntity(entity);
-        }
+    }
 
+    public void gone() {
         entityStatus = EntityStatus.GONE;
     }
 
@@ -67,5 +65,9 @@ public class EntityEntry {
 
     public EntityKey getEntityKey() {
         return entityKey;
+    }
+
+    public boolean isDeleted() {
+        return entityStatus.isDeleted();
     }
 }

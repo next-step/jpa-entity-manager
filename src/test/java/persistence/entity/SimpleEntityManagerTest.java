@@ -90,19 +90,21 @@ class SimpleEntityManagerTest {
     @DisplayName("1차 캐시에 의해 조회가 된다.")
     void firstCache() {
         //given
-        Person person = new Person("이름", 19, "asd@gmail.com");
+        Person person1 = new Person("이름", 19, "asd@gmail.com");
+        Person person2 = new Person("이름", 19, "asd@gmail.com");
+        Person person3 = new Person("이름", 19, "asd@gmail.com");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when
-        final Person person1 = entityManager.persist(person);
-        final Person person2 = entityManager.persist(person);
-        final Person person3 = entityManager.persist(person);
+        final Person savePerson1 = entityManager.persist(person1);
+        final Person savePerson2= entityManager.persist(person2);
+        final Person savePerson3 = entityManager.persist(person3);
 
         //then
         assertSoftly(it -> {
-                    it.assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
-                    it.assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
-                    it.assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
+                    it.assertThat(savePerson1).isEqualTo(entityManager.find(Person.class, person1.getId()));
+                    it.assertThat(savePerson2).isEqualTo(entityManager.find(Person.class, person2.getId()));
+                    it.assertThat(savePerson3).isEqualTo(entityManager.find(Person.class, person3.getId()));
                 }
         );
     }
