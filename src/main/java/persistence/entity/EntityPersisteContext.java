@@ -12,4 +12,5 @@ public class EntityPersisteContext {
     public EntityPersister getEntityPersister(Class<?> tClass) {
         return context.get(tClass);
     }
+
 }

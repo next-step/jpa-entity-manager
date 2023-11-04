@@ -63,4 +63,15 @@ public class EntityPersister {
         }
     }
 
+    public void deleteByKey(EntityKey entityKey) {
+        final String query = queryGenerator
+                .delete()
+                .build(entityKey.getId());
+
+        log.info(query);
+
+        jdbcTemplate.execute(query);
+    }
+
+
 }

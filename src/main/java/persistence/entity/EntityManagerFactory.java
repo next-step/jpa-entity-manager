@@ -14,13 +14,14 @@ public class EntityManagerFactory {
     private final EntityPersisteContext entityPersisteContext;
     private final EntityLoaderContext entityLoaderContext;
 
-    public EntityManagerFactory(String packageName, JdbcTemplate jdbcTemplate, Dialect dialect) {
-        Set<Class<?>> entityClasses = getEntityClassesFromPackage(packageName);
-
+    private EntityManagerFactory(Set<Class<?>> entityClasses, JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.entityPersisteContext = initEntityPersisteContext(entityClasses, jdbcTemplate, dialect);
         this.entityLoaderContext = initEntityLoaderContext(entityClasses, jdbcTemplate, dialect);
     }
 
+    public static EntityManagerFactory of(String packageName, JdbcTemplate jdbcTemplate, Dialect dialect) {
+        return new EntityManagerFactory(getEntityClassesFromPackage(packageName), jdbcTemplate, dialect);
+    }
 
     private EntityPersisteContext initEntityPersisteContext(Set<Class<?>> entityClasses, JdbcTemplate jdbcTemplate,
                                                             Dialect dialect) {
@@ -44,7 +45,7 @@ public class EntityManagerFactory {
         return new EntityLoaderContext(loaderContext);
     }
 
-    private Set<Class<?>> getEntityClassesFromPackage(String packageName) {
+    private static Set<Class<?>> getEntityClassesFromPackage(String packageName) {
         return new EntityClassLoader(packageName).getEntityClasses();
     }
 

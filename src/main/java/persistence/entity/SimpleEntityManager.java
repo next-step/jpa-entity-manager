@@ -24,64 +24,33 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public <T> T persist(T entity) {
         EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
-        final T persistEntity = entityPersister.insert(entity);
 
-        this.persistenceContext.addEntity(EntityKey.of(entity), persistEntity);
-
-        return persistEntity;
+        return persistenceContext.saving(entityPersister, entity);
     }
 
     @Override
     public void remove(Object entity) {
-        EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(entity.getClass());
-        EntityKey entityKey = EntityKey.of(entity);
-
-        if (persistenceContext.getEntity(entityKey) != null) {
-            persistenceContext.removeEntity(entity);
-        }
-
-        entityPersister.delete(entity);
+        persistenceContext.deleted(entity);
     }
 
     @Override
     public <T, ID> T find(Class<T> clazz, ID id) {
         EntityLoader entityLoader = entityLoaderContext.getEntityLoader(clazz);
-        EntityKey entityKey = EntityKey.of(clazz, id);
 
-        if (persistenceContext.getEntity(entityKey) != null) {
-            return (T) persistenceContext.getEntity(entityKey);
-        }
-
-        final T entity = entityLoader.find(clazz, id);
-        if (entity != null) {
-            persistenceContext.addEntity(entityKey, entity);
-        }
-
-        return entity;
+        return persistenceContext.loading(entityLoader, clazz, id);
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
         EntityLoader entityLoader = entityLoaderContext.getEntityLoader(tClass);
 
-        final List<T> findList = entityLoader.findAll(tClass);
-
-        findList.forEach((it) ->
-                persistenceContext.addEntity(EntityKey.of(it), it)
-        );
-        return findList;
+        return persistenceContext.findAll(entityLoader, tClass);
     }
 
 
     @Override
     public void flush() {
-        final List<Object> changedEntity = persistenceContext.getChangedEntity();
-
-        changedEntity.forEach((it) -> {
-            EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(it.getClass());
-            entityPersister.update(it);
-        });
-
-        persistenceContext.clear();
+        persistenceContext.flush(entityPersisterContenxt);
     }
+
 }

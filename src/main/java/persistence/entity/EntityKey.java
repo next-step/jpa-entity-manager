@@ -22,6 +22,14 @@ public class EntityKey {
         return new EntityKey(clazz, id);
     }
 
+    public Class<?> getClazz() {
+        return clazz;
+    }
+
+    public Object getId() {
+        return id;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {

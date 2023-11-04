@@ -33,7 +33,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
         jdbcTemplate.execute(QueryGenerator.of(DifferentPerson.class, dialect).create());
-        entityManagerFactory = new EntityManagerFactory("persistence.testFixtures", jdbcTemplate, dialect);
+        entityManagerFactory = EntityManagerFactory.of("persistence.testFixtures", jdbcTemplate, dialect);
     }
 
 
@@ -64,6 +64,7 @@ class SimpleEntityManagerTest {
         //when
         final List<Person> persons = entityManager.findAll(Person.class);
         entityManager.remove(persons.get(0));
+        entityManager.flush();
         final List<Person> resultPersons = entityManager.findAll(Person.class);
 
         //then
@@ -75,7 +76,6 @@ class SimpleEntityManagerTest {
     void findById() {
         //given
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(2L, "이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.persist(person);
 
@@ -90,19 +90,21 @@ class SimpleEntityManagerTest {
     @DisplayName("1차 캐시에 의해 조회가 된다.")
     void firstCache() {
         //given
-        Person person = new Person("이름", 19, "asd@gmail.com");
+        Person person1 = new Person("이름", 19, "asd@gmail.com");
+        Person person2 = new Person("이름", 19, "asd@gmail.com");
+        Person person3 = new Person("이름", 19, "asd@gmail.com");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when
-        final Person person1 = entityManager.persist(person);
-        final Person person2 = entityManager.persist(person);
-        final Person person3 = entityManager.persist(person);
+        final Person savePerson1 = entityManager.persist(person1);
+        final Person savePerson2= entityManager.persist(person2);
+        final Person savePerson3 = entityManager.persist(person3);
 
         //then
         assertSoftly(it -> {
-                    it.assertThat(person1).isEqualTo(entityManager.find(Person.class, person1.getId()));
-                    it.assertThat(person2).isEqualTo(entityManager.find(Person.class, person2.getId()));
-                    it.assertThat(person3).isEqualTo(entityManager.find(Person.class, person3.getId()));
+                    it.assertThat(savePerson1).isEqualTo(entityManager.find(Person.class, person1.getId()));
+                    it.assertThat(savePerson2).isEqualTo(entityManager.find(Person.class, person2.getId()));
+                    it.assertThat(savePerson3).isEqualTo(entityManager.find(Person.class, person3.getId()));
                 }
         );
     }
@@ -113,7 +115,6 @@ class SimpleEntityManagerTest {
         //given
         final String CHANGE_EMAIL_STRING = "change23@gmail.com";
         Person person = new Person("이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         final Person person1 = entityManager.persist(person);
@@ -144,7 +145,6 @@ class SimpleEntityManagerTest {
         //given
         Person person = new Person("이름", 19, "asd@gmail.com");
         DifferentPerson noAutoIncrementPerson = new DifferentPerson(2L, "이름", 19, "asd@gmail.com");
-        Dialect dialect = new FakeDialect();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         //when

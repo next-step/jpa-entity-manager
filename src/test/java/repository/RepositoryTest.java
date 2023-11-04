@@ -39,7 +39,7 @@ public class RepositoryTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         dialect = new FakeDialect();
-        entityManagerFactory = new EntityManagerFactory("persistence.testFixtures", jdbcTemplate, dialect);
+        entityManagerFactory = EntityManagerFactory.of("persistence.testFixtures", jdbcTemplate, dialect);
 
     }
 
@@ -48,7 +48,7 @@ public class RepositoryTest {
     Stream<DynamicNode> testFactory() {
 
         final DDLRepository<Person> ddlRepository = new BaseDDLRepository<>(jdbcTemplate, Person.class, dialect);
-        final CrudRepository<Person, Long> crudRepository = new SimpleCrudRepository<>(
+        final SimpleCrudRepository<Person, Long> crudRepository = new SimpleCrudRepository<>(
                 entityManagerFactory.createEntityManager(), Person.class);
 
         return Stream.of(
@@ -121,11 +121,13 @@ public class RepositoryTest {
 
                             //when
                             crudRepository.delete(persons.get(0));
+                            crudRepository.flush();
 
                             //then
                             assertThat(crudRepository.findAll()).hasSize(1);
                         }))
                 ),
+
                 dynamicTest("테이블이 삭제된다", () ->
                         assertDoesNotThrow(ddlRepository::dropTable)
                 )

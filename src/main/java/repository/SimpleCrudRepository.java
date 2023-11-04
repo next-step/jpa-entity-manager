@@ -19,6 +19,9 @@ public class SimpleCrudRepository<T, ID> implements CrudRepository<T, ID> {
     public void delete(T entity) {
         entityManager.remove(entity);
     }
+    public void flush() {
+        entityManager.flush();
+    }
 
     public T findById(Class<T> tClass, ID id) {
         return entityManager.find(tClass, id);
