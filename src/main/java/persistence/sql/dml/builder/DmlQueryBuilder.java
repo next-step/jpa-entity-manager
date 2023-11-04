@@ -1,5 +1,7 @@
 package persistence.sql.dml.builder;
 
+import java.util.List;
+
 public class DmlQueryBuilder {
   private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
   private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
@@ -8,8 +10,8 @@ public class DmlQueryBuilder {
   public DmlQueryBuilder() {
   }
 
-  public String createUpdateQuery(String tableName, String targetColumn, String targetValue, String whereColumn, String whereValue){
-    return updateQueryBuilder.createUpdateQuery(tableName, targetColumn, targetValue, whereColumn, whereValue);
+  public String createUpdateQuery(String tableName, List<String> columns, List<String> values, String whereColumn, String whereValue){
+    return updateQueryBuilder.createUpdateQuery(tableName, columns, values, whereColumn, whereValue);
   }
 
   public String createInsertQuery(String tableName, String columnClause, String valueClause){
