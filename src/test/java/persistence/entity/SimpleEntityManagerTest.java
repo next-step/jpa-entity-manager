@@ -8,10 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.dialect.Dialect;
-import persistence.dialect.DialectFactory;
-import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.ddl.DropQueryBuilder;
+import persistence.sql.ddl.H2DdlQueryBuilder;
 import persistence.sql.metadata.EntityMetadata;
 
 import java.sql.SQLException;
@@ -31,11 +28,10 @@ class SimpleEntityManagerTest {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        Dialect dialect = DialectFactory.getDialect("H2");
         EntityMetadata entityMetadata = new EntityMetadata(new Person());
 
-        jdbcTemplate.execute(new DropQueryBuilder().buildQuery(entityMetadata));
-        jdbcTemplate.execute(new CreateQueryBuilder(dialect).buildQuery(entityMetadata));
+        jdbcTemplate.execute(H2DdlQueryBuilder.build().dropQuery(entityMetadata));
+        jdbcTemplate.execute(H2DdlQueryBuilder.build().createQuery(entityMetadata));
         jdbcTemplate.execute("INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');");
 
         entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate), new SimplePersistenceContext());
@@ -58,7 +54,7 @@ class SimpleEntityManagerTest {
         Person resultPerson = entityManager.find(Person.class, 2L);
         Assertions.assertAll(
                 () -> assertTrue(resultPerson.getName().equals("name")),
-                () -> assertTrue(resultPerson.getId().equals(2L))
+                () -> assertTrue(resultPerson.getEmail().equals("test@email.com"))
         );
     }
 

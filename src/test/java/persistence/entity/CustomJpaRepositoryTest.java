@@ -8,10 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.dialect.Dialect;
-import persistence.dialect.DialectFactory;
-import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.ddl.DropQueryBuilder;
+import persistence.sql.ddl.H2DdlQueryBuilder;
 import persistence.sql.metadata.EntityMetadata;
 
 import java.sql.SQLException;
@@ -32,11 +29,10 @@ class CustomJpaRepositoryTest {
 
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-		Dialect dialect = DialectFactory.getDialect("H2");
 		EntityMetadata entityMetadata = new EntityMetadata(new Person());
 
-		jdbcTemplate.execute(new DropQueryBuilder().buildQuery(entityMetadata));
-		jdbcTemplate.execute(new CreateQueryBuilder(dialect).buildQuery(entityMetadata));
+		jdbcTemplate.execute(H2DdlQueryBuilder.build().dropQuery(entityMetadata));
+		jdbcTemplate.execute(H2DdlQueryBuilder.build().createQuery(entityMetadata));
 
 		persistenceContext = new SimplePersistenceContext();
 		entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate), persistenceContext);
