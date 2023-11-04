@@ -32,7 +32,7 @@ public class BuilderTest {
     insertQueryBuilder = new InsertQueryBuilder();
     createQueryBuilder = new CreateQueryBuilder();
 
-    String query = createQueryBuilder.createCreateQuery(meta.getCreateClause());
+    String query = createQueryBuilder.createCreateQuery(meta.getTableName(), meta.getColumns());
     jdbcTemplate.execute(query);
 
     String queryFirst = insertQueryBuilder.createInsertQuery(meta.getTableName(), meta.getColumnClause(), meta.getValueClause(PersonInstances.첫번째사람));

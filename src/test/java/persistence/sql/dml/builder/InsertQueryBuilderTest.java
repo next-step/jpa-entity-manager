@@ -32,7 +32,7 @@ public class InsertQueryBuilderTest {
 
     meta = MetaEntity.of(person);
     CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder();
-    String query = createQueryBuilder.createCreateQuery(meta.getCreateClause());
+    String query = createQueryBuilder.createCreateQuery(meta.getTableName(), meta.getColumns());
 
     jdbcTemplate = new JdbcTemplate(server.getConnection());
     jdbcTemplate.execute(query);

@@ -14,7 +14,7 @@ public class JdbcEntityPersisterTest extends BuilderTest {
   @Test
   @DisplayName("Persister를 이용해서 insert 합니다.")
   public void persisterInsertEntity() {
-    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(jdbcTemplate, connection);
+    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection);
     JdbcEntityPersister persister = new JdbcEntityPersister(PersonFixtureStep3.class, connection);
     PersonFixtureStep3 네번째사람 = new PersonFixtureStep3(4L, "지미 헨드릭스", 24, "sdafij@gmail.com");
 
@@ -28,7 +28,7 @@ public class JdbcEntityPersisterTest extends BuilderTest {
   @Test
   @DisplayName("Persister를 이용해서 update 합니다.")
   public void persisterUpdateEntity() {
-    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(jdbcTemplate, connection);
+    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection);
     JdbcEntityPersister persister = new JdbcEntityPersister(PersonFixtureStep3.class, connection);
     PersonFixtureStep3 업데이트된세번째사람 = new PersonFixtureStep3(3L, "헨드릭스", 24, "sdafij@gmail.com");
 
@@ -45,7 +45,7 @@ public class JdbcEntityPersisterTest extends BuilderTest {
   @Test
   @DisplayName("Persister를 이용해서 delete 합니다.")
   public void persisterDeleteEntity() {
-    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(jdbcTemplate, connection);
+    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection);
     JdbcEntityPersister persister = new JdbcEntityPersister(PersonFixtureStep3.class, connection);
 
     persister.delete(PersonInstances.두번째사람);
