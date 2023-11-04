@@ -1,13 +1,14 @@
 package persistence.entity;
 
 import java.sql.Connection;
+import java.util.List;
 import jdbc.JdbcRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.meta.MetaDataColumn;
 import persistence.meta.MetaEntity;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
-public class JdbcEntityLoader<T> implements EntityLoader {
+public class JdbcEntityLoader<T> implements EntityLoader<T> {
 
   private final JdbcTemplate jdbcTemplate;
   private final MetaEntity<T> metaEntity;
@@ -29,5 +30,12 @@ public class JdbcEntityLoader<T> implements EntityLoader {
         metaEntity.getTableName(), targetColumn, id);
 
     return jdbcTemplate.queryForObject(query, jdbcRowMapper);
+  }
+
+  @Override
+  public List<T> findAll() {
+    String query = selectQueryBuilder.createSelectQuery(metaEntity.getColumnClauseWithId(),
+        metaEntity.getTableName());
+    return jdbcTemplate.query(query, jdbcRowMapper);
   }
 }
