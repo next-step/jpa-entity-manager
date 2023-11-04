@@ -56,7 +56,7 @@ class CustomJpaRepositoryTest {
 
 	@DisplayName("엔티티가 영속성 컨텍스트에 존재할 경우 Update 한다.")
 	@Test
-	void When_EntityIsPersistent_Then_Update() {
+	void When_EntityIsAlreadyPersistent_Then_Update() {
 		persistenceContext.addEntity(2L, new Person("name", 1, "email@gmail.com", 0));
 
 		customJpaRepository.save(new Person(2L, "hhhhhwi", 10, "aab555586@gmail.com", 0));
