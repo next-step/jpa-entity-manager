@@ -9,11 +9,11 @@ import persistence.meta.MetaDataColumns;
 import persistence.meta.MetaEntity;
 import persistence.sql.dml.builder.DmlQueryBuilder;
 
-public class JdbcEntityPersister<T> implements EntityPersister {
+public class JdbcEntityPersister<T> implements EntityPersister<T> {
 
   private final JdbcTemplate jdbcTemplate;
   private final MetaEntity<T> metaEntity;
-  private final EntityLoader entityLoader;
+  private final EntityLoader<T> entityLoader;
   private final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder();
 
   public JdbcEntityPersister(Class<T> clazz, Connection connection) {
@@ -35,6 +35,7 @@ public class JdbcEntityPersister<T> implements EntityPersister {
     List<String> dbColumns = fields.stream()
         .map(field -> metaDataColumns.getColumnByFieldName(field).getDBColumnName())
         .toList();
+
     throwExceptionIfNotExists((Long) id, entity);
 
     String query = dmlQueryBuilder.createUpdateQuery(metaEntity.getTableName(),

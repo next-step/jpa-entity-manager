@@ -22,8 +22,8 @@ public class JdbcEntityManager implements EntityManager {
   }
 
   @Override
-  public void persist(Object entity) {
-    EntityPersister persister = persisterMap.getOrDefault(entity.getClass(),
+  public <T> void persist(T entity) {
+    EntityPersister<T> persister = persisterMap.getOrDefault(entity.getClass(),
         new JdbcEntityPersister<>(entity.getClass(), connection));
     persisterMap.putIfAbsent(entity.getClass(), persister);
 
@@ -36,8 +36,8 @@ public class JdbcEntityManager implements EntityManager {
   }
 
   @Override
-  public void remove(Object entity) {
-    EntityPersister persister = persisterMap.getOrDefault(entity.getClass(),
+  public <T> void remove(T entity) {
+    EntityPersister<T> persister = persisterMap.getOrDefault(entity.getClass(),
         new JdbcEntityPersister<>(entity.getClass(), connection));
     persisterMap.putIfAbsent(entity.getClass(), persister);
 
