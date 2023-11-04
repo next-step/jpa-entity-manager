@@ -25,7 +25,7 @@ public class JdbcTemplate {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return rowMapper.mapRow(resultSet);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("해당 객체는 존재 하지 않습니다.", e);
         }
     }
 

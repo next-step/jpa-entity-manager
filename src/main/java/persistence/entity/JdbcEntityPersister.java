@@ -1,6 +1,8 @@
 package persistence.entity;
 
 import java.sql.Connection;
+import java.util.List;
+import java.util.Objects;
 import jdbc.JdbcTemplate;
 import persistence.meta.MetaDataColumn;
 import persistence.meta.MetaDataColumns;
@@ -11,25 +13,33 @@ public class JdbcEntityPersister<T> implements EntityPersister {
 
   private final JdbcTemplate jdbcTemplate;
   private final MetaEntity<T> metaEntity;
+  private final EntityLoader entityLoader;
   private final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder();
+
   public JdbcEntityPersister(Class<T> clazz, Connection connection) {
     this.jdbcTemplate = new JdbcTemplate(connection);
     this.metaEntity = MetaEntity.of(clazz);
+    this.entityLoader = new JdbcEntityLoader<T>(clazz, connection);
   }
 
   @Override
-  public boolean update(Object entity, String fieldName) {
+  public boolean update(Object entity) throws RuntimeException{
 
     MetaDataColumn primaryKeyColumn = metaEntity.getPrimaryKeyColumn();
     String whereColumn = primaryKeyColumn.getDBColumnName();
-    String id = primaryKeyColumn.getFieldValue(entity).toString();
+    Object id = primaryKeyColumn.getFieldValue(entity);
 
     MetaDataColumns metaDataColumns = metaEntity.getMetaDataColumns();
-    MetaDataColumn targetColumn = metaDataColumns.getColumnByFieldName(fieldName);
-    String fieldValue = targetColumn.getFieldValue(entity).toString();
+    List<String> fields = metaDataColumns.getFields();
+    List<String> extractValuesFromEntity = metaEntity.extractValuesFromEntity(fields, entity);
+    List<String> dbColumns = fields.stream()
+        .map(field -> metaDataColumns.getColumnByFieldName(field).getDBColumnName())
+        .toList();
+    throwExceptionIfNotExists((Long) id, entity);
 
-    String query = dmlQueryBuilder.createUpdateQuery(metaEntity.getTableName(), targetColumn.getDBColumnName(), fieldValue,
-        whereColumn, id);
+    String query = dmlQueryBuilder.createUpdateQuery(metaEntity.getTableName(),
+        dbColumns, extractValuesFromEntity,
+        whereColumn, id.toString());
 
     return jdbcTemplate.execute(query);
   }
@@ -39,19 +49,33 @@ public class JdbcEntityPersister<T> implements EntityPersister {
     String values = metaEntity.getValueClause(entity);
     String columns = metaEntity.getColumnClause();
 
-    String query = dmlQueryBuilder.createInsertQuery(metaEntity.getTableName(),columns, values);
+    String query = dmlQueryBuilder.createInsertQuery(metaEntity.getTableName(), columns, values);
 
     jdbcTemplate.execute(query);
   }
 
   @Override
-  public void delete(Object entity) {
+  public void delete(Object entity) throws RuntimeException {
     MetaDataColumn primaryKeyColumn = metaEntity.getPrimaryKeyColumn();
     String targetColumn = primaryKeyColumn.getDBColumnName();
     Object id = primaryKeyColumn.getFieldValue(entity);
 
+    throwExceptionIfNotExists((Long) id, entity);
+
     String query = dmlQueryBuilder.createDeleteQuery(metaEntity.getTableName(), targetColumn, id);
 
     jdbcTemplate.execute(query);
+  }
+
+  public void throwExceptionIfNotExists(Long id, Object entity) {
+    if (Objects.isNull(load(id)) && metaEntity.getPrimaryKeyColumnIsNull(entity)) {
+      throw new RuntimeException("해당 객체는 존재 하지 않습니다.");
+    }
+  }
+  public boolean entityExists(Object entity) {
+    return metaEntity.getPrimaryKeyColumnIsNull(entity);
+  }
+  public T load(Long id) {
+    return entityLoader.load(id);
   }
 }

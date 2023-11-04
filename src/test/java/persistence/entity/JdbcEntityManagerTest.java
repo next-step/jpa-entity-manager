@@ -45,4 +45,6 @@ public class JdbcEntityManagerTest extends BuilderTest {
     assertThat(thrown).isInstanceOf(RuntimeException.class);
   }
 
+
+
 }
