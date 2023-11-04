@@ -52,11 +52,6 @@ public class MetaDataColumns {
         .collect(Collectors.toList());
   }
 
-  public String getClause(List<String> entries) {
-
-    return String.join(DELIMITER, entries);
-  }
-
   public List<String> getFieldValuesWithoutId(Object entity) {
     return columns.stream()
         .filter(MetaDataColumn::isNotPrimaryKey)

@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import persistence.dialect.h2.H2Dialect;
 
 public class MetaEntity<T> {
@@ -12,11 +12,13 @@ public class MetaEntity<T> {
   private static final String DELIMITER = ",";
   private final MetaDataTable metaDataTable;
   private final MetaDataColumns metaDataColumns;
+  private final MetaDataColumn primaryKeyColumn;
   private final Class<T> clazz;
 
   private MetaEntity(MetaDataTable metaDataTable, MetaDataColumns metaDataColumns, Class<T> clazz) {
     this.metaDataTable = metaDataTable;
     this.metaDataColumns = metaDataColumns;
+    this.primaryKeyColumn = metaDataColumns.getPrimaryColumn();
     this.clazz = clazz;
   }
 
@@ -29,9 +31,11 @@ public class MetaEntity<T> {
   }
 
   public MetaDataColumn getPrimaryKeyColumn() {
-    return metaDataColumns.getPrimaryColumn();
+    return primaryKeyColumn;
   }
-
+  public boolean getPrimaryKeyColumnIsNull(Object entity) {
+    return Objects.nonNull(primaryKeyColumn.getFieldValue(entity));
+  }
   public String getValueClause(Object entity) {
     List<String> columns = getEntityFields();
 
@@ -58,7 +62,7 @@ public class MetaEntity<T> {
       throw new RuntimeException("생성자 오류", e);
     }
   }
-  private List<String> extractValuesFromEntity(List<String> columns, Object entity) {
+  public List<String> extractValuesFromEntity(List<String> columns, Object entity) {
     List<String> values = new ArrayList<>();
 
     for (String column : columns) {
@@ -94,8 +98,6 @@ public class MetaEntity<T> {
 
     return String.join(DELIMITER, columns);
   }
-
-
 
   private List<String> getEntityColumns() {
     return metaDataColumns.getDBColumnsWithoutId();

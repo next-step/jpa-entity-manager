@@ -63,14 +63,11 @@ UPDATE USERS[TABLE] SET nick_name[COLUMN] = 'value2'[VALUE] WHERE ID[COLUMN] = 6
   - 복수의 entity는 아직 가져오는게 안되있는데 이부분은 조금 어떻게 구현해야할지 궁금하다.
 
 ## 고민사항
-  - MetaEntity에 대한 의존성이 점점 줄고있는데 제거하는 방향이 맞을까요?
-    - RowMapper에서 MetaEntity를 생성하면서 불필요한 객체를 다 만들고 있긴합니다.
-    - 하지만 instance를 만드는 책임을 누구에게 줘야할지 궁금합니다.
   - 이제 Exception에 대한 걱정을 하기 시작
     - Exception 처리를 할 부분은 constructor 가 없을때 (instance 못만듬)
     - Custom Exception도 처리하길 원하시나요??
   - 지연 로딩 구현 
-    - 이미 있는 값이면 먼저 가져오기? entity들을 Loader가 cache 해두는 느낌인듯?
+    - 이미 있는 값이면 먼저 가져오기? entity들을 Loader가 cache 해두는 느낌인듯? (이번 구현에는 포함이 안된것일듯?)
 ## 테스트 사항
 - UpdateQueryBuilder 쿼리 검증 및 수행 검증
 - EntityPersister Update 수행 검증
@@ -78,8 +75,8 @@ UPDATE USERS[TABLE] SET nick_name[COLUMN] = 'value2'[VALUE] WHERE ID[COLUMN] = 6
 ## 리뷰사항
 https://github.com/next-step/jpa-entity-manager/pull/68
 1. MetaData 이용, QueryBuilder 한군데 모아두기  --> 이것은 MetaData 와 parse, mapping 로직 에 전반적 객체지향적 수정 필요 일단 CreateBuilder 로직만 이전
-2. WhereClauseBuilder
-3. delete 시에 대한 예외처리
-4. update 시에 예외처리
-5. Persist 할때 id 있을때랑 없을때 확인해서 넣어주기ㄴ
+2. WhereClauseBuilder 
+3. delete 시에 대한 예외처리 -> 완료 (없을 시에 runtime exception 던지기)  --> persist 로직 오류시 test 필요하다
+4. update 시에 예외처리 -> 완료 (없을 시에 runtime exception 던지기) -> updateQueryBuilder 리팩토링 필요 --> persist 로직 오류시 test 필요하다
+5. Persist 할때 id 있을때랑 없을때 확인해서 넣어주기 -> 완료 (있을때와 없을때 구분해서 진행)
 

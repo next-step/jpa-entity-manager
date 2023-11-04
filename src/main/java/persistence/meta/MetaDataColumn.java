@@ -61,7 +61,7 @@ public class MetaDataColumn {
       field.setAccessible(true);
       Object value = field.get(entity);
       if (value.getClass().equals(String.class)) {
-        return "'" + value.toString() + "'";
+        return "'" + value + "'";
       }
       field.setAccessible(false);
       return value;
