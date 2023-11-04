@@ -226,6 +226,23 @@ class EntityManagerImplTest {
             //when & then
             assertThrows(RuntimeException.class, () -> entityManager.remove(person, id));
         }
+
+        @Test
+        @DisplayName("entity가 gone 상태일 때 삭제 시도시 오류")
+        void entityIsGone() {
+            //given
+            final Long id = 5L;
+            final SelectPerson person = new SelectPerson(id, "zz", 3, "xx", 3);
+
+            entityManager.persist(person);
+            entityManager.flush();
+
+            entityManager.remove(person, id);
+            entityManager.flush();
+
+            //when & then
+            assertThrows(InvalidContextException.class, () -> entityManager.remove(person, id));
+        }
     }
 
     @Nested

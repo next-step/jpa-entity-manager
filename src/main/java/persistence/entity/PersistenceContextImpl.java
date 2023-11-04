@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import persistence.exception.InvalidContextException;
 
 public class PersistenceContextImpl implements PersistenceContext {
-
     private final Map<Integer, Snapshot> contextMap;
     private final Map<Integer, Snapshot> snapshotMap;
 
