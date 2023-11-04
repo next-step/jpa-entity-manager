@@ -11,25 +11,41 @@ public class EntityEntry {
         entry = new HashMap<>();
     }
 
-    public boolean isManaged(Integer id) {
-        if (!containsEntry(id)) {
+    public boolean isManaged(Integer key) {
+        if (!containsEntry(key)) {
             return false;
         }
-        return entry.get(id).isManaged();
+        return entry.get(key).isManaged();
     }
 
-    public boolean isGone(Integer id) {
-        if (!containsEntry(id)) {
+    public boolean isGone(Integer key) {
+        if (!containsEntry(key)) {
             return false;
         }
-        return entry.get(id).isGone();
+        return entry.get(key).isGone();
     }
 
-    private boolean containsEntry(Integer id) {
-        return entry.containsKey(id);
+    public void managed(Integer key) {
+        entry.put(key, EntityStatus.MANAGED);
     }
 
-    public void updateStatus(Integer id, EntityStatus entityStatus) {
-        entry.put(id, entityStatus);
+    public void loading(Integer key) {
+        entry.put(key, EntityStatus.LOADING);
+    }
+
+    public void saving(Integer key) {
+        entry.put(key, EntityStatus.SAVING);
+    }
+
+    public void deleted(Integer key) {
+        entry.put(key, EntityStatus.DELETED);
+    }
+
+    public void gone(Integer key) {
+        entry.put(key, EntityStatus.GONE);
+    }
+
+    private boolean containsEntry(Integer key) {
+        return entry.containsKey(key);
     }
 }
