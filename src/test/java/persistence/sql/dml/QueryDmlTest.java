@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -217,10 +219,11 @@ class QueryDmlTest {
             String q = query.delete(tableName, columns, id);
             jdbcTemplate.execute(q);
 
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
+                    , new ResultMapper<>(SelectPerson.class));
+
             //then
-            assertThrows(RuntimeException.class
-                , () -> jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
-                    , new ResultMapper<>(SelectPerson.class)), "No data is available [2000-214]");
+            assertThat(result).isNull();
         }
 
         @AfterEach

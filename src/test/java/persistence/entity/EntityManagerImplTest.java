@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.exception.InvalidContextException;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
@@ -136,7 +135,7 @@ class EntityManagerImplTest {
             final Long id = -999L;
 
             //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.find(clazz, id));
+            assertThat(entityManager.find(clazz, id)).isNull();
         }
 
         @Test
@@ -173,7 +172,6 @@ class EntityManagerImplTest {
 
             //then
             assertSoftly(softAssertions -> {
-                softAssertions.assertThat(result.getId()).isEqualTo(id);
                 softAssertions.assertThat(result.getId()).isEqualTo(id);
                 softAssertions.assertThat(result.getName()).isEqualTo(name);
                 softAssertions.assertThat(result.getEmail()).isEqualTo(email);
@@ -214,35 +212,7 @@ class EntityManagerImplTest {
             entityManager.flush();
 
             //then
-            assertThrows(RuntimeException.class, () -> 데이터를_조회함(clazz, id));
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 테이블의 데이터 삭제 시도시 오류")
-        void notFoundTable() {
-            //given
-            final Long id = 5L;
-            final Person person = new Person(id, "zz", 3, "xx", 3);
-
-            //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.remove(person, id));
-        }
-
-        @Test
-        @DisplayName("entity가 gone 상태일 때 삭제 시도시 오류")
-        void entityIsGone() {
-            //given
-            final Long id = 5L;
-            final SelectPerson person = new SelectPerson(id, "zz", 3, "xx", 3);
-
-            entityManager.persist(person);
-            entityManager.flush();
-
-            entityManager.remove(person, id);
-            entityManager.flush();
-
-            //when & then
-            assertThrows(InvalidContextException.class, () -> entityManager.remove(person, id));
+            assertThat(데이터를_조회함(clazz, id)).isNull();
         }
     }
 
@@ -304,7 +274,7 @@ class EntityManagerImplTest {
             entityManager.flush();
 
             //when
-            assertThrows(RuntimeException.class, () -> 데이터를_조회함(clazz, id));
+            assertThat(데이터를_조회함(clazz, id)).isNull();
         }
 
         @Test

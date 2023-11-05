@@ -1,16 +1,9 @@
 package persistence.entity;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
-import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
-import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
-
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import domain.SelectPerson;
-import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import org.junit.jupiter.api.AfterAll;
@@ -25,6 +18,15 @@ import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
 import persistence.sql.dml.Query;
+
+import java.sql.SQLException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class EntityPersisterTest {
 
@@ -132,16 +134,13 @@ class EntityPersisterTest {
             final Integer index = 1;
 
             SelectPerson request = new SelectPerson(id, name, age, email, index);
-            데이터를_저장함(request);
+            entityPersister.insert(request);
 
             //when
             entityPersister.delete(id);
 
-            String selectQuery = 아이디로_데이터를_조회하는_쿼리_생성(id);
-
             //then
-            assertThrows(RuntimeException.class,
-                () -> jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(SelectPerson.class)));
+            assertThat(entityPersister.findById(id)).isNull();
         }
     }
 

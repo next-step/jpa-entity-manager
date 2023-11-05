@@ -18,11 +18,29 @@ public class EntityEntry {
         return entry.get(key).isManaged();
     }
 
+    public boolean isSaving(Integer key) {
+        if (!containsEntry(key)) {
+            return false;
+        }
+        return entry.get(key).isSaving();
+    }
+
+    public boolean isDeleted(Integer key) {
+        if (!containsEntry(key)) {
+            return false;
+        }
+        return entry.get(key).isDeleted();
+    }
+
     public boolean isGone(Integer key) {
         if (!containsEntry(key)) {
             return false;
         }
         return entry.get(key).isGone();
+    }
+
+    public Map<Integer, EntityStatus> getEntry() {
+        return entry;
     }
 
     public void managed(Integer key) {
@@ -43,6 +61,14 @@ public class EntityEntry {
 
     public void gone(Integer key) {
         entry.put(key, EntityStatus.GONE);
+    }
+
+    public void clear(Integer key) {
+        entry.remove(key);
+    }
+
+    public void clear() {
+        entry.clear();
     }
 
     private boolean containsEntry(Integer key) {

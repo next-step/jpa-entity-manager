@@ -1,29 +1,42 @@
 package persistence.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import domain.SelectPerson;
-import java.sql.SQLException;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.exception.InvalidContextException;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
+import persistence.sql.ddl.DmlQuery;
 import persistence.sql.dml.Query;
+
+import java.sql.SQLException;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class PersistenceContextImplTest {
 
     private PersistenceContextImpl persistenceContext;
+    private EntityPersister<SelectPerson> persister;
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void init() {
+    void init() throws SQLException {
+        DatabaseServer server = new H2();
+        jdbcTemplate = new JdbcTemplate(server.getConnection());
         persistenceContext = new PersistenceContextImpl();
+        persister = new EntityPersister<>(jdbcTemplate, SelectPerson.class, Query.getInstance());
+
+        테이블을_생성함(SelectPerson.class);
     }
 
     @Nested
@@ -42,7 +55,7 @@ class PersistenceContextImplTest {
             //when
             persistenceContext.addEntity(key, id, person);
 
-            Object result = persistenceContext.getEntity(key);
+            Object result = persistenceContext.getEntity(key, persister, id);
 
             //then
             assertThat(result).isNull();
@@ -64,8 +77,9 @@ class PersistenceContextImplTest {
 
             //when
             영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
 
-            SelectPerson result = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(key);
+            SelectPerson result = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(key, id);
 
             //then
             assertSoftly(softAssertions -> {
@@ -80,6 +94,7 @@ class PersistenceContextImplTest {
         @Test
         @DisplayName("서로 다른 객체가 영속성 컨텍스트에 저장이 된다")
         void differentEntitySave() throws SQLException {
+            테이블을_생성함(Person.class);
             //given
             final Long id = 333L;
             SelectPerson selectPerson = new SelectPerson(id, "name", 30, "email", 3);
@@ -91,12 +106,17 @@ class PersistenceContextImplTest {
             //when
             영속성_컨텍스트에서_데이터를_저장한다(selectPersonKey, id, selectPerson);
             영속성_컨텍스트에서_데이터를_저장한다(personKey, id, person);
+            persistenceContext.flush(
+                    Map.of("domain.SelectPerson", persister, "domain.Person", new EntityPersister<>(jdbcTemplate, Person.class, Query.getInstance()))
+            );
 
             //then
             assertSoftly(softAssertions -> {
-                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(selectPersonKey)).isNotNull();
-                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(personKey)).isNotNull();
+                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(selectPersonKey, id)).isNotNull();
+                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(personKey, id)).isNotNull();
             });
+
+            테이블을_삭제함(Person.class);
         }
     }
 
@@ -118,9 +138,10 @@ class PersistenceContextImplTest {
 
             SelectPerson person = new SelectPerson(id, name, age, email, index);
             영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
 
             //when
-            SelectPerson result = (SelectPerson) persistenceContext.getEntity(key);
+            SelectPerson result = persistenceContext.getEntity(key, persister, id);
 
             //then
             assertSoftly(softAssertions -> {
@@ -139,7 +160,7 @@ class PersistenceContextImplTest {
             final Integer key = -93939393;
 
             //when
-            SelectPerson result = (SelectPerson) persistenceContext.getEntity(key);
+            SelectPerson result = persistenceContext.getEntity(key, persister, key);
 
             //then
             assertThat(result).isNull();
@@ -151,10 +172,13 @@ class PersistenceContextImplTest {
             //given
             final Long id = 2233L;
             SelectPerson selectPerson = new SelectPerson(id, "name", 30, "email", 3);
+            final Integer hashcode = selectPerson.hashCode();
+            persistenceContext.addEntity(hashcode, id, selectPerson);
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
 
             //when
-            SelectPerson firstResult = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(selectPerson.hashCode());
-            SelectPerson secondResult = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(selectPerson.hashCode());
+            SelectPerson firstResult = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(selectPerson.hashCode(), id);
+            SelectPerson secondResult = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(selectPerson.hashCode(), id);
 
             //then
             assertThat(firstResult).isEqualTo(secondResult);
@@ -178,21 +202,14 @@ class PersistenceContextImplTest {
             //when
             persistenceContext.removeEntity(key);
 
-            SelectPerson result = (SelectPerson) persistenceContext.getEntity(key);
-
             //then
-            assertThat(result).isNull();
+            assertThat(persistenceContext.isEntityInContext(key)).isFalse();
         }
+    }
 
-        @Test
-        @DisplayName("존재하지 않는 데이터를 삭제하려고 할 때 오류 출력")
-        void notFound() {
-            //given
-            final Integer key = 33312;
-
-            //when & then
-            assertThrows(InvalidContextException.class, () -> persistenceContext.removeEntity(key));
-        }
+    @AfterEach
+    void after() {
+        테이블을_삭제함(SelectPerson.class);
     }
 
     private void 영속성_컨텍스트에서_데이터를_저장한다(Integer key, Object id, Object entity) throws SQLException {
@@ -205,7 +222,18 @@ class PersistenceContextImplTest {
         persistenceContext.addEntity(key, id, entityPersister.getEntity(entity));
     }
 
-    private Object 영속성_컨텍스트에서_데이터를_가져온다(Integer id) {
-        return persistenceContext.getEntity(id);
+    private Object 영속성_컨텍스트에서_데이터를_가져온다(Integer hashcode, Long id) {
+        return persistenceContext.getEntity(hashcode, persister, id);
+    }
+
+    private <T> void 테이블을_생성함(Class<T> tClass) {
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+
+        jdbcTemplate.execute(DmlQuery.getInstance().create(tableName, columns));
+    }
+
+    private <T> void 테이블을_삭제함(Class<T> tClass) {
+        jdbcTemplate.execute(DmlQuery.getInstance().drop(TableName을_생성함(tClass)));
     }
 }

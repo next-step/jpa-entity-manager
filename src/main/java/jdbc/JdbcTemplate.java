@@ -2,7 +2,6 @@ package jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +23,8 @@ public class JdbcTemplate {
 
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            if(!resultSet.next()) {
-                throw new SQLException();
+            if (!resultSet.next()) {
+                return null;
             }
             return rowMapper.mapRow(resultSet);
         } catch (Exception e) {
@@ -44,4 +43,22 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
+//    public ResultSet getGeneratedKeys(final String sql) throws SQLException {
+//        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+//
+//            int affectedRows = statement.executeUpdate();
+//
+//            // 자동 증가된 키 값을 가져오기 위해 ResultSet 사용
+//            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+//                if (resultSet.next()) {
+//                    // 자동 증가된 키 값 가져오기
+//                    long generatedKey = resultSet.getLong(1);
+//
+//                    // 가져온 키 값을 사용하여 원하는 작업 수행
+//            ...
+//                }
+//            }
+//        }
+//    }
 }

@@ -15,4 +15,12 @@ public enum EntityStatus {
     public boolean isManaged() {
         return this.equals(MANAGED);
     }
+
+    public boolean isSaving() {
+        return this.equals(SAVING);
+    }
+
+    public boolean isDeleted() {
+        return this.equals(DELETED);
+    }
 }
