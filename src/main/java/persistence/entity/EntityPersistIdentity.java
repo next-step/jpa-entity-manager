@@ -23,8 +23,4 @@ public class EntityPersistIdentity {
     public int hashCode() {
         return Objects.hash(entityClass, entityId);
     }
-
-    public boolean equalsById(Object id) {
-        return entityId.equals(id);
-    }
 }

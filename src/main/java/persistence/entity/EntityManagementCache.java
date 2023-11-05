@@ -11,12 +11,14 @@ public class EntityManagementCache {
     private final Dialect dialect;
     private final Map<Class<?>, EntityPersister<?>> persisterCachePool;
     private final Map<Class<?>, EntityLoader<?>> loaderCachePool;
+    private final Map<Class<?>, PersistenceContext<?>> persistenceCachePool;
 
     public EntityManagementCache(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
         this.persisterCachePool = new HashMap<>();
         this.loaderCachePool = new HashMap<>();
+        this.persistenceCachePool = new HashMap<>();
     }
 
     public <T> EntityPersister<T> persister(Class<T> entityClass) {
@@ -33,5 +35,13 @@ public class EntityManagementCache {
         }
 
         return (EntityLoader<T>) loaderCachePool.get(entityClass);
+    }
+
+    public <T> PersistenceContext<T> persistenceContext(Class<T> entityClass) {
+        if(!persistenceCachePool.containsKey(entityClass)) {
+            persistenceCachePool.put(entityClass, new DefaultPersistenceContext());
+        }
+
+        return (PersistenceContext<T>) persistenceCachePool.get(entityClass);
     }
 }
