@@ -38,11 +38,11 @@ public class EntityPersistenceContext {
         return contextMap.size();
     }
 
-    public Map<Integer, Snapshot> exploreInContext(Map<Integer, Snapshot> snapshotMap) {
+    public Map<Integer, Snapshot> exploreInContext(EntitySnapshot snapshotMap) {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
         contextMap.forEach((id, snapshot) -> {
-            if (snapshotMap.containsKey(id) && snapshot.getObject().equals(snapshotMap.get(id).getObject())) {
+            if (snapshotMap.isEntityInSnapshot(id) && snapshot.getObject().equals(snapshotMap.getEntity(id))) {
                 return;
             }
 
@@ -50,8 +50,8 @@ public class EntityPersistenceContext {
                 result.put(id, snapshot);
             }
 
-            if (snapshotMap.containsKey(id)) {
-                result.put(id, snapshotMap.get(id));
+            if (snapshotMap.isEntityInSnapshot(id)) {
+                result.put(id, snapshotMap.getSnapshot(id));
             }
         });
 

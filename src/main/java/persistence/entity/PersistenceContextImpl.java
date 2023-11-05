@@ -3,17 +3,16 @@ package persistence.entity;
 import domain.Snapshot;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceContextImpl implements PersistenceContext {
     private final EntityEntry entityEntry;
     private final EntityPersistenceContext entityContext;
-    private final Map<Integer, Snapshot> snapshotMap;
+    private final EntitySnapshot snapshotMap;
 
     PersistenceContextImpl() {
         this.entityEntry = new EntityEntry();
         this.entityContext = new EntityPersistenceContext();
-        this.snapshotMap = new ConcurrentHashMap<>();
+        this.snapshotMap = new EntitySnapshot();
     }
 
     @Override
@@ -66,14 +65,13 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T, I> Snapshot getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
         Object data = persister.findById(input);
-        snapshotMap.put(key, new Snapshot(input, data));
-        return snapshotMap.get(key);
+        return snapshotMap.save(key, input, data);
     }
 
     @Override
     public Map<Integer, Snapshot> comparison() {
         if (snapshotMap.size() >= entityContext.size()) {
-            return exploreInSnapshot();
+            return snapshotMap.exploreInSnapshot(entityContext);
         }
 
         return entityContext.exploreInContext(snapshotMap);
@@ -114,25 +112,5 @@ public class PersistenceContextImpl implements PersistenceContext {
         entityContext.clear();
         snapshotMap.clear();
         entityEntry.clear();
-    }
-
-    private Map<Integer, Snapshot> exploreInSnapshot() {
-        Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
-
-        snapshotMap.forEach((id, snapshot) -> {
-            if (entityContext.isEntityInContext(id) && snapshot.getObject().equals(entityContext.getEntity(id).getObject())) {
-                return;
-            }
-
-            if (snapshotMap.containsKey(id)) {
-                result.put(id, snapshot);
-            }
-
-            if (entityContext.isEntityInContext(id)) {
-                result.put(id, entityContext.getEntity(id));
-            }
-        });
-
-        return result;
     }
 }
