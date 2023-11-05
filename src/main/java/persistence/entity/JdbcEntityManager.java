@@ -2,6 +2,10 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dbms.Dialect;
+import persistence.sql.entitymetadata.model.EntityColumn;
+import persistence.sql.entitymetadata.model.EntityTable;
+
+import java.util.Optional;
 
 public class JdbcEntityManager implements EntityManager {
     private final EntityManagementCache entityManagementCache;
@@ -12,15 +16,17 @@ public class JdbcEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        EntityLoader<T> entityLoader = entityManagementCache.loader(clazz);
+        T entity = findPersistedEntity(clazz, id)
+                .orElse(loadEntity(clazz, id));
 
-        return entityLoader.findById(clazz, id);
+        persistEntity(clazz, id, entity);
+
+        return entity;
     }
 
-    public <T> T findByEntity(T entity) {
-        EntityLoader<T> entityLoader = (EntityLoader<T>) entityManagementCache.loader(entity.getClass());
 
-        return entityLoader.findOne(entity);
+    private <T> T findByEntity(T entity) {
+        return (T) find(entity.getClass(), (Long) getEntityId(entity));
     }
 
     @Override
@@ -30,10 +36,12 @@ public class JdbcEntityManager implements EntityManager {
 
         if (persistedEntity != null) {
             entityPersister.update(entity);
-            return;
+            entity = persistedEntity;
+        } else {
+            entityPersister.insert(entity);
         }
 
-        entityPersister.insert(entity);
+        persistEntity((Class<Object>) entity.getClass(), (Long) getEntityId(entity), entity);
     }
 
     @Override
@@ -41,5 +49,35 @@ public class JdbcEntityManager implements EntityManager {
         EntityPersister entityPersister = entityManagementCache.persister(entity.getClass());
 
         entityPersister.delete(entity);
+        removeEntity(entity);
+    }
+
+    private <T> T loadEntity(Class<T> clazz, Long id) {
+        return entityManagementCache.loader(clazz).findById(clazz, id);
+    }
+
+    private <T> void persistEntity(Class<T> clazz, Long id, T entity) {
+        PersistenceContext<T> persistenceContext = entityManagementCache.persistenceContext(clazz);
+        persistenceContext.addEntity(new EntityPersistIdentity(clazz, id), entity);
+    }
+
+    private <T> void removeEntity(T entity) {
+        PersistenceContext<T> persistenceContext = (PersistenceContext<T>) entityManagementCache.persistenceContext(entity.getClass());
+        persistenceContext.removeEntity(entity);
+    }
+
+    private <T> Optional<T> findPersistedEntity(Class<T> clazz, Object id) {
+        PersistenceContext<T> persistenceContext = entityManagementCache.persistenceContext(clazz);
+
+        return Optional.ofNullable(persistenceContext.getEntity(new EntityPersistIdentity(clazz, id)));
+    }
+
+    private <T> Object getEntityId(T entity) {
+        Class<T> entityClass = (Class<T>) entity.getClass();
+        EntityTable<T> entityTable = new EntityTable<>(entityClass);
+        EntityColumn<T, ?> idColumn = entityTable.getIdColumn();
+        Object entityId = idColumn.getValue(entity);
+
+        return entityId;
     }
 }

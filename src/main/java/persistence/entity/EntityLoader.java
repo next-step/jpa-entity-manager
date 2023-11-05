@@ -28,16 +28,4 @@ public class EntityLoader<T> {
 
         return jdbcTemplate.queryForObject(selectDMLQueryBuilder.build(), new SimpleEntityRowMapper<>(entityTable, dialect));
     }
-
-    public T findOne(T entity) {
-        Class<T> entityClass = (Class<T>) entity.getClass();
-        EntityTable<T> entityTable = (EntityTable<T>) new EntityTable<>(entity.getClass());
-        EntityColumn<T, ?> idColumn = entityTable.getIdColumn();
-
-        SelectDMLQueryBuilder<T> selectDMLQueryBuilder = new SelectDMLQueryBuilder<>(dialect, entityClass)
-                .where(WhereClause.of(idColumn.getDbColumnName(), idColumn.getValue(entity), Operator.EQUALS));
-        selectDMLQueryBuilder.build();
-
-        return jdbcTemplate.queryForObject(selectDMLQueryBuilder.build(), new SimpleEntityRowMapper<>(entityTable, dialect));
-    }
 }
