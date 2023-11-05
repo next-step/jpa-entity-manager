@@ -44,10 +44,8 @@ class CustomJpaRepositoryTest {
 	void When_EntitySave_Then_EntityIsPersistent() {
 		customJpaRepository.save(new Person("name", 1, "email@gmail.com", 0));
 		Person resultPerson = persistenceContext.getEntity(Person.class, 1L);
-		Assertions.assertAll(
-				() -> assertTrue(resultPerson.getName().equals("name")),
-				() -> assertTrue(resultPerson.getAge().equals(1))
-		);
+
+		assertEquals(new Person(1L, "name", 1, "email@gmail.com", 0), resultPerson);
 	}
 
 	@DisplayName("엔티티가 영속성 컨텍스트에 존재할 경우 Update 한다.")
@@ -60,8 +58,8 @@ class CustomJpaRepositoryTest {
 		Person resultPerson = entityManager.find(Person.class, 2L);
 
 		Assertions.assertAll(
-				() -> assertTrue(resultPerson.getName().equals("hhhhhwi")),
-				() -> assertTrue(resultPerson.getAge().equals(10))
+				() -> assertEquals("hhhhhwi", resultPerson.getName()),
+				() -> assertEquals(10, resultPerson.getAge())
 		);
 	}
 }

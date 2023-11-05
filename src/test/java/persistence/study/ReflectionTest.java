@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -75,8 +75,8 @@ class ReflectionTest {
         priceField.set(car, price);
 
         Assertions.assertAll(
-                () -> assertTrue(car.getName().equals(name)),
-                () -> assertTrue(car.getPrice() == price)
+                () -> assertEquals(name, car.getName()),
+                () -> assertEquals(price, car.getPrice())
         );
     }
 
@@ -93,8 +93,8 @@ class ReflectionTest {
         Car car = (Car) constructor.newInstance(name, price);
 
         Assertions.assertAll(
-                () -> assertTrue(car.getName().equals(name)),
-                () -> assertTrue(car.getPrice() == price)
+                () -> assertEquals(name, car.getName()),
+                () -> assertEquals(price, car.getPrice())
         );
     }
 
