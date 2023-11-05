@@ -5,23 +5,50 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.persister.EntityPersister;
+import persistence.sql.H2Dialect;
+import persistence.sql.ddl.TableCreateQueryBuilder;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
         logger.info("Starting application...");
+
+        DatabaseServer server = null;
         try {
-            final DatabaseServer server = new H2();
+            server = new H2();
             server.start();
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+            final H2Dialect h2Dialect = new H2Dialect();
 
-            server.stop();
+            String sql = new TableCreateQueryBuilder(h2Dialect).generateSQLQuery(Person.class);
+            logger.info(sql);
+            jdbcTemplate.execute(sql);
+
+            Person person = new Person(null, "aa", 10, "aa@aa.com");
+            logger.info(String.valueOf(person));
+
+            EntityPersister entityPersister = new EntityPersister(person.getClass());
+            entityPersister.insert(person, jdbcTemplate);
+            logger.info(String.valueOf(person));
+
+            person.setAge(20);
+            entityPersister.update(person, jdbcTemplate);
+            logger.info(String.valueOf(person));
+
+            Person person1 = (Person) entityPersister.find(1L, jdbcTemplate);
+            logger.info(String.valueOf(person1));
+
+            entityPersister.delete(person, jdbcTemplate);
         } catch (Exception e) {
             logger.error("Error occurred", e);
         } finally {
             logger.info("Application finished");
+            if (server != null) {
+                server.stop();
+            }
         }
     }
 }
