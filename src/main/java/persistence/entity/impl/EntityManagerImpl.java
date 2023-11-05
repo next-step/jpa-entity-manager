@@ -5,9 +5,19 @@ import java.sql.SQLException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.EntityEventPublisher;
 import persistence.entity.EntityManager;
+import persistence.entity.EventSource;
 import persistence.entity.PersistenceContext;
-import persistence.entity.impl.retrieve.EntityLoader;
+import persistence.entity.impl.event.DeleteEvent;
+import persistence.entity.impl.event.LoadEvent;
+import persistence.entity.impl.event.MergeEvent;
+import persistence.entity.impl.event.PersistEvent;
+import persistence.entity.impl.listener.LoadEventListenerImpl;
+import persistence.entity.impl.listener.MergeEventListenerImpl;
+import persistence.entity.impl.listener.PersistEventListenerImpl;
+import persistence.entity.impl.listener.DeleteEventListenerImpl;
+import persistence.entity.impl.publisher.EntityEventPublisherImpl;
 import persistence.entity.impl.retrieve.EntityLoaderImpl;
 import persistence.entity.impl.store.EntityPersister;
 import persistence.entity.impl.store.EntityPersisterImpl;
@@ -20,26 +30,22 @@ public class EntityManagerImpl implements EntityManager {
 
     private final ColumnType columnType;
     private final Connection connection;
-    private final EntityLoader entityLoader;
-    private final EntityPersister entityPersister;
     private final PersistenceContext persistenceContext;
+    private final EntityEventPublisher entityEventPublisher;
 
-    public EntityManagerImpl(Connection connection, ColumnType columnType) {
+    public EntityManagerImpl(Connection connection, ColumnType columnType, PersistenceContext persistenceContext) {
         this.connection = connection;
         this.columnType = columnType;
-        this.entityLoader = new EntityLoaderImpl(connection, columnType);
-        this.entityPersister = new EntityPersisterImpl(connection);
-        this.persistenceContext = new DefaultPersistenceContextImpl(columnType);
+        this.entityEventPublisher = initEntityEventPublisher(connection);
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
         final Optional<Object> cachedEntity = persistenceContext.getEntity(clazz, id);
         if (cachedEntity.isEmpty()) {
-            final T loadedEntity = entityLoader.load(clazz, id);
-            syncToPersistenceContext(id, loadedEntity);
-
-            return loadedEntity;
+            final Object loadedEntity = entityEventPublisher.onLoad(LoadEvent.of(clazz, id, (EventSource)persistenceContext));
+            return clazz.cast(loadedEntity);
         }
 
         return clazz.cast(cachedEntity.get());
@@ -51,26 +57,18 @@ public class EntityManagerImpl implements EntityManager {
 
         final Optional<Object> cachedEntity = persistenceContext.getEntity(entity.getClass(), objectMappingMeta.getIdValue());
 
-        if (cachedEntity.isEmpty()) {
-            final Object savedEntity = entityPersister.store(entity, columnType);
-            final EntityObjectMappingMeta savedObjectMappingMeta = EntityObjectMappingMeta.of(savedEntity, columnType);
-            syncToPersistenceContext(savedObjectMappingMeta.getIdValue(), savedEntity);
-
-            return savedEntity;
-        }
-
-        return cachedEntity.get();
+        return cachedEntity.orElseGet(() ->
+            entityEventPublisher.onPersist(PersistEvent.of(entity, (EventSource)persistenceContext))
+        );
     }
 
     @Override
     public void remove(Object entity) {
-        persistenceContext.removeEntity(entity);
-        persistenceContext.purgeEntityCache(entity);
-        entityPersister.delete(entity, columnType);
+        entityEventPublisher.onDelete(DeleteEvent.of(entity, (EventSource)persistenceContext));
     }
 
     @Override
-    public <T> T merge(T entity) {
+    public <T> T merge(Class<T> clazz, T entity) {
         final EntityObjectMappingMeta objectMappingMeta = EntityObjectMappingMeta.of(entity, columnType);
 
         final SnapShot snapShot = persistenceContext.getSnapShot(entity.getClass(), objectMappingMeta.getIdValue());
@@ -78,15 +76,9 @@ public class EntityManagerImpl implements EntityManager {
             return entity;
         }
 
-        entityPersister.update(entity, columnType);
-        syncToPersistenceContext(objectMappingMeta.getIdValue(), entity);
+        final Object mergedEntity = entityEventPublisher.onMerge(MergeEvent.of(entity, (EventSource)persistenceContext));
 
-        return entity;
-    }
-
-    private void syncToPersistenceContext(Object id, Object entity) {
-        persistenceContext.addEntity(id, entity);
-        persistenceContext.getDatabaseSnapshot(id, entity);
+        return clazz.cast(mergedEntity);
     }
 
     @Override
@@ -112,5 +104,17 @@ public class EntityManagerImpl implements EntityManager {
             log.error("EntityManager connection not closed", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private EntityEventPublisherImpl initEntityEventPublisher(Connection connection) {
+        final EntityPersister entityPersister = new EntityPersisterImpl(connection);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(connection);
+
+        return new EntityEventPublisherImpl(
+            new LoadEventListenerImpl(entityLoader, columnType),
+            new MergeEventListenerImpl(entityPersister, columnType),
+            new PersistEventListenerImpl(entityPersister, columnType),
+            new DeleteEventListenerImpl(entityPersister, columnType)
+        );
     }
 }

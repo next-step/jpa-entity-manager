@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.impl.EntityManagerImpl;
+import persistence.entity.impl.context.DefaultPersistenceContext;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
 import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.ddl.generator.fixture.PersonV3;
@@ -28,8 +29,6 @@ class EntityManagerImplIntegrationTest {
 
     private Database jdbcTemplate;
 
-    private Connection connection;
-
     private EntityManager entityManager;
 
     @BeforeEach
@@ -37,12 +36,13 @@ class EntityManagerImplIntegrationTest {
         server = new H2();
         server.start();
 
-        connection = server.getConnection();
+        Connection connection = server.getConnection();
 
-        entityManager = new EntityManagerImpl(connection, new H2ColumnType());
+        final H2ColumnType columnType = new H2ColumnType();
+        entityManager = new EntityManagerImpl(connection, columnType, new DefaultPersistenceContext(columnType));
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(new H2ColumnType());
+        CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(columnType);
         jdbcTemplate.execute(createDDLQueryGenerator.create(PersonV3.class));
     }
 

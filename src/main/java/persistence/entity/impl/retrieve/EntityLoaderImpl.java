@@ -11,16 +11,14 @@ import persistence.sql.schema.EntityClassMappingMeta;
 
 public class EntityLoaderImpl implements EntityLoader {
 
-    private final ColumnType columnType;
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityLoaderImpl(Connection connection, ColumnType columnType) {
+    public EntityLoaderImpl(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
-        this.columnType = columnType;
     }
 
     @Override
-    public <T> T load(Class<T> clazz, Object id) {
+    public <T> T load(Class<T> clazz, Object id, ColumnType columnType) {
         final EntityClassMappingMeta classMappingMeta = EntityClassMappingMeta.of(clazz, columnType);
 
         final String selectSql = SelectStatementBuilder.builder()

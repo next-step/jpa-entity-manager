@@ -23,11 +23,8 @@ public class EntityClassMappingMeta {
 
     private final Map<Field, ColumnMeta> columnMetaMap = new LinkedHashMap<>();
 
-    private final ColumnType columnType;
-
-    private EntityClassMappingMeta(TableMeta tableMeta, Map<Field, ColumnMeta> columnMetaMap, ColumnType columnType) {
+    private EntityClassMappingMeta(TableMeta tableMeta, Map<Field, ColumnMeta> columnMetaMap) {
         this.tableMeta = tableMeta;
-        this.columnType = columnType;
         this.columnMetaMap.putAll(columnMetaMap);
     }
 
@@ -35,7 +32,7 @@ public class EntityClassMappingMeta {
         validateEntityAnnotationIsPresent(entityClazz);
         validateHasIdAnnotation(entityClazz);
 
-        return new EntityClassMappingMeta(TableMeta.of(entityClazz), getColumnMetasFromEntity(entityClazz, columnType), columnType);
+        return new EntityClassMappingMeta(TableMeta.of(entityClazz), getColumnMetasFromEntity(entityClazz, columnType));
     }
 
     public String tableClause() {
