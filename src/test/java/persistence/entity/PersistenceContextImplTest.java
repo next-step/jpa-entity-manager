@@ -203,7 +203,7 @@ class PersistenceContextImplTest {
             persistenceContext.removeEntity(key);
 
             //then
-            assertThat(persistenceContext.isEntityInContext(key)).isFalse();
+            assertThat(persistenceContext.getEntity(key, persister, id)).isNull();
         }
     }
 

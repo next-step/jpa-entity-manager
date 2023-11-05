@@ -7,19 +7,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceContextImpl implements PersistenceContext {
     private final EntityEntry entityEntry;
-    private final Map<Integer, Snapshot> contextMap;
+    private final EntityPersistenceContext entityContext;
     private final Map<Integer, Snapshot> snapshotMap;
 
     PersistenceContextImpl() {
         this.entityEntry = new EntityEntry();
-        this.contextMap = new ConcurrentHashMap<>();
+        this.entityContext = new EntityPersistenceContext();
         this.snapshotMap = new ConcurrentHashMap<>();
     }
 
     @Override
     public <T, I> T getEntity(Integer key, EntityPersister<T> persister, I input) {
         if (entityEntry.isManaged(key)) {
-            return (T) contextMap.get(key).getObject();
+            return (T) entityContext.getEntity(key).getObject();
         }
 
         entityEntry.loading(key);
@@ -44,30 +44,23 @@ public class PersistenceContextImpl implements PersistenceContext {
             return null;
         }
 
-        return addEntity(key, new Snapshot(id, entity));
+        addEntity(key, new Snapshot(id, entity));
+
+        return entityContext.getEntity(key).getObject();
     }
 
     @Override
     public Object addEntity(Integer key, Snapshot snapshot) {
         entityEntry.saving(key);
-        contextMap.put(key, snapshot);
-        return contextMap.get(key).getObject();
+
+        return entityContext.save(key, snapshot);
     }
 
     @Override
     public void removeEntity(Integer key) {
         entityEntry.deleted(key);
 
-        contextMap.remove(key);
-    }
-
-    @Override
-    public boolean isEntityInSnapshot(Integer id) {
-        return snapshotMap.containsKey(id);
-    }
-
-    public boolean isEntityInContext(Integer id) {
-        return contextMap.containsKey(id);
+        entityContext.delete(key);
     }
 
     @Override
@@ -79,11 +72,11 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public Map<Integer, Snapshot> comparison() {
-        if (snapshotMap.size() >= contextMap.size()) {
+        if (snapshotMap.size() >= entityContext.size()) {
             return exploreInSnapshot();
         }
 
-        return exploreInContext();
+        return entityContext.exploreInContext(snapshotMap);
     }
 
     @Override
@@ -110,7 +103,7 @@ public class PersistenceContextImpl implements PersistenceContext {
                 return;
             }
 
-            entityPersister.update(object, map.get(contextMap.get(hashcode)).getId());
+            entityPersister.update(object, map.get(entityContext.getEntity(hashcode)).getId());
             entityEntry.managed(hashcode);
         });
 
@@ -118,7 +111,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     private void clear() {
-        contextMap.clear();
+        entityContext.clear();
         snapshotMap.clear();
         entityEntry.clear();
     }
@@ -127,7 +120,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
         snapshotMap.forEach((id, snapshot) -> {
-            if (isEntityInContext(id) && snapshot.getObject().equals(contextMap.get(id).getObject())) {
+            if (entityContext.isEntityInContext(id) && snapshot.getObject().equals(entityContext.getEntity(id).getObject())) {
                 return;
             }
 
@@ -135,28 +128,8 @@ public class PersistenceContextImpl implements PersistenceContext {
                 result.put(id, snapshot);
             }
 
-            if (isEntityInContext(id)) {
-                result.put(id, contextMap.get(id));
-            }
-        });
-
-        return result;
-    }
-
-    private Map<Integer, Snapshot> exploreInContext() {
-        Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
-
-        contextMap.forEach((id, snapshot) -> {
-            if (isEntityInSnapshot(id) && snapshot.getObject().equals(snapshotMap.get(id).getObject())) {
-                return;
-            }
-
-            if (contextMap.containsKey(id)) {
-                result.put(id, snapshot);
-            }
-
-            if (isEntityInSnapshot(id)) {
-                result.put(id, snapshotMap.get(id));
+            if (entityContext.isEntityInContext(id)) {
+                result.put(id, entityContext.getEntity(id));
             }
         });
 
