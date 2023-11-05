@@ -1,10 +1,14 @@
 package persistence.entity;
 
-public interface EntityPersister {
+public interface EntityPersister<T> {
 
-  boolean update(Object entity, String fieldName);
+  boolean update(T entity);
 
-  void insert(Object entity);
+  void insert(T entity);
 
-  void delete(Object entity);
+  void delete(T entity);
+
+  T load(Long id);
+
+  boolean entityExists(Object entity);
 }

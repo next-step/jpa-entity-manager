@@ -1,30 +1,41 @@
 package persistence.meta;
 
-import persistence.dialect.h2.H2Dialect;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import persistence.dialect.h2.H2Dialect;
 
 public class MetaEntity<T> {
+
   private static final String DELIMITER = ",";
-  private static final String CREATE_TABLE_CLAUSE = "%s (%s)";
   private final MetaDataTable metaDataTable;
   private final MetaDataColumns metaDataColumns;
+  private final MetaDataColumn primaryKeyColumn;
   private final Class<T> clazz;
 
   private MetaEntity(MetaDataTable metaDataTable, MetaDataColumns metaDataColumns, Class<T> clazz) {
     this.metaDataTable = metaDataTable;
     this.metaDataColumns = metaDataColumns;
+    this.primaryKeyColumn = metaDataColumns.getPrimaryColumn();
     this.clazz = clazz;
   }
 
   public static <T> MetaEntity<T> of(Class<T> clazz) {
-    return new MetaEntity<>(MetaDataTable.of(clazz), MetaDataColumns.of(clazz, new H2Dialect()), clazz);
+    return new MetaEntity<>(MetaDataTable.of(clazz), MetaDataColumns.of(clazz, new H2Dialect()),
+        clazz);
+  }
+  public String getTableName() {
+    return metaDataTable.getName();
   }
 
+  public MetaDataColumn getPrimaryKeyColumn() {
+    return primaryKeyColumn;
+  }
+  public boolean getPrimaryKeyColumnIsNull(Object entity) {
+    return Objects.nonNull(primaryKeyColumn.getFieldValue(entity));
+  }
   public String getValueClause(Object entity) {
     List<String> columns = getEntityFields();
 
@@ -36,8 +47,22 @@ public class MetaEntity<T> {
 
     return String.join(DELIMITER, columns);
   }
+  public MetaDataColumns getMetaDataColumns() {
+    return metaDataColumns;
+  }
+  public String getColumns() {
+    return metaDataColumns.getColumns();
+  }
 
-  private List<String> extractValuesFromEntity(List<String> columns, Object entity) {
+  public T createInstance() {
+    try {
+      return clazz.getDeclaredConstructor().newInstance();
+    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+             NoSuchMethodException e) {
+      throw new RuntimeException("생성자 오류", e);
+    }
+  }
+  public List<String> extractValuesFromEntity(List<String> columns, Object entity) {
     List<String> values = new ArrayList<>();
 
     for (String column : columns) {
@@ -74,42 +99,18 @@ public class MetaEntity<T> {
     return String.join(DELIMITER, columns);
   }
 
-  public String getTableName() {
-    return metaDataTable.getName();
-  }
-
-  public List<String> getEntityColumns() {
+  private List<String> getEntityColumns() {
     return metaDataColumns.getDBColumnsWithoutId();
   }
 
-  public List<String> getEntityFields() {
+  private List<String> getEntityFields() {
     return metaDataColumns.getFields();
   }
 
-  public Map<String, String> getFieldMapping() {
-    return metaDataColumns.getFieldToDBColumnMap();
-  }
 
-  public MetaDataColumn getPrimaryKeyColumn() {
-    return metaDataColumns.getPrimaryColumn();
-  }
-
-
-  public List<String> getEntityColumnsWithId() {
+  private List<String> getEntityColumnsWithId() {
     return metaDataColumns.getColumnsWithId();
   }
-  public List<MetaDataColumn> getMetaDataColumns(){
-    return metaDataColumns.getMetaDataColumns();
-  }
-  public String getCreateClause() {
-    return String.format(CREATE_TABLE_CLAUSE, metaDataTable.getName(), metaDataColumns.getColumns());
-  }
 
-  public T createInstance() {
-    try {
-      return clazz.getDeclaredConstructor().newInstance();
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    }
-  }
+
 }
