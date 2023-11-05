@@ -1,8 +1,10 @@
 package persistence.entity;
 
+import jakarta.persistence.Id;
 import persistence.sql.metadata.EntityMetadata;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class SimpleEntityManager implements EntityManager{
     private final EntityPersister entityPersister;
@@ -31,7 +33,21 @@ public class SimpleEntityManager implements EntityManager{
 
     @Override
     public void persist(Object entity) {
-        persistenceContext.addEntity(entityPersister.insert(entity), entity);
+        Object id = entityPersister.insert(entity);
+
+        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(x -> x.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Id 값이 정의되지 않은 엔티티입니다."));
+
+        try {
+            idField.setAccessible(true);
+            idField.set(entity, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        persistenceContext.addEntity(id, entity);
     }
 
     @Override
