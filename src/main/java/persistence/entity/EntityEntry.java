@@ -11,67 +11,67 @@ public class EntityEntry {
         entry = new HashMap<>();
     }
 
-    public boolean isManaged(Integer key) {
-        if (!containsEntry(key)) {
+    public boolean isManaged(Integer hashCode) {
+        if (!containsEntry(hashCode)) {
             return false;
         }
-        return entry.get(key).isManaged();
+        return entry.get(hashCode).isManaged();
     }
 
-    public boolean isSaving(Integer key) {
-        if (!containsEntry(key)) {
+    public boolean isSaving(Integer hashCode) {
+        if (!containsEntry(hashCode)) {
             return false;
         }
-        return entry.get(key).isSaving();
+        return entry.get(hashCode).isSaving();
     }
 
-    public boolean isDeleted(Integer key) {
-        if (!containsEntry(key)) {
+    public boolean isDeleted(Integer hashCode) {
+        if (!containsEntry(hashCode)) {
             return false;
         }
-        return entry.get(key).isDeleted();
+        return entry.get(hashCode).isDeleted();
     }
 
-    public boolean isGone(Integer key) {
-        if (!containsEntry(key)) {
+    public boolean isGone(Integer hashCode) {
+        if (!containsEntry(hashCode)) {
             return false;
         }
-        return entry.get(key).isGone();
+        return entry.get(hashCode).isGone();
     }
 
     public Map<Integer, EntityStatus> getEntry() {
         return entry;
     }
 
-    public void managed(Integer key) {
-        entry.put(key, EntityStatus.MANAGED);
+    public void managed(Integer hashCode) {
+        entry.put(hashCode, EntityStatus.MANAGED);
     }
 
-    public void loading(Integer key) {
-        entry.put(key, EntityStatus.LOADING);
+    public void loading(Integer hashCode) {
+        entry.put(hashCode, EntityStatus.LOADING);
     }
 
-    public void saving(Integer key) {
-        entry.put(key, EntityStatus.SAVING);
+    public void saving(Integer hashCode) {
+        entry.put(hashCode, EntityStatus.SAVING);
     }
 
-    public void deleted(Integer key) {
-        entry.put(key, EntityStatus.DELETED);
+    public void deleted(Integer hashCode) {
+        entry.put(hashCode, EntityStatus.DELETED);
     }
 
-    public void gone(Integer key) {
-        entry.put(key, EntityStatus.GONE);
+    public void gone(Integer hashCode) {
+        entry.put(hashCode, EntityStatus.GONE);
     }
 
-    public void clear(Integer key) {
-        entry.remove(key);
+    public void clear(Integer hashCode) {
+        entry.remove(hashCode);
     }
 
     public void clear() {
         entry.clear();
     }
 
-    private boolean containsEntry(Integer key) {
-        return entry.containsKey(key);
+    private boolean containsEntry(Integer hashCode) {
+        return entry.containsKey(hashCode);
     }
 }

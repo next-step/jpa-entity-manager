@@ -6,52 +6,52 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityPersistenceContext {
-    private final Map<Integer, Snapshot> contextMap;
+    private final Map<Integer, Snapshot> context;
 
     public EntityPersistenceContext() {
-        this.contextMap = new ConcurrentHashMap<>();
+        this.context = new ConcurrentHashMap<>();
     }
 
     public Snapshot getEntity(Integer hashCode) {
-        return contextMap.get(hashCode);
+        return context.get(hashCode);
     }
 
     public Object save(Integer hashCode, Snapshot snapshot) {
-        contextMap.put(hashCode, snapshot);
+        context.put(hashCode, snapshot);
 
-        return contextMap.get(hashCode);
+        return context.get(hashCode);
     }
 
     public void delete(Integer hashCode) {
-        contextMap.remove(hashCode);
+        context.remove(hashCode);
     }
 
     public void clear() {
-        contextMap.clear();
+        context.clear();
     }
 
     public boolean isEntityInContext(Integer hashCode) {
-        return contextMap.containsKey(hashCode);
+        return context.containsKey(hashCode);
     }
 
     public int size() {
-        return contextMap.size();
+        return context.size();
     }
 
     public Map<Integer, Snapshot> exploreInContext(EntitySnapshot snapshotMap) {
         Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
 
-        contextMap.forEach((id, snapshot) -> {
-            if (snapshotMap.isEntityInSnapshot(id) && snapshot.getObject().equals(snapshotMap.getEntity(id))) {
+        context.forEach((hashCode, data) -> {
+            if (snapshotMap.isEntityInSnapshot(hashCode) && data.getObject().equals(snapshotMap.getEntity(hashCode))) {
                 return;
             }
 
-            if (contextMap.containsKey(id)) {
-                result.put(id, snapshot);
+            if (context.containsKey(hashCode)) {
+                result.put(hashCode, data);
             }
 
-            if (snapshotMap.isEntityInSnapshot(id)) {
-                result.put(id, snapshotMap.getSnapshot(id));
+            if (snapshotMap.isEntityInSnapshot(hashCode)) {
+                result.put(hashCode, snapshotMap.getSnapshot(hashCode));
             }
         });
 

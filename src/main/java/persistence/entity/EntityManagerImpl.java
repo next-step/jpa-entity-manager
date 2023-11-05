@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {
-    private final PersistenceContext persistenceContext;
     private final Map<String, EntityPersister<?>> persisterMap;
+    private final PersistenceContext persistenceContext;
 
     EntityManagerImpl(Map<String, EntityPersister<?>> persisterMap) {
         this.persisterMap = persisterMap;
@@ -20,26 +20,26 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <R, I> R find(Class<R> rClass, I input) {
         final EntityPersister<?> persister = getPersister(rClass);
-        int key = persister.getHashCode(input);
+        int hashCode = persister.getHashCode(input);
 
-        return (R) persistenceContext.getEntity(key, persister, input);
+        return (R) persistenceContext.getEntity(hashCode, persister, input);
     }
 
     @Override
     public <T> T persist(T t) {
         final EntityPersister<?> persister = getPersister(t.getClass());
         Object id = persister.getIdValue(t);
-        int key = persister.getHashCode(id);
+        int hashCode = persister.getHashCode(id);
 
-        return (T) persistenceContext.addEntity(key, id, persister.getEntity(t));
+        return (T) persistenceContext.addEntity(hashCode, id, persister.getEntity(t));
     }
 
     @Override
     public <T> void remove(T t, Object arg) {
         final EntityPersister<?> persister = getPersister(t.getClass());
-        int key = persister.getHashCode(arg);
+        int hashCode = persister.getHashCode(arg);
 
-        persistenceContext.removeEntity(key);
+        persistenceContext.removeEntity(hashCode);
     }
 
     public void flush() {

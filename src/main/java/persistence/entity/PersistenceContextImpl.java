@@ -16,56 +16,56 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T, I> T getEntity(Integer key, EntityPersister<T> persister, I input) {
-        if (entityEntry.isManaged(key)) {
-            return (T) entityContext.getEntity(key).getObject();
+    public <T, I> T getEntity(Integer hashCode, EntityPersister<T> persister, I input) {
+        if (entityEntry.isManaged(hashCode)) {
+            return (T) entityContext.getEntity(hashCode).getObject();
         }
 
-        entityEntry.loading(key);
+        entityEntry.loading(hashCode);
 
-        Snapshot snapshot = getDatabaseSnapshot(key, persister, input);
+        Snapshot snapshot = getDatabaseSnapshot(hashCode, persister, input);
 
         if (snapshot.getObject() == null) {
-            entityEntry.clear(key);
+            entityEntry.clear(hashCode);
             return null;
         }
 
-        addEntity(key, snapshot);
+        addEntity(hashCode, snapshot);
 
-        entityEntry.managed(key);
+        entityEntry.managed(hashCode);
 
         return (T) snapshot.getObject();
     }
 
     @Override
-    public Object addEntity(Integer key, Object id, Object entity) {
+    public Object addEntity(Integer hashCode, Object id, Object entity) {
         if (entity == null) {
             return null;
         }
 
-        addEntity(key, new Snapshot(id, entity));
+        addEntity(hashCode, new Snapshot(id, entity));
 
-        return entityContext.getEntity(key).getObject();
+        return entityContext.getEntity(hashCode).getObject();
     }
 
     @Override
-    public Object addEntity(Integer key, Snapshot snapshot) {
-        entityEntry.saving(key);
+    public Object addEntity(Integer hashCode, Snapshot snapshot) {
+        entityEntry.saving(hashCode);
 
-        return entityContext.save(key, snapshot);
+        return entityContext.save(hashCode, snapshot);
     }
 
     @Override
-    public void removeEntity(Integer key) {
-        entityEntry.deleted(key);
+    public void removeEntity(Integer hashCode) {
+        entityEntry.deleted(hashCode);
 
-        entityContext.delete(key);
+        entityContext.delete(hashCode);
     }
 
     @Override
-    public <T, I> Snapshot getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
+    public <T, I> Snapshot getDatabaseSnapshot(Integer hashCode, EntityPersister<T> persister, I input) {
         Object data = persister.findById(input);
-        return snapshotMap.save(key, input, data);
+        return snapshotMap.save(hashCode, input, data);
     }
 
     @Override

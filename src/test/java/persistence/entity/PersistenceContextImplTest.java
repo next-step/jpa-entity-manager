@@ -50,12 +50,12 @@ class PersistenceContextImplTest {
             final Long id = 9898L;
             SelectPerson person = null;
 
-            final Integer key = id.hashCode();
+            final Integer hashCode = id.hashCode();
 
             //when
-            persistenceContext.addEntity(key, id, person);
+            persistenceContext.addEntity(hashCode, id, person);
 
-            Object result = persistenceContext.getEntity(key, persister, id);
+            Object result = persistenceContext.getEntity(hashCode, persister, id);
 
             //then
             assertThat(result).isNull();
@@ -71,15 +71,15 @@ class PersistenceContextImplTest {
             final String email = "email";
             final int index = 3;
 
-            final Integer key = id.hashCode();
+            final Integer hashCode = id.hashCode();
 
             SelectPerson person = new SelectPerson(id, name, age, email, index);
 
             //when
-            영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
+            영속성_컨텍스트에서_데이터를_저장한다(hashCode, id, person);
             persistenceContext.flush(Map.of("domain.SelectPerson", persister));
 
-            SelectPerson result = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(key, id);
+            SelectPerson result = (SelectPerson) 영속성_컨텍스트에서_데이터를_가져온다(hashCode, id);
 
             //then
             assertSoftly(softAssertions -> {
@@ -100,20 +100,20 @@ class PersistenceContextImplTest {
             SelectPerson selectPerson = new SelectPerson(id, "name", 30, "email", 3);
             Person person = new Person(id, "name", 30, "email", 3);
 
-            final int selectPersonKey = selectPerson.hashCode();
-            final int personKey = person.hashCode();
+            final int selectPersonHashCode = selectPerson.hashCode();
+            final int personHashCode = person.hashCode();
 
             //when
-            영속성_컨텍스트에서_데이터를_저장한다(selectPersonKey, id, selectPerson);
-            영속성_컨텍스트에서_데이터를_저장한다(personKey, id, person);
+            영속성_컨텍스트에서_데이터를_저장한다(selectPersonHashCode, id, selectPerson);
+            영속성_컨텍스트에서_데이터를_저장한다(personHashCode, id, person);
             persistenceContext.flush(
                     Map.of("domain.SelectPerson", persister, "domain.Person", new EntityPersister<>(jdbcTemplate, Person.class, Query.getInstance()))
             );
 
             //then
             assertSoftly(softAssertions -> {
-                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(selectPersonKey, id)).isNotNull();
-                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(personKey, id)).isNotNull();
+                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(selectPersonHashCode, id)).isNotNull();
+                softAssertions.assertThat(영속성_컨텍스트에서_데이터를_가져온다(personHashCode, id)).isNotNull();
             });
 
             테이블을_삭제함(Person.class);
@@ -134,14 +134,14 @@ class PersistenceContextImplTest {
             final String email = "email";
             final int index = 3;
 
-            final Integer key = id.hashCode();
+            final Integer hashCode = id.hashCode();
 
             SelectPerson person = new SelectPerson(id, name, age, email, index);
-            영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
+            영속성_컨텍스트에서_데이터를_저장한다(hashCode, id, person);
             persistenceContext.flush(Map.of("domain.SelectPerson", persister));
 
             //when
-            SelectPerson result = persistenceContext.getEntity(key, persister, id);
+            SelectPerson result = persistenceContext.getEntity(hashCode, persister, id);
 
             //then
             assertSoftly(softAssertions -> {
@@ -157,10 +157,10 @@ class PersistenceContextImplTest {
         @DisplayName("영속성 컨텍스트에 저장되지 않은 값을 가져오면 null 반환")
         void returnNull() {
             //given
-            final Integer key = -93939393;
+            final Integer hashCode = -93939393;
 
             //when
-            SelectPerson result = persistenceContext.getEntity(key, persister, key);
+            SelectPerson result = persistenceContext.getEntity(hashCode, persister, hashCode);
 
             //then
             assertThat(result).isNull();
@@ -194,16 +194,16 @@ class PersistenceContextImplTest {
         void success() throws SQLException {
             //given
             final Long id = 5555L;
-            final Integer key = id.hashCode();
+            final Integer hashCode = id.hashCode();
 
             SelectPerson person = new SelectPerson(id, "name", 30, "email", 3);
-            영속성_컨텍스트에서_데이터를_저장한다(key, id, person);
+            영속성_컨텍스트에서_데이터를_저장한다(hashCode, id, person);
 
             //when
-            persistenceContext.removeEntity(key);
+            persistenceContext.removeEntity(hashCode);
 
             //then
-            assertThat(persistenceContext.getEntity(key, persister, id)).isNull();
+            assertThat(persistenceContext.getEntity(hashCode, persister, id)).isNull();
         }
     }
 
@@ -212,14 +212,14 @@ class PersistenceContextImplTest {
         테이블을_삭제함(SelectPerson.class);
     }
 
-    private void 영속성_컨텍스트에서_데이터를_저장한다(Integer key, Object id, Object entity) throws SQLException {
+    private void 영속성_컨텍스트에서_데이터를_저장한다(Integer hashCode, Object id, Object entity) throws SQLException {
         EntityPersister<SelectPerson> entityPersister;
 
         DatabaseServer server = new H2();
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityPersister = new EntityPersister<>(jdbcTemplate, SelectPerson.class, Query.getInstance());
 
-        persistenceContext.addEntity(key, id, entityPersister.getEntity(entity));
+        persistenceContext.addEntity(hashCode, id, entityPersister.getEntity(entity));
     }
 
     private Object 영속성_컨텍스트에서_데이터를_가져온다(Integer hashcode, Long id) {

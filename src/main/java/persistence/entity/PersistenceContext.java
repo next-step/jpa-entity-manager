@@ -6,15 +6,15 @@ import java.util.Map;
 
 public interface PersistenceContext {
 
-    <T, I> T getEntity(Integer key, EntityPersister<T> persister, I input);
+    <T, I> T getEntity(Integer hashCode, EntityPersister<T> persister, I input);
 
-    Object addEntity(Integer key, Object id, Object entity);
+    Object addEntity(Integer hashCode, Object id, Object entity);
 
-    Object addEntity(Integer key, Snapshot snapshot);
+    Object addEntity(Integer hashCode, Snapshot snapshot);
 
-    void removeEntity(Integer id);
+    void removeEntity(Integer hashCode);
 
-    <T, I> Snapshot getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input);
+    <T, I> Snapshot getDatabaseSnapshot(Integer hashCode, EntityPersister<T> persister, I input);
 
     Map<Integer, Snapshot> comparison();
 
