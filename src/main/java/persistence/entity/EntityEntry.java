@@ -3,8 +3,12 @@ package persistence.entity;
 public class EntityEntry {
 	private EntityStatus entityStatus;
 
-	public EntityEntry() {
-		this.entityStatus = EntityStatus.LOADING;
+	private EntityEntry(EntityStatus entityStatus) {
+		this.entityStatus = entityStatus;
+	}
+
+	public static EntityEntry loadingOf() {
+		return new EntityEntry(EntityStatus.LOADING);
 	}
 
 	public void manage() {
@@ -28,19 +32,11 @@ public class EntityEntry {
 	}
 
 	public boolean isReadOnly() {
-		if(entityStatus == EntityStatus.READ_ONLY) {
-			return true;
-		}
-
-		return false;
+		return entityStatus == EntityStatus.READ_ONLY;
 	}
 
 	public boolean isGone() {
-		if(entityStatus == EntityStatus.GONE) {
-			return true;
-		}
-
-		return false;
+		return entityStatus == EntityStatus.GONE;
 	}
 
 	public EntityStatus getStatus() {

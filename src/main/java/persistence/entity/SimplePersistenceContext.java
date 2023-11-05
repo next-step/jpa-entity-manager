@@ -77,7 +77,7 @@ public class SimplePersistenceContext implements PersistenceContext {
 		EntityEntry entry = entityEntries.get(key);
 
 		if(Objects.isNull(entry)) {
-			entry = new EntityEntry();
+			entry = EntityEntry.loadingOf();
 			entityEntries.put(key, entry);
 
 			return entry;
