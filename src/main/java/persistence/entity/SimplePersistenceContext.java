@@ -34,6 +34,10 @@ public class SimplePersistenceContext implements PersistenceContext {
 
 	@Override
 	public void addEntity(Object id, Object entity) {
+		if(Objects.isNull(entity)) {
+			return ;
+		}
+
 		EntityKey key = new EntityKey(entity.getClass(), id);
 		EntityEntry entry = saveEntry(key);
 
@@ -49,7 +53,7 @@ public class SimplePersistenceContext implements PersistenceContext {
 		EntityEntry entry = entityEntries.get(key);
 
 		if(Objects.isNull(entry)) {
-			throw new EntityNotFoundException("영속성 컨텍스에 존재하지 않는 엔티티입니다.");
+			return ;
 		}
 
 		if(entry.isReadOnly()) {
