@@ -54,4 +54,8 @@ public class EntityManipulationBuilder {
         return entityMetadata.getEntity(resultSet);
     }
 
+    public <T> void setIdToEntity(T entity, long id) {
+        entityMetadata.setIdToEntity(entity, id);
+    }
+
 }

@@ -41,7 +41,8 @@ class SimpleEntityManagerTest {
         entityDefinitionBuilder = new EntityDefinitionBuilder(entityMetadata);
         entityManipulationBuilder = new EntityManipulationBuilder(entityMetadata);
         Dialect dialect = new H2Dialect();
-        entityManager = new SimpleEntityManager(jdbcTemplate, dialect);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        entityManager = new SimpleEntityManager(entityPersister);
 
         jdbcTemplate.execute(entityDefinitionBuilder.create());
         jdbcTemplate.execute(entityManipulationBuilder
@@ -68,9 +69,10 @@ class SimpleEntityManagerTest {
     void persist() {
         Person person = new Person("test2", 30, "test1@gmail.com");
 
-        Object key = entityManager.persist(person);
+        Person persist = entityManager.persist(person);
 
-        assertThat(key).isEqualTo(2L);
+        assertThat(person.getName()).isEqualTo(persist.getName());
+        assertThat(person.getId()).isEqualTo(2L);
     }
 
     @Test
