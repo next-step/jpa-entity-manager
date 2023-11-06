@@ -25,7 +25,7 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
             return clazz.cast(entityManager.persist(t));
         }
 
-        return entityManager.merge(t);
+        return entityManager.merge(clazz, t);
     }
 
     @Override

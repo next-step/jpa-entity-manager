@@ -18,9 +18,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.impl.EntityManagerImpl;
+import persistence.entity.impl.context.DefaultPersistenceContext;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
 import persistence.sql.ddl.generator.DropDDLQueryGenerator;
-import persistence.sql.ddl.generator.fixture.PersonV3;
 import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.JdbcTemplate;
@@ -43,10 +43,11 @@ class CustomJpaRepositoryIntegrationTest {
 
         Connection connection = server.getConnection();
 
-        entityManager = new EntityManagerImpl(connection, new H2ColumnType());
+        final H2ColumnType columnType = new H2ColumnType();
+        entityManager = new EntityManagerImpl(connection, columnType, new DefaultPersistenceContext(columnType));
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(new H2ColumnType());
+        CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(columnType);
         jdbcTemplate.execute(createDDLQueryGenerator.create(TestEntity.class));
 
         jpaRepository = new CustomJpaRepository<>(entityManager, TestEntity.class);

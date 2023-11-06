@@ -1,4 +1,4 @@
-package persistence.entity.impl;
+package persistence.entity.impl.context;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -13,16 +13,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import persistence.entity.PersistenceContext;
+import persistence.entity.impl.context.DefaultPersistenceContext;
 import persistence.sql.dialect.H2ColumnType;
 
 @DisplayName("PersistenceContext 테스트")
-class DefaultPersistenceContextImplTest {
+class DefaultPersistenceContextTest {
 
     private PersistenceContext defaultPersistenceContext;
 
     @BeforeEach
     void setUp() {
-        defaultPersistenceContext = new DefaultPersistenceContextImpl(new H2ColumnType());
+        defaultPersistenceContext = new DefaultPersistenceContext(new H2ColumnType());
     }
 
     @TestFactory
@@ -37,7 +38,7 @@ class DefaultPersistenceContextImplTest {
 
         return Stream.of(
             dynamicTest("PersistenceContext에 Entity를 관리대상으로 추가할 수 있다.", () -> {
-                assertThatCode(() -> defaultPersistenceContext.addEntity(entity.getId(), entity))
+                assertThatCode(() -> defaultPersistenceContext.addEntity(entity))
                     .doesNotThrowAnyException();
             }),
             dynamicTest("PersistenceContext에 관리대상에 추가된 Entity를 갖고올 수 있다.", () -> {

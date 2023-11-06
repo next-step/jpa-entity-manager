@@ -10,5 +10,5 @@ public interface EntityManager extends AutoCloseable {
 
     void clear();
 
-    <T> T merge(T t);
+    <T> T merge(Class<T> clazz, T t);
 }
