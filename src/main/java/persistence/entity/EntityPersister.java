@@ -32,10 +32,10 @@ public class EntityPersister<E> {
         jdbcTemplate.execute(updateDMLQueryBuilder.build());
     }
 
-    public void insert(E entity) {
+    public Object insert(E entity) {
         InsertDMLQueryBuilder<?> insertDMLQueryBuilder = new InsertDMLQueryBuilder<>(dialect, entity);
 
-        jdbcTemplate.execute(insertDMLQueryBuilder.build());
+        return jdbcTemplate.executeWithGeneratedKey(insertDMLQueryBuilder.build());
     }
 
     public void delete(E entity) {

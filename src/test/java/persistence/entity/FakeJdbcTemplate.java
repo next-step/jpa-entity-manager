@@ -33,6 +33,13 @@ public class FakeJdbcTemplate extends JdbcTemplate {
     }
 
     @Override
+    public Object executeWithGeneratedKey(String sql) {
+        this.latestExecutionSqlResult = sql;
+
+        return 0L;
+    }
+
+    @Override
     public <T> List<T> query(String sql, RowMapper<T> rowMapper) {
         try {
             latestQueryResult = rowMapper.mapRow(null);

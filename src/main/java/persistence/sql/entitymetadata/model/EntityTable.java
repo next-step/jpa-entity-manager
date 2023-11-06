@@ -67,4 +67,8 @@ public class EntityTable<E> extends EntityValidatable<E> {
             throw new RuntimeException("Entity Creation Failed! Entity Name: " + name);
         }
     }
+
+    public boolean isExistsId(E entity) {
+        return getIdColumn().getValue(entity) != null;
+    }
 }
