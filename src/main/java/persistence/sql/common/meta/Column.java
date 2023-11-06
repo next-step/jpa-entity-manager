@@ -29,7 +29,7 @@ public class Column {
 
     public static Column[] of(Field[] fields) {
         return Arrays.stream(fields)
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
+                .filter(field -> !isTransient(field))
                 .map(Column::of)
                 .toArray(Column[]::new);
     }

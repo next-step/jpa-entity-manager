@@ -1,111 +1,116 @@
 package persistence.entity;
 
 import domain.Snapshot;
+
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import persistence.exception.InvalidContextException;
 
 public class PersistenceContextImpl implements PersistenceContext {
-
-    private final Map<Integer, Snapshot> contextMap;
-    private final Map<Integer, Snapshot> snapshotMap;
+    private final EntityEntry entityEntry;
+    private final EntityPersistenceContext entityContext;
+    private final EntitySnapshot snapshotMap;
 
     PersistenceContextImpl() {
-        this.contextMap = new ConcurrentHashMap<>();
-        this.snapshotMap = new ConcurrentHashMap<>();
+        this.entityEntry = new EntityEntry();
+        this.entityContext = new EntityPersistenceContext();
+        this.snapshotMap = new EntitySnapshot();
     }
 
     @Override
-    public Object getEntity(Integer id) {
-        if (isEntityInContext(id)) {
-            return contextMap.get(id).getObject();
+    public <T, I> T getEntity(Integer hashCode, EntityPersister<T> persister, I input) {
+        if (entityEntry.isManaged(hashCode)) {
+            return (T) entityContext.getEntity(hashCode).getObject();
         }
-        return null;
+
+        entityEntry.loading(hashCode);
+
+        Snapshot snapshot = getDatabaseSnapshot(hashCode, persister, input);
+
+        if (snapshot.getObject() == null) {
+            entityEntry.clear(hashCode);
+            return null;
+        }
+
+        addEntity(hashCode, snapshot);
+
+        entityEntry.managed(hashCode);
+
+        return (T) snapshot.getObject();
     }
 
     @Override
-    public void addEntity(Integer key, Object id, Object entity) {
+    public Object addEntity(Integer hashCode, Object id, Object entity) {
         if (entity == null) {
-            return;
+            return null;
         }
 
-        addEntity(key, new Snapshot(id, entity));
+        addEntity(hashCode, new Snapshot(id, entity));
+
+        return entityContext.getEntity(hashCode).getObject();
     }
 
     @Override
-    public void addEntity(Integer key, Snapshot snapshot) {
-        contextMap.put(key, snapshot);
+    public Object addEntity(Integer hashCode, Snapshot snapshot) {
+        entityEntry.saving(hashCode);
+
+        return entityContext.save(hashCode, snapshot);
     }
 
     @Override
-    public void removeEntity(Integer key) {
-        if (!isEntityInContext(key)) {
-            throw new InvalidContextException();
-        }
-        contextMap.remove(key);
+    public void removeEntity(Integer hashCode) {
+        entityEntry.deleted(hashCode);
+
+        entityContext.delete(hashCode);
     }
 
     @Override
-    public boolean isEntityInSnapshot(Integer id) {
-        return snapshotMap.containsKey(id);
-    }
-
-    public boolean isEntityInContext(Integer id) {
-        return contextMap.containsKey(id);
-    }
-
-    @Override
-    public <T, I> Snapshot getDatabaseSnapshot(Integer key, EntityPersister<T> persister, I input) {
+    public <T, I> Snapshot getDatabaseSnapshot(Integer hashCode, EntityPersister<T> persister, I input) {
         Object data = persister.findById(input);
-        return snapshotMap.put(key, new Snapshot(input, data));
+        return snapshotMap.save(hashCode, input, data);
     }
 
     @Override
     public Map<Integer, Snapshot> comparison() {
-        if(snapshotMap.size() >= contextMap.size()) {
-            return exploreInSnapshot();
+        if (snapshotMap.size() >= entityContext.size()) {
+            return snapshotMap.exploreInSnapshot(entityContext);
         }
 
-        return exploreInContext();
+        return entityContext.exploreInContext(snapshotMap);
     }
 
-    private Map<Integer, Snapshot> exploreInSnapshot() {
-        Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
+    @Override
+    public void flush(Map<String, EntityPersister<?>> persister) {
+        Map<Integer, Snapshot> map = comparison();
 
-        snapshotMap.forEach((id, snapshot) -> {
-            if (isEntityInContext(id) && snapshot.getObject().equals(contextMap.get(id).getObject())) {
+        if (map.isEmpty()) {
+            return;
+        }
+
+        entityEntry.getEntry().forEach((hashcode, status) -> {
+            Object object = map.get(hashcode).getObject();
+            EntityPersister<?> entityPersister = persister.get(object.getClass().getName());
+
+            if (status.isSaving()) {
+                entityPersister.insert(object);
+                entityEntry.managed(hashcode);
                 return;
             }
 
-            if (snapshotMap.containsKey(id)) {
-                result.put(id, snapshot);
-            }
-
-            if (isEntityInContext(id)) {
-                result.put(id, contextMap.get(id));
-            }
-        });
-
-        return result;
-    }
-
-    private Map<Integer, Snapshot> exploreInContext() {
-        Map<Integer, Snapshot> result = new ConcurrentHashMap<>();
-
-        contextMap.forEach((id, snapshot) -> {
-            if (isEntityInSnapshot(id) && snapshot.getObject().equals(snapshotMap.get(id).getObject())) {
+            if (status.isDeleted()) {
+                entityPersister.delete(object);
+                entityEntry.gone(hashcode);
                 return;
             }
 
-            if (contextMap.containsKey(id)) {
-                result.put(id, snapshot);
-            }
-
-            if (isEntityInSnapshot(id)) {
-                result.put(id, snapshotMap.get(id));
-            }
+            entityPersister.update(object, map.get(entityContext.getEntity(hashcode)).getId());
+            entityEntry.managed(hashcode);
         });
 
-        return result;
+        clear();
+    }
+
+    private void clear() {
+        entityContext.clear();
+        snapshotMap.clear();
+        entityEntry.clear();
     }
 }

@@ -17,8 +17,4 @@ public class Snapshot {
     public Object getObject() {
         return object;
     }
-
-    public Class getObjectClass() {
-        return object.getClass();
-    }
 }

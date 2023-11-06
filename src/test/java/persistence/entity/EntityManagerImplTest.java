@@ -1,18 +1,9 @@
 package persistence.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
-import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
-
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import domain.SelectPerson;
-import java.sql.SQLException;
-import java.util.List;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -24,6 +15,15 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class EntityManagerImplTest {
 
@@ -135,7 +135,7 @@ class EntityManagerImplTest {
             final Long id = -999L;
 
             //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.find(clazz, id));
+            assertThat(entityManager.find(clazz, id)).isNull();
         }
 
         @Test
@@ -172,7 +172,6 @@ class EntityManagerImplTest {
 
             //then
             assertSoftly(softAssertions -> {
-                softAssertions.assertThat(result.getId()).isEqualTo(id);
                 softAssertions.assertThat(result.getId()).isEqualTo(id);
                 softAssertions.assertThat(result.getName()).isEqualTo(name);
                 softAssertions.assertThat(result.getEmail()).isEqualTo(email);
@@ -213,18 +212,7 @@ class EntityManagerImplTest {
             entityManager.flush();
 
             //then
-            assertThrows(RuntimeException.class, () -> 데이터를_조회함(clazz, id));
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 테이블의 데이터 삭제 시도시 오류")
-        void notFoundTable() {
-            //given
-            final Long id = 5L;
-            final Person person = new Person(id, "zz", 3, "xx", 3);
-
-            //when & then
-            assertThrows(RuntimeException.class, () -> entityManager.remove(person, id));
+            assertThat(데이터를_조회함(clazz, id)).isNull();
         }
     }
 
@@ -286,7 +274,7 @@ class EntityManagerImplTest {
             entityManager.flush();
 
             //when
-            assertThrows(RuntimeException.class, () -> 데이터를_조회함(clazz, id));
+            assertThat(데이터를_조회함(clazz, id)).isNull();
         }
 
         @Test
