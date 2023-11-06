@@ -33,6 +33,7 @@ public class SimpleEntityManager implements EntityManager {
 
         persistenceContext.addEntity(new EntityKey(selected), selected);
         persistenceContext.getDatabaseSnapshot(new EntityKey(selected), selected);
+        persistenceContext.addEntityEntry(selected, new SimpleEntityEntry(selected, Status.MANAGED));
         return selected;
     }
 
@@ -40,29 +41,33 @@ public class SimpleEntityManager implements EntityManager {
     public void persist(Object entity) {
         Class<?> entityClass = entity.getClass();
         EntityData entityData = new EntityData(entityClass);
+        persistenceContext.addEntityEntry(entity, new SimpleEntityEntry(entity, Status.SAVING));
 
         Object idValue = ReflectionUtil.getValueFrom(entityData.getEntityColumns().getIdColumn().getField(), entity);
         if (idValue == null) {
             entityPersister.insert(entity);
             persistenceContext.addEntity(new EntityKey(entity), entity);
+            persistenceContext.updateEntityEntryStatus(entity, Status.MANAGED);
             return;
         }
 
         Object foundEntity = find(entityClass, idValue);
         if (foundEntity == null) {
             entityPersister.insert(entity);
-            persistenceContext.addEntity(new EntityKey(entity), entity);
         } else {
             entityPersister.update(entity);
             persistenceContext.removeEntity(new EntityKey(entity));
-            persistenceContext.addEntity(new EntityKey(entity), entity);
         }
+        persistenceContext.addEntity(new EntityKey(entity), entity);
+        persistenceContext.updateEntityEntryStatus(entity, Status.MANAGED);
     }
 
     @Override
     public void remove(Object entity) {
+        persistenceContext.updateEntityEntryStatus(entity, Status.DELETED);
         entityPersister.delete(entity);
         persistenceContext.removeEntity(new EntityKey(entity));
+        persistenceContext.updateEntityEntryStatus(entity, Status.GONE); // TODO : commit이 구별되어야 함
     }
 
 }

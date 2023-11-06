@@ -10,4 +10,10 @@ public interface PersistenceContext {
 
     Object getDatabaseSnapshot(EntityKey entityKey, Object entity);
 
+    void addEntityEntry(Object object, EntityEntry entityEntry);
+
+    void deleteEntityEntry(Object object);
+
+    void updateEntityEntryStatus(Object object, Status status);
+
 }
