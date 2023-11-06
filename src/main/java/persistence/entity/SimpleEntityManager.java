@@ -5,6 +5,7 @@ import persistence.sql.metadata.EntityMetadata;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class SimpleEntityManager implements EntityManager{
     private final EntityPersister entityPersister;
@@ -23,7 +24,7 @@ public class SimpleEntityManager implements EntityManager{
     public <T> T find(Class<T> clazz, Long id) {
         Object entity = persistenceContext.getEntity(clazz, id);
 
-        if(entity == null) {
+        if(Objects.isNull(entity)) {
             entity = entityLoader.find(clazz, id);
             persistenceContext.addEntity(id, entity);
         }
@@ -52,6 +53,8 @@ public class SimpleEntityManager implements EntityManager{
 
     @Override
     public void remove(Object entity) {
+        Object id = new EntityMetadata(entity).getId();
+        persistenceContext.removeEntity(id, entity);
         entityPersister.delete(entity);
     }
 
