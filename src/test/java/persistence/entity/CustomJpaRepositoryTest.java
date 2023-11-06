@@ -4,7 +4,6 @@ import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,9 +56,6 @@ class CustomJpaRepositoryTest {
 
 		Person resultPerson = entityManager.find(Person.class, 2L);
 
-		Assertions.assertAll(
-				() -> assertEquals("hhhhhwi", resultPerson.getName()),
-				() -> assertEquals(10, resultPerson.getAge())
-		);
+		assertEquals(new Person(2L, "hhhhhwi", 10, "aab555586@gmail.com", 0), resultPerson);
 	}
 }
