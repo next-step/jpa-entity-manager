@@ -1,11 +1,14 @@
 package persistence.entity;
 
 import jakarta.persistence.Id;
+import persistence.sql.metadata.Column;
+import persistence.sql.metadata.Columns;
 import persistence.sql.metadata.EntityMetadata;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SimpleEntityManager implements EntityManager{
     private final EntityPersister entityPersister;
@@ -34,7 +37,7 @@ public class SimpleEntityManager implements EntityManager{
 
     @Override
     public void persist(Object entity) {
-        Object id = entityPersister.insert(entity);
+        Object id = entityPersister.insert(new EntityMetadata(entity));
 
         Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
@@ -53,15 +56,15 @@ public class SimpleEntityManager implements EntityManager{
 
     @Override
     public void remove(Object entity) {
-        Object id = new EntityMetadata(entity).getId();
-        persistenceContext.removeEntity(id, entity);
-        entityPersister.delete(entity);
+        EntityMetadata entityMetadata = new EntityMetadata(entity);
+        persistenceContext.removeEntity(entityMetadata.getId(), entity);
+        entityPersister.delete(entityMetadata);
     }
 
     @Override
     public void merge(Object entity) {
-        Object id = new EntityMetadata(entity).getId();
-        Snapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(id, entity);
+        EntityMetadata entityMetadata = new EntityMetadata(entity);
+        Snapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(entityMetadata.getId(), entity);
 
         if(snapshot == null) {
             persist(entity);
@@ -74,7 +77,16 @@ public class SimpleEntityManager implements EntityManager{
             return;
         }
 
-        persistenceContext.addEntity(id, entity);
-        entityPersister.update(fields, entity);
+        persistenceContext.addEntity(entityMetadata.getId(), entity);
+        entityPersister.update(
+                new Columns(Arrays.stream(fields).map(x -> {
+                    try {
+                        return new Column(x, String.valueOf(x.get(entity)));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList())),
+                new EntityMetadata(entity)
+        );
     }
 }
