@@ -1,7 +1,10 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.Person;
+import persistence.entity.entitymanager.EntityManager;
+import persistence.entity.entitymanager.JdbcEntityManager;
 import persistence.sql.dbms.Dialect;
 import persistence.sql.ddl.CreateDDLQueryBuilder;
 import persistence.sql.dml.InsertDMLQueryBuilder;

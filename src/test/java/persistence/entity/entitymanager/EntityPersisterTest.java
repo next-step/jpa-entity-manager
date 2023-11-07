@@ -1,8 +1,10 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import jdbc.FakeJdbcTemplate;
+import persistence.entity.Person;
 import persistence.sql.dbms.Dialect;
 import persistence.testutils.ReflectionTestSupport;
 
@@ -27,7 +29,7 @@ class EntityPersisterTest {
 
         entityPersister.insert(person);
 
-        assertThat(mockJdbcTemplate.latestExecutionSqlResult)
+        assertThat(mockJdbcTemplate.getLatestExecutionSqlResult())
                 .isEqualTo("INSERT INTO USERS (ID, NICK_NAME, OLD, EMAIL) VALUES (1, 'name1', 20, 'email1');");
     }
 
@@ -36,7 +38,7 @@ class EntityPersisterTest {
         Person person = fixture(1L, "name1", 20, "email1");
 
         entityPersister.update(person);
-        assertThat(mockJdbcTemplate.latestExecutionSqlResult)
+        assertThat(mockJdbcTemplate.getLatestExecutionSqlResult())
                 .isEqualTo("UPDATE USERS \n" +
                         "SET NICK_NAME = 'name1', OLD = 20, EMAIL = 'email1' \n" +
                         "WHERE id = 1;");
@@ -52,7 +54,7 @@ class EntityPersisterTest {
         assertThatThrownBy(() -> entityPersister.update(idNullPerson))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("id column value is null, entity = Person");
-        assertThat(mockJdbcTemplate.latestExecutionSqlResult).isNull();
+        assertThat(mockJdbcTemplate.getLatestExecutionSqlResult()).isNull();
     }
 
     @Test
@@ -61,7 +63,7 @@ class EntityPersisterTest {
 
         entityPersister.delete(person);
 
-        assertThat(mockJdbcTemplate.latestExecutionSqlResult)
+        assertThat(mockJdbcTemplate.getLatestExecutionSqlResult())
                 .isEqualTo("DELETE FROM USERS \n" +
                         "  WHERE id = 1;");
     }
@@ -76,6 +78,6 @@ class EntityPersisterTest {
         assertThatThrownBy(() -> entityPersister.delete(idNullPerson))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("id column value is null, entity = Person");
-        assertThat(mockJdbcTemplate.latestExecutionSqlResult).isNull();
+        assertThat(mockJdbcTemplate.getLatestExecutionSqlResult()).isNull();
     }
 }

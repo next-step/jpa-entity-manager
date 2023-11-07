@@ -1,12 +1,14 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.persistencecontext.EntityPersistIdentity;
+import persistence.entity.persistencecontext.EntitySnapShot;
+import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.sql.dbms.Dialect;
 import persistence.sql.entitymetadata.model.EntityColumn;
 import persistence.sql.entitymetadata.model.EntityTable;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class JdbcEntityManager implements EntityManager {
     private final EntityManagementCache entityManagementCache;
@@ -23,6 +25,10 @@ public class JdbcEntityManager implements EntityManager {
 
         T entity = findPersistedEntity(clazz, id)
                 .orElse(loadEntity(clazz, id));
+
+        if (entity == null) {
+            return null;
+        }
 
         persistEntity(clazz, id, entity);
 
@@ -50,35 +56,9 @@ public class JdbcEntityManager implements EntityManager {
     public void merge(Object entity) {
         PersistenceContext persistenceContext = entityManagementCache.persistenceContext(entity.getClass());
 
-        EntityPersistIdentity persistId = new EntityPersistIdentity(entity.getClass(), getEntityId(entity));
+        EntitySnapShot entitySnapShot = persistenceContext.getDatabaseSnapshot(new EntityPersistIdentity(entity.getClass(), getEntityId(entity)), entity);
 
-        if(persistenceContext.getEntity(persistId) == null) {
-            nonDirtyCheckMerge(entity);
-            return;
-        }
-
-        dirtyCheckMerge(entity, persistId);
-    }
-
-    private void nonDirtyCheckMerge(Object entity) {
-        EntityPersister entityPersister = entityManagementCache.persister(entity.getClass());
-        Object persistedEntity = findByEntity(entity);
-
-        if (persistedEntity == null) {
-            persist(entity);
-            return;
-        }
-
-        entityPersister.update(entity);
-        persistEntity((Class<Object>) entity.getClass(), (Long) getEntityId(entity), entity);
-    }
-
-    private void dirtyCheckMerge(Object entity, EntityPersistIdentity persistId) {
-        PersistenceContext persistenceContext = entityManagementCache.persistenceContext(entity.getClass());
-
-        EntitySnapShot entitySnapShot = persistenceContext.getDatabaseSnapshot(persistId, entity);
-
-        if(isDirty(entity, entitySnapShot)) {
+        if (isDirty(entity, entitySnapShot)) {
             EntityPersister entityPersister = entityManagementCache.persister(entity.getClass());
             entityPersister.update(entity);
             persistEntity((Class<Object>) entity.getClass(), (Long) getEntityId(entity), entity);
@@ -103,7 +83,9 @@ public class JdbcEntityManager implements EntityManager {
 
     private <T> void persistEntity(Class<T> clazz, Long id, T entity) {
         PersistenceContext<T> persistenceContext = entityManagementCache.persistenceContext(clazz);
-        persistenceContext.addEntity(new EntityPersistIdentity(clazz, id), entity);
+        EntityPersistIdentity persistId = new EntityPersistIdentity(clazz, id);
+        persistenceContext.addEntity(persistId, entity);
+        persistenceContext.getDatabaseSnapshot(persistId, entity);
     }
 
     private <T> void removeEntity(T entity) {

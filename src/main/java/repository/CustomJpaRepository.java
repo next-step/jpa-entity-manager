@@ -1,5 +1,6 @@
-package persistence.entity;
+package repository;
 
+import persistence.entity.entitymanager.EntityManager;
 import persistence.sql.entitymetadata.model.EntityTable;
 
 public class CustomJpaRepository<T, ID> {

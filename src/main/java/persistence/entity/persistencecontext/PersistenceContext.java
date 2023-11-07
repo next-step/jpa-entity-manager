@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persistencecontext;
 
 public interface PersistenceContext<E> {
     E getEntity(EntityPersistIdentity id);

@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persistencecontext;
 
 import java.util.Objects;
 

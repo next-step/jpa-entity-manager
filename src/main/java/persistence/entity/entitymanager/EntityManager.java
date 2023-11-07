@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 public interface EntityManager {
     <T> T find(Class<T> clazz, Long Id);

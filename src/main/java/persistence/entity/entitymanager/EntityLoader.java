@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import jdbc.JdbcTemplate;
 import jdbc.SimpleEntityRowMapper;

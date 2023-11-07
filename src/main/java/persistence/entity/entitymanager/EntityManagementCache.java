@@ -1,6 +1,8 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.persistencecontext.DefaultPersistenceContext;
+import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.sql.dbms.Dialect;
 
 import java.util.HashMap;

@@ -1,7 +1,9 @@
-package persistence.entity;
+package persistence.entity.persistencecontext;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.Person;
+import persistence.entity.persistencecontext.EntityPersistIdentity;
 
 import static org.assertj.core.api.Assertions.*;
 

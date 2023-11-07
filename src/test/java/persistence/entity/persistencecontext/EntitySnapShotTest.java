@@ -1,7 +1,10 @@
-package persistence.entity;
+package persistence.entity.persistencecontext;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.Person;
+import persistence.entity.PersonFixtures;
+import persistence.entity.persistencecontext.EntitySnapShot;
 import persistence.sql.entitymetadata.model.EntityColumn;
 
 import java.util.Set;

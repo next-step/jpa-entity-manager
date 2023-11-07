@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persistencecontext;
 
 import persistence.sql.entitymetadata.model.EntityColumn;
 import persistence.sql.entitymetadata.model.EntityTable;
