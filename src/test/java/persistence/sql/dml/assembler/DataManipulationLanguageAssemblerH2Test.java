@@ -61,6 +61,20 @@ class DataManipulationLanguageAssemblerH2Test {
         assertThat(sql).isEqualTo(expected);
     }
 
+    @Test
+    void generateUpdateWithWhere() {
+        // given
+        Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
+        person.setId(2L);
+
+        // when
+        String sql = dataManipulationLanguageAssembler.generateUpdate(person);
+
+        // then
+        String expected = "update users set nick_name='tongnamuu', old=11, email='tongnamuu@naver.com' where id = 2;";
+        assertThat(sql).isEqualTo(expected);
+    }
+
     private DataManipulationLanguageAssembler createDataManipulationLanguageAssembler() {
         H2Dialect h2Dialect = new H2Dialect();
         GetTableNameFromClassUseCase getTableNameFromClassUseCase = new GetTableNameFromClassUseCase();

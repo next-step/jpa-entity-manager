@@ -13,8 +13,12 @@ import jdbc.PersonRowMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
+import persistence.sql.usecase.GetFieldFromClassUseCase;
+import persistence.sql.usecase.GetFieldValueUseCase;
+import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 
 class EntityManagerTest {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler = createDataManipulationLanguageAssembler();
@@ -22,6 +26,7 @@ class EntityManagerTest {
     private final PersonRowMapper personRowMapper = new PersonRowMapper();
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
+    private EntityPersister entityPersister;
     private EntityManager entityManager;
 
 
@@ -30,7 +35,9 @@ class EntityManagerTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(personRowMapper, dataManipulationLanguageAssembler, jdbcTemplate);
+        entityPersister = new EntityPersister(personRowMapper, dataManipulationLanguageAssembler, jdbcTemplate);
+        entityManager = new EntityManagerImpl(personRowMapper, dataManipulationLanguageAssembler,
+            jdbcTemplate, entityPersister, new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()), new GetFieldValueUseCase());
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
     }
 
