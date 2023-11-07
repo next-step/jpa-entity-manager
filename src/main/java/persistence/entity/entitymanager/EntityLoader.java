@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import jdbc.JdbcTemplate;
 import jdbc.SimpleEntityRowMapper;
@@ -24,18 +24,6 @@ public class EntityLoader<T> {
 
         SelectDMLQueryBuilder<T> selectDMLQueryBuilder = new SelectDMLQueryBuilder<>(dialect, clazz)
                 .where(WhereClause.of(idColumn.getDbColumnName(), id, Operator.EQUALS));
-        selectDMLQueryBuilder.build();
-
-        return jdbcTemplate.queryForObject(selectDMLQueryBuilder.build(), new SimpleEntityRowMapper<>(entityTable, dialect));
-    }
-
-    public T findOne(T entity) {
-        Class<T> entityClass = (Class<T>) entity.getClass();
-        EntityTable<T> entityTable = (EntityTable<T>) new EntityTable<>(entity.getClass());
-        EntityColumn<T, ?> idColumn = entityTable.getIdColumn();
-
-        SelectDMLQueryBuilder<T> selectDMLQueryBuilder = new SelectDMLQueryBuilder<>(dialect, entityClass)
-                .where(WhereClause.of(idColumn.getDbColumnName(), idColumn.getValue(entity), Operator.EQUALS));
         selectDMLQueryBuilder.build();
 
         return jdbcTemplate.queryForObject(selectDMLQueryBuilder.build(), new SimpleEntityRowMapper<>(entityTable, dialect));

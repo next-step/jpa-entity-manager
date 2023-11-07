@@ -1,9 +1,14 @@
-package persistence.entity;
+package persistence.entity.persistencecontext;
 
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import jdbc.FakeJdbcTemplate;
+import persistence.entity.Person;
+import persistence.entity.entitymanager.EntityLoader;
+import persistence.entity.entitymanager.EntityManagementCache;
+import persistence.entity.entitymanager.EntityPersister;
 import persistence.sql.dbms.Dialect;
 
 import static org.assertj.core.api.Assertions.*;

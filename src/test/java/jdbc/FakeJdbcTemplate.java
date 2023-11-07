@@ -1,4 +1,4 @@
-package persistence.entity;
+package jdbc;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class FakeJdbcTemplate extends JdbcTemplate {
-    String latestExecutionSqlResult;
-    Object latestQueryForObjectResult;
-    Object latestQueryResult;
+    private String latestExecutionSqlResult;
+    private Object latestQueryForObjectResult;
+    private Object latestQueryResult;
 
     public FakeJdbcTemplate() {
         super(null);
@@ -33,6 +33,13 @@ public class FakeJdbcTemplate extends JdbcTemplate {
     }
 
     @Override
+    public Object executeWithGeneratedKey(String sql) {
+        this.latestExecutionSqlResult = sql;
+
+        return 0L;
+    }
+
+    @Override
     public <T> List<T> query(String sql, RowMapper<T> rowMapper) {
         try {
             latestQueryResult = rowMapper.mapRow(null);
@@ -41,5 +48,17 @@ public class FakeJdbcTemplate extends JdbcTemplate {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getLatestExecutionSqlResult() {
+        return latestExecutionSqlResult;
+    }
+
+    public Object getLatestQueryForObjectResult() {
+        return latestQueryForObjectResult;
+    }
+
+    public Object getLatestQueryResult() {
+        return latestQueryResult;
     }
 }

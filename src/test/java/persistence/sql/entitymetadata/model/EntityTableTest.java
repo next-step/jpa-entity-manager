@@ -7,8 +7,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.Person;
+import persistence.entity.PersonFixtures;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.not;
 
 class EntityTableTest {
 
@@ -57,5 +60,16 @@ class EntityTableTest {
         EntityTable<FakeTableAnnotationDefaultNameEntity> entityTable = new EntityTable<>(FakeTableAnnotationDefaultNameEntity.class);
 
         assertThat(entityTable.getName()).isEqualTo("FakeTableAnnotationDefaultNameEntity");
+    }
+
+    @DisplayName("엔티티 테이블 메타데이터 생성 후 idColumn의 값 여부 검증")
+    @Test
+    void entityTableisExistsIdColumnValue() {
+        EntityTable<Person> entityTable = new EntityTable<>(Person.class);
+        Person existIdPerson = PersonFixtures.fixtureById(1L);
+        Person notExistIdPerson = PersonFixtures.fixtureWithoutId("name", 1, "");
+
+        assertThat(entityTable.isExistsId(existIdPerson)).isTrue();
+        assertThat(entityTable.isExistsId(notExistIdPerson)).isFalse();
     }
 }

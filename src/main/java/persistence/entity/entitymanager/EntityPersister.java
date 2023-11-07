@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dbms.Dialect;
@@ -23,19 +23,21 @@ public class EntityPersister<E> {
         this.dialect = dialect;
     }
 
-    public void update(E entity) {
+    public E update(E entity) {
         validatePersisted(entity);
 
         UpdateDMLQueryBuilder<E> updateDMLQueryBuilder = new UpdateDMLQueryBuilder<>(dialect, entity)
                 .where(WhereClause.of(idColumn.getDbColumnName(), idColumn.getValue(entity), Operator.EQUALS));
 
         jdbcTemplate.execute(updateDMLQueryBuilder.build());
+
+        return entity;
     }
 
-    public void insert(E entity) {
+    public Object insert(E entity) {
         InsertDMLQueryBuilder<?> insertDMLQueryBuilder = new InsertDMLQueryBuilder<>(dialect, entity);
 
-        jdbcTemplate.execute(insertDMLQueryBuilder.build());
+        return jdbcTemplate.executeWithGeneratedKey(insertDMLQueryBuilder.build());
     }
 
     public void delete(E entity) {

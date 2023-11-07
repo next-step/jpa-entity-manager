@@ -6,6 +6,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 public class JdbcTemplate {
     private final Connection connection;
 
@@ -16,6 +18,17 @@ public class JdbcTemplate {
     public void execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object executeWithGeneratedKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql, RETURN_GENERATED_KEYS);
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            generatedKeys.next();
+            return generatedKeys.getObject(1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
