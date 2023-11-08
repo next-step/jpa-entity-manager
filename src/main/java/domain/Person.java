@@ -2,10 +2,11 @@ package domain;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Table(name = "users")
 @Entity
 public class Person {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,6 +41,7 @@ public class Person {
         this.email = email;
         this.index = index;
     }
+
     public Long getId() {
         return id;
     }
@@ -66,5 +68,23 @@ public class Person {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, age, email);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if (!(obj instanceof Person person)) {
+            return false;
+        }
+
+        return hashCode() == person.hashCode();
     }
 }
