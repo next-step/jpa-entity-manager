@@ -3,7 +3,7 @@ package persistence.sql.dml;
 import java.util.Objects;
 
 public class ColumnClause {
-    String columnName;
+    private final String columnName;
 
     public ColumnClause(String columnName) {
         this.columnName = columnName;

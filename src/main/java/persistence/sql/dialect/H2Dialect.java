@@ -6,6 +6,7 @@ import persistence.sql.dml.ValueClause;
 import persistence.sql.dml.delete.DeleteQuery;
 import persistence.sql.dml.insert.InsertQuery;
 import persistence.sql.dml.select.SelectQuery;
+import persistence.sql.dml.update.UpdateQuery;
 import persistence.sql.dml.where.ConditionType;
 import persistence.sql.dml.where.KeyCondition;
 import persistence.sql.dml.where.WhereQuery;
@@ -47,6 +48,25 @@ public class H2Dialect implements Dialect{
         sb.append("delete from ");
         sb.append(deleteQuery.getTableName().toString());
         whereQueryToSql(whereQuery, sb);
+        sb.append(";");
+        return sb.toString();
+    }
+
+    @Override
+    public String updateBuilder(UpdateQuery updateQuery) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("update ");
+        sb.append(updateQuery.getTableName());
+        sb.append(" set");
+        updateQuery.getColumToValueMap().forEach((columnClause, valueClause) -> {
+            sb.append(" ");
+            sb.append(columnClause.getColumnName());
+            sb.append("=");
+            sb.append(changeToSql(valueClause));
+            sb.append(",");
+        });
+        sb.deleteCharAt(sb.length() - 1);
+        whereQueryToSql(updateQuery.getWhereQuery(), sb);
         sb.append(";");
         return sb.toString();
     }

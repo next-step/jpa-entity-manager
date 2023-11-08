@@ -103,4 +103,39 @@ class PersonIntegrationTest {
         List<Person> persons = jdbcTemplate.query(dataManipulationLanguageAssembler.generateSelect(Person.class), personRowMapper);
         assertThat(persons.size()).isZero();
     }
+
+    @DisplayName("업데이트 쿼리를 날린 후 조회하면 업데이트 된 객체가 반환된다")
+    @Test
+    void testUpdate() {
+        // given
+        Person p = new Person("tongnamuu", 14, "tongnamuu@naver.com");
+        PersonRowMapper personRowMapper = new PersonRowMapper();
+        String insertQuery = dataManipulationLanguageAssembler.generateInsert(p);
+        jdbcTemplate.execute(insertQuery);
+        Person beforeUpdatePerson = jdbcTemplate.queryForObject(
+            dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, 1L),
+            personRowMapper
+        );
+
+        // when
+        Person updatePerson = new Person("tongnamuu2", 15, "tongnamuu@gmail.com");
+        updatePerson.setId(1L);
+        String updateQuery = dataManipulationLanguageAssembler.generateUpdate(updatePerson);
+        jdbcTemplate.execute(updateQuery);
+
+        Person afterUpdatePerson = jdbcTemplate.queryForObject(
+            dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, 1L),
+            personRowMapper
+        );
+
+        // then
+        assertAll(
+            () -> assertThat(afterUpdatePerson.getName()).isEqualTo("tongnamuu2"),
+            () -> assertThat(afterUpdatePerson.getAge()).isEqualTo(15),
+            () -> assertThat(afterUpdatePerson.getEmail()).isEqualTo("tongnamuu@gmail.com"),
+            () -> assertThat(beforeUpdatePerson.getName()).isEqualTo("tongnamuu"),
+            () -> assertThat(beforeUpdatePerson.getAge()).isEqualTo(14),
+            () -> assertThat(beforeUpdatePerson.getEmail()).isEqualTo("tongnamuu@naver.com")
+        );
+    }
 }

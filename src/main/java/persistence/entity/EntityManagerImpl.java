@@ -3,17 +3,28 @@ package persistence.entity;
 import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
+import persistence.entity.persister.EntityPersister;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
+import persistence.sql.usecase.GetFieldValueUseCase;
+import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 
 public class EntityManagerImpl implements EntityManager {
     private final RowMapper<?> rowMapper;
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler;
     private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
+    private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
+    private final GetFieldValueUseCase getFieldValueUseCase;
 
-    public EntityManagerImpl(RowMapper<?> rowMapper, DataManipulationLanguageAssembler dataManipulationLanguageAssembler, JdbcTemplate jdbcTemplate) {
+
+    public EntityManagerImpl(RowMapper<?> rowMapper, DataManipulationLanguageAssembler dataManipulationLanguageAssembler, JdbcTemplate jdbcTemplate, EntityPersister entityPersister,
+                             GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase, GetFieldValueUseCase getFieldValueUseCase) {
         this.rowMapper = rowMapper;
         this.dataManipulationLanguageAssembler = dataManipulationLanguageAssembler;
         this.jdbcTemplate = jdbcTemplate;
+        this.entityPersister = entityPersister;
+        this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
+        this.getFieldValueUseCase = getFieldValueUseCase;
     }
 
     @Override
@@ -31,14 +42,17 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object persist(Object entity) {
-        String sql = dataManipulationLanguageAssembler.generateInsert(entity);
-        jdbcTemplate.execute(sql);
+        Object idValue = getFieldValueUseCase.execute(entity, getIdDatabaseFieldUseCase.execute(entity.getClass()));
+        if (idValue == null) {
+            entityPersister.insert(entity);
+        } else {
+            entityPersister.update(entity);
+        }
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        String sql = dataManipulationLanguageAssembler.generateDeleteWithWhere(entity);
-        jdbcTemplate.execute(sql);
+        entityPersister.delete(entity);
     }
 }

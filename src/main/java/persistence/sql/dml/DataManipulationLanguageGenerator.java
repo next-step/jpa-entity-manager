@@ -4,6 +4,7 @@ import jakarta.persistence.GenerationType;
 import persistence.sql.dml.delete.DeleteQuery;
 import persistence.sql.dml.insert.InsertQuery;
 import persistence.sql.dml.select.SelectQuery;
+import persistence.sql.dml.update.UpdateQuery;
 import persistence.sql.dml.where.ConditionType;
 import persistence.sql.dml.where.WhereQuery;
 import persistence.sql.usecase.GetFieldFromClassUseCase;
@@ -20,7 +21,8 @@ public class DataManipulationLanguageGenerator {
     private final GetFieldValueUseCase getFieldValueUseCase;
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
 
-    public DataManipulationLanguageGenerator(GetTableNameFromClassUseCase getTableNameFromClassUseCase, GetFieldFromClassUseCase getFieldFromClassUseCase, GetFieldValueUseCase getFieldValueUseCase, GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase) {
+    public DataManipulationLanguageGenerator(GetTableNameFromClassUseCase getTableNameFromClassUseCase, GetFieldFromClassUseCase getFieldFromClassUseCase, GetFieldValueUseCase getFieldValueUseCase,
+                                             GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase) {
         this.getTableNameFromClassUseCase = getTableNameFromClassUseCase;
         this.getFieldFromClassUseCase = getFieldFromClassUseCase;
         this.getFieldValueUseCase = getFieldValueUseCase;
@@ -31,8 +33,8 @@ public class DataManipulationLanguageGenerator {
         TableName tableName = getTableNameFromClassUseCase.execute(object.getClass());
         DatabaseFields databaseFields = getFieldFromClassUseCase.execute(object.getClass());
         InsertQuery insertQuery = new InsertQuery(tableName);
-        for(DatabaseField databaseField : databaseFields.getDatabaseFields()) {
-            if(databaseField.isPrimary() && databaseField.getPrimaryKeyGenerationType() == GenerationType.IDENTITY) {
+        for (DatabaseField databaseField : databaseFields.getDatabaseFields()) {
+            if (databaseField.isPrimary() && databaseField.getPrimaryKeyGenerationType() == GenerationType.IDENTITY) {
                 continue;
             }
             insertQuery.addFieldValue(new ColumnClause(databaseField.getDatabaseFieldName()), new ValueClause(getFieldValueUseCase.execute(object, databaseField), databaseField.getDatabaseType()));
@@ -56,8 +58,8 @@ public class DataManipulationLanguageGenerator {
         WhereQuery whereQuery = new WhereQuery();
         DatabaseField field = getIdDatabaseFieldUseCase.execute(object.getClass());
         Object value = getFieldValueUseCase.execute(object, field);
-        if(value == null) {
-            throw new NullPointerException("Id should not be null to delete");
+        if (value == null) {
+            throw new NullPointerException("Id should not be null in whereClause");
         }
         whereQuery.addKey(field.getDatabaseFieldName(), new ValueClause(value, field.getDatabaseType()), ConditionType.IS);
         return whereQuery;
@@ -66,5 +68,18 @@ public class DataManipulationLanguageGenerator {
     public DeleteQuery buildDeleteQuery(Class<?> cls) {
         TableName tableName = getTableNameFromClassUseCase.execute(cls);
         return new DeleteQuery(tableName);
+    }
+
+    public UpdateQuery buildUpdateQuery(Object object) {
+        TableName tableName = getTableNameFromClassUseCase.execute(object.getClass());
+        DatabaseFields databaseFields = getFieldFromClassUseCase.execute(object.getClass());
+        UpdateQuery updateQuery = new UpdateQuery(tableName, buildWhereQuery(object));
+        for (DatabaseField databaseField : databaseFields.getDatabaseFields()) {
+            if (!databaseField.isPrimary()) {
+                updateQuery.addFieldValue(new ColumnClause(databaseField.getDatabaseFieldName()),
+                    new ValueClause(getFieldValueUseCase.execute(object, databaseField), databaseField.getDatabaseType()));
+            }
+        }
+        return updateQuery;
     }
 }

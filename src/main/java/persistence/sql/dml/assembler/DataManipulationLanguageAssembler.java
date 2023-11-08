@@ -5,6 +5,7 @@ import persistence.sql.dml.DataManipulationLanguageGenerator;
 import persistence.sql.dml.delete.DeleteQuery;
 import persistence.sql.dml.insert.InsertQuery;
 import persistence.sql.dml.select.SelectQuery;
+import persistence.sql.dml.update.UpdateQuery;
 import persistence.sql.dml.where.WhereQuery;
 
 public class DataManipulationLanguageAssembler {
@@ -19,6 +20,11 @@ public class DataManipulationLanguageAssembler {
     public String generateInsert(Object object) {
         InsertQuery insertQuery = dataManipulationLanguageGenerator.buildInsertQuery(object);
         return dialect.insertBuilder(insertQuery);
+    }
+
+    public String generateUpdate(Object object) {
+        UpdateQuery updateQuery = dataManipulationLanguageGenerator.buildUpdateQuery(object);
+        return dialect.updateBuilder(updateQuery);
     }
 
     public String generateSelect(Class<?> cls) {
