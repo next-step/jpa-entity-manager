@@ -1,8 +1,12 @@
 package persistence.sql.ddl;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.Person;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityMetadataTest {
@@ -17,7 +21,39 @@ class EntityMetadataTest {
                 .hasMessage("No @Entity annotation");
     }
 
+    @Test
+    @DisplayName("setIdToEntity() 메서드 테스트")
+    public void setIdToEntity() {
+        EntityMetadata entityMetadata = new EntityMetadata(Person.class, null);
+        // TODO 픽스처 하나 만들어서 걷어내자.
+        Person person = new Person("test", 30, "test@gmail.com");
+
+        entityMetadata.setIdToEntity(person, 1L);
+
+        assertThat(person.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("setIdToEntity() 메서드 Exception 테스트")
+    public void setIdToEntityException() {
+        EntityMetadata entityMetadata = new EntityMetadata(EntityAnnotation.class, null);
+        EntityAnnotation entityAnnotation = new EntityAnnotation();
+
+        assertThatThrownBy(() -> {
+            entityMetadata.setIdToEntity(entityAnnotation, 1L);
+        }).isInstanceOf(RuntimeException.class)
+                .hasMessage("Entity 객체에 ID 값을 세팅 중 오류 발생");
+    }
+
     private class NoEntityAnnotation {
+    }
+
+    @Entity
+    private class EntityAnnotation {
+
+        @Id
+        private Integer id;
+
     }
 
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import persistence.sql.ddl.dialect.Dialect;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 
 public class EntityMetadata {
@@ -62,6 +63,17 @@ public class EntityMetadata {
             return instance;
         } catch (Exception e) {
             throw new RuntimeException("엔티티 객체를 생성하는데 오류가 발생하였습니다.", e);
+        }
+    }
+
+    public <T> void setIdToEntity(T entity, long id) {
+        try {
+            String idColumnName = fieldMetadataExtractors.getIdColumnName();
+            Field declaredField = type.getDeclaredField(idColumnName);
+            declaredField.setAccessible(true);
+            declaredField.set(entity, id);
+        } catch (Exception e) {
+            throw new RuntimeException("Entity 객체에 ID 값을 세팅 중 오류 발생", e);
         }
     }
 
