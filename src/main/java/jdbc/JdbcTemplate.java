@@ -41,4 +41,12 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
+    public ResultSet query(final String sql) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            return resultSet;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

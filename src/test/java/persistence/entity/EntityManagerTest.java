@@ -35,7 +35,7 @@ class EntityManagerTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersister(personRowMapper, dataManipulationLanguageAssembler, jdbcTemplate);
+        entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityManager = new EntityManagerImpl(personRowMapper, dataManipulationLanguageAssembler,
             jdbcTemplate, entityPersister, new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()), new GetFieldValueUseCase());
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));

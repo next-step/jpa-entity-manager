@@ -1,18 +1,14 @@
 package persistence.entity.persister;
 
-import java.util.HashMap;
 import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
 
 public class EntityPersister {
-    private final RowMapper<?> rowMapper;
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler;
     private final JdbcTemplate jdbcTemplate;
 
 
-    public EntityPersister(RowMapper<?> rowMapper, DataManipulationLanguageAssembler dataManipulationLanguageAssembler, JdbcTemplate jdbcTemplate) {
-        this.rowMapper = rowMapper;
+    public EntityPersister(DataManipulationLanguageAssembler dataManipulationLanguageAssembler, JdbcTemplate jdbcTemplate) {
         this.dataManipulationLanguageAssembler = dataManipulationLanguageAssembler;
         this.jdbcTemplate = jdbcTemplate;
     }
