@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class RowUpdateQueryBuilder {
-    public String generateSQLQuery(String tableName, String[] columnNames, Object[] values, String primaryKeyName, Object primaryKeyValue) {
+    public static String generateSQLQuery(String tableName, String[] columnNames, Object[] values, String primaryKeyName, Object primaryKeyValue) {
         ArrayList<String> columnAndValues = new ArrayList<>();
         Iterator<String> nameIterator = Arrays.stream(columnNames).iterator();
         Iterator<Object> valueIterator = Arrays.stream(values).iterator();

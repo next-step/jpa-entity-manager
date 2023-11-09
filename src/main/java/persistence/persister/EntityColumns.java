@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class EntityColumns {
     private final Field[] columnFields;
-    private final Map<Field, Object> columnToValues = new HashMap<>();
+    private final Map<Field, Object> fieldToValues = new HashMap<>();
     private final Map<String, Field> columnNameToFields = new HashMap<>();
 
     public EntityColumns(Class<?> clazz) {
@@ -22,7 +22,7 @@ public class EntityColumns {
             .filter(field -> !field.isAnnotationPresent(Transient.class))
             .filter(field -> !field.isAnnotationPresent(Id.class))
             .peek(field -> field.setAccessible(true))
-            .peek(field -> columnToValues.put(field, null))
+            .peek(field -> fieldToValues.put(field, null))
             .peek(field-> columnNameToFields.put(TableSQLMapper.getColumnName(field), field))
             .toArray(Field[]::new);
     }
@@ -36,7 +36,7 @@ public class EntityColumns {
         return columnNames.toArray(String[]::new);
     }
 
-    public Field getField(String columnName) {
+    public Field getColumnField(String columnName) {
         return this.columnNameToFields.get(columnName);
     }
 
@@ -45,7 +45,7 @@ public class EntityColumns {
             .stream(columnFields)
             .map(field -> {
                 Object value = TableSQLMapper.getColumnValue(field, object);
-                columnToValues.put(field, value);
+                fieldToValues.put(field, value);
                 return value;
             })
             .collect(Collectors.toList());

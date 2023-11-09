@@ -5,7 +5,7 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.persister.EntityPersister;
+import persistence.entity.SimpleEntityManager;
 import persistence.sql.H2Dialect;
 import persistence.sql.ddl.TableCreateQueryBuilder;
 
@@ -30,18 +30,18 @@ public class Application {
             Person person = new Person(null, "aa", 10, "aa@aa.com");
             logger.info(String.valueOf(person));
 
-            EntityPersister entityPersister = new EntityPersister(person.getClass());
-            entityPersister.insert(person, jdbcTemplate);
+            SimpleEntityManager entityManager = new SimpleEntityManager(jdbcTemplate);
+            entityManager.persist(person);
             logger.info(String.valueOf(person));
 
             person.setAge(20);
-            entityPersister.update(person, jdbcTemplate);
+            entityManager.update(person);
             logger.info(String.valueOf(person));
 
-            Person person1 = (Person) entityPersister.find(1L, jdbcTemplate);
+            Person person1 = entityManager.find(person.getClass(), 1L);
             logger.info(String.valueOf(person1));
 
-            entityPersister.delete(person, jdbcTemplate);
+            entityManager.remove(person);
         } catch (Exception e) {
             logger.error("Error occurred", e);
         } finally {
