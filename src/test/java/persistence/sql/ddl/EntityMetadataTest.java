@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.Fixtures;
 import persistence.entity.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,7 @@ class EntityMetadataTest {
     public void setIdToEntity() {
         EntityMetadata entityMetadata = new EntityMetadata(Person.class, null);
         // TODO 픽스처 하나 만들어서 걷어내자.
-        Person person = new Person("test", 30, "test@gmail.com");
+        Person person = Fixtures.person1();
 
         entityMetadata.setIdToEntity(person, 1L);
 
