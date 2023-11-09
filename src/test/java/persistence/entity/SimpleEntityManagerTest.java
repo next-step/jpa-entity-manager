@@ -41,8 +41,7 @@ class SimpleEntityManagerTest {
         entityManager = new SimpleEntityManager(
                 new EntityPersister(query, jdbcTemplate),
                 new EntityLoader(query, jdbcTemplate),
-                new SimplePersistenceContext()
-        );
+                new SimplePersistenceContext());
     }
 
     @AfterEach

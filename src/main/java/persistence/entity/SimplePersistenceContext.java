@@ -7,6 +7,7 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     private static final Map<EntityKey, Object> entityMap = new HashMap<>();
     private static final Map<EntityKey, Object> entitySnapshotMap = new HashMap<>();
+    private static final Map<Object, EntityEntry> entityEntryContext = new HashMap<>();
 
     @Override
     public Object getEntity(EntityKey entityKey) {
@@ -31,6 +32,27 @@ public class SimplePersistenceContext implements PersistenceContext {
             return snapshot;
         }
         return entitySnapshotMap.put(entityKey, entity);
+    }
+
+    public void addEntityEntry(Object object, EntityEntry entityEntry) {
+        entityEntryContext.put(object, entityEntry);
+    }
+
+    @Override
+    public EntityEntry getEntityEntry(Object object) {
+        return entityEntryContext.get(object);
+    }
+
+    public void deleteEntityEntry(Object object) {
+        entityEntryContext.remove(object);
+    }
+
+    public void updateEntityEntryStatus(Object object, Status status) {
+        EntityEntry entityEntry = entityEntryContext.get(object);
+        if (entityEntry == null) {
+            throw new IllegalArgumentException("주어진 object에 해당하는 entity가 entityContext에 없습니다.");
+        }
+        entityEntry.updateStatus(status);
     }
 
 }
