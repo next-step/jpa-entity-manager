@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.ddl.EntityDefinitionBuilder;
 import persistence.sql.ddl.EntityMetadata;
 import persistence.sql.ddl.dialect.Dialect;
 import persistence.sql.dml.EntityManipulationBuilder;
@@ -28,9 +27,6 @@ public class EntityPersister {
         });
     }
 
-    public <T> void update(T entity, String id) {
-    }
-
     public <T> T insert(T entity) {
         EntityManipulationBuilder manipulationBuilder = createManipulationBuilder(entity.getClass());
         long key = jdbcTemplate.executeAndReturnKey(manipulationBuilder.insert(entity));
@@ -45,10 +41,6 @@ public class EntityPersister {
 
     private <T>EntityManipulationBuilder createManipulationBuilder(Class<T> clazz) {
         return new EntityManipulationBuilder(EntityMetadata.of(clazz, dialect));
-    }
-
-    private <T> EntityDefinitionBuilder createDefinitionBuilder(Class<T> clazz) {
-        return new EntityDefinitionBuilder(EntityMetadata.of(clazz, dialect));
     }
 
 }
