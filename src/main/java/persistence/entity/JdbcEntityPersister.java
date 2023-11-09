@@ -3,6 +3,7 @@ package persistence.entity;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import jdbc.JdbcTemplate;
 import persistence.meta.MetaDataColumn;
 import persistence.meta.MetaDataColumns;
@@ -46,13 +47,16 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
   }
 
   @Override
-  public void insert(Object entity) {
+  public Long insert(Object entity) {
     String values = metaEntity.getValueClause(entity);
     String columns = metaEntity.getColumnClause();
 
     String query = dmlQueryBuilder.createInsertQuery(metaEntity.getTableName(), columns, values);
 
-    jdbcTemplate.execute(query);
+    Long id =  jdbcTemplate.executeWithGeneratedKey(query);
+    metaEntity.getPrimaryKeyColumn().setFieldValue(entity, id);
+
+    return id;
   }
 
   @Override
@@ -73,9 +77,15 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
       throw new RuntimeException("해당 객체는 존재 하지 않습니다.");
     }
   }
+  @Override
   public boolean entityExists(Object entity) {
     return metaEntity.getPrimaryKeyColumnIsNull(entity);
   }
+  @Override
+  public Optional<Long> getEntityId(Object entity) {
+    return Optional.ofNullable(metaEntity.getPrimaryKeyColumnValue(entity));
+  }
+
   public T load(Long id) {
     return entityLoader.load(id);
   }

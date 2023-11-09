@@ -1,14 +1,18 @@
 package persistence.entity;
 
+import java.util.Optional;
+
 public interface EntityPersister<T> {
 
   boolean update(T entity);
 
-  void insert(T entity);
+  Long insert(T entity);
 
   void delete(T entity);
 
   T load(Long id);
 
   boolean entityExists(Object entity);
+
+  Optional<Long> getEntityId(Object entity);
 }

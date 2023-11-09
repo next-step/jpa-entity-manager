@@ -36,6 +36,11 @@ public class MetaEntity<T> {
   public boolean getPrimaryKeyColumnIsNull(Object entity) {
     return Objects.nonNull(primaryKeyColumn.getFieldValue(entity));
   }
+
+  public Long getPrimaryKeyColumnValue(Object entity) {
+    return (Long) primaryKeyColumn.getFieldValue(entity);
+  }
+
   public String getValueClause(Object entity) {
     List<String> columns = getEntityFields();
 
