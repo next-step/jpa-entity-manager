@@ -15,4 +15,9 @@ public class SimpleEntityEntry implements EntityEntry {
         this.status = status;
     }
 
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
 }

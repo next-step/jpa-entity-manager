@@ -4,4 +4,6 @@ public interface EntityEntry {
 
     void updateStatus(Status status);
 
+    Status getStatus();
+
 }

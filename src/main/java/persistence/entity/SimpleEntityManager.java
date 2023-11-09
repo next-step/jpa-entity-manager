@@ -41,6 +41,12 @@ public class SimpleEntityManager implements EntityManager {
     public void persist(Object entity) {
         Class<?> entityClass = entity.getClass();
         EntityData entityData = new EntityData(entityClass);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+
+        if (entityEntry != null && entityEntry.getStatus().equals(Status.READ_ONLY)) {
+            throw new IllegalStateException("READ_ONLY는 저장할 수 없습니다.");
+        }
+
         persistenceContext.addEntityEntry(entity, new SimpleEntityEntry(entity, Status.SAVING));
 
         Object idValue = ReflectionUtil.getValueFrom(entityData.getEntityColumns().getIdColumn().getField(), entity);
@@ -64,10 +70,22 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        persistenceContext.updateEntityEntryStatus(entity, Status.DELETED);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+
+        if (entityEntry != null && entityEntry.getStatus().equals(Status.READ_ONLY)) {
+            throw new IllegalStateException("READ_ONLY는 저장할 수 없습니다.");
+        }
+
+        if (entityEntry != null) {
+            persistenceContext.updateEntityEntryStatus(entity, Status.DELETED);
+        }
+
         entityPersister.delete(entity);
-        persistenceContext.removeEntity(new EntityKey(entity));
-        persistenceContext.updateEntityEntryStatus(entity, Status.GONE); // TODO : commit이 구별되어야 함
+
+        if (entityEntry != null) {
+            persistenceContext.removeEntity(new EntityKey(entity));
+            persistenceContext.updateEntityEntryStatus(entity, Status.GONE); // TODO : commit이 구별되어야 함
+        }
     }
 
 }

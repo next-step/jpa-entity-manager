@@ -38,6 +38,11 @@ public class SimplePersistenceContext implements PersistenceContext {
         entityEntryContext.put(object, entityEntry);
     }
 
+    @Override
+    public EntityEntry getEntityEntry(Object object) {
+        return entityEntryContext.get(object);
+    }
+
     public void deleteEntityEntry(Object object) {
         entityEntryContext.remove(object);
     }
