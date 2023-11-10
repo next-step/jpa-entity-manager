@@ -8,6 +8,8 @@ public enum DataLanguage {
     VALUES("VALUES"),
     SELECT("SELECT"),
     DELETE("DELETE"),
+    UPDATE("UPDATE"),
+    SET("SET"),
     FROM("FROM"),
     WHERE("WHERE"),
     LEFT_PARENTHESIS("("),

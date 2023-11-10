@@ -22,7 +22,7 @@ class EntityManipulationBuilderTest {
     @DisplayName("Person 엔터티 insert 쿼리 만들기")
     public void insertQueryTest() {
         Person person = Fixtures.person1();
-        String query = EntityManipulationBuilder.insert(person, entityMetadata);
+        String query = new EntityManipulationBuilder().insert(person, entityMetadata);
 
         assertThat(query).isEqualTo("INSERT INTO users (nick_name, old, email) " +
                 "VALUES ('test1', 30, 'test1@gmail.com');");
@@ -31,7 +31,7 @@ class EntityManipulationBuilderTest {
     @Test
     @DisplayName("Person 엔터티 findAll 쿼리 만들기")
     public void findAllQueryTest() {
-        String query = EntityManipulationBuilder.findAll(entityMetadata);
+        String query = new EntityManipulationBuilder().findAll(entityMetadata);
 
         assertThat(query).isEqualTo("SELECT id, nick_name, old, email FROM users;");
     }
@@ -40,7 +40,7 @@ class EntityManipulationBuilderTest {
     @DisplayName("Person 엔터티 findById 쿼리 만들기")
     public void findByIdQueryTest() {
         long id = 1L;
-        String query = EntityManipulationBuilder.findById(id, entityMetadata);
+        String query = new EntityManipulationBuilder().findById(id, entityMetadata);
 
         assertThat(query).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id = " + id + ";");
     }
@@ -49,7 +49,7 @@ class EntityManipulationBuilderTest {
     @DisplayName("Person 엔터티 delete 쿼리 만들기")
     public void deleteQueryTest() {
         String id = "1";
-        String query = EntityManipulationBuilder.delete(id, entityMetadata);
+        String query = new EntityManipulationBuilder().delete(id, entityMetadata);
 
         assertThat(query).isEqualTo("DELETE FROM users WHERE id = " + id + ";");
     }

@@ -14,7 +14,10 @@ public class EntityPersister {
 
     public <T> T insert(T entity) {
         EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass());
-        long key = jdbcTemplate.executeAndReturnKey(EntityManipulationBuilder.insert(entity, entityMetadata));
+
+        long key = jdbcTemplate.executeAndReturnKey(
+                new EntityManipulationBuilder().insert(entity, entityMetadata)
+        );
         entityMetadata.setIdToEntity(entity, key);
 
         return entity;
@@ -22,7 +25,15 @@ public class EntityPersister {
 
     public <T> void remove(T entity, String id) {
         EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass());
-        jdbcTemplate.execute(EntityManipulationBuilder.delete(id, entityMetadata));
+        jdbcTemplate.execute(new EntityManipulationBuilder().delete(id, entityMetadata));
+    }
+
+    public <T> void update(T entity, T snapshot) {
+        EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass());
+        String update = new EntityManipulationBuilder().update(entity, snapshot, entityMetadata);
+        if (!update.isEmpty()) {
+            jdbcTemplate.execute(update);
+        }
     }
 
 }

@@ -49,6 +49,27 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
                 .hasMessage("No @Entity annotation");
     }
 
+    @Test
+    @DisplayName("merge() 메서드 테스트")
+    void merge() {
+        Person person = entityManager.find(Person.class, 1L);
+        person.setName("new name");
+
+        Person mergedPerson = entityManager.merge(person);
+
+        assertThat(person.getName()).isEqualTo(mergedPerson.getName());
+    }
+
+    @Test
+    @DisplayName("merge() 메서드 수정 사항이 없는 케이스 테스트")
+    void mergeNoUpdate() {
+        Person person = entityManager.find(Person.class, 1L);
+
+        Person mergedPerson = entityManager.merge(person);
+
+        assertThat(person.getName()).isEqualTo(mergedPerson.getName());
+    }
+
     private class TestPerson {
 
         private Long id;

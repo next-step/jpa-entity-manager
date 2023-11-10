@@ -79,4 +79,7 @@ public class EntityMetadata {
         }
     }
 
+    public String getUpdateClause(Object entity, Object snapshot) {
+     return fieldMetadataExtractors.getUpdateClause(entity, snapshot);
+    }
 }

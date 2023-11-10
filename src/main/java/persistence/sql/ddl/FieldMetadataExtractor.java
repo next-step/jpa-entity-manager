@@ -81,4 +81,33 @@ public class FieldMetadataExtractor {
         return ColumnOptionFactory.createColumnOption(field, dialect);
     }
 
+    public String getUpdateClause(Object entity, Object snapshot) {
+        try {
+            Field entityFiled = entity.getClass().getDeclaredField(field.getName());
+            entityFiled.setAccessible(true);
+            Object entityValue = entityFiled.get(entity);
+
+            Field snapshotFiled = snapshot.getClass().getDeclaredField(field.getName());
+            snapshotFiled.setAccessible(true);
+            Object snapshotValue = snapshotFiled.get(snapshot);
+
+            if (entityValue == null || !entityValue.equals(snapshotValue)) {
+                return "";
+            }
+
+            if (entityValue instanceof String) {
+                return getColumnName() + " = '" + entityValue + "'";
+            } else if (entityValue instanceof Integer) {
+                return getColumnName() + " = " + entityValue;
+            } else if (entityValue instanceof Long) {
+                return getColumnName() + " = " + entityValue;
+            }
+
+            return "";
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
 }

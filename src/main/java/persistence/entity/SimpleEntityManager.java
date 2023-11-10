@@ -35,6 +35,7 @@ public class SimpleEntityManager implements EntityManager {
 
         T entity = entityLoader.findById(clazz, id);
         persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntitySnapshot(id, entity);
         return entity;
     }
 
@@ -42,7 +43,21 @@ public class SimpleEntityManager implements EntityManager {
     public <T> T persist(T entity) {
         T persistedEntity = entityPersister.insert(entity);
         persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
+        persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
         return persistedEntity;
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        Object snapshot = persistenceContext.getDatabaseSnapshot(
+                Long.valueOf(findEntityId(entity)),
+                entity
+        );
+
+        entityPersister.update(entity, snapshot);
+        persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(entity)), entity);
+
+        return entity;
     }
 
     @Override

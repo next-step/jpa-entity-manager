@@ -16,7 +16,8 @@ public class EntityLoader {
 
     public <T> T findById(Class<T> clazz, Long id) {
         EntityMetadata entityMetadata = EntityMetadata.of(clazz);
-        return jdbcTemplate.queryForObject(EntityManipulationBuilder.findById(id, entityMetadata),
+        return jdbcTemplate.queryForObject(
+                new EntityManipulationBuilder().findById(id, entityMetadata),
                 resultSet -> {
                     if (!resultSet.next()) {
                         return null;

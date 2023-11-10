@@ -7,26 +7,11 @@ import static utils.CustomStringBuilder.*;
 
 public class EntityManipulationBuilder {
 
-    public static String insert(Object entity, EntityMetadata entityMetadata) {
-        return new CustomStringBuilder()
-                .append(columnsClause(entity, entityMetadata))
-                .append(valuesClause(entity, entityMetadata))
-                .toString();
-    }
-
-    private static String columnsClause(Object entity, EntityMetadata entityMetadata) {
-        return toInsertColumnsClause(entityMetadata.getTableName(), entityMetadata.getColumnNames(entity));
-    }
-
-    private static String valuesClause(Object entity, EntityMetadata entityMetadata) {
-        return toInsertValuesClause(entityMetadata.getValueFrom(entity));
-    }
-
-    public static String findAll(EntityMetadata entityMetadata) {
+    public String findAll(EntityMetadata entityMetadata) {
         return toFindAllStatement(entityMetadata.getTableName(), entityMetadata.getColumnNames());
     }
 
-    public static String findById(long id, EntityMetadata entityMetadata) {
+    public String findById(long id, EntityMetadata entityMetadata) {
         return toFindByIdStatement(
                 entityMetadata.getTableName(),
                 entityMetadata.getColumnNames(),
@@ -35,11 +20,40 @@ public class EntityManipulationBuilder {
         );
     }
 
-    public static String delete(String id, EntityMetadata entityMetadata) {
+    public String insert(Object entity, EntityMetadata entityMetadata) {
+        return new CustomStringBuilder()
+                .append(columnsClause(entity, entityMetadata))
+                .append(valuesClause(entity, entityMetadata))
+                .toString();
+    }
+
+    public String update(Object entity, Object snapshot, EntityMetadata entityMetadata) {
+        String updateClause = entityMetadata.getUpdateClause(entity, snapshot);
+        if (updateClause.isEmpty()) {
+            return "";
+        }
+
+        return toUpdateStatement(
+                entityMetadata.getTableName(),
+                entityMetadata.getIdColumnName(),
+                entityMetadata.getIdColumnValue(entity),
+                updateClause
+        );
+    }
+
+    public String delete(String id, EntityMetadata entityMetadata) {
         return toDeleteStatement(
                 entityMetadata.getTableName(),
                 entityMetadata.getIdColumnName(),
                 id);
+    }
+
+    private String columnsClause(Object entity, EntityMetadata entityMetadata) {
+        return toInsertColumnsClause(entityMetadata.getTableName(), entityMetadata.getColumnNames(entity));
+    }
+
+    private String valuesClause(Object entity, EntityMetadata entityMetadata) {
+        return toInsertValuesClause(entityMetadata.getValueFrom(entity));
     }
 
 }

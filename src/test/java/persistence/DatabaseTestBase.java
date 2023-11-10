@@ -50,7 +50,7 @@ public abstract class DatabaseTestBase {
         entityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, dialect);
 
         jdbcTemplate.execute(entityDefinitionBuilder.create(dialect));
-        jdbcTemplate.execute(EntityManipulationBuilder
+        jdbcTemplate.execute(new EntityManipulationBuilder()
                 .insert(Fixtures.person1(), entityMetadata)
         );
 
@@ -60,6 +60,5 @@ public abstract class DatabaseTestBase {
     void afterEach() {
         jdbcTemplate.execute(entityDefinitionBuilder.drop());
     }
-
 
 }

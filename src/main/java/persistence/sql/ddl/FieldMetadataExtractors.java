@@ -91,4 +91,13 @@ public class FieldMetadataExtractors {
             fieldMetadataExtractor.setInstanceValue(instance, resultSet);
         }
     }
+
+    public String getUpdateClause(Object entity, Object snapshot) {
+        return fieldMetadataExtractorList.stream()
+                .map(fieldMetadataExtractor -> {
+                    return fieldMetadataExtractor.getUpdateClause(entity, snapshot);
+                })
+                .filter(String::isEmpty)
+                .collect(Collectors.joining(", "));
+    }
 }
