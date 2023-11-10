@@ -17,28 +17,29 @@ public class GetFieldFromClassUseCase {
         Field[] declaredFields = cls.getDeclaredFields();
         return DatabaseFields.of(Arrays.stream(declaredFields)
                                        .filter(it -> !it.isAnnotationPresent(Transient.class))
-                                       .map(
-                                           it -> {
-                                               String name = it.getName();
-                                               boolean isNullable = true;
-                                               if (it.isAnnotationPresent(Column.class)) {
-                                                   Column annotation = it.getAnnotation(Column.class);
-                                                   if (annotation.name() != null && !annotation.name().isEmpty()) {
-                                                       name = annotation.name();
-                                                   }
-                                                   isNullable = annotation.nullable();
-                                               }
-                                               boolean isPrimary = it.isAnnotationPresent(Id.class);
-                                               GenerationType type = null;
-                                               if (it.isAnnotationPresent(GeneratedValue.class)) {
-                                                   GeneratedValue annotation = it.getAnnotation(GeneratedValue.class);
-                                                   if (annotation.strategy() == GenerationType.IDENTITY) {
-                                                       type = GenerationType.IDENTITY;
-                                                   }
-                                               }
-                                               return new DatabaseField(name, it.getName(), TypeConverter.convert(it), isPrimary,
-                                                   type, isNullable);
-                                           }
-                                       ).collect(Collectors.toList()));
+                                       .map(this::convertToDatabaseField)
+                                       .collect(Collectors.toList()));
+    }
+
+    private DatabaseField convertToDatabaseField(Field field) {
+        String name = field.getName();
+        boolean isNullable = true;
+        if (field.isAnnotationPresent(Column.class)) {
+            Column annotation = field.getAnnotation(Column.class);
+            if (annotation.name() != null && !annotation.name().isEmpty()) {
+                name = annotation.name();
+            }
+            isNullable = annotation.nullable();
+        }
+        boolean isPrimary = field.isAnnotationPresent(Id.class);
+        GenerationType type = null;
+        if (field.isAnnotationPresent(GeneratedValue.class)) {
+            GeneratedValue annotation = field.getAnnotation(GeneratedValue.class);
+            if (annotation.strategy() == GenerationType.IDENTITY) {
+                type = GenerationType.IDENTITY;
+            }
+        }
+        return new DatabaseField(name, field.getName(), TypeConverter.convert(field), isPrimary,
+            type, isNullable);
     }
 }
