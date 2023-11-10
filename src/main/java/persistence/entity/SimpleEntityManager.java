@@ -12,26 +12,43 @@ public class SimpleEntityManager implements EntityManager {
 
     private final EntityLoader entityLoader;
 
+    private final PersistenceContext persistenceContext;
+
     private final Dialect dialect;
 
-    public SimpleEntityManager(EntityPersister entityPersister, EntityLoader entityLoader, Dialect dialect) {
+    public SimpleEntityManager(EntityPersister entityPersister,
+                               EntityLoader entityLoader,
+                               PersistenceContext persistenceContext,
+                               Dialect dialect) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
+        this.persistenceContext = persistenceContext;
         this.dialect = dialect;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityLoader.findById(clazz, id);
+        Object persistedEntity = persistenceContext.getEntity(id);
+        if (persistedEntity != null) {
+            return (T) persistedEntity;
+        }
+
+        T entity = entityLoader.findById(clazz, id);
+        persistenceContext.addEntity(id, entity);
+        return entity;
     }
 
     @Override
     public <T> T persist(T entity) {
-        return entityPersister.insert(entity);
+        T persistedEntity = entityPersister.insert(entity);
+        persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
+        return persistedEntity;
     }
 
     @Override
     public <T> void remove(T entity) {
+        persistenceContext.removeEntity(entity);
+        // TODO entityPersister.remove() 익셉션 테스트가 위에서 다 익셉션 먼저 발생해서 테스트하기 힘드네.
         entityPersister.remove(entity, findEntityId(entity));
     }
 

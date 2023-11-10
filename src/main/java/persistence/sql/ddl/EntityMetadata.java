@@ -51,6 +51,10 @@ public class EntityMetadata {
         return fieldMetadataExtractors.getIdColumnName();
     }
 
+    public String getIdColumnValue(Object entity) {
+        return fieldMetadataExtractors.getIdColumnValue(entity);
+    }
+
     public <T> T getEntity(ResultSet resultSet) {
         try {
             Constructor<T> constructor = (Constructor<T>) type.getDeclaredConstructor();

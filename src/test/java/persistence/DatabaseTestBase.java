@@ -25,6 +25,8 @@ public abstract class DatabaseTestBase {
     protected EntityPersister entityPersister;
     protected EntityLoader entityLoader;
 
+    protected PersistenceContext persistenceContext;
+
     @BeforeAll
     static void beforeAll() throws SQLException {
         server = new H2();
@@ -44,11 +46,12 @@ public abstract class DatabaseTestBase {
         Dialect dialect = new H2Dialect();
         entityPersister = new EntityPersister(jdbcTemplate);
         entityLoader = new EntityLoader(jdbcTemplate);
-        entityManager = new SimpleEntityManager(entityPersister, entityLoader, dialect);
+        persistenceContext = new SimplePersistenceContext();
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, dialect);
 
         jdbcTemplate.execute(entityDefinitionBuilder.create(dialect));
         jdbcTemplate.execute(EntityManipulationBuilder
-                .insert(new Person("test1", 30, "test1@gmail.com"), entityMetadata)
+                .insert(Fixtures.person1(), entityMetadata)
         );
 
     }

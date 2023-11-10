@@ -1,13 +1,9 @@
 package persistence.entity;
 
-import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTestBase;
 import persistence.Fixtures;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,17 +46,7 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
 
         assertThatThrownBy(() -> entityManager.remove(person))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("ID 필드가 없습니다.");
-    }
-
-    @Test
-    @DisplayName("remove() 메서드 Id value Exception 테스트")
-    void removeNoIdValueException() {
-        Person person = Fixtures.person2();
-
-        assertThatThrownBy(() -> entityManager.remove(person))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("ID 값이 없습니다.");
+                .hasMessage("No @Entity annotation");
     }
 
     private class TestPerson {
