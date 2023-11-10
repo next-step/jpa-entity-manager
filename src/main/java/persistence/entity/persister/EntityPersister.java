@@ -18,8 +18,8 @@ public class EntityPersister {
         return true;
     }
 
-    public void insert(Object object) {
-        jdbcTemplate.execute(dataManipulationLanguageAssembler.generateInsert(object));
+    public Long insert(Object object) {
+        return jdbcTemplate.insertSingle(dataManipulationLanguageAssembler.generateInsert(object));
     }
 
     public void delete(Object object) {
