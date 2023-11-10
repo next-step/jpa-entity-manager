@@ -2,6 +2,7 @@ package persistence.sql.dml.assembler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
 import persistence.sql.dialect.H2Dialect;
@@ -15,6 +16,7 @@ class DataManipulationLanguageAssemblerH2Test {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler = createDataManipulationLanguageAssembler();
 
     @Test
+    @DisplayName("insert sql 생성")
     void generateInsertTest() {
         // given
         Person person = new Person("안녕하세요", 25, "tongnamuu@naver.com");
@@ -28,6 +30,7 @@ class DataManipulationLanguageAssemblerH2Test {
     }
 
     @Test
+    @DisplayName("select sql 생성")
     void generateSelect() {
         // when
         String sql = dataManipulationLanguageAssembler.generateSelect(Person.class);
@@ -38,6 +41,7 @@ class DataManipulationLanguageAssemblerH2Test {
     }
 
     @Test
+    @DisplayName("select with where sql 생성")
     void generateSelectWithWhere() {
         // when
         String sql = dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, 1L);
@@ -48,6 +52,7 @@ class DataManipulationLanguageAssemblerH2Test {
     }
 
     @Test
+    @DisplayName("delete sql 생성")
     void generateDeleteWithWhere() {
         // given
         Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
@@ -62,6 +67,7 @@ class DataManipulationLanguageAssemblerH2Test {
     }
 
     @Test
+    @DisplayName("update sql 생성")
     void generateUpdateWithWhere() {
         // given
         Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
