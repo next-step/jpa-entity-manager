@@ -3,38 +3,30 @@ package persistence.sql.dml;
 import persistence.sql.ddl.EntityMetadata;
 import utils.CustomStringBuilder;
 
-import java.sql.ResultSet;
-
 import static utils.CustomStringBuilder.*;
 
 public class EntityManipulationBuilder {
 
-    private EntityMetadata entityMetadata;
-
-    public EntityManipulationBuilder(EntityMetadata entityMetadata) {
-        this.entityMetadata = entityMetadata;
-    }
-
-    public String insert(Object entity) {
+    public static String insert(Object entity, EntityMetadata entityMetadata) {
         return new CustomStringBuilder()
-                .append(columnsClause(entity))
-                .append(valuesClause(entity))
+                .append(columnsClause(entity, entityMetadata))
+                .append(valuesClause(entity, entityMetadata))
                 .toString();
     }
 
-    private String columnsClause(Object entity) {
+    private static String columnsClause(Object entity, EntityMetadata entityMetadata) {
         return toInsertColumnsClause(entityMetadata.getTableName(), entityMetadata.getColumnNames(entity));
     }
 
-    private String valuesClause(Object entity) {
+    private static String valuesClause(Object entity, EntityMetadata entityMetadata) {
         return toInsertValuesClause(entityMetadata.getValueFrom(entity));
     }
 
-    public String findAll() {
+    public static String findAll(EntityMetadata entityMetadata) {
         return toFindAllStatement(entityMetadata.getTableName(), entityMetadata.getColumnNames());
     }
 
-    public String findById(long id) {
+    public static String findById(long id, EntityMetadata entityMetadata) {
         return toFindByIdStatement(
                 entityMetadata.getTableName(),
                 entityMetadata.getColumnNames(),
@@ -43,19 +35,11 @@ public class EntityManipulationBuilder {
         );
     }
 
-    public String delete(String id) {
+    public static String delete(String id, EntityMetadata entityMetadata) {
         return toDeleteStatement(
                 entityMetadata.getTableName(),
                 entityMetadata.getIdColumnName(),
                 id);
-    }
-
-    public <T> T getEntity(ResultSet resultSet) {
-        return entityMetadata.getEntity(resultSet);
-    }
-
-    public <T> void setIdToEntity(T entity, long id) {
-        entityMetadata.setIdToEntity(entity, id);
     }
 
 }
