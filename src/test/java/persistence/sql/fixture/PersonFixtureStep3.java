@@ -3,6 +3,7 @@ package persistence.sql.fixture;
 import jakarta.persistence.*;
 
 import java.util.Objects;
+
 @Table(name = "users")
 @Entity
 public class PersonFixtureStep3 {
@@ -23,11 +24,11 @@ public class PersonFixtureStep3 {
   @Override
   public String toString() {
     return "PersonFixtureStep3{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", age=" + age +
-            ", email='" + email + '\'' +
-            '}';
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", age=" + age +
+        ", email='" + email + '\'' +
+        '}';
   }
 
   @Transient
@@ -50,6 +51,18 @@ public class PersonFixtureStep3 {
 
   }
 
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setAge(Integer age) {
+    this.age = age;
+  }
+
   public String getEmail() {
     return email;
   }
@@ -68,10 +81,15 @@ public class PersonFixtureStep3 {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     PersonFixtureStep3 that = (PersonFixtureStep3) o;
-    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(age, that.age) && Objects.equals(email, that.email) && Objects.equals(index, that.index);
+    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(age,
+        that.age) && Objects.equals(email, that.email) && Objects.equals(index, that.index);
   }
 
   @Override

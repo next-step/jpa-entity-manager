@@ -1,6 +1,7 @@
 package jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -20,7 +21,17 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+    public Long executeWithGeneratedKey(final String sql) {
+        try (final PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.execute();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            resultSet.next();
 
+            return resultSet.getLong(1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return rowMapper.mapRow(resultSet);
