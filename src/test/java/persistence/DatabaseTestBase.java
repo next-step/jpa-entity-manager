@@ -39,14 +39,14 @@ public abstract class DatabaseTestBase {
 
     @BeforeEach
     void beforeEach() {
-        EntityMetadata entityMetadata = EntityMetadata.of(Person.class, new H2Dialect());
+        EntityMetadata entityMetadata = EntityMetadata.of(Person.class);
         entityDefinitionBuilder = new EntityDefinitionBuilder(entityMetadata);
         Dialect dialect = new H2Dialect();
-        entityPersister = new EntityPersister(jdbcTemplate, dialect);
-        entityLoader = new EntityLoader(jdbcTemplate, dialect);
-        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
+        entityPersister = new EntityPersister(jdbcTemplate);
+        entityLoader = new EntityLoader(jdbcTemplate);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader, dialect);
 
-        jdbcTemplate.execute(entityDefinitionBuilder.create());
+        jdbcTemplate.execute(entityDefinitionBuilder.create(dialect));
         jdbcTemplate.execute(EntityManipulationBuilder
                 .insert(new Person("test1", 30, "test1@gmail.com"), entityMetadata)
         );

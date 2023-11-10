@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import persistence.Fixtures;
 import persistence.entity.Person;
 import persistence.sql.ddl.EntityMetadata;
-import persistence.sql.ddl.dialect.H2Dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,7 +15,7 @@ class EntityManipulationBuilderTest {
 
     @BeforeAll
     static void setUp() {
-        entityMetadata = EntityMetadata.of(Person.class, new H2Dialect());
+        entityMetadata = EntityMetadata.of(Person.class);
     }
 
     @Test
