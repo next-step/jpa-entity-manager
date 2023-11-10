@@ -8,4 +8,7 @@ public interface PersistenceContext<E> {
     void removeEntity(E entity);
 
     EntitySnapShot getDatabaseSnapshot(EntityPersistIdentity id, E entity);
+
+    void addEntityEntry(EntityPersistIdentity id, EntityEntry entityEntry);
+    EntityEntry getEntityEntry(EntityPersistIdentity id);
 }

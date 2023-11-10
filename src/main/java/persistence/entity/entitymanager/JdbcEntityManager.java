@@ -1,8 +1,10 @@
 package persistence.entity.entitymanager;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.EntityPersistIdentity;
 import persistence.entity.persistencecontext.EntitySnapShot;
+import persistence.entity.persistencecontext.EntityStatus;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.sql.dbms.Dialect;
 import persistence.sql.entitymetadata.model.EntityColumn;
@@ -31,10 +33,10 @@ public class JdbcEntityManager implements EntityManager {
         }
 
         persistEntity(clazz, id, entity);
+        updateEntityStatus(id, entity, EntityStatus.LOADING);
 
         return entity;
     }
-
 
     private <T> T findByEntity(T entity) {
         return (T) find(entity.getClass(), (Long) getEntityId(entity));
@@ -72,9 +74,13 @@ public class JdbcEntityManager implements EntityManager {
     @Override
     public void remove(Object entity) {
         EntityPersister entityPersister = entityManagementCache.persister(entity.getClass());
+        PersistenceContext persistenceContext = entityManagementCache.persistenceContext(entity.getClass());
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(new EntityPersistIdentity(entity.getClass(), getEntityId(entity)));
 
+        updateEntityStatus((Long) getEntityId(entity), entity, EntityStatus.DELETED);
         entityPersister.delete(entity);
         removeEntity(entity);
+        updateEntityStatus((Long) getEntityId(entity), entity, EntityStatus.GONE);
     }
 
     private <T> T loadEntity(Class<T> clazz, Long id) {
@@ -106,5 +112,11 @@ public class JdbcEntityManager implements EntityManager {
         Object entityId = idColumn.getValue(entity);
 
         return entityId;
+    }
+
+    private <T> void updateEntityStatus(Long id, T entity, EntityStatus status) {
+        PersistenceContext persistenceContext = entityManagementCache.persistenceContext(entity.getClass());
+        persistenceContext.getEntityEntry(new EntityPersistIdentity(entity.getClass(), id))
+                .updateStatus(status);
     }
 }

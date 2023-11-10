@@ -9,6 +9,7 @@ import java.util.Map;
 public class DefaultPersistenceContext<E> implements PersistenceContext<E> {
     private final Map<EntityPersistIdentity, E> persistenceContextMap = new HashMap<>();
     private final Map<EntityPersistIdentity, EntitySnapShot> snapshotContextMap = new HashMap<>();
+    private final Map<EntityPersistIdentity, EntityEntry> entityEntryContextMap = new HashMap<>();
 
     @Override
     public E getEntity(EntityPersistIdentity id) {
@@ -17,6 +18,12 @@ public class DefaultPersistenceContext<E> implements PersistenceContext<E> {
 
     @Override
     public void addEntity(EntityPersistIdentity id, E entity) {
+        EntityEntry entityEntry = getEntityEntry(id);
+        if(entityEntry == null)  {
+            addEntityEntry(id, new DefaultEntityEntry(EntityStatus.SAVING));
+        } else {
+            entityEntry.updateStatus(EntityStatus.MANAGED);
+        }
         persistenceContextMap.put(id, entity);
     }
 
@@ -33,5 +40,15 @@ public class DefaultPersistenceContext<E> implements PersistenceContext<E> {
     @Override
     public EntitySnapShot getDatabaseSnapshot(EntityPersistIdentity id, E entity) {
         return snapshotContextMap.put(id, EntitySnapShot.fromEntity(entity));
+    }
+
+    @Override
+    public void addEntityEntry(EntityPersistIdentity id, EntityEntry entityEntry) {
+        entityEntryContextMap.put(id, entityEntry);
+    }
+
+    @Override
+    public EntityEntry getEntityEntry(EntityPersistIdentity id) {
+        return entityEntryContextMap.get(id);
     }
 }
