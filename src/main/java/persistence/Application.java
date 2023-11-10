@@ -6,6 +6,8 @@ import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.SimpleEntityManager;
+import persistence.loader.EntityLoader;
+import persistence.persister.EntityPersister;
 import persistence.sql.H2Dialect;
 import persistence.sql.ddl.TableCreateQueryBuilder;
 
@@ -27,10 +29,13 @@ public class Application {
             logger.info(sql);
             jdbcTemplate.execute(sql);
 
+
             Person person = new Person(null, "aa", 10, "aa@aa.com");
             logger.info(String.valueOf(person));
 
-            SimpleEntityManager entityManager = new SimpleEntityManager(jdbcTemplate);
+            EntityPersister entityPersister = new EntityPersister(person.getClass(), jdbcTemplate);
+            EntityLoader entityLoader = new EntityLoader(person.getClass(), jdbcTemplate);
+            SimpleEntityManager entityManager = new SimpleEntityManager(entityLoader, entityPersister);
             entityManager.persist(person);
             logger.info(String.valueOf(person));
 
