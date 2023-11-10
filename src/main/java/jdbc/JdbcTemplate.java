@@ -56,7 +56,7 @@ public class JdbcTemplate {
     public Long insertSingle(final String sql) {
         try {
             final PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            int x = preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
             try(ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getLong(1);
