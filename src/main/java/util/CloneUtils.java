@@ -6,6 +6,10 @@ import java.lang.reflect.InvocationTargetException;
 
 public class CloneUtils {
 
+  private CloneUtils() {
+
+  }
+
   public static Object clone(Object entity) {
     try {
       Class<?> clazz = entity.getClass();
