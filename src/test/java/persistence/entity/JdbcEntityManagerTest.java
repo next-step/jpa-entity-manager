@@ -45,7 +45,7 @@ public class JdbcEntityManagerTest extends BuilderTest {
     assertThat(thrown).isInstanceOf(RuntimeException.class);
   }
   @Test
-  @DisplayName("find시에 Persistence Context 저장된 entity를 가져온다.")
+  @DisplayName("find시에 1차 캐시에 저장된 entity를 가져온다.")
   public void findEntityWithPersistenceContext() {
     JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection, persistenceContext);
 
@@ -53,10 +53,11 @@ public class JdbcEntityManagerTest extends BuilderTest {
     PersonFixtureStep3 person = jdbcEntityManager.find(PersonFixtureStep3.class, 2L);
 
     assertThat(person).isEqualTo(PersonInstances.두번째사람);
+    assertThat(person == PersonInstances.두번째사람).isEqualTo(true);
   }
 
   @Test
-  @DisplayName("persist시에 Persistence Context의 entity와 다르면 더티체킹으로 업데이트한다.")
+  @DisplayName("persist시에 1차 캐시의 entity와 snapshot의 값이 다르면 더티체킹으로 업데이트한다.")
   public void persistDiffEntityWithPersistenceContext() {
     JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection, persistenceContext);
 

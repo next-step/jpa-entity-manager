@@ -23,6 +23,7 @@ public class JdbcPersistenceContextTest extends BuilderTest {
         PersonInstances.첫번째사람.getClass()).get();
 
     assertThat(entity).isEqualTo(PersonInstances.첫번째사람);
+    assertThat(entity == PersonInstances.첫번째사람).isEqualTo(true);
   }
 
   @Test
