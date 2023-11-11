@@ -57,6 +57,20 @@ public class CustomStringBuilder {
                 .toStringWithoutSpace();
     }
 
+    public static String toUpdateStatement(String tableName, String idColumnName, String id, String updateClause) {
+        return new CustomStringBuilder()
+                .append(UPDATE.getName())
+                .append(tableName)
+                .append(SET.getName())
+                .append(updateClause)
+                .append(WHERE.getName())
+                .append(idColumnName)
+                .append(EQUALS.getName())
+                .appendWithoutSpace(id)
+                .appendWithoutSpace(SEMICOLON.getName())
+                .toStringWithoutSpace();
+    }
+
     public static String toDeleteStatement(String tableName, String columnNames, String values) {
         return new CustomStringBuilder()
                 .append(DELETE.getName())

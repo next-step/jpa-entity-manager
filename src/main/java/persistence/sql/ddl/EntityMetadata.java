@@ -11,29 +11,27 @@ public class EntityMetadata {
 
     private final TableMetadataExtractor tableMetaDataExtractor;
     private final FieldMetadataExtractors fieldMetadataExtractors;
-    private final Dialect dialect;
     private final Class<?> type;
 
-    public EntityMetadata(Class<?> type, Dialect dialectParam) {
+    public EntityMetadata(Class<?> type) {
         if (!type.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("No @Entity annotation");
         }
 
         tableMetaDataExtractor = new TableMetadataExtractor(type);
         fieldMetadataExtractors = new FieldMetadataExtractors(type);
-        dialect = dialectParam;
         this.type = type;
     }
 
-    public static EntityMetadata of(Class<?> type, Dialect dialectParam) {
-        return new EntityMetadata(type, dialectParam);
+    public static EntityMetadata of(Class<?> type) {
+        return new EntityMetadata(type);
     }
 
     public String getTableName() {
         return tableMetaDataExtractor.getTableName();
     }
 
-    public String getColumnInfo() {
+    public String getColumnInfo(Dialect dialect) {
         return fieldMetadataExtractors.getDefinition(dialect);
     }
 
@@ -51,6 +49,10 @@ public class EntityMetadata {
 
     public String getIdColumnName() {
         return fieldMetadataExtractors.getIdColumnName();
+    }
+
+    public String getIdColumnValue(Object entity) {
+        return fieldMetadataExtractors.getIdColumnValue(entity);
     }
 
     public <T> T getEntity(ResultSet resultSet) {
@@ -77,4 +79,7 @@ public class EntityMetadata {
         }
     }
 
+    public String getUpdateClause(Object entity, Object snapshot) {
+     return fieldMetadataExtractors.getUpdateClause(entity, snapshot);
+    }
 }

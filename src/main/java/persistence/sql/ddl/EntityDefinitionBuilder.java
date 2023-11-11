@@ -1,5 +1,7 @@
 package persistence.sql.ddl;
 
+import persistence.sql.ddl.dialect.Dialect;
+
 import static utils.CustomStringBuilder.toCreateStatement;
 import static utils.CustomStringBuilder.toDropStatement;
 
@@ -11,8 +13,8 @@ public class EntityDefinitionBuilder {
         this.entityMetadata = entityMetadata;
     }
 
-    public String create() {
-        return toCreateStatement(entityMetadata.getTableName(), entityMetadata.getColumnInfo());
+    public String create(Dialect dialect) {
+        return toCreateStatement(entityMetadata.getTableName(), entityMetadata.getColumnInfo(dialect));
     }
 
     public String drop() {

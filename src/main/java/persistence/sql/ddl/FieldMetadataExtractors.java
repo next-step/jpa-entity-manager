@@ -69,10 +69,35 @@ public class FieldMetadataExtractors {
                 .orElseThrow(() -> new IllegalArgumentException("No @Id annotation"));
     }
 
+    public String getIdColumnValue(Object entity) {
+        String idColumnName = getIdColumnName();
+        return fieldMetadataExtractorList.stream()
+                .filter(FieldMetadataExtractor -> FieldMetadataExtractor.getColumnName().equals(idColumnName))
+                .map(fieldMetadataExtractor -> {
+                    try {
+                        return fieldMetadataExtractor.getValueFrom(entity);
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("ID 컬럼 값이 없습니다."));
+    }
+
     public <T> void setInstanceValue(T instance, ResultSet resultSet) throws SQLException, IllegalAccessException {
         for (FieldMetadataExtractor fieldMetadataExtractor : fieldMetadataExtractorList) {
             fieldMetadataExtractor.setInstanceValue(instance, resultSet);
         }
     }
 
+    public String getUpdateClause(Object entity, Object snapshot) {
+        return fieldMetadataExtractorList.stream()
+                .map(fieldMetadataExtractor -> {
+                    return fieldMetadataExtractor.getUpdateClause(entity, snapshot);
+                })
+                .filter(String::isEmpty)
+                .collect(Collectors.joining(", "));
+    }
 }

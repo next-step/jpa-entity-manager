@@ -17,7 +17,7 @@ class EntityMetadataTest {
     public void noEntityAnnotation() {
 
         assertThatThrownBy(() -> {
-            new EntityMetadata(NoEntityAnnotation.class, null);
+            new EntityMetadata(NoEntityAnnotation.class);
         }).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No @Entity annotation");
     }
@@ -25,7 +25,7 @@ class EntityMetadataTest {
     @Test
     @DisplayName("setIdToEntity() 메서드 테스트")
     public void setIdToEntity() {
-        EntityMetadata entityMetadata = new EntityMetadata(Person.class, null);
+        EntityMetadata entityMetadata = new EntityMetadata(Person.class);
         // TODO 픽스처 하나 만들어서 걷어내자.
         Person person = Fixtures.person1();
 
@@ -37,7 +37,7 @@ class EntityMetadataTest {
     @Test
     @DisplayName("setIdToEntity() 메서드 Exception 테스트")
     public void setIdToEntityException() {
-        EntityMetadata entityMetadata = new EntityMetadata(EntityAnnotation.class, null);
+        EntityMetadata entityMetadata = new EntityMetadata(EntityAnnotation.class);
         EntityAnnotation entityAnnotation = new EntityAnnotation();
 
         assertThatThrownBy(() -> {
