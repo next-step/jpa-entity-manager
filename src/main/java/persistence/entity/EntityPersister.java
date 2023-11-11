@@ -10,7 +10,7 @@ public interface EntityPersister<T> {
 
   void delete(T entity);
 
-  T load(Long id);
+  Optional<T> load(Long id);
 
   boolean entityExists(Object entity);
 

@@ -1,7 +1,9 @@
 package persistence.entity;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JdbcEntityManager implements EntityManager {
@@ -23,9 +25,13 @@ public class JdbcEntityManager implements EntityManager {
 
     return (T) persistenceContext.getEntity(id, clazz)
         .orElseGet(() -> {
-          T entity = persister.load(id);
-          persistenceContext.addEntity(id, entity);
-          persistenceContext.putDatabaseSnapshot(id, entity);
+          Optional<T> entity = persister.load(id);
+
+          entity.ifPresent(nullable -> {
+            persistenceContext.addEntity(id, nullable);
+            persistenceContext.putDatabaseSnapshot(id, nullable);
+          });
+
           return entity;
         });
   }
@@ -38,7 +44,7 @@ public class JdbcEntityManager implements EntityManager {
 
     Long assignedId = persister.getEntityId(entity).orElse(-1L);
 
-    if (persister.entityExists(entity) && persistenceContext.isSameWithSnapshot(assignedId, entity)) {
+    if (persister.entityExists(entity) && !persistenceContext.isSameWithSnapshot(assignedId, entity)) {
       persister.update(entity);
       persistenceContext.putDatabaseSnapshot(assignedId, entity);
       persistenceContext.addEntity(assignedId, entity);
@@ -58,6 +64,13 @@ public class JdbcEntityManager implements EntityManager {
 
     persistenceContext.removeEntity(entity);
     persister.delete(entity);
+  }
+
+  @Override
+  public void sync(){
+    List<Object> entites = persistenceContext.dirtyCheckedEntities();
+    entites
+      .forEach(this::persist);
   }
 
 }

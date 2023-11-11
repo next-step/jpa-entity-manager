@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PersistenceContext {
@@ -13,4 +14,6 @@ public interface PersistenceContext {
   <T> void putDatabaseSnapshot(Long id, T entity);
 
   <T> boolean isSameWithSnapshot(Long id, T entity);
+
+  List<Object> dirtyCheckedEntities();
 }

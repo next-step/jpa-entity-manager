@@ -1,8 +1,10 @@
 package persistence.entity;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import util.CloneUtils;
 
 public class JdbcPersistenceContext implements PersistenceContext {
@@ -35,6 +37,15 @@ public class JdbcPersistenceContext implements PersistenceContext {
   public <T> boolean isSameWithSnapshot(Long id, T entity) {
     Object snapshot = entitySnapshot.get(new EntityKey(entity.getClass(), id));
     return entity.equals(snapshot);
+  }
+
+  @Override
+  public List<Object> dirtyCheckedEntities() {
+    return entityCache.entrySet()
+        .stream()
+        .filter(entry -> !isSameWithSnapshot(entry.getKey().getId(), entry.getValue().getClass()))
+        .map(entry -> entry.getValue())
+        .collect(Collectors.toList());
   }
 
 }
