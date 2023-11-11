@@ -1,5 +1,6 @@
 package persistence.repository;
 
+import java.util.Optional;
 import persistence.entity.EntityManager;
 
 public class CustomJpaRepository <T, ID> {
@@ -14,7 +15,7 @@ public class CustomJpaRepository <T, ID> {
     return entity;
   }
 
-  public T findById(T entity, Long id){
-    return (T) entityManager.find(entity.getClass(), id);
+  public Optional<T> findById(T entity, Long id){
+    return (Optional<T>) entityManager.find(entity.getClass(), id);
   }
 }

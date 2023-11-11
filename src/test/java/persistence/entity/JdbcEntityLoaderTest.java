@@ -14,8 +14,8 @@ public class JdbcEntityLoaderTest extends BuilderTest {
   @DisplayName("Loader를 이용해서 find 합니다.")
   public void findEntity() {
     JdbcEntityLoader<PersonFixtureStep3> jdbcEntityLoader = new JdbcEntityLoader<>(PersonFixtureStep3.class, connection);
-
-    PersonFixtureStep3 person = jdbcEntityLoader.load(2L);
+    List<PersonFixtureStep3> people = jdbcEntityLoader.findAll();
+    PersonFixtureStep3 person = jdbcEntityLoader.load(2L).get();
 
     assertThat(person).isEqualTo(PersonInstances.두번째사람);
   }

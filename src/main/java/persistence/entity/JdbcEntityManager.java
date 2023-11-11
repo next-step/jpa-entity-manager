@@ -32,7 +32,11 @@ public class JdbcEntityManager implements EntityManager {
             persistenceContext.putDatabaseSnapshot(id, nullable);
           });
 
-          return entity;
+          if (entity.isPresent()) {
+            return entity.get();
+          }
+
+          return null;
         });
   }
 
@@ -44,7 +48,8 @@ public class JdbcEntityManager implements EntityManager {
 
     Long assignedId = persister.getEntityId(entity).orElse(-1L);
 
-    if (persister.entityExists(entity) && !persistenceContext.isSameWithSnapshot(assignedId, entity)) {
+    if (persister.entityExists(entity) && !persistenceContext.isSameWithSnapshot(assignedId,
+        entity)) {
       persister.update(entity);
       persistenceContext.putDatabaseSnapshot(assignedId, entity);
       persistenceContext.addEntity(assignedId, entity);
@@ -67,10 +72,10 @@ public class JdbcEntityManager implements EntityManager {
   }
 
   @Override
-  public void sync(){
+  public void sync() {
     List<Object> entites = persistenceContext.dirtyCheckedEntities();
     entites
-      .forEach(this::persist);
+        .forEach(this::persist);
   }
 
 }

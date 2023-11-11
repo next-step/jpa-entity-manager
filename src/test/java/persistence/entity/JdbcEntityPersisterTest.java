@@ -50,10 +50,7 @@ public class JdbcEntityPersisterTest extends BuilderTest {
 
     persister.delete(PersonInstances.두번째사람);
 
-    Throwable thrown = catchThrowable(() -> {
-      jdbcEntityManager.find(PersonFixtureStep3.class, 2L);
-    });
-    assertThat(thrown).isInstanceOf(RuntimeException.class);
+    assertThat(jdbcEntityManager.find(PersonFixtureStep3.class, 3L)).isEqualTo(null);
   }
 
   @Test

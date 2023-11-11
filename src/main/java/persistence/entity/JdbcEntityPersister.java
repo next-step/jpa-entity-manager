@@ -2,7 +2,6 @@ package persistence.entity;
 
 import java.sql.Connection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import jdbc.JdbcTemplate;
@@ -74,13 +73,13 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
   }
 
   public void throwExceptionIfNotExists(Long id, Object entity) {
-    if (Objects.isNull(load(id)) && metaEntity.getPrimaryKeyColumnIsNull(entity)) {
+    if (load(id).isEmpty() && metaEntity.getPrimaryKeyColumnIsNonNull(entity)) {
       throw new RuntimeException("해당 객체는 존재 하지 않습니다.");
     }
   }
   @Override
   public boolean entityExists(Object entity) {
-    return metaEntity.getPrimaryKeyColumnIsNull(entity) ||
+    return metaEntity.getPrimaryKeyColumnIsNonNull(entity) &&
           entityLoader.load(metaEntity.getPrimaryKeyColumnValue(entity)).isPresent();
   }
   @Override

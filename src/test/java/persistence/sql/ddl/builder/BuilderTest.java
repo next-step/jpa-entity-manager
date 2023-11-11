@@ -5,6 +5,7 @@ import database.H2;
 import java.sql.Connection;
 import java.sql.SQLException;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +62,7 @@ public class BuilderTest {
   void delete() {
     persistenceContext = new JdbcPersistenceContext();
 
-    String queryFirst = "truncate table USERS";
+    String queryFirst = "truncate table USERS RESTART IDENTITY" ;
     jdbcTemplate.execute(queryFirst);
   }
 
