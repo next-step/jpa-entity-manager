@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class RowInsertQueryBuilder {
 
-    public String generateSQLQuery(String tableName, String[] columns, Object[] values, String primaryKeyName, Object primaryKeyValue) {
+    public static String generateSQLQuery(String tableName, String[] columns, Object[] values, String primaryKeyName, Object primaryKeyValue) {
         String primaryKeyColumName = "";
         String primaryKeyColumnValue = "";
         if (primaryKeyValue != null) {

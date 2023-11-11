@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class FindByIdQueryBuilder {
-    public String generateSQLQuery(String tableName, String[] columnNames, String primaryKeyName, Object primaryKeyValue) {
+    public static String generateSQLQuery(String tableName, String[] columnNames, String primaryKeyName, Object primaryKeyValue) {
         return "SELECT " +
             Arrays
                 .stream(columnNames)

@@ -6,15 +6,10 @@ import persistence.sql.TableSQLMapper;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 public class EntityColumns {
     private final Field[] columnFields;
-    private final Map<Field, Object> columnToValues = new HashMap<>();
-    private final Map<String, Field> columnNameToFields = new HashMap<>();
 
     public EntityColumns(Class<?> clazz) {
         columnFields = Arrays
@@ -22,34 +17,28 @@ public class EntityColumns {
             .filter(field -> !field.isAnnotationPresent(Transient.class))
             .filter(field -> !field.isAnnotationPresent(Id.class))
             .peek(field -> field.setAccessible(true))
-            .peek(field -> columnToValues.put(field, null))
-            .peek(field-> columnNameToFields.put(TableSQLMapper.getColumnName(field), field))
             .toArray(Field[]::new);
     }
 
     public String[] getColumnNames() {
-        final List<String> columnNames = Arrays
+        return  Arrays
             .stream(columnFields)
             .map(TableSQLMapper::getColumnName)
-            .collect(Collectors.toList());
-
-        return columnNames.toArray(String[]::new);
+            .toArray(String[]::new);
     }
 
-    public Field getField(String columnName) {
-        return this.columnNameToFields.get(columnName);
+    public Field getColumnField(String columnName) {
+        return Arrays
+            .stream(columnFields)
+            .filter(field -> Objects.equals(TableSQLMapper.getColumnName(field), columnName))
+            .findFirst()
+            .orElse(null);
     }
 
     public Object[] getColumnValues(Object object) {
-        final List<Object> columnNames = Arrays
+        return Arrays
             .stream(columnFields)
-            .map(field -> {
-                Object value = TableSQLMapper.getColumnValue(field, object);
-                columnToValues.put(field, value);
-                return value;
-            })
-            .collect(Collectors.toList());
-
-        return columnNames.toArray(Object[]::new);
+            .map(field -> TableSQLMapper.getColumnValue(field, object))
+            .toArray();
     }
 }

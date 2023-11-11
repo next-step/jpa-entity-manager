@@ -3,14 +3,9 @@ package persistence.persister;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.sql.dml.FindByIdQueryBuilder;
 import persistence.sql.dml.RowDeleteQueryBuilder;
 import persistence.sql.dml.RowInsertQueryBuilder;
 import persistence.sql.dml.RowUpdateQueryBuilder;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class EntityPersister {
     private static final Logger logger = LoggerFactory.getLogger(EntityPersister.class);
@@ -20,8 +15,10 @@ public class EntityPersister {
     private final EntityTableName entityTableName;
     private final EntityColumns entityColumns;
     private final EntityPrimaryKey entityPrimaryKey;
+    private final JdbcTemplate jdbcTemplate;
 
-    public EntityPersister(Class<?> clazz) {
+    public EntityPersister(Class<?> clazz, JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.clazz = clazz;
         this.entityName = new EntityName(clazz);
         this.entityTableName = new EntityTableName(clazz);
@@ -29,9 +26,8 @@ public class EntityPersister {
         this.entityPrimaryKey = new EntityPrimaryKey(clazz);
     }
 
-    public boolean update(Object object, JdbcTemplate jdbcTemplate) {
-        RowUpdateQueryBuilder queryBuilder = new RowUpdateQueryBuilder();
-        String query = queryBuilder.generateSQLQuery(
+    public boolean update(Object object) {
+        String query = RowUpdateQueryBuilder.generateSQLQuery(
             this.entityTableName.getName(),
             this.entityColumns.getColumnNames(),
             this.entityColumns.getColumnValues(object),
@@ -49,9 +45,8 @@ public class EntityPersister {
         return true;
     }
 
-    public void insert(Object object, JdbcTemplate jdbcTemplate) {
-        RowInsertQueryBuilder queryBuilder = new RowInsertQueryBuilder();
-        String query = queryBuilder.generateSQLQuery(
+    public void insert(Object object) {
+        String query = RowInsertQueryBuilder.generateSQLQuery(
             this.entityTableName.getName(),
             this.entityColumns.getColumnNames(),
             this.entityColumns.getColumnValues(object),
@@ -64,63 +59,8 @@ public class EntityPersister {
         this.entityPrimaryKey.setPrimaryKey(object, value);
     }
 
-    public Object find(Object primaryKevValue, JdbcTemplate jdbcTemplate) {
-        FindByIdQueryBuilder queryBuilder = new FindByIdQueryBuilder();
-        String query = queryBuilder.generateSQLQuery(
-            this.entityTableName.getName(),
-            this.entityColumns.getColumnNames(),
-            this.entityPrimaryKey.getPrimaryKeyName(),
-            primaryKevValue
-        );
-        logger.info(query);
-
-        return jdbcTemplate.queryForObject(query, resultSet -> {
-            if (!resultSet.next()) {
-                return null;
-            }
-
-            try {
-                Object result = getEmptyObject(this.clazz);
-                Object primaryKeyValue = resultSet.getObject(this.entityPrimaryKey.getPrimaryKeyName());
-                this.entityPrimaryKey.setPrimaryKey(result, primaryKeyValue);
-
-                for (String columnName : this.entityColumns.getColumnNames()) {
-                    Object value = resultSet.getObject(columnName);
-                    if (value == null) {
-                        continue;
-                    }
-
-                    Field field = this.entityColumns.getField(columnName);
-                    field.set(result, value);
-                }
-
-                return this.clazz.cast(result);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    private Object getEmptyObject(Class<?> clazz) {
-        Constructor<?> emptyConstructor = Arrays
-            .stream(clazz.getDeclaredConstructors())
-            .filter(constructor -> constructor.getParameterCount() == 0)
-            .findFirst()
-            .orElse(null);
-        if (emptyConstructor == null) {
-            throw new RuntimeException("Entity must have empty constructor!");
-        }
-
-        try {
-            return emptyConstructor.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void delete(Object object, JdbcTemplate jdbcTemplate) {
-        RowDeleteQueryBuilder queryBuilder = new RowDeleteQueryBuilder();
-        String query = queryBuilder.generateSQLQuery(
+    public void delete(Object object) {
+        String query = RowDeleteQueryBuilder.generateSQLQuery(
             this.entityTableName.getName(),
             this.entityPrimaryKey.getPrimaryKeyName(),
             this.entityPrimaryKey.getPrimaryKeyValue(object)

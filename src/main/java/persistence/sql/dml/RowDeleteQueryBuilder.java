@@ -5,7 +5,7 @@ import persistence.sql.TableSQLMapper;
 
 public class RowDeleteQueryBuilder {
 
-    public String generateSQLQuery(String tableName, String primaryKeyName, Object primaryKeyValue) {
+    public static String generateSQLQuery(String tableName, String primaryKeyName, Object primaryKeyValue) {
 
         return "DELETE FROM " +
             SQLEscaper.escapeNameByBacktick(tableName) +
