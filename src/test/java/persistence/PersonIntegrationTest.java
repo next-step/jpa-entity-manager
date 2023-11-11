@@ -94,8 +94,8 @@ class PersonIntegrationTest {
         Person p = new Person(name, age, email);
         PersonRowMapper personRowMapper = new PersonRowMapper();
         String insertQuery = dataManipulationLanguageAssembler.generateInsert(p);
-        jdbcTemplate.execute(insertQuery);
-        p.setId(1L);
+        Long id = jdbcTemplate.insertSingle(insertQuery);
+        p.setId(id);
         String deleteQuery = dataManipulationLanguageAssembler.generateDeleteWithWhere(p);
 
         // when
@@ -111,20 +111,20 @@ class PersonIntegrationTest {
         Person p = new Person("tongnamuu", 14, "tongnamuu@naver.com");
         PersonRowMapper personRowMapper = new PersonRowMapper();
         String insertQuery = dataManipulationLanguageAssembler.generateInsert(p);
-        jdbcTemplate.execute(insertQuery);
+        Long id = jdbcTemplate.insertSingle(insertQuery);
         Person beforeUpdatePerson = jdbcTemplate.queryForObject(
-            dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, 1L),
+            dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, id),
             personRowMapper
         );
 
         // when
         Person updatePerson = new Person("tongnamuu2", 15, "tongnamuu@gmail.com");
-        updatePerson.setId(1L);
+        updatePerson.setId(id);
         String updateQuery = dataManipulationLanguageAssembler.generateUpdate(updatePerson);
         jdbcTemplate.execute(updateQuery);
 
         Person afterUpdatePerson = jdbcTemplate.queryForObject(
-            dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, 1L),
+            dataManipulationLanguageAssembler.generateSelectWithWhere(Person.class, id),
             personRowMapper
         );
 

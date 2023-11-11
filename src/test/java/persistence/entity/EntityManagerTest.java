@@ -9,24 +9,25 @@ import database.DatabaseServer;
 import database.H2;
 import java.sql.SQLException;
 import jdbc.JdbcTemplate;
-import jdbc.PersonRowMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
 import persistence.sql.usecase.GetFieldFromClassUseCase;
 import persistence.sql.usecase.GetFieldValueUseCase;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
+import persistence.sql.usecase.SetFieldValueUseCase;
 
 class EntityManagerTest {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler = createDataManipulationLanguageAssembler();
     private final DataDefinitionLanguageAssembler dataDefinitionLanguageAssembler = createDataDefinitionLanguageAssembler();
-    private final PersonRowMapper personRowMapper = new PersonRowMapper();
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
     private EntityPersister entityPersister;
+    private EntityLoader entityLoader;
     private EntityManager entityManager;
 
 
@@ -35,9 +36,10 @@ class EntityManagerTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersister(personRowMapper, dataManipulationLanguageAssembler, jdbcTemplate);
-        entityManager = new EntityManagerImpl(personRowMapper, dataManipulationLanguageAssembler,
-            jdbcTemplate, entityPersister, new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()), new GetFieldValueUseCase());
+        entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
+        entityLoader = new EntityLoader(new GetFieldFromClassUseCase(), new SetFieldValueUseCase(), jdbcTemplate, dataManipulationLanguageAssembler);
+        entityManager = new EntityManagerImpl(entityLoader,
+            entityPersister, new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()), new GetFieldValueUseCase(), new SetFieldValueUseCase());
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
     }
 
@@ -54,6 +56,7 @@ class EntityManagerTest {
 
         Person findPerson = entityManager.find(Person.class, 1L);
         assertAll(
+            () -> assertThat(findPerson.getId()).isEqualTo(1L),
             () -> assertThat(findPerson.getName()).isEqualTo(person.getName()),
             () -> assertThat(findPerson.getAge()).isEqualTo(person.getAge()),
             () -> assertThat(findPerson.getEmail()).isEqualTo(person.getEmail())
@@ -64,11 +67,11 @@ class EntityManagerTest {
     void persist() {
         // when, then
         Person person = (Person) entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
-        Person findPerson = entityManager.find(Person.class, 1L);
         assertAll(
-            () -> assertThat(findPerson.getName()).isEqualTo(person.getName()),
-            () -> assertThat(findPerson.getAge()).isEqualTo(person.getAge()),
-            () -> assertThat(findPerson.getEmail()).isEqualTo(person.getEmail())
+            () -> assertThat(person.getId()).isEqualTo(1L),
+            () -> assertThat(person.getName()).isEqualTo(person.getName()),
+            () -> assertThat(person.getAge()).isEqualTo(person.getAge()),
+            () -> assertThat(person.getEmail()).isEqualTo(person.getEmail())
         );
     }
 
