@@ -6,7 +6,6 @@ public class DmlQueryBuilder {
   private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
   private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
   private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
-
   public DmlQueryBuilder() {
   }
 
@@ -21,5 +20,4 @@ public class DmlQueryBuilder {
   public String createDeleteQuery(String tableName, String targetName, Object targetValue){
     return deleteQueryBuilder.createDeleteQuery(tableName, targetName, targetValue);
   }
-
 }
