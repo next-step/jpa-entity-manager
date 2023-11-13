@@ -12,10 +12,6 @@ public class EntityKey {
     this.id = id;
   }
 
-  public Long getId() {
-    return id;
-  }
-
   @Override
   public int hashCode() {
     return Objects.hash(clazz, id);

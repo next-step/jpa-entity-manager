@@ -16,8 +16,5 @@ public interface PersistenceContext {
   <T> boolean isSameWithSnapshot(Long id, T entity);
 
   List<Object> dirtyCheckedEntities();
-
-  void putEntityEntryStatus(Object entity, EntityStatus entityStatus);
-
-  EntityStatus getEntityStatus(Object entity);
+  
 }

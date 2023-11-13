@@ -11,8 +11,7 @@ public class JdbcPersistenceContext implements PersistenceContext {
 
   private final Map<EntityKey, Object> entityCache = new ConcurrentHashMap<>();
   private final Map<EntityKey, Object> entitySnapshot = new ConcurrentHashMap<>();
-  private final Map<Integer, EntityStatus> entityEntry = new ConcurrentHashMap<>();
-
+  private final EntityEntry entityEntry = new JdbcEntityEntry();
   @Override
   public Optional<Object> getEntity(Long id, Class<?> clazz) {
     return Optional.ofNullable(entityCache.get(new EntityKey(clazz, id)));
@@ -40,22 +39,18 @@ public class JdbcPersistenceContext implements PersistenceContext {
     return entity.equals(snapshot);
   }
 
+  public <T> boolean isSameWithSnapshot(EntityKey entityKey, T entity) {
+    Object snapshot = entitySnapshot.get(entityKey);
+    return entity.equals(snapshot);
+  }
+
   @Override
   public List<Object> dirtyCheckedEntities() {
     return entityCache.entrySet()
         .stream()
-        .filter(entry -> !isSameWithSnapshot(entry.getKey().getId(), entry.getValue().getClass()))
+        .filter(entry -> !isSameWithSnapshot(entry.getKey(), entry.getValue()))
         .map(entry -> entry.getValue())
         .collect(Collectors.toList());
-  }
-
-  public void putEntityEntryStatus(Object entity, EntityStatus entityEntryStatus) {
-    entityEntry.put(entity.hashCode(), entityEntryStatus);
-  }
-
-  @Override
-  public EntityStatus getEntityStatus(Object entity) {
-    return entityEntry.get(entity.hashCode());
   }
 
 }

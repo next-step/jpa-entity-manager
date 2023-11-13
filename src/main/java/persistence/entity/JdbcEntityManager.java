@@ -11,10 +11,13 @@ public class JdbcEntityManager implements EntityManager {
   private final Connection connection;
   private final Map<Class<?>, EntityPersister> persisterMap = new ConcurrentHashMap<>();
   private final PersistenceContext persistenceContext;
+  private final EntityEntry entityEntry;
 
-  public JdbcEntityManager(Connection connection, PersistenceContext persistenceContext) {
+  public JdbcEntityManager(Connection connection, PersistenceContext persistenceContext,
+      EntityEntry entityEntry) {
     this.connection = connection;
     this.persistenceContext = persistenceContext;
+    this.entityEntry = entityEntry;
   }
 
   @Override
@@ -25,7 +28,7 @@ public class JdbcEntityManager implements EntityManager {
 
     Optional<T> entity = (Optional<T>) persistenceContext.getEntity(id, clazz);
 
-    entity.ifPresent(obj -> persistenceContext.putEntityEntryStatus(obj, EntityStatus.LOADING));
+    entity.ifPresent(obj -> entityEntry.putEntityEntryStatus(obj, EntityStatus.LOADING));
 
     T foundEntity = entity.orElseGet(() -> {
       Optional<T> obj = persister.load(id);
@@ -43,7 +46,7 @@ public class JdbcEntityManager implements EntityManager {
     EntityPersister<T> persister = persisterMap.getOrDefault(entity.getClass(),
         new JdbcEntityPersister<>((Class<T>) entity.getClass(), connection));
     persisterMap.putIfAbsent(entity.getClass(), persister);
-    persistenceContext.putEntityEntryStatus(entity, EntityStatus.SAVING);
+    entityEntry.putEntityEntryStatus(entity, EntityStatus.SAVING);
     Long assignedId = persister.getEntityId(entity).orElse(-1L);
 
     if (persister.entityExists(entity) &&
@@ -80,16 +83,16 @@ public class JdbcEntityManager implements EntityManager {
   public <T> void putPersistenceContext(Long id, T entity) {
     persistenceContext.addEntity(id, entity);
     persistenceContext.putDatabaseSnapshot(id, entity);
-    persistenceContext.putEntityEntryStatus(entity, EntityStatus.MANAGED);
+    entityEntry.putEntityEntryStatus(entity, EntityStatus.MANAGED);
   }
   public <T> void removePersistenceContext(T entity) {
-    persistenceContext.putEntityEntryStatus(entity, EntityStatus.DELETED);
+    entityEntry.putEntityEntryStatus(entity, EntityStatus.DELETED);
     persistenceContext.removeEntity(entity);
   }
 
   public <T> void deleteEntity(EntityPersister<T> persister, T entity) {
     persister.delete(entity);
-    persistenceContext.putEntityEntryStatus(entity, EntityStatus.GONE);
+    entityEntry.putEntityEntryStatus(entity, EntityStatus.GONE);
   }
 
 }
