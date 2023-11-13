@@ -18,6 +18,7 @@ public class JdbcEntityManagerTest extends BuilderTest {
     PersonFixtureStep3 person = jdbcEntityManager.find(PersonFixtureStep3.class, 2L);
 
     assertThat(person).isEqualTo(PersonInstances.두번째사람);
+    assertThat(persistenceContext.getEntityStatus(PersonInstances.두번째사람)).isEqualTo(EntityStatus.MANAGED);
   }
 
   @Test
@@ -27,9 +28,12 @@ public class JdbcEntityManagerTest extends BuilderTest {
 
     jdbcEntityManager.persist(PersonInstances.세번째사람);
 
+    assertThat(persistenceContext.getEntityStatus(PersonInstances.세번째사람)).isEqualTo(EntityStatus.MANAGED);
+
     PersonFixtureStep3 person = jdbcEntityManager.find(PersonFixtureStep3.class, 3L);
 
     assertThat(person).isEqualTo(PersonInstances.세번째사람);
+    assertThat(persistenceContext.getEntityStatus(PersonInstances.세번째사람)).isEqualTo(EntityStatus.LOADING);
   }
 
   @Test
@@ -38,11 +42,10 @@ public class JdbcEntityManagerTest extends BuilderTest {
     JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection, persistenceContext);
 
     jdbcEntityManager.remove(PersonInstances.첫번째사람);
+    PersonFixtureStep3 person = jdbcEntityManager.find(PersonFixtureStep3.class, 1L);
 
-    Throwable thrown = catchThrowable(() -> {
-      jdbcEntityManager.find(PersonFixtureStep3.class, 1L);
-    });
-    assertThat(thrown).isInstanceOf(RuntimeException.class);
+    assertThat(person).isEqualTo(null);
+    assertThat(persistenceContext.getEntityStatus(PersonInstances.첫번째사람)).isEqualTo(EntityStatus.GONE);
   }
   @Test
   @DisplayName("find시에 1차 캐시에 저장된 entity를 가져온다.")
@@ -54,6 +57,7 @@ public class JdbcEntityManagerTest extends BuilderTest {
 
     assertThat(person).isEqualTo(PersonInstances.두번째사람);
     assertThat(person == PersonInstances.두번째사람).isEqualTo(true);
+    assertThat(persistenceContext.getEntityStatus(PersonInstances.두번째사람)).isEqualTo(EntityStatus.LOADING);
   }
 
   @Test

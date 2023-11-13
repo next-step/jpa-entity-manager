@@ -18,4 +18,6 @@ public interface PersistenceContext {
   List<Object> dirtyCheckedEntities();
 
   void putEntityEntryStatus(Object entity, EntityStatus entityStatus);
+
+  EntityStatus getEntityStatus(Object entity);
 }

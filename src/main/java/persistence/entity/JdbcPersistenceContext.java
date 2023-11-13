@@ -52,4 +52,10 @@ public class JdbcPersistenceContext implements PersistenceContext {
   public void putEntityEntryStatus(Object entity, EntityStatus entityEntryStatus) {
     entityEntry.put(entity.hashCode(), entityEntryStatus);
   }
+
+  @Override
+  public EntityStatus getEntityStatus(Object entity) {
+    return entityEntry.get(entity.hashCode());
+  }
+
 }
