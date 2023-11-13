@@ -27,9 +27,8 @@ public class JdbcEntityManager implements EntityManager {
         .orElseGet(() -> {
           Optional<T> entity = persister.load(id);
 
-          entity.ifPresent(nullable -> {
-            persistenceContext.addEntity(id, nullable);
-            persistenceContext.putDatabaseSnapshot(id, nullable);
+          entity.ifPresent(presentEntity -> {
+            putPersistenceContext(id, presentEntity);
           });
 
           if (entity.isPresent()) {
@@ -48,23 +47,22 @@ public class JdbcEntityManager implements EntityManager {
 
     Long assignedId = persister.getEntityId(entity).orElse(-1L);
 
-    if (persister.entityExists(entity) && !persistenceContext.isSameWithSnapshot(assignedId,
-        entity)) {
+    if (persister.entityExists(entity) &&
+        !persistenceContext.isSameWithSnapshot(assignedId, entity)) {
       persister.update(entity);
-      persistenceContext.putDatabaseSnapshot(assignedId, entity);
-      persistenceContext.addEntity(assignedId, entity);
+      putPersistenceContext(assignedId, entity);
       return;
     }
 
     Long id = persister.insert(entity);
-    persistenceContext.putDatabaseSnapshot(id, entity);
-    persistenceContext.addEntity(id, entity);
+    putPersistenceContext(id, entity);
   }
 
   @Override
   public <T> void remove(T entity) {
     EntityPersister<T> persister = persisterMap.getOrDefault(entity.getClass(),
         new JdbcEntityPersister<>((Class<T>) entity.getClass(), connection));
+
     persisterMap.putIfAbsent(entity.getClass(), persister);
 
     persistenceContext.removeEntity(entity);
@@ -78,4 +76,8 @@ public class JdbcEntityManager implements EntityManager {
         .forEach(this::persist);
   }
 
+  public <T> void putPersistenceContext(Long id, T entity) {
+    persistenceContext.addEntity(id, entity);
+    persistenceContext.putDatabaseSnapshot(id, entity);
+  }
 }

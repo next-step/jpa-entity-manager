@@ -11,6 +11,7 @@ public class JdbcPersistenceContext implements PersistenceContext {
 
   private final Map<EntityKey, Object> entityCache = new ConcurrentHashMap<>();
   private final Map<EntityKey, Object> entitySnapshot = new ConcurrentHashMap<>();
+  private final Map<Integer, EntityStatus> entityEntry = new ConcurrentHashMap<>();
 
   @Override
   public Optional<Object> getEntity(Long id, Class<?> clazz) {
@@ -48,4 +49,7 @@ public class JdbcPersistenceContext implements PersistenceContext {
         .collect(Collectors.toList());
   }
 
+  public void putEntityEntryStatus(Object entity, EntityStatus entityEntryStatus) {
+    entityEntry.put(entity.hashCode(), entityEntryStatus);
+  }
 }
