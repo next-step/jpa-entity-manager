@@ -39,7 +39,12 @@ public class PersistenceContextImpl<T> implements PersistenceContext<T> {
     }
 
     @Override
-    public T getDatabaseSnapshot(Long id, T entity) {
-        return snapShot.put(id, entity);
+    public T getDatabaseSnapshot(Long id) {
+        return snapShot.get(id);
+    }
+
+    @Override
+    public void addDatabaseSnapshot(Long id, T entity) {
+        snapShot.put(id, entity);
     }
 }

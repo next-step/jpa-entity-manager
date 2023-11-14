@@ -46,7 +46,7 @@ public class EntityManagerImpl implements EntityManager {
         T entity = entityLoader.find(clazz, Id);
         if (entity != null) {
             persistenceContext.addEntity(Id, entity);
-            persistenceContext.getDatabaseSnapshot(Id, entity);
+            persistenceContext.addDatabaseSnapshot(Id, entity);
         }
         return entity;
     }
@@ -60,9 +60,10 @@ public class EntityManagerImpl implements EntityManager {
         T findEntity = (T) find(entity.getClass(), (Long) idValue);
         if (findEntity == null) {
             return insertIfNotExist(entity);
-        } else {
-            return updatetIfAlreadyExist(entity, (Long) idValue);
         }
+
+        return updatetIfAlreadyExist(entity, (Long) idValue);
+
     }
 
 
@@ -84,9 +85,12 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private <T> T updatetIfAlreadyExist(T entity, Long idValue) {
-        entityPersister.update(entity);
         PersistenceContext<T> persistenceContext = getPersistenceContext((Class<T>) entity.getClass());
-        persistenceContext.addEntity(idValue, entity);
+        T snapshotEntity = persistenceContext.getDatabaseSnapshot(idValue);
+        if (entity.equals(snapshotEntity)) {
+            return entity;
+        }
+        entityPersister.update(entity);
         return entity;
     }
 
