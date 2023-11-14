@@ -35,10 +35,18 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long Id) {
+        if (Id == null) {
+            throw new NullPointerException("Id can't be null in EntityManager find");
+        }
+        PersistenceContext<T> persistenceContext = getPersistenceContext(clazz);
+        T persistenceContextCachedEntity = persistenceContext.getEntity(Id);
+        if (persistenceContextCachedEntity != null) {
+            return persistenceContextCachedEntity;
+        }
         T entity = entityLoader.find(clazz, Id);
         if (entity != null) {
-            PersistenceContext<T> persistenceContext = getPersistenceContext(clazz);
             persistenceContext.addEntity(Id, entity);
+            persistenceContext.getDatabaseSnapshot(Id, entity);
         }
         return entity;
     }
@@ -60,10 +68,10 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> void remove(T entity) {
+        entityPersister.delete(entity);
         Class<T> cls = (Class<T>) entity.getClass();
         PersistenceContext<T> persistenceContext = getPersistenceContext(cls);
         persistenceContext.removeEntity(entity);
-        entityPersister.delete(entity);
     }
 
     private <T> PersistenceContext<T> getPersistenceContext(Class<T> cls) {
