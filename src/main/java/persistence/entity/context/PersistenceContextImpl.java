@@ -18,16 +18,20 @@ public class PersistenceContextImpl<T> implements PersistenceContext {
 
     @Override
     public Object getEntity(Long id) {
+        System.out.println("########### get " + context.get(id).toString());
         return context.get(id);
     }
 
+
     @Override
     public void addEntity(Long id, Object entity) {
+        System.out.println("########### add " + entity.toString());
         context.put(id, (T) entity);
     }
 
     @Override
     public void removeEntity(Object entity) {
+        System.out.println("########### remove " + entity);
         DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
         Long id = (Long) getFieldValueUseCase.execute(entity, databaseField);
         context.remove(id);

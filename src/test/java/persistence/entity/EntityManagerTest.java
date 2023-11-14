@@ -66,7 +66,7 @@ class EntityManagerTest {
     @Test
     void persist() {
         // when, then
-        Person person = (Person) entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
+        Person person = entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
         assertAll(
             () -> assertThat(person.getId()).isEqualTo(1L),
             () -> assertThat(person.getName()).isEqualTo(person.getName()),
