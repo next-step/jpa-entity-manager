@@ -7,4 +7,5 @@ public interface EntityManager {
 
   <T> void remove(T entity);
 
+  <T> void sync();
 }

@@ -2,8 +2,8 @@ package persistence.entity;
 
 import java.sql.Connection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import jdbc.JdbcTemplate;
 import persistence.meta.MetaDataColumn;
 import persistence.meta.MetaDataColumns;
@@ -35,7 +35,7 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
     List<String> extractValuesFromEntity = metaEntity.extractValuesFromEntity(fields, entity);
     List<String> dbColumns = fields.stream()
         .map(field -> metaDataColumns.getColumnByFieldName(field).getDBColumnName())
-        .toList();
+        .collect(Collectors.toList());
 
     throwExceptionIfNotExists((Long) id, entity);
 
@@ -73,20 +73,25 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
   }
 
   public void throwExceptionIfNotExists(Long id, Object entity) {
-    if (Objects.isNull(load(id)) && metaEntity.getPrimaryKeyColumnIsNull(entity)) {
+    if (load(id).isEmpty() && metaEntity.getPrimaryKeyColumnIsNonNull(entity)) {
       throw new RuntimeException("해당 객체는 존재 하지 않습니다.");
     }
   }
   @Override
   public boolean entityExists(Object entity) {
-    return metaEntity.getPrimaryKeyColumnIsNull(entity);
+    return metaEntity.getPrimaryKeyColumnIsNonNull(entity) &&
+          entityLoader.load(metaEntity.getPrimaryKeyColumnValue(entity)).isPresent();
   }
   @Override
   public Optional<Long> getEntityId(Object entity) {
     return Optional.ofNullable(metaEntity.getPrimaryKeyColumnValue(entity));
   }
 
-  public T load(Long id) {
+  public Optional<T> load(Long id) {
     return entityLoader.load(id);
+  }
+
+  public List<T> loadAll(List<Long> ids) {
+    return entityLoader.loadByIds(ids);
   }
 }

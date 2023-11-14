@@ -33,7 +33,7 @@ public class MetaEntity<T> {
   public MetaDataColumn getPrimaryKeyColumn() {
     return primaryKeyColumn;
   }
-  public boolean getPrimaryKeyColumnIsNull(Object entity) {
+  public boolean getPrimaryKeyColumnIsNonNull(Object entity) {
     return Objects.nonNull(primaryKeyColumn.getFieldValue(entity));
   }
 

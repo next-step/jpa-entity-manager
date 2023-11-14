@@ -8,6 +8,8 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import persistence.entity.EntityEntry;
+import persistence.entity.JdbcEntityEntry;
 import persistence.entity.JdbcPersistenceContext;
 import persistence.entity.PersistenceContext;
 import persistence.meta.MetaEntity;
@@ -27,6 +29,7 @@ public class BuilderTest {
   public static SelectQueryBuilder selectQueryBuilder;
   public static Connection connection;
   public static PersistenceContext persistenceContext;
+  public static EntityEntry entityEntry;
 
   @BeforeAll
   static void setup() throws SQLException {
@@ -37,7 +40,7 @@ public class BuilderTest {
     server.start();
     connection = server.getConnection();
     jdbcTemplate = new JdbcTemplate(connection);
-
+    entityEntry = new JdbcEntityEntry();
     insertQueryBuilder = new InsertQueryBuilder();
     createQueryBuilder = new CreateQueryBuilder();
     selectQueryBuilder = new SelectQueryBuilder();
@@ -61,7 +64,7 @@ public class BuilderTest {
   void delete() {
     persistenceContext = new JdbcPersistenceContext();
 
-    String queryFirst = "truncate table USERS";
+    String queryFirst = "truncate table USERS RESTART IDENTITY" ;
     jdbcTemplate.execute(queryFirst);
   }
 

@@ -1,15 +1,17 @@
 package persistence.entity;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import util.CloneUtils;
 
 public class JdbcPersistenceContext implements PersistenceContext {
 
   private final Map<EntityKey, Object> entityCache = new ConcurrentHashMap<>();
   private final Map<EntityKey, Object> entitySnapshot = new ConcurrentHashMap<>();
-
+  private final EntityEntry entityEntry = new JdbcEntityEntry();
   @Override
   public Optional<Object> getEntity(Long id, Class<?> clazz) {
     return Optional.ofNullable(entityCache.get(new EntityKey(clazz, id)));
@@ -35,6 +37,20 @@ public class JdbcPersistenceContext implements PersistenceContext {
   public <T> boolean isSameWithSnapshot(Long id, T entity) {
     Object snapshot = entitySnapshot.get(new EntityKey(entity.getClass(), id));
     return entity.equals(snapshot);
+  }
+
+  public <T> boolean isSameWithSnapshot(EntityKey entityKey, T entity) {
+    Object snapshot = entitySnapshot.get(entityKey);
+    return entity.equals(snapshot);
+  }
+
+  @Override
+  public List<Object> dirtyCheckedEntities() {
+    return entityCache.entrySet()
+        .stream()
+        .filter(entry -> !isSameWithSnapshot(entry.getKey(), entry.getValue()))
+        .map(entry -> entry.getValue())
+        .collect(Collectors.toList());
   }
 
 }

@@ -15,10 +15,11 @@ public class CustomJpaRepositoryTest extends BuilderTest {
   @Test
   @DisplayName("entity를 저장합니다.")
   void saveEntity(){
-    customJpaRepository = new CustomJpaRepository<>(new JdbcEntityManager(connection, persistenceContext));
+    customJpaRepository = new CustomJpaRepository<>(new JdbcEntityManager(connection, persistenceContext,
+        entityEntry));
     PersonFixtureStep3 person = customJpaRepository.save(PersonInstances.세번째사람);
 
-    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId());
+    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId()).get();
 
     assertThat(personFound.getId()).isEqualTo(person.getId());
     assertThat(personFound.getName()).isEqualTo(person.getName());
@@ -27,14 +28,15 @@ public class CustomJpaRepositoryTest extends BuilderTest {
   @Test
   @DisplayName("영속화된 entity를 변경감지로 수정된 entity로 persist 합니다.")
   void persistUpdatedEntity(){
-    customJpaRepository = new CustomJpaRepository<>(new JdbcEntityManager(connection, persistenceContext));
+    customJpaRepository = new CustomJpaRepository<>(new JdbcEntityManager(connection, persistenceContext,
+        entityEntry));
     PersonFixtureStep3 person = customJpaRepository.save(PersonInstances.세번째사람);
 
     customJpaRepository.save(person);
     person.setName("사이먼팍");
     customJpaRepository.save(person);
 
-    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId());
+    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId()).get();
     assertThat(personFound.getId()).isEqualTo(person.getId());
     assertThat(personFound.getName()).isEqualTo(person.getName());
   }
