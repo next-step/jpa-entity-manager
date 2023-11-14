@@ -100,6 +100,7 @@ public class EntityManagerImpl implements EntityManager {
         DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
         setFieldValueUseCase.execute(entity, databaseField, id);
         persistenceContext.addEntity(id, entity);
+        persistenceContext.addDatabaseSnapshot(id, entity);
         return entity;
     }
 }
