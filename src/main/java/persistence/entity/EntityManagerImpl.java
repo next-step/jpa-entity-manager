@@ -13,7 +13,6 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
     private final GetFieldValueUseCase getFieldValueUseCase;
-
     private final SetFieldValueUseCase setFieldValueUseCase;
 
 
