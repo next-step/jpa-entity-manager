@@ -36,6 +36,7 @@ public class PersistenceContextImpl<T> implements PersistenceContext<T> {
         DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
         Long id = (Long) getFieldValueUseCase.execute(entity, databaseField);
         cache.remove(id);
+        snapShot.remove(id);
     }
 
     @Override
