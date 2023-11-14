@@ -36,7 +36,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Long Id) {
         T entity = entityLoader.find(clazz, Id);
-        if(entity != null) {
+        if (entity != null) {
             PersistenceContext<T> persistenceContext = getPersistenceContext(clazz);
             persistenceContext.addEntity(Id, entity);
         }
@@ -46,27 +46,17 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T persist(T entity) {
         Object idValue = getFieldValueUseCase.execute(entity, getIdDatabaseFieldUseCase.execute(entity.getClass()));
-        PersistenceContext<T> persistenceContext = getPersistenceContext((Class<T>) entity.getClass());
-        // id가 있는 경우
-        if (idValue != null) {
-            T findEntity = (T) find(entity.getClass(), (Long) idValue);
-            if(findEntity == null) { // 키를 가지고 넣어주는 경우
-                entityPersister.insert(entity);
-                persistenceContext.addEntity((Long) idValue, entity);
-                return entity;
-            } else { // 이미 존재하는 데이터
-                entityPersister.update(entity);
-                persistenceContext.addEntity((Long) idValue, entity);
-                return findEntity;
-            }
+        if (idValue == null) {
+            return insertIfNotExist(entity);
         }
-        // id가 없는 경우
-        Long id = entityPersister.insert(entity);
-        DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
-        setFieldValueUseCase.execute(entity, databaseField, id);
-        persistenceContext.addEntity(id, entity);
-        return entity;
+        T findEntity = (T) find(entity.getClass(), (Long) idValue);
+        if (findEntity == null) {
+            return insertIfNotExist(entity);
+        } else {
+            return updatetIfAlreadyExist(entity, (Long) idValue);
+        }
     }
+
 
     @Override
     public <T> void remove(T entity) {
@@ -77,11 +67,27 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private <T> PersistenceContext<T> getPersistenceContext(Class<T> cls) {
-        if(persistenceContextMap.containsKey(cls)) {
+        if (persistenceContextMap.containsKey(cls)) {
             return (PersistenceContext<T>) persistenceContextMap.get(cls);
         }
         PersistenceContext<T> newContext = new PersistenceContextImpl<T>(getIdDatabaseFieldUseCase, getFieldValueUseCase);
         persistenceContextMap.put(cls, newContext);
         return newContext;
+    }
+
+    private <T> T updatetIfAlreadyExist(T entity, Long idValue) {
+        entityPersister.update(entity);
+        PersistenceContext<T> persistenceContext = getPersistenceContext((Class<T>) entity.getClass());
+        persistenceContext.addEntity(idValue, entity);
+        return entity;
+    }
+
+    private <T> T insertIfNotExist(T entity) {
+        Long id = entityPersister.insert(entity);
+        PersistenceContext<T> persistenceContext = getPersistenceContext((Class<T>) entity.getClass());
+        DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
+        setFieldValueUseCase.execute(entity, databaseField, id);
+        persistenceContext.addEntity(id, entity);
+        return entity;
     }
 }
