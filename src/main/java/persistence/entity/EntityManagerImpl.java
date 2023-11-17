@@ -46,7 +46,6 @@ public class EntityManagerImpl implements EntityManager {
         T entity = entityLoader.find(clazz, Id);
         if (entity != null) {
             persistenceContext.addEntity(Id, entity);
-            persistenceContext.addDatabaseSnapshot(Id, entity);
         }
         return entity;
     }
@@ -91,6 +90,7 @@ public class EntityManagerImpl implements EntityManager {
             return entity;
         }
         entityPersister.update(entity);
+        persistenceContext.addEntity(idValue, entity);
         return entity;
     }
 
@@ -100,7 +100,6 @@ public class EntityManagerImpl implements EntityManager {
         DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
         setFieldValueUseCase.execute(entity, databaseField, id);
         persistenceContext.addEntity(id, entity);
-        persistenceContext.addDatabaseSnapshot(id, entity);
         return entity;
     }
 }

@@ -26,8 +26,12 @@ public class PersistenceContextImpl<T> implements PersistenceContext<T> {
 
     @Override
     public void addEntity(Long id, T entity) {
+        if (id == null || entity == null) {
+            return;
+        }
         System.out.println("########### add " + entity.toString());
         cache.put(id, entity);
+        snapShot.put(id, entity);
     }
 
     @Override
@@ -42,10 +46,5 @@ public class PersistenceContextImpl<T> implements PersistenceContext<T> {
     @Override
     public T getDatabaseSnapshot(Long id) {
         return snapShot.get(id);
-    }
-
-    @Override
-    public void addDatabaseSnapshot(Long id, T entity) {
-        snapShot.put(id, entity);
     }
 }
