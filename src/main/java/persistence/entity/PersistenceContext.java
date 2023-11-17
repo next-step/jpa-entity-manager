@@ -12,4 +12,8 @@ public interface PersistenceContext {
 
     void removeEntity(Object entity);
 
+    void changeEntityStatus(Object entity, Status status);
+
+    Status getEntityStatus(Object entity);
+
 }

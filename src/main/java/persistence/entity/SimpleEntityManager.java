@@ -7,6 +7,9 @@ import persistence.sql.ddl.dialect.Dialect;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import static persistence.entity.Status.LOADING;
+import static persistence.entity.Status.SAVING;
+
 public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
@@ -35,7 +38,13 @@ public class SimpleEntityManager implements EntityManager {
         }
 
         T entity = entityLoader.findById(clazz, id);
+        if (entity == null) {
+            throw new RuntimeException("엔티티가 없습니다.");
+        }
+
+        persistenceContext.changeEntityStatus(entity, LOADING);
         persistenceContext.addEntity(id, entity);
+        // TODO 복사해서 넣는 부분
         persistenceContext.addEntitySnapshot(id, entity);
         return entity;
     }
@@ -47,7 +56,9 @@ public class SimpleEntityManager implements EntityManager {
         }
 
         T persistedEntity = entityPersister.insert(entity);
+        persistenceContext.changeEntityStatus(entity, SAVING);
         persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
+        // TODO 복사해서 넣는 부분
         persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
         return persistedEntity;
     }

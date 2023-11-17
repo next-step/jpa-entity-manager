@@ -13,12 +13,12 @@ class SimplePersistenceContextTest extends DatabaseTestBase {
     @Test
     @DisplayName("addEntity() 메서드 테스트")
     void addEntity() {
-        Person person1 = Fixtures.person1();
-        persistenceContext.addEntity(person1.getId(), person1);
+        Person person = entityManager.find(Person.class, 1L);
+        persistenceContext.addEntity(person.getId(), person);
 
-        Person persist1 = (Person) persistenceContext.getEntity(person1.getId());
+        Person persist1 = (Person) persistenceContext.getEntity(person.getId());
 
-        assertThat(persist1).usingRecursiveComparison().isEqualTo(person1);
+        assertThat(persist1).usingRecursiveComparison().isEqualTo(person);
     }
 
     @Test
@@ -31,6 +31,7 @@ class SimplePersistenceContextTest extends DatabaseTestBase {
         Person persist1 = (Person) persistenceContext.getEntity(person.getId());
 
         assertThat(persist1).isNull();
+        assertThat(persistenceContext.getEntityStatus(person)).isEqualTo(Status.DELETED);
     }
 
     @Test
@@ -44,6 +45,7 @@ class SimplePersistenceContextTest extends DatabaseTestBase {
         Person persist1 = (Person) persistenceContext.getDatabaseSnapshot(person.getId(), person);
 
         assertThat(persist1.getName()).isEqualTo(person.getName());
+        assertThat(persistenceContext.getEntityStatus(persist1)).isEqualTo(Status.MANAGED);
     }
 
 }

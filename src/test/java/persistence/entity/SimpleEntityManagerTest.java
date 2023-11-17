@@ -39,8 +39,9 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
         Person person = entityManager.find(Person.class, 1L);
         entityManager.remove(person);
 
-        Person removedPerson = entityManager.find(Person.class, 1L);
-        assertThat(removedPerson).isNull();
+        assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("엔티티가 없습니다.");
     }
 
     @Test
@@ -62,6 +63,7 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
         Person mergedPerson = entityManager.merge(person);
 
         assertThat(person.getName()).isEqualTo(mergedPerson.getName());
+        assertThat(persistenceContext.getEntityStatus(person)).isEqualTo(Status.MANAGED);
     }
 
     @Test
@@ -72,6 +74,7 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
         Person mergedPerson = entityManager.merge(person);
 
         assertThat(person.getName()).isEqualTo(mergedPerson.getName());
+        assertThat(persistenceContext.getEntityStatus(person)).isEqualTo(Status.MANAGED);
     }
 
     @Test
