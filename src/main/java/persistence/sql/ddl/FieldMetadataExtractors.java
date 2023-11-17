@@ -100,4 +100,11 @@ public class FieldMetadataExtractors {
                 .filter(String::isEmpty)
                 .collect(Collectors.joining(", "));
     }
+
+    public boolean hasDifferentValue(Object entity, Object snapshot) {
+        return fieldMetadataExtractorList.stream()
+                .anyMatch(fieldMetadataExtractor -> {
+                    return fieldMetadataExtractor.hasDifferentValue(entity, snapshot);
+                });
+    }
 }

@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Test;
 import persistence.DatabaseTestBase;
 import persistence.Fixtures;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -68,6 +72,30 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
         Person mergedPerson = entityManager.merge(person);
 
         assertThat(person.getName()).isEqualTo(mergedPerson.getName());
+    }
+
+    @Test
+    @DisplayName("getIdValue() 메서드 테스트")
+    void getIdValue() throws NoSuchMethodException, NoSuchFieldException {
+        Person person = entityManager.find(Person.class, 1L);
+        String methodName = "getIdValue";
+        Class<?>[] parameterTypes = {Object.class, Field.class};
+        Method method = SimpleEntityManager.class.getDeclaredMethod(methodName, parameterTypes);
+        method.setAccessible(true);
+        Field field = Person.class.getDeclaredField("id");
+        field.setAccessible(false);
+        SimpleEntityManager simpleEntityManager = new SimpleEntityManager(null, null, null, null);
+
+        try {
+            method.invoke(simpleEntityManager, person, field);
+        } catch (InvocationTargetException e) {
+            Throwable actualException = e.getTargetException();
+            assertThat(actualException instanceof RuntimeException).isEqualTo(true);
+            assertThat("Field 값을 읽어오는데 실패했습니다.").isEqualTo(actualException.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private class TestPerson {

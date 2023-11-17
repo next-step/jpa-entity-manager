@@ -17,6 +17,10 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public Object getDatabaseSnapshot(Long id, Object entity) {
+        if (entitySnapshots.containsKey(String.valueOf(id))) {
+            return entitySnapshots.get(String.valueOf(id));
+        }
+
         entitySnapshots.put(String.valueOf(id), entity);
         return entitySnapshots.get(String.valueOf(id));
     }

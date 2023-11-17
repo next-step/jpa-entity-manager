@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.Id;
+import persistence.sql.ddl.EntityMetadata;
 import persistence.sql.ddl.dialect.Dialect;
 
 import java.lang.reflect.Field;
@@ -41,6 +42,10 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
+        if (hasIdValue(entity)) {
+            return merge(entity);
+        }
+
         T persistedEntity = entityPersister.insert(entity);
         persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
         persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
@@ -54,8 +59,10 @@ public class SimpleEntityManager implements EntityManager {
                 entity
         );
 
-        entityPersister.update(entity, snapshot);
-        persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(entity)), entity);
+        if (isDirty(entity)) {
+            entityPersister.update(entity, snapshot);
+            persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(entity)), entity);
+        }
 
         return entity;
     }
@@ -67,27 +74,51 @@ public class SimpleEntityManager implements EntityManager {
         entityPersister.remove(entity, findEntityId(entity));
     }
 
+    private <T> boolean isDirty(T entity) {
+        Object snapshot = persistenceContext.getDatabaseSnapshot(
+                Long.valueOf(findEntityId(entity)),
+                entity
+        );
+        EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass());
+
+        return entityMetadata.hasDifferentValue(entity, snapshot);
+    }
+
+    private <T> boolean hasIdValue(T entity) {
+        Object id = extractId(entity);
+        return id != null;
+    }
+
     private <T> String findEntityId(T entity) {
+        Object idValue = extractId(entity);
+
+        if (idValue == null) {
+            throw new RuntimeException("ID 값이 없습니다.");
+        }
+
+        return String.valueOf(idValue);
+    }
+
+    private <T> Object extractId(T entity) {
         Field field = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("ID 필드가 없습니다."));
         field.setAccessible(true);
 
-        Object value = null;
+        return getIdValue(entity, field);
+    }
 
-        // TODO 이런 부분도 테스트를 만들고 싶은데
+    private <T> Object getIdValue(T entity, Field field) {
+        Object idValue;
+
         try {
-            value = field.get(entity);
+            idValue = field.get(entity);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Field 값을 읽어오는데 실패했습니다.");
         }
 
-        if (value == null) {
-            throw new RuntimeException("ID 값이 없습니다.");
-        }
-
-        return String.valueOf(value);
+        return idValue;
     }
 
 }
