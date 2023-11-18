@@ -4,7 +4,6 @@ package persistence.entity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTestBase;
-import persistence.Fixtures;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

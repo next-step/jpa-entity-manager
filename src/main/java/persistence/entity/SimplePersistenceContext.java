@@ -47,6 +47,7 @@ public class SimplePersistenceContext implements PersistenceContext {
     public void removeEntity(Object entity) {
         String id = EntityMetadata.of(entity.getClass()).getIdColumnValue(entity);
         entities.remove(id);
+        entitySnapshots.remove(id);
         entityEntries.addOrChange(entity, DELETED);
         // EntityEntries에서도 삭제해야 할까?
     }

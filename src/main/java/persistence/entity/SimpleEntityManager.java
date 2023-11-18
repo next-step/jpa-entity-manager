@@ -3,6 +3,7 @@ package persistence.entity;
 import jakarta.persistence.Id;
 import persistence.sql.ddl.EntityMetadata;
 import persistence.sql.ddl.dialect.Dialect;
+import utils.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -44,8 +45,8 @@ public class SimpleEntityManager implements EntityManager {
 
         persistenceContext.changeEntityStatus(entity, LOADING);
         persistenceContext.addEntity(id, entity);
-        // TODO 복사해서 넣는 부분
-        persistenceContext.addEntitySnapshot(id, entity);
+        persistenceContext.addEntitySnapshot(id, ReflectionUtils.copy(entity));
+
         return entity;
     }
 
@@ -58,8 +59,11 @@ public class SimpleEntityManager implements EntityManager {
         T persistedEntity = entityPersister.insert(entity);
         persistenceContext.changeEntityStatus(entity, SAVING);
         persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
-        // TODO 복사해서 넣는 부분
-        persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
+        persistenceContext.addEntitySnapshot(
+                Long.parseLong(findEntityId(persistedEntity)),
+                ReflectionUtils.copy(persistedEntity)
+        );
+
         return persistedEntity;
     }
 
@@ -72,7 +76,10 @@ public class SimpleEntityManager implements EntityManager {
 
         if (isDirty(entity)) {
             entityPersister.update(entity, snapshot);
-            persistenceContext.addEntitySnapshot(Long.parseLong(findEntityId(entity)), entity);
+            persistenceContext.addEntitySnapshot(
+                    Long.parseLong(findEntityId(entity)),
+                    ReflectionUtils.copy(entity)
+            );
         }
 
         return entity;
