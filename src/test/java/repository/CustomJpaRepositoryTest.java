@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
@@ -60,6 +61,7 @@ class CustomJpaRepositoryTest {
         server.stop();
     }
 
+    @DisplayName("save 후 나오는 person 은 기존 객체와 같은 값을 갖는다.")
     @Test
     void test_insert() {
         Person person = new Person("tongnamuu", 12, "tongnamuu@naver.com");
@@ -71,6 +73,7 @@ class CustomJpaRepositoryTest {
         );
     }
 
+    @DisplayName("update 후에는 update 된 값이 조회된다.")
     @Test
     void test_update() {
         Person person = new Person("tongnamuu", 12, "tongnamuu@naver.com");
