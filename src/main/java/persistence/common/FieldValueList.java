@@ -37,4 +37,9 @@ public class FieldValueList {
         return this.fieldValueList.stream().filter(fieldValue -> fieldValue.isId())
                 .collect(Collectors.toList());
     }
+
+    public List<FieldValue> getAttributeFVList() {
+        return this.fieldValueList.stream().filter(fieldValue -> !fieldValue.isId())
+                .collect(Collectors.toList());
+    }
 }

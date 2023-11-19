@@ -24,4 +24,8 @@ public class EntityMetadata {
     public EntityClazz getEntityClazz() {
         return this.entityClazz;
     }
+
+    public List<FieldValue> getAttributeFVList() {
+        return fieldValueList.getAttributeFVList();
+    }
 }
