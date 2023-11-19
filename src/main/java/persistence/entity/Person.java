@@ -62,4 +62,8 @@ public class Person {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
 }

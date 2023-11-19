@@ -4,6 +4,7 @@ import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
+import persistence.sql.usecase.CreateSnapShotObject;
 import persistence.sql.usecase.GetFieldValueUseCase;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 import persistence.sql.usecase.SetFieldValueUseCase;
@@ -19,18 +20,21 @@ public class EntityManagerImpl implements EntityManager {
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
     private final GetFieldValueUseCase getFieldValueUseCase;
     private final SetFieldValueUseCase setFieldValueUseCase;
+    private final CreateSnapShotObject createSnapShotObject;
     private final Map<Class<?>, PersistenceContext<?>> persistenceContextMap = new ConcurrentHashMap<>();
 
 
     public EntityManagerImpl(EntityLoader entityLoader, EntityPersister entityPersister,
                              GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase,
                              GetFieldValueUseCase getFieldValueUseCase,
-                             SetFieldValueUseCase setFieldValueUseCase) {
+                             SetFieldValueUseCase setFieldValueUseCase,
+                             CreateSnapShotObject createSnapShotObject) {
         this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
         this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
         this.getFieldValueUseCase = getFieldValueUseCase;
         this.setFieldValueUseCase = setFieldValueUseCase;
+        this.createSnapShotObject = createSnapShotObject;
     }
 
     @Override
@@ -74,11 +78,21 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.removeEntity(entity);
     }
 
+    @Override
+    public void clear() {
+        persistenceContextMap.forEach(
+            (key, value) -> {
+                value.clear();
+            }
+        );
+        persistenceContextMap.clear();
+    }
+
     private <T> PersistenceContext<T> getPersistenceContext(Class<T> cls) {
         if (persistenceContextMap.containsKey(cls)) {
             return (PersistenceContext<T>) persistenceContextMap.get(cls);
         }
-        PersistenceContext<T> newContext = new PersistenceContextImpl<T>(getIdDatabaseFieldUseCase, getFieldValueUseCase);
+        PersistenceContext<T> newContext = new PersistenceContextImpl<T>(getIdDatabaseFieldUseCase, getFieldValueUseCase, createSnapShotObject);
         persistenceContextMap.put(cls, newContext);
         return newContext;
     }

@@ -9,4 +9,6 @@ public interface PersistenceContext<T> {
     void removeEntity(T entity);
 
     T getDatabaseSnapshot(Long id);
+
+    void clear();
 }

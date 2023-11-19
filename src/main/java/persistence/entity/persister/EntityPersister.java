@@ -1,8 +1,10 @@
 package persistence.entity.persister;
 
 import jdbc.JdbcTemplate;
+import lombok.extern.slf4j.Slf4j;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
 
+@Slf4j
 public class EntityPersister {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler;
     private final JdbcTemplate jdbcTemplate;
@@ -14,15 +16,18 @@ public class EntityPersister {
     }
 
     public boolean update(Object object) {
-        jdbcTemplate.execute(dataManipulationLanguageAssembler.generateUpdate(object));
+        String sql = dataManipulationLanguageAssembler.generateUpdate(object);
+        jdbcTemplate.execute(sql);
         return true;
     }
 
     public Long insert(Object object) {
-        return jdbcTemplate.insertSingle(dataManipulationLanguageAssembler.generateInsert(object));
+        String sql = dataManipulationLanguageAssembler.generateInsert(object);
+        return jdbcTemplate.insertSingle(sql);
     }
 
     public void delete(Object object) {
-        jdbcTemplate.execute(dataManipulationLanguageAssembler.generateDeleteWithWhere(object));
+        String sql = dataManipulationLanguageAssembler.generateDeleteWithWhere(object);
+        jdbcTemplate.execute(sql);
     }
 }

@@ -16,6 +16,7 @@ import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
+import persistence.sql.usecase.CreateSnapShotObject;
 import persistence.sql.usecase.GetFieldFromClassUseCase;
 import persistence.sql.usecase.GetFieldValueUseCase;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
@@ -39,7 +40,12 @@ class EntityManagerTest {
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityLoader = new EntityLoader(new GetFieldFromClassUseCase(), new SetFieldValueUseCase(), jdbcTemplate, dataManipulationLanguageAssembler);
         entityManager = new EntityManagerImpl(entityLoader,
-            entityPersister, new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()), new GetFieldValueUseCase(), new SetFieldValueUseCase());
+            entityPersister,
+            new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()),
+            new GetFieldValueUseCase(),
+            new SetFieldValueUseCase(),
+            new CreateSnapShotObject(new GetFieldFromClassUseCase(), new GetFieldValueUseCase(), new SetFieldValueUseCase())
+        );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
     }
 
