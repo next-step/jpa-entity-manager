@@ -5,6 +5,7 @@ import persistence.annotations.Transient;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FieldValueList {
     private final List<FieldValue> fieldValueList;
@@ -30,5 +31,10 @@ public class FieldValueList {
 
     public List<FieldValue> getFieldValueList() {
         return fieldValueList;
+    }
+
+    public List<FieldValue> getIdFVList() {
+        return this.fieldValueList.stream().filter(fieldValue -> fieldValue.isId())
+                .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import entity.Person;
+import fixture.PersonFixture;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -12,7 +13,7 @@ class DeleteQueryBuilderTest {
     @Test
     public void deleteById() {
         //when
-        String deleteById = new DeleteQueryBuilder().deleteById(Person.class, Arrays.asList(1));
+        String deleteById = DeleteQueryBuilder.getQuery(PersonFixture.changgunyee());
 
         //then
         assertThat(deleteById)

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class InsertQueryBuilder {
 
-    public String getQuery(Object obj) {
+    public static String getQuery(Object obj) {
         Class<?> clazz = obj.getClass();
         EntityClazz entityClazz = new EntityClazz(clazz);
         String insertQuery = "INSERT INTO " + entityClazz.getName() + " ";
@@ -21,7 +21,7 @@ public class InsertQueryBuilder {
         return insertQuery;
     }
 
-    private String getValueClause(List<FieldValue> fieldValueList) {
+    private static String getValueClause(List<FieldValue> fieldValueList) {
         String values = fieldValueList.stream()
                 .map(fv -> {
                     if (fv.getClazz().equals(String.class)) {
@@ -34,7 +34,7 @@ public class InsertQueryBuilder {
         return "values (" + values + ") ";
     }
 
-    private String getColumnClause(List<FieldValue> fieldValueList) {
+    private static String getColumnClause(List<FieldValue> fieldValueList) {
         String fieldNames = fieldValueList.stream()
                 .map(fv -> fv.getFieldName())
                 .collect(Collectors.joining(","));

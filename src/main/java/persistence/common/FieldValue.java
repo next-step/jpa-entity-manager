@@ -23,4 +23,7 @@ public class FieldValue {
         return this.fieldClazz.getClazz();
     }
 
+    public boolean isId() {
+        return fieldClazz.isId();
+    }
 }
