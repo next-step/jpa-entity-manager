@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.Objects;
 import lombok.ToString;
 
 @ToString
@@ -65,5 +66,23 @@ public class Person {
 
     public void updateEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        Person person = (Person) object;
+        return Objects.equals(id, person.id) && Objects.equals(name, person.name) && Objects.equals(age, person.age) && Objects.equals(email, person.email)
+            && Objects.equals(index, person.index);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, age, email, index);
     }
 }
