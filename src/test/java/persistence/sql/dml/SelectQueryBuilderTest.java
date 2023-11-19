@@ -32,6 +32,6 @@ class SelectQueryBuilderTest {
 
         //then
         assertThat(findById)
-                .isEqualTo("SELECT * FROM users WHERE id=1");
+                .isEqualTo("SELECT * FROM users WHERE id=1;");
     }
 }

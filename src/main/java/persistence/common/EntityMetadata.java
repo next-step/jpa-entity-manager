@@ -20,4 +20,8 @@ public class EntityMetadata {
     public List<FieldValue> getIdFVList() {
         return fieldValueList.getIdFVList();
     }
+
+    public EntityClazz getEntityClazz() {
+        return this.entityClazz;
+    }
 }

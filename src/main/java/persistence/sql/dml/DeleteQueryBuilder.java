@@ -1,5 +1,7 @@
 package persistence.sql.dml;
 
+import persistence.clause.FromClause;
+import persistence.clause.WhereClause;
 import persistence.common.EntityClazz;
 import persistence.common.EntityMetadata;
 import persistence.common.FieldClazzList;
@@ -11,17 +13,13 @@ public class DeleteQueryBuilder {
 
     public static String getQuery(Object entity) {
         EntityMetadata entityMetadata = new EntityMetadata(entity);
-        String tableName = entityMetadata.getTableName();
 
         StringBuilder sb = new StringBuilder()
-                .append("DELETE FROM ")
-                .append(tableName + " ")
-                .append("WHERE ");
+                .append("DELETE")
+                .append(FromClause.getQuery(entityMetadata.getEntityClazz()));
 
-        entityMetadata.getIdFVList()
-                .forEach(fieldValue -> sb.append(fieldValue.getFieldName())
-                        .append("=")
-                        .append(fieldValue.getValue()));
+        String whereClause = WhereClause.getQuery(entityMetadata.getIdFVList());
+        sb.append(whereClause);
 
         return sb.append(";").toString();
     }

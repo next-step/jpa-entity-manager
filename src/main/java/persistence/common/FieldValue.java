@@ -11,6 +11,11 @@ public class FieldValue {
         this.value = value;
     }
 
+    public FieldValue(FieldClazz fieldClazz, String value) {
+        this.fieldClazz = fieldClazz;
+        this.value = value;
+    }
+
     public String getFieldName() {
         return fieldClazz.getName();
     }
