@@ -1,27 +1,27 @@
 package persistence.sql.ddl;
 
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.GetTableNameFromClassUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.GetTableNameFromClass;
 
 public class DataDefinitionLanguageGenerator {
-    private final GetTableNameFromClassUseCase getTableNameFromClassUseCase;
-    private final GetFieldFromClassUseCase getFieldFromClass;
+    private final GetTableNameFromClass getTableNameFromClass;
+    private final GetFieldFromClass getFieldFromClass;
 
 
-    public DataDefinitionLanguageGenerator(GetTableNameFromClassUseCase getTableNameFromClassUseCase,
-                                           GetFieldFromClassUseCase getFieldFromClass) {
-        this.getTableNameFromClassUseCase = getTableNameFromClassUseCase;
+    public DataDefinitionLanguageGenerator(GetTableNameFromClass getTableNameFromClass,
+                                           GetFieldFromClass getFieldFromClass) {
+        this.getTableNameFromClass = getTableNameFromClass;
         this.getFieldFromClass = getFieldFromClass;
     }
 
     public TableCreator generateTableCreatorWithClass(Class<?> dbClass) {
         return TableCreator.builder()
-                           .tableName(getTableNameFromClassUseCase.execute(dbClass))
+                           .tableName(getTableNameFromClass.execute(dbClass))
                            .fields(getFieldFromClass.execute(dbClass))
                            .build();
     }
 
     public TableRemover generateTableRemoverWithClass(Class<?> dbClass) {
-        return TableRemover.builder().tableName(getTableNameFromClassUseCase.execute(dbClass)).build();
+        return TableRemover.builder().tableName(getTableNameFromClass.execute(dbClass)).build();
     }
 }

@@ -5,9 +5,9 @@ import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.usecase.CreateSnapShotObject;
-import persistence.sql.usecase.GetFieldValueUseCase;
+import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
-import persistence.sql.usecase.SetFieldValueUseCase;
+import persistence.sql.usecase.SetFieldValue;
 import persistence.sql.vo.DatabaseField;
 
 import java.util.Map;
@@ -18,22 +18,22 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
-    private final GetFieldValueUseCase getFieldValueUseCase;
-    private final SetFieldValueUseCase setFieldValueUseCase;
+    private final GetFieldValue getFieldValue;
+    private final SetFieldValue setFieldValue;
     private final CreateSnapShotObject createSnapShotObject;
     private final Map<Class<?>, PersistenceContext<?>> persistenceContextMap = new ConcurrentHashMap<>();
 
 
     public EntityManagerImpl(EntityLoader entityLoader, EntityPersister entityPersister,
                              GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase,
-                             GetFieldValueUseCase getFieldValueUseCase,
-                             SetFieldValueUseCase setFieldValueUseCase,
+                             GetFieldValue getFieldValue,
+                             SetFieldValue setFieldValue,
                              CreateSnapShotObject createSnapShotObject) {
         this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
         this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
-        this.getFieldValueUseCase = getFieldValueUseCase;
-        this.setFieldValueUseCase = setFieldValueUseCase;
+        this.getFieldValue = getFieldValue;
+        this.setFieldValue = setFieldValue;
         this.createSnapShotObject = createSnapShotObject;
     }
 
@@ -56,7 +56,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
-        Object idValue = getFieldValueUseCase.execute(entity, getIdDatabaseFieldUseCase.execute(entity.getClass()));
+        Object idValue = getFieldValue.execute(entity, getIdDatabaseFieldUseCase.execute(entity.getClass()));
         if (idValue == null) {
             return insertIfNotExist(entity);
         }
@@ -92,7 +92,7 @@ public class EntityManagerImpl implements EntityManager {
         if (persistenceContextMap.containsKey(cls)) {
             return (PersistenceContext<T>) persistenceContextMap.get(cls);
         }
-        PersistenceContext<T> newContext = new PersistenceContextImpl<T>(getIdDatabaseFieldUseCase, getFieldValueUseCase, createSnapShotObject);
+        PersistenceContext<T> newContext = new PersistenceContextImpl<T>(getIdDatabaseFieldUseCase, getFieldValue, createSnapShotObject);
         persistenceContextMap.put(cls, newContext);
         return newContext;
     }
@@ -112,7 +112,7 @@ public class EntityManagerImpl implements EntityManager {
         Long id = entityPersister.insert(entity);
         PersistenceContext<T> persistenceContext = getPersistenceContext((Class<T>) entity.getClass());
         DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
-        setFieldValueUseCase.execute(entity, databaseField, id);
+        setFieldValue.execute(entity, databaseField, id);
         persistenceContext.addEntity(id, entity);
         return entity;
     }

@@ -4,23 +4,23 @@ import java.lang.reflect.InvocationTargetException;
 import persistence.sql.vo.DatabaseFields;
 
 public class CreateSnapShotObject {
-    private final GetFieldFromClassUseCase getFieldFromClassUseCase;
-    private final GetFieldValueUseCase getFieldValueUseCase;
-    private final SetFieldValueUseCase setFieldValueUseCase;
+    private final GetFieldFromClass getFieldFromClass;
+    private final GetFieldValue getFieldValue;
+    private final SetFieldValue setFieldValue;
 
-    public CreateSnapShotObject(GetFieldFromClassUseCase getFieldFromClassUseCase, GetFieldValueUseCase getFieldValueUseCase, SetFieldValueUseCase setFieldValueUseCase) {
-        this.getFieldFromClassUseCase = getFieldFromClassUseCase;
-        this.getFieldValueUseCase = getFieldValueUseCase;
-        this.setFieldValueUseCase = setFieldValueUseCase;
+    public CreateSnapShotObject(GetFieldFromClass getFieldFromClass, GetFieldValue getFieldValue, SetFieldValue setFieldValue) {
+        this.getFieldFromClass = getFieldFromClass;
+        this.getFieldValue = getFieldValue;
+        this.setFieldValue = setFieldValue;
     }
 
     public Object execute(Object object) {
         Object newInstance = createInstance(object.getClass());
-        DatabaseFields databaseFields = getFieldFromClassUseCase.execute(object.getClass());
+        DatabaseFields databaseFields = getFieldFromClass.execute(object.getClass());
         databaseFields.getDatabaseFields().forEach(
             field -> {
-                Object value = getFieldValueUseCase.execute(object, field);
-                setFieldValueUseCase.execute(newInstance, field, value);
+                Object value = getFieldValue.execute(object, field);
+                setFieldValue.execute(newInstance, field, value);
             }
         );
         return newInstance;

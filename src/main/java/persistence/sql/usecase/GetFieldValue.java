@@ -3,7 +3,7 @@ package persistence.sql.usecase;
 import java.lang.reflect.Field;
 import persistence.sql.vo.DatabaseField;
 
-public class GetFieldValueUseCase {
+public class GetFieldValue {
 
     public Object execute(Object object, DatabaseField databaseField) {
         if(object == null) {

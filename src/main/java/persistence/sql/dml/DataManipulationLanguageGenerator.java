@@ -7,43 +7,43 @@ import persistence.sql.dml.select.SelectQuery;
 import persistence.sql.dml.update.UpdateQuery;
 import persistence.sql.dml.where.ConditionType;
 import persistence.sql.dml.where.WhereQuery;
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.GetFieldValueUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
-import persistence.sql.usecase.GetTableNameFromClassUseCase;
+import persistence.sql.usecase.GetTableNameFromClass;
 import persistence.sql.vo.DatabaseField;
 import persistence.sql.vo.DatabaseFields;
 import persistence.sql.vo.TableName;
 
 public class DataManipulationLanguageGenerator {
-    private final GetTableNameFromClassUseCase getTableNameFromClassUseCase;
-    private final GetFieldFromClassUseCase getFieldFromClassUseCase;
-    private final GetFieldValueUseCase getFieldValueUseCase;
+    private final GetTableNameFromClass getTableNameFromClass;
+    private final GetFieldFromClass getFieldFromClass;
+    private final GetFieldValue getFieldValue;
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
 
-    public DataManipulationLanguageGenerator(GetTableNameFromClassUseCase getTableNameFromClassUseCase, GetFieldFromClassUseCase getFieldFromClassUseCase, GetFieldValueUseCase getFieldValueUseCase,
+    public DataManipulationLanguageGenerator(GetTableNameFromClass getTableNameFromClass, GetFieldFromClass getFieldFromClass, GetFieldValue getFieldValue,
                                              GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase) {
-        this.getTableNameFromClassUseCase = getTableNameFromClassUseCase;
-        this.getFieldFromClassUseCase = getFieldFromClassUseCase;
-        this.getFieldValueUseCase = getFieldValueUseCase;
+        this.getTableNameFromClass = getTableNameFromClass;
+        this.getFieldFromClass = getFieldFromClass;
+        this.getFieldValue = getFieldValue;
         this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
     }
 
     public InsertQuery buildInsertQuery(Object object) {
-        TableName tableName = getTableNameFromClassUseCase.execute(object.getClass());
-        DatabaseFields databaseFields = getFieldFromClassUseCase.execute(object.getClass());
+        TableName tableName = getTableNameFromClass.execute(object.getClass());
+        DatabaseFields databaseFields = getFieldFromClass.execute(object.getClass());
         InsertQuery insertQuery = new InsertQuery(tableName);
         for (DatabaseField databaseField : databaseFields.getDatabaseFields()) {
             if (databaseField.isPrimary() && databaseField.getPrimaryKeyGenerationType() == GenerationType.IDENTITY) {
                 continue;
             }
-            insertQuery.addFieldValue(new ColumnClause(databaseField.getDatabaseFieldName()), new ValueClause(getFieldValueUseCase.execute(object, databaseField), databaseField.getDatabaseType()));
+            insertQuery.addFieldValue(new ColumnClause(databaseField.getDatabaseFieldName()), new ValueClause(getFieldValue.execute(object, databaseField), databaseField.getDatabaseType()));
         }
         return insertQuery;
     }
 
     public SelectQuery buildSelectQuery(Class<?> cls) {
-        TableName tableName = getTableNameFromClassUseCase.execute(cls);
+        TableName tableName = getTableNameFromClass.execute(cls);
         return new SelectQuery(tableName);
     }
 
@@ -57,7 +57,7 @@ public class DataManipulationLanguageGenerator {
     public WhereQuery buildWhereQuery(Object object) {
         WhereQuery whereQuery = new WhereQuery();
         DatabaseField field = getIdDatabaseFieldUseCase.execute(object.getClass());
-        Object value = getFieldValueUseCase.execute(object, field);
+        Object value = getFieldValue.execute(object, field);
         if (value == null) {
             throw new NullPointerException("Id should not be null in whereClause");
         }
@@ -66,18 +66,18 @@ public class DataManipulationLanguageGenerator {
     }
 
     public DeleteQuery buildDeleteQuery(Class<?> cls) {
-        TableName tableName = getTableNameFromClassUseCase.execute(cls);
+        TableName tableName = getTableNameFromClass.execute(cls);
         return new DeleteQuery(tableName);
     }
 
     public UpdateQuery buildUpdateQuery(Object object) {
-        TableName tableName = getTableNameFromClassUseCase.execute(object.getClass());
-        DatabaseFields databaseFields = getFieldFromClassUseCase.execute(object.getClass());
+        TableName tableName = getTableNameFromClass.execute(object.getClass());
+        DatabaseFields databaseFields = getFieldFromClass.execute(object.getClass());
         UpdateQuery updateQuery = new UpdateQuery(tableName, buildWhereQuery(object));
         for (DatabaseField databaseField : databaseFields.getDatabaseFields()) {
             if (!databaseField.isPrimary()) {
                 updateQuery.addFieldValue(new ColumnClause(databaseField.getDatabaseFieldName()),
-                    new ValueClause(getFieldValueUseCase.execute(object, databaseField), databaseField.getDatabaseType()));
+                    new ValueClause(getFieldValue.execute(object, databaseField), databaseField.getDatabaseType()));
             }
         }
         return updateQuery;

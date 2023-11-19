@@ -15,8 +15,8 @@ import persistence.TestUtils;
 import persistence.entity.Person;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.SetFieldValueUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.SetFieldValue;
 
 class EntityLoaderTest {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler = TestUtils.createDataManipulationLanguageAssembler();
@@ -32,8 +32,8 @@ class EntityLoaderTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
         entityLoader = new EntityLoader(
-            new GetFieldFromClassUseCase(),
-            new SetFieldValueUseCase(),
+            new GetFieldFromClass(),
+            new SetFieldValue(),
             jdbcTemplate,
             dataManipulationLanguageAssembler
         );

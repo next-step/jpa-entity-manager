@@ -4,8 +4,8 @@ import java.util.Collections;
 import jdbc.JdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.SetFieldValueUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.SetFieldValue;
 import persistence.sql.vo.DatabaseField;
 import persistence.sql.vo.DatabaseFields;
 import persistence.sql.vo.type.BigInt;
@@ -21,15 +21,15 @@ import java.util.List;
 
 @Slf4j
 public class EntityLoader {
-    private final GetFieldFromClassUseCase getFieldFromClassUseCase;
-    private final SetFieldValueUseCase setFieldValueUseCase;
+    private final GetFieldFromClass getFieldFromClass;
+    private final SetFieldValue setFieldValue;
     private final JdbcTemplate jdbcTemplate;
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler;
 
-    public EntityLoader(GetFieldFromClassUseCase getFieldFromClassUseCase, SetFieldValueUseCase setFieldValueUseCase, JdbcTemplate jdbcTemplate,
+    public EntityLoader(GetFieldFromClass getFieldFromClass, SetFieldValue setFieldValue, JdbcTemplate jdbcTemplate,
                         DataManipulationLanguageAssembler dataManipulationLanguageAssembler) {
-        this.getFieldFromClassUseCase = getFieldFromClassUseCase;
-        this.setFieldValueUseCase = setFieldValueUseCase;
+        this.getFieldFromClass = getFieldFromClass;
+        this.setFieldValue = setFieldValue;
         this.jdbcTemplate = jdbcTemplate;
         this.dataManipulationLanguageAssembler = dataManipulationLanguageAssembler;
     }
@@ -49,7 +49,7 @@ public class EntityLoader {
         String sql = dataManipulationLanguageAssembler.generateSelectWithWhere(cls, id);
         List<T> entityList = new ArrayList<>();
         try (ResultSet resultSet = jdbcTemplate.query(sql)) {
-            DatabaseFields databaseFields = getFieldFromClassUseCase.execute(cls);
+            DatabaseFields databaseFields = getFieldFromClass.execute(cls);
             while (resultSet.next()) {
                 T entity = createInstance(cls);
                 entityList.add(fillEntityValue(entity, resultSet, databaseFields));
@@ -72,7 +72,7 @@ public class EntityLoader {
 
     private <T> T fillEntityValue(T object, ResultSet resultSet, DatabaseFields databaseFields) {
         for (DatabaseField databaseField : databaseFields.getDatabaseFields()) {
-            setFieldValueUseCase.execute(object, databaseField, getValueFromResultSet(databaseField, resultSet));
+            setFieldValue.execute(object, databaseField, getValueFromResultSet(databaseField, resultSet));
         }
         return object;
     }

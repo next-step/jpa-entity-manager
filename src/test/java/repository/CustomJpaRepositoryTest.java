@@ -20,10 +20,10 @@ import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
 import persistence.sql.usecase.CreateSnapShotObject;
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.GetFieldValueUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
-import persistence.sql.usecase.SetFieldValueUseCase;
+import persistence.sql.usecase.SetFieldValue;
 
 class CustomJpaRepositoryTest {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler = createDataManipulationLanguageAssembler();
@@ -42,13 +42,13 @@ class CustomJpaRepositoryTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
-        entityLoader = new EntityLoader(new GetFieldFromClassUseCase(), new SetFieldValueUseCase(), jdbcTemplate, dataManipulationLanguageAssembler);
+        entityLoader = new EntityLoader(new GetFieldFromClass(), new SetFieldValue(), jdbcTemplate, dataManipulationLanguageAssembler);
         entityManager = new EntityManagerImpl(entityLoader,
             entityPersister,
-            new GetIdDatabaseFieldUseCase(new GetFieldFromClassUseCase()),
-            new GetFieldValueUseCase(),
-            new SetFieldValueUseCase(),
-            new CreateSnapShotObject(new GetFieldFromClassUseCase(), new GetFieldValueUseCase(), new SetFieldValueUseCase())
+            new GetIdDatabaseFieldUseCase(new GetFieldFromClass()),
+            new GetFieldValue(),
+            new SetFieldValue(),
+            new CreateSnapShotObject(new GetFieldFromClass(), new GetFieldValue(), new SetFieldValue())
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
         customJpaRepository = new CustomJpaRepository<>(entityManager);
