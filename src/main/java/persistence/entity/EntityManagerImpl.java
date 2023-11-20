@@ -2,6 +2,7 @@ package persistence.entity;
 
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
+import persistence.entity.context.PersistenceContextMap;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.usecase.CreateSnapShotObject;
@@ -9,9 +10,6 @@ import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 import persistence.sql.usecase.SetFieldValue;
 import persistence.sql.vo.DatabaseField;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -21,16 +19,18 @@ public class EntityManagerImpl implements EntityManager {
     private final GetFieldValue getFieldValue;
     private final SetFieldValue setFieldValue;
     private final CreateSnapShotObject createSnapShotObject;
-    private final Map<Class<?>, PersistenceContext<?>> persistenceContextMap = new ConcurrentHashMap<>();
+    private final PersistenceContextMap persistenceContextMap;
 
 
     public EntityManagerImpl(EntityLoader entityLoader, EntityPersister entityPersister,
+                             PersistenceContextMap persistenceContextMap,
                              GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase,
                              GetFieldValue getFieldValue,
                              SetFieldValue setFieldValue,
                              CreateSnapShotObject createSnapShotObject) {
         this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
+        this.persistenceContextMap = persistenceContextMap;
         this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
         this.getFieldValue = getFieldValue;
         this.setFieldValue = setFieldValue;
@@ -80,11 +80,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void clear() {
-        persistenceContextMap.forEach(
-            (key, value) -> {
-                value.clear();
-            }
-        );
         persistenceContextMap.clear();
     }
 
