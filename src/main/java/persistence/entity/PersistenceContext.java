@@ -6,7 +6,7 @@ public interface PersistenceContext {
 
     Object getDatabaseSnapshot(Long id, Object entity);
 
-    void addEntity(Long id, Object entity);
+    void addEntity(Long id, Object entity, Status status);
 
     void addEntitySnapshot(Long id, Object entity);
 

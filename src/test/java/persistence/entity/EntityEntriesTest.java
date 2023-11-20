@@ -18,11 +18,8 @@ class EntityEntriesTest extends DatabaseTestBase {
 
         entityEntries.addOrChange(person, status);
 
-        assertThat(entityEntries.getEntityEntries()).hasSize(1);
-        assertThat(entityEntries.getEntityEntries().get(Person.class))
-                .hasSize(1)
-                .containsKey("1");
-        assertThat(entityEntries.getEntityEntries().get(Person.class).get("1").getStatus()).isEqualTo(status);
+        assertThat(entityEntries.entityEntries).hasSize(1);
+        assertThat(entityEntries.entityEntries.get(person).getStatus()).isEqualTo(status);
     }
 
 }

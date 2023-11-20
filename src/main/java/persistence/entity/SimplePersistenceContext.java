@@ -32,7 +32,8 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(Long id, Object entity) {
+    public void addEntity(Long id, Object entity, Status status) {
+        entityEntries.addOrChange(entity, status);
         entities.put(String.valueOf(id), entity);
         entityEntries.addOrChange(entity, MANAGED);
     }
@@ -40,7 +41,6 @@ public class SimplePersistenceContext implements PersistenceContext {
     @Override
     public void addEntitySnapshot(Long id, Object entity) {
         entitySnapshots.put(String.valueOf(id), entity);
-        entityEntries.addOrChange(entity, MANAGED);
     }
 
     @Override

@@ -87,7 +87,7 @@ class SimpleEntityManagerTest extends DatabaseTestBase {
         method.setAccessible(true);
         Field field = Person.class.getDeclaredField("id");
         field.setAccessible(false);
-        SimpleEntityManager simpleEntityManager = new SimpleEntityManager(null, null, null, null);
+        SimpleEntityManager simpleEntityManager = new SimpleEntityManager(null, null, null);
 
         try {
             method.invoke(simpleEntityManager, person, field);

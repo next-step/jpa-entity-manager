@@ -2,7 +2,6 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import persistence.sql.ddl.EntityMetadata;
-import persistence.sql.ddl.dialect.Dialect;
 import utils.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -19,16 +18,12 @@ public class SimpleEntityManager implements EntityManager {
 
     private final PersistenceContext persistenceContext;
 
-    private final Dialect dialect;
-
     public SimpleEntityManager(EntityPersister entityPersister,
                                EntityLoader entityLoader,
-                               PersistenceContext persistenceContext,
-                               Dialect dialect) {
+                               PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
         this.persistenceContext = persistenceContext;
-        this.dialect = dialect;
     }
 
     @Override
@@ -43,8 +38,7 @@ public class SimpleEntityManager implements EntityManager {
             throw new RuntimeException("엔티티가 없습니다.");
         }
 
-        persistenceContext.changeEntityStatus(entity, LOADING);
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntity(id, entity, LOADING);
         persistenceContext.addEntitySnapshot(id, ReflectionUtils.copy(entity));
 
         return entity;
@@ -57,8 +51,7 @@ public class SimpleEntityManager implements EntityManager {
         }
 
         T persistedEntity = entityPersister.insert(entity);
-        persistenceContext.changeEntityStatus(entity, SAVING);
-        persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity);
+        persistenceContext.addEntity(Long.parseLong(findEntityId(persistedEntity)), persistedEntity, SAVING);
         persistenceContext.addEntitySnapshot(
                 Long.parseLong(findEntityId(persistedEntity)),
                 ReflectionUtils.copy(persistedEntity)
@@ -88,7 +81,6 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public <T> void remove(T entity) {
         persistenceContext.removeEntity(entity);
-        // TODO entityPersister.remove() 익셉션 테스트가 위에서 다 익셉션 먼저 발생해서 테스트하기 힘드네.
         entityPersister.remove(entity, findEntityId(entity));
     }
 
