@@ -1,10 +1,8 @@
 package persistence.entity.persister;
 
 import jdbc.JdbcTemplate;
-import lombok.extern.slf4j.Slf4j;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
 
-@Slf4j
 public class EntityPersister {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler;
     private final JdbcTemplate jdbcTemplate;

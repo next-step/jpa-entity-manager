@@ -17,6 +17,7 @@ import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
 import persistence.entity.Person;
 import persistence.entity.context.PersistenceContextMap;
+import persistence.entity.entry.EntityEntry;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
@@ -34,6 +35,7 @@ class CustomJpaRepositoryTest {
     private JdbcTemplate jdbcTemplate;
     private EntityPersister entityPersister;
     private EntityLoader entityLoader;
+    private EntityEntry entityEntry;
     private EntityManager entityManager;
 
     private CustomJpaRepository<Person, Long> customJpaRepository;
@@ -45,8 +47,9 @@ class CustomJpaRepositoryTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityLoader = new EntityLoader(new GetFieldFromClass(), new SetFieldValue(), jdbcTemplate, dataManipulationLanguageAssembler);
-        entityManager = new EntityManagerImpl(entityLoader,
-            entityPersister,
+        entityEntry = new EntityEntry(entityPersister, entityLoader);
+        entityManager = new EntityManagerImpl(
+            entityEntry,
             new PersistenceContextMap(),
             new GetIdDatabaseFieldUseCase(new GetFieldFromClass()),
             new GetFieldValue(),

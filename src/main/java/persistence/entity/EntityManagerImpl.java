@@ -3,8 +3,7 @@ package persistence.entity;
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.context.PersistenceContextMap;
-import persistence.entity.loader.EntityLoader;
-import persistence.entity.persister.EntityPersister;
+import persistence.entity.entry.EntityEntry;
 import persistence.sql.usecase.CreateSnapShotObject;
 import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
@@ -12,9 +11,8 @@ import persistence.sql.usecase.SetFieldValue;
 import persistence.sql.vo.DatabaseField;
 
 public class EntityManagerImpl implements EntityManager {
+    private final EntityEntry entityEntry;
 
-    private final EntityLoader entityLoader;
-    private final EntityPersister entityPersister;
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
     private final GetFieldValue getFieldValue;
     private final SetFieldValue setFieldValue;
@@ -22,14 +20,13 @@ public class EntityManagerImpl implements EntityManager {
     private final PersistenceContextMap persistenceContextMap;
 
 
-    public EntityManagerImpl(EntityLoader entityLoader, EntityPersister entityPersister,
+    public EntityManagerImpl(EntityEntry entityEntry,
                              PersistenceContextMap persistenceContextMap,
                              GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase,
                              GetFieldValue getFieldValue,
                              SetFieldValue setFieldValue,
                              CreateSnapShotObject createSnapShotObject) {
-        this.entityLoader = entityLoader;
-        this.entityPersister = entityPersister;
+        this.entityEntry = entityEntry;
         this.persistenceContextMap = persistenceContextMap;
         this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
         this.getFieldValue = getFieldValue;
@@ -47,7 +44,7 @@ public class EntityManagerImpl implements EntityManager {
         if (persistenceContextCachedEntity != null) {
             return persistenceContextCachedEntity;
         }
-        T entity = entityLoader.find(clazz, Id);
+        T entity = entityEntry.find(clazz, Id);
         if (entity != null) {
             persistenceContext.addEntity(Id, entity);
         }
@@ -72,7 +69,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> void remove(T entity) {
-        entityPersister.delete(entity);
+        entityEntry.delete(entity);
         Class<T> cls = (Class<T>) entity.getClass();
         PersistenceContext<T> persistenceContext = getPersistenceContext(cls);
         persistenceContext.removeEntity(entity);
@@ -98,13 +95,13 @@ public class EntityManagerImpl implements EntityManager {
         if (entity.equals(snapshotEntity)) {
             return entity;
         }
-        entityPersister.update(entity);
+        entityEntry.update(entity);
         persistenceContext.addEntity(idValue, entity);
         return entity;
     }
 
     private <T> T insertIfNotExist(T entity) {
-        Long id = entityPersister.insert(entity);
+        Long id = entityEntry.insert(entity);
         PersistenceContext<T> persistenceContext = getPersistenceContext((Class<T>) entity.getClass());
         DatabaseField databaseField = getIdDatabaseFieldUseCase.execute(entity.getClass());
         setFieldValue.execute(entity, databaseField, id);
