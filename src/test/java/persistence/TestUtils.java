@@ -5,22 +5,22 @@ import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.DataManipulationLanguageGenerator;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.GetFieldValueUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
-import persistence.sql.usecase.GetTableNameFromClassUseCase;
+import persistence.sql.usecase.GetTableNameFromClass;
 
 public class TestUtils {
     public static DataManipulationLanguageAssembler createDataManipulationLanguageAssembler() {
         H2Dialect h2Dialect = new H2Dialect();
-        GetTableNameFromClassUseCase getTableNameFromClassUseCase = new GetTableNameFromClassUseCase();
-        GetFieldFromClassUseCase getFieldFromClassUseCase = new GetFieldFromClassUseCase();
-        GetFieldValueUseCase getFieldValueUseCase = new GetFieldValueUseCase();
-        GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase = new GetIdDatabaseFieldUseCase(getFieldFromClassUseCase);
+        GetTableNameFromClass getTableNameFromClass = new GetTableNameFromClass();
+        GetFieldFromClass getFieldFromClass = new GetFieldFromClass();
+        GetFieldValue getFieldValue = new GetFieldValue();
+        GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase = new GetIdDatabaseFieldUseCase(getFieldFromClass);
         DataManipulationLanguageGenerator dataManipulationLanguageGenerator = new DataManipulationLanguageGenerator(
-            getTableNameFromClassUseCase,
-            getFieldFromClassUseCase,
-            getFieldValueUseCase,
+            getTableNameFromClass,
+            getFieldFromClass,
+            getFieldValue,
             getIdDatabaseFieldUseCase);
         return new DataManipulationLanguageAssembler(
             h2Dialect, dataManipulationLanguageGenerator
@@ -28,10 +28,10 @@ public class TestUtils {
     }
 
     public static DataDefinitionLanguageAssembler createDataDefinitionLanguageAssembler() {
-        GetTableNameFromClassUseCase getTableNameFromClassUseCase = new GetTableNameFromClassUseCase();
-        GetFieldFromClassUseCase getFieldFromClassUseCase = new GetFieldFromClassUseCase();
+        GetTableNameFromClass getTableNameFromClass = new GetTableNameFromClass();
+        GetFieldFromClass getFieldFromClass = new GetFieldFromClass();
         DataDefinitionLanguageGenerator dataDefinitionLanguageGenerator = new DataDefinitionLanguageGenerator(
-            getTableNameFromClassUseCase, getFieldFromClassUseCase
+            getTableNameFromClass, getFieldFromClass
         );
         return new DataDefinitionLanguageAssembler(dataDefinitionLanguageGenerator);
     }

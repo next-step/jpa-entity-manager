@@ -1,4 +1,4 @@
-package persistence.entity;
+package repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -11,7 +11,11 @@ import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityManager;
+import persistence.entity.EntityManagerImpl;
+import persistence.entity.Person;
 import persistence.entity.context.PersistenceContextMap;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
@@ -23,7 +27,7 @@ import persistence.sql.usecase.GetFieldValue;
 import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 import persistence.sql.usecase.SetFieldValue;
 
-class EntityManagerTest {
+class CustomJpaRepositoryTest {
     private final DataManipulationLanguageAssembler dataManipulationLanguageAssembler = createDataManipulationLanguageAssembler();
     private final DataDefinitionLanguageAssembler dataDefinitionLanguageAssembler = createDataDefinitionLanguageAssembler();
     private DatabaseServer server;
@@ -32,6 +36,7 @@ class EntityManagerTest {
     private EntityLoader entityLoader;
     private EntityManager entityManager;
 
+    private CustomJpaRepository<Person, Long> customJpaRepository;
 
     @BeforeEach
     void setup() throws SQLException {
@@ -49,6 +54,7 @@ class EntityManagerTest {
             new CreateSnapShotObject(new GetFieldFromClass(), new GetFieldValue(), new SetFieldValue())
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
+        customJpaRepository = new CustomJpaRepository<>(entityManager);
     }
 
     @AfterEach
@@ -57,45 +63,32 @@ class EntityManagerTest {
         server.stop();
     }
 
+    @DisplayName("save 후 나오는 person 은 기존 객체와 같은 값을 갖는다.")
     @Test
-    void find() {
-        Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
-        jdbcTemplate.execute(dataManipulationLanguageAssembler.generateInsert(person));
-
-        Person findPerson = entityManager.find(Person.class, 1L);
+    void test_insert() {
+        Person person = new Person("tongnamuu", 12, "tongnamuu@naver.com");
+        Person person1 = customJpaRepository.save(person);
         assertAll(
-            () -> assertThat(findPerson.getId()).isEqualTo(1L),
-            () -> assertThat(findPerson.getName()).isEqualTo(person.getName()),
-            () -> assertThat(findPerson.getAge()).isEqualTo(person.getAge()),
-            () -> assertThat(findPerson.getEmail()).isEqualTo(person.getEmail())
+            () -> assertThat(person1.getName()).isEqualTo("tongnamuu"),
+            () -> assertThat(person1.getAge()).isEqualTo(12),
+            () -> assertThat(person1.getEmail()).isEqualTo("tongnamuu@naver.com")
         );
     }
 
+    @DisplayName("update 후에는 update 된 값이 조회된다.")
     @Test
-    void persist() {
-        // when, then
-        Person person = entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
+    void test_update() {
+        Person person = new Person("tongnamuu", 12, "tongnamuu@naver.com");
+        customJpaRepository.save(person);
+        person.updateEmail("hello@gmail.com");
+        Person person1 = customJpaRepository.save(person);
+        entityManager.clear();
+        Person findPerson = entityManager.find(person1.getClass(), person1.getId());
+
         assertAll(
-            () -> assertThat(person.getId()).isEqualTo(1L),
-            () -> assertThat(person.getName()).isEqualTo(person.getName()),
-            () -> assertThat(person.getAge()).isEqualTo(person.getAge()),
-            () -> assertThat(person.getEmail()).isEqualTo(person.getEmail())
+            () -> assertThat(findPerson.getName()).isEqualTo("tongnamuu"),
+            () -> assertThat(findPerson.getAge()).isEqualTo(12),
+            () -> assertThat(findPerson.getEmail()).isEqualTo("hello@gmail.com")
         );
-    }
-
-    @Test
-    void remove() {
-        // given
-        Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
-        jdbcTemplate.execute(dataManipulationLanguageAssembler.generateInsert(person));
-        Person findPerson = entityManager.find(Person.class, 1L);
-
-        // when
-        entityManager.remove(findPerson);
-        Person findPerson2 = entityManager.find(Person.class, 1L);
-
-        // then
-        assertThat(findPerson).isNotNull();
-        assertThat(findPerson2).isNull();
     }
 }

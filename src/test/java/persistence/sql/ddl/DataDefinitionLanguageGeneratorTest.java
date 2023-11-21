@@ -17,18 +17,18 @@ import persistence.sql.cls.MultipleId;
 import persistence.sql.cls.NoEntity;
 import persistence.sql.ddl.exception.CannotCreateTableException;
 import persistence.sql.ddl.exception.FieldShouldHaveOnlyOnePrimaryKeyException;
-import persistence.sql.usecase.GetFieldFromClassUseCase;
-import persistence.sql.usecase.GetTableNameFromClassUseCase;
+import persistence.sql.usecase.GetFieldFromClass;
+import persistence.sql.usecase.GetTableNameFromClass;
 import persistence.sql.vo.DatabaseField;
 import persistence.sql.vo.type.BigInt;
 import persistence.sql.vo.type.Int;
 import persistence.sql.vo.type.VarChar;
 
 class DataDefinitionLanguageGeneratorTest {
-    private final GetTableNameFromClassUseCase getTableNameFromClassUseCase = new GetTableNameFromClassUseCase();
-    private final GetFieldFromClassUseCase getFieldFromClassUseCase = new GetFieldFromClassUseCase();
+    private final GetTableNameFromClass getTableNameFromClass = new GetTableNameFromClass();
+    private final GetFieldFromClass getFieldFromClass = new GetFieldFromClass();
     private final DataDefinitionLanguageGenerator dataDefinitionLanguageGenerator = new DataDefinitionLanguageGenerator(
-            getTableNameFromClassUseCase, getFieldFromClassUseCase
+        getTableNameFromClass, getFieldFromClass
     );
 
 
