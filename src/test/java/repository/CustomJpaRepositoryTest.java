@@ -16,16 +16,13 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
 import persistence.entity.Person;
-import persistence.entity.context.PersistenceContextMap;
+import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.entry.EntityEntry;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
-import persistence.sql.usecase.CreateSnapShotObject;
 import persistence.sql.usecase.GetFieldFromClass;
-import persistence.sql.usecase.GetFieldValue;
-import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 import persistence.sql.usecase.SetFieldValue;
 
 class CustomJpaRepositoryTest {
@@ -50,11 +47,7 @@ class CustomJpaRepositoryTest {
         entityEntry = new EntityEntry(entityPersister, entityLoader);
         entityManager = new EntityManagerImpl(
             entityEntry,
-            new PersistenceContextMap(),
-            new GetIdDatabaseFieldUseCase(new GetFieldFromClass()),
-            new GetFieldValue(),
-            new SetFieldValue(),
-            new CreateSnapShotObject(new GetFieldFromClass(), new GetFieldValue(), new SetFieldValue())
+            new PersistenceContextImpl()
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
         customJpaRepository = new CustomJpaRepository<>(entityManager);

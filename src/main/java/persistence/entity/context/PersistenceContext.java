@@ -1,14 +1,14 @@
 package persistence.entity.context;
 
-public interface PersistenceContext<T> {
+public interface PersistenceContext {
 
-    T getEntity(Long id);
+    Object getEntity(Class<?> cls, Long id);
 
-    void addEntity(Long id, T entity);
+    void addEntity(Long id, Object entity);
 
-    void removeEntity(T entity);
+    void removeEntity(Object entity);
 
-    T getDatabaseSnapshot(Long id);
+    Object getDatabaseSnapshot(Class<?> cls, Long id);
 
     void clear();
 }

@@ -4,14 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 import persistence.sql.vo.DatabaseFields;
 
 public class CreateSnapShotObject {
-    private final GetFieldFromClass getFieldFromClass;
-    private final GetFieldValue getFieldValue;
-    private final SetFieldValue setFieldValue;
+    private final GetFieldFromClass getFieldFromClass = new GetFieldFromClass();
+    private final GetFieldValue getFieldValue = new GetFieldValue();
+    private final SetFieldValue setFieldValue = new SetFieldValue();
 
-    public CreateSnapShotObject(GetFieldFromClass getFieldFromClass, GetFieldValue getFieldValue, SetFieldValue setFieldValue) {
-        this.getFieldFromClass = getFieldFromClass;
-        this.getFieldValue = getFieldValue;
-        this.setFieldValue = setFieldValue;
+    public CreateSnapShotObject() {
     }
 
     public Object execute(Object object) {

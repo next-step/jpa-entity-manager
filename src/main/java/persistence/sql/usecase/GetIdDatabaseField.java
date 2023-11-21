@@ -6,10 +6,10 @@ import persistence.sql.vo.DatabaseFields;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetIdDatabaseFieldUseCase {
+public class GetIdDatabaseField {
     private final GetFieldFromClass getFieldFromClass;
 
-    public GetIdDatabaseFieldUseCase(GetFieldFromClass getFieldFromClass) {
+    public GetIdDatabaseField(GetFieldFromClass getFieldFromClass) {
         this.getFieldFromClass = getFieldFromClass;
     }
 

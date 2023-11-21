@@ -9,7 +9,7 @@ import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.DataManipulationLanguageGenerator;
 import persistence.sql.usecase.GetFieldFromClass;
 import persistence.sql.usecase.GetFieldValue;
-import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
+import persistence.sql.usecase.GetIdDatabaseField;
 import persistence.sql.usecase.GetTableNameFromClass;
 
 class DataManipulationLanguageAssemblerH2Test {
@@ -86,11 +86,11 @@ class DataManipulationLanguageAssemblerH2Test {
         GetTableNameFromClass getTableNameFromClass = new GetTableNameFromClass();
         GetFieldFromClass getFieldFromClass = new GetFieldFromClass();
         GetFieldValue getFieldValue = new GetFieldValue();
-        GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase = new GetIdDatabaseFieldUseCase(getFieldFromClass);
+        GetIdDatabaseField getIdDatabaseField = new GetIdDatabaseField(getFieldFromClass);
         DataManipulationLanguageGenerator dataManipulationLanguageGenerator = new DataManipulationLanguageGenerator(
             getTableNameFromClass,
             getFieldFromClass,
-            getFieldValue, getIdDatabaseFieldUseCase);
+            getFieldValue, getIdDatabaseField);
         return new DataManipulationLanguageAssembler(
             h2Dialect, dataManipulationLanguageGenerator
         );

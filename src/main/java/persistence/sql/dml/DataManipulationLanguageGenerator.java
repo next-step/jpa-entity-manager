@@ -9,7 +9,7 @@ import persistence.sql.dml.where.ConditionType;
 import persistence.sql.dml.where.WhereQuery;
 import persistence.sql.usecase.GetFieldFromClass;
 import persistence.sql.usecase.GetFieldValue;
-import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
+import persistence.sql.usecase.GetIdDatabaseField;
 import persistence.sql.usecase.GetTableNameFromClass;
 import persistence.sql.vo.DatabaseField;
 import persistence.sql.vo.DatabaseFields;
@@ -19,14 +19,14 @@ public class DataManipulationLanguageGenerator {
     private final GetTableNameFromClass getTableNameFromClass;
     private final GetFieldFromClass getFieldFromClass;
     private final GetFieldValue getFieldValue;
-    private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
+    private final GetIdDatabaseField getIdDatabaseField;
 
     public DataManipulationLanguageGenerator(GetTableNameFromClass getTableNameFromClass, GetFieldFromClass getFieldFromClass, GetFieldValue getFieldValue,
-                                             GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase) {
+                                             GetIdDatabaseField getIdDatabaseField) {
         this.getTableNameFromClass = getTableNameFromClass;
         this.getFieldFromClass = getFieldFromClass;
         this.getFieldValue = getFieldValue;
-        this.getIdDatabaseFieldUseCase = getIdDatabaseFieldUseCase;
+        this.getIdDatabaseField = getIdDatabaseField;
     }
 
     public InsertQuery buildInsertQuery(Object object) {
@@ -49,14 +49,14 @@ public class DataManipulationLanguageGenerator {
 
     public WhereQuery buildSelectWhereQuery(Class<?> cls, long id) {
         WhereQuery whereQuery = new WhereQuery();
-        DatabaseField field = getIdDatabaseFieldUseCase.execute(cls);
+        DatabaseField field = getIdDatabaseField.execute(cls);
         whereQuery.addKey(field.getDatabaseFieldName(), new ValueClause(id, field.getDatabaseType()), ConditionType.IS);
         return whereQuery;
     }
 
     public WhereQuery buildWhereQuery(Object object) {
         WhereQuery whereQuery = new WhereQuery();
-        DatabaseField field = getIdDatabaseFieldUseCase.execute(object.getClass());
+        DatabaseField field = getIdDatabaseField.execute(object.getClass());
         Object value = getFieldValue.execute(object, field);
         if (value == null) {
             throw new NullPointerException("Id should not be null in whereClause");

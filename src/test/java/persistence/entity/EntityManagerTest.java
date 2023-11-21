@@ -12,16 +12,13 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import persistence.entity.context.PersistenceContextMap;
+import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.entry.EntityEntry;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.assembler.DataDefinitionLanguageAssembler;
 import persistence.sql.dml.assembler.DataManipulationLanguageAssembler;
-import persistence.sql.usecase.CreateSnapShotObject;
 import persistence.sql.usecase.GetFieldFromClass;
-import persistence.sql.usecase.GetFieldValue;
-import persistence.sql.usecase.GetIdDatabaseFieldUseCase;
 import persistence.sql.usecase.SetFieldValue;
 
 class EntityManagerTest {
@@ -45,11 +42,7 @@ class EntityManagerTest {
         entityEntry = new EntityEntry(entityPersister, entityLoader);
         entityManager = new EntityManagerImpl(
             entityEntry,
-            new PersistenceContextMap(),
-            new GetIdDatabaseFieldUseCase(new GetFieldFromClass()),
-            new GetFieldValue(),
-            new SetFieldValue(),
-            new CreateSnapShotObject(new GetFieldFromClass(), new GetFieldValue(), new SetFieldValue())
+            new PersistenceContextImpl()
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
     }
@@ -77,7 +70,7 @@ class EntityManagerTest {
     @Test
     void persist() {
         // when, then
-        Person person = entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
+        Person person = (Person) entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
         assertAll(
             () -> assertThat(person.getId()).isEqualTo(1L),
             () -> assertThat(person.getName()).isEqualTo(person.getName()),

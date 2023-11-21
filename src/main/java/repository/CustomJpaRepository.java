@@ -10,6 +10,6 @@ public class CustomJpaRepository<T, ID> {
     }
 
     public T save(T t) {
-        return entityManager.persist(t);
+        return (T) entityManager.persist(t);
     }
 }
