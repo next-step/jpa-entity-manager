@@ -12,7 +12,6 @@ import persistence.sql.vo.DatabaseField;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityEntry entityEntry;
-
     private final GetIdDatabaseFieldUseCase getIdDatabaseFieldUseCase;
     private final GetFieldValue getFieldValue;
     private final SetFieldValue setFieldValue;
@@ -95,8 +94,9 @@ public class EntityManagerImpl implements EntityManager {
         if (entity.equals(snapshotEntity)) {
             return entity;
         }
-        entityEntry.update(entity);
-        persistenceContext.addEntity(idValue, entity);
+        if (entityEntry.update(entity)) {
+            persistenceContext.addEntity(idValue, entity);
+        }
         return entity;
     }
 
