@@ -24,18 +24,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T>clazz, Long Id) {
-        if (Id == null) {
-            throw new NullPointerException("Id can't be null in EntityManager find");
-        }
-        Object persistenceContextCachedEntity = persistenceContext.getEntity(clazz, Id);
-        if (persistenceContextCachedEntity != null) {
-            return (T) persistenceContextCachedEntity;
-        }
-        Object entity = entityEntry.find(clazz, Id);
-        if (entity != null) {
-            persistenceContext.addEntity(Id, entity);
-        }
-        return (T) entity;
+        return entityEntry.find(clazz, Id);
     }
 
     @Override
@@ -64,21 +53,13 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private Object updatetIfAlreadyExist(Object entity, Long idValue) {
-        Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), idValue);
-        if (entity.equals(snapshotEntity)) {
-            return entity;
-        }
-        if (entityEntry.update(entity)) {
-            persistenceContext.addEntity(idValue, entity);
-        }
-        return entity;
+        return entityEntry.update(entity, idValue);
     }
 
     private <T> T insertIfNotExist(T entity) {
         Long id = entityEntry.insert(entity);
         DatabaseField databaseField = getIdDatabaseField.execute(entity.getClass());
         setFieldValue.execute(entity, databaseField, id);
-        persistenceContext.addEntity(id, entity);
         return entity;
     }
 }

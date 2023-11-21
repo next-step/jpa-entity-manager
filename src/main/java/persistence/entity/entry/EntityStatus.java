@@ -16,4 +16,8 @@ public enum EntityStatus {
     public static boolean insertAble(EntityStatus entityStatus) {
         return entityStatus == null || entityStatus == MANAGED;
     }
+
+    public static boolean readAble(EntityStatus entityStatus) {
+        return entityStatus == MANAGED || entityStatus == READ_ONLY;
+    }
 }

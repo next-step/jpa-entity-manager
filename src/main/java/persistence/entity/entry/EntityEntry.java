@@ -19,22 +19,43 @@ public class EntityEntry {
     }
 
     public <T> T find(Class<T> clazz, Long id) {
-        T result = entityLoader.find(clazz, id);
-        if (result != null) {
-            entityStatusMap.put(System.identityHashCode(result), EntityStatus.MANAGED);
+        if (id == null) {
+            throw new NullPointerException("Id can't be null in EntityManager find");
         }
-        return result;
+        Object persistenceContextCachedEntity = persistenceContext.getEntity(clazz, id);
+        if (persistenceContextCachedEntity == null) {
+            Object entity = entityLoader.find(clazz, id);
+            if (entity != null) {
+                int code = System.identityHashCode(entity);
+                entityStatusMap.put(code, EntityStatus.LOADING);
+                persistenceContext.addEntity(id, entity);
+                entityStatusMap.put(code, EntityStatus.MANAGED);
+                return (T) entity;
+            }
+            return null;
+        }
+        int code = System.identityHashCode(persistenceContextCachedEntity);
+        if (EntityStatus.readAble(entityStatusMap.get(code))) {
+            return (T) persistenceContextCachedEntity;
+        }
+        throw new IllegalStateException("Object is not readable");
     }
 
-    public boolean update(Object object) {
-        if (object == null) {
+    public Object update(Object entity, Long idValue) {
+        if (entity == null) {
             throw new NullPointerException("Can not be update with null");
         }
-        int code = System.identityHashCode(object);
+        int code = System.identityHashCode(entity);
         if (!EntityStatus.updateAble(entityStatusMap.get(code))) {
             throw new IllegalStateException("Can not be update");
         }
-        return entityPersister.update(object);
+        Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), idValue);
+        if (entity.equals(snapshotEntity)) {
+            return entity;
+        }
+        entityPersister.update(entity);
+        persistenceContext.addEntity(idValue, entity);
+        return entity;
     }
 
     public Long insert(Object object) {
@@ -43,9 +64,10 @@ public class EntityEntry {
             throw new IllegalStateException("Can not be insert");
         }
         entityStatusMap.put(code, EntityStatus.SAVING);
-        Long result = entityPersister.insert(object);
+        Long id = entityPersister.insert(object);
+        persistenceContext.addEntity(id, object);
         entityStatusMap.put(code, EntityStatus.MANAGED);
-        return result;
+        return id;
     }
 
     public void delete(Object object) {
