@@ -19,7 +19,7 @@ public class EntityEntry {
     }
 
     public <T> T find(Class<T> clazz, Long id) {
-        if (id == null) {
+        if (id == null || clazz == null) {
             throw new NullPointerException("Id can't be null in EntityManager find");
         }
         Object persistenceContextCachedEntity = persistenceContext.getEntity(clazz, id);
@@ -59,6 +59,9 @@ public class EntityEntry {
     }
 
     public Long insert(Object object) {
+        if (object == null) {
+            throw new NullPointerException("insert with null");
+        }
         int code = System.identityHashCode(object);
         if (!EntityStatus.insertAble(entityStatusMap.get(code))) {
             throw new IllegalStateException("Can not be insert");
@@ -71,6 +74,9 @@ public class EntityEntry {
     }
 
     public void delete(Object object) {
+        if (object == null) {
+            throw new NullPointerException("delete with null");
+        }
         int code = System.identityHashCode(object);
         entityPersister.delete(object);
         entityStatusMap.put(code, EntityStatus.DELETED);
