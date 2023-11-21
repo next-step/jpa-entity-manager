@@ -38,9 +38,7 @@ public class FieldMetadataExtractor {
     }
 
     public String getValueFrom(Object entity) throws NoSuchFieldException, IllegalAccessException {
-        Field entityFiled = entity.getClass().getDeclaredField(field.getName());
-        entityFiled.setAccessible(true);
-        Object object = entityFiled.get(entity);
+        Object object = extractValue(entity);
 
         if (object instanceof String) {
             return "'" + object + "'";
@@ -83,13 +81,8 @@ public class FieldMetadataExtractor {
 
     public String getUpdateClause(Object entity, Object snapshot) {
         try {
-            Field entityFiled = entity.getClass().getDeclaredField(field.getName());
-            entityFiled.setAccessible(true);
-            Object entityValue = entityFiled.get(entity);
-
-            Field snapshotFiled = snapshot.getClass().getDeclaredField(field.getName());
-            snapshotFiled.setAccessible(true);
-            Object snapshotValue = snapshotFiled.get(snapshot);
+            Object entityValue = extractValue(entity);
+            Object snapshotValue = extractValue(snapshot);
 
             if (entityValue == null || !entityValue.equals(snapshotValue)) {
                 return "";
@@ -110,4 +103,29 @@ public class FieldMetadataExtractor {
 
         return "";
     }
+
+    public boolean hasDifferentValue(Object entity, Object snapshot) {
+        try {
+            Object entityValue = extractValue(entity);
+            Object snapshotValue = extractValue(snapshot);
+
+            if (entityValue == null || !entityValue.equals(snapshotValue)) {
+                return true;
+            }
+
+            return false;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private Object extractValue(Object entity) throws NoSuchFieldException, IllegalAccessException {
+        Field entityFiled = entity.getClass().getDeclaredField(field.getName());
+        entityFiled.setAccessible(true);
+        Object entityValue = entityFiled.get(entity);
+        return entityValue;
+    }
+
 }

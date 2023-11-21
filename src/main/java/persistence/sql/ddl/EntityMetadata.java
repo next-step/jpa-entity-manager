@@ -82,4 +82,9 @@ public class EntityMetadata {
     public String getUpdateClause(Object entity, Object snapshot) {
      return fieldMetadataExtractors.getUpdateClause(entity, snapshot);
     }
+
+    public boolean hasDifferentValue(Object entity, Object snapshot) {
+        return fieldMetadataExtractors.hasDifferentValue(entity, snapshot);
+    }
+
 }

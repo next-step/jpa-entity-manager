@@ -47,7 +47,7 @@ public abstract class DatabaseTestBase {
         entityPersister = new EntityPersister(jdbcTemplate);
         entityLoader = new EntityLoader(jdbcTemplate);
         persistenceContext = new SimplePersistenceContext();
-        entityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, dialect);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext);
 
         jdbcTemplate.execute(entityDefinitionBuilder.create(dialect));
         jdbcTemplate.execute(new EntityManipulationBuilder()
