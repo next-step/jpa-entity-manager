@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
 import persistence.entity.Person;
+import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.entry.EntityEntry;
 import persistence.entity.loader.EntityLoader;
@@ -30,6 +31,7 @@ class CustomJpaRepositoryTest {
     private final DataDefinitionLanguageAssembler dataDefinitionLanguageAssembler = createDataDefinitionLanguageAssembler();
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
+    private PersistenceContext persistenceContext;
     private EntityPersister entityPersister;
     private EntityLoader entityLoader;
     private EntityEntry entityEntry;
@@ -44,10 +46,11 @@ class CustomJpaRepositoryTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityLoader = new EntityLoader(new GetFieldFromClass(), new SetFieldValue(), jdbcTemplate, dataManipulationLanguageAssembler);
-        entityEntry = new EntityEntry(entityPersister, entityLoader);
+        persistenceContext = new PersistenceContextImpl();
+        entityEntry = new EntityEntry(entityPersister, entityLoader, persistenceContext);
         entityManager = new EntityManagerImpl(
             entityEntry,
-            new PersistenceContextImpl()
+            persistenceContext
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
         customJpaRepository = new CustomJpaRepository<>(entityManager);

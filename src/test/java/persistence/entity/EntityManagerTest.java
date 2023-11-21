@@ -12,6 +12,7 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.entry.EntityEntry;
 import persistence.entity.loader.EntityLoader;
@@ -26,6 +27,7 @@ class EntityManagerTest {
     private final DataDefinitionLanguageAssembler dataDefinitionLanguageAssembler = createDataDefinitionLanguageAssembler();
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
+    private PersistenceContext persistenceContext;
     private EntityPersister entityPersister;
     private EntityLoader entityLoader;
     private EntityEntry entityEntry;
@@ -37,12 +39,13 @@ class EntityManagerTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+        persistenceContext = new PersistenceContextImpl();
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityLoader = new EntityLoader(new GetFieldFromClass(), new SetFieldValue(), jdbcTemplate, dataManipulationLanguageAssembler);
-        entityEntry = new EntityEntry(entityPersister, entityLoader);
+        entityEntry = new EntityEntry(entityPersister, entityLoader, persistenceContext);
         entityManager = new EntityManagerImpl(
             entityEntry,
-            new PersistenceContextImpl()
+            persistenceContext
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
     }

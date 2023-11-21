@@ -56,9 +56,6 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public  void remove(Object entity) {
         entityEntry.delete(entity);
-        Class<?> cls = entity.getClass();
-        PersistenceContext persistenceContext = getPersistenceContext(cls);
-        persistenceContext.removeEntity(entity);
     }
 
     @Override
@@ -66,12 +63,7 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.clear();
     }
 
-    private PersistenceContext getPersistenceContext(Class<?> cls) {
-        return persistenceContext;
-    }
-
     private Object updatetIfAlreadyExist(Object entity, Long idValue) {
-        PersistenceContext persistenceContext = getPersistenceContext(entity.getClass());
         Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), idValue);
         if (entity.equals(snapshotEntity)) {
             return entity;
@@ -84,7 +76,6 @@ public class EntityManagerImpl implements EntityManager {
 
     private <T> T insertIfNotExist(T entity) {
         Long id = entityEntry.insert(entity);
-        PersistenceContext persistenceContext = getPersistenceContext(entity.getClass());
         DatabaseField databaseField = getIdDatabaseField.execute(entity.getClass());
         setFieldValue.execute(entity, databaseField, id);
         persistenceContext.addEntity(id, entity);
