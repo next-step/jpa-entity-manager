@@ -71,4 +71,22 @@ class EntityEntryTest {
             () -> assertThat(findPerson.getEmail()).isEqualTo("test@naver.com")
         );
     }
+
+    @Test
+    @DisplayName("삭제 후 조회하면 null 반환한다.")
+    void test_delete_find() {
+        // given
+        Person p = new Person("hello", 21, "hello@naver.com");
+        Long id = entityEntry.insert(p);
+        p.setId(id);
+
+        // when
+        entityEntry.delete(p);
+
+        // then
+        Person findPerson = entityEntry.find(Person.class, id);
+        assertAll(
+            () -> assertThat(findPerson).isNull()
+        );
+    }
 }
