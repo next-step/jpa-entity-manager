@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
@@ -42,9 +43,11 @@ class EntityManagerTest {
         persistenceContext = new PersistenceContextImpl();
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityLoader = new EntityLoader(new GetFieldFromClass(), new SetFieldValue(), jdbcTemplate, dataManipulationLanguageAssembler);
-        entityEntry = new EntityEntry(entityPersister, entityLoader, persistenceContext);
+        entityEntry = new EntityEntry();
         entityManager = new EntityManagerImpl(
             entityEntry,
+            entityPersister,
+            entityLoader,
             persistenceContext
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
@@ -57,6 +60,7 @@ class EntityManagerTest {
     }
 
     @Test
+    @DisplayName("조회 시 올바른 객체가 나온다.")
     void find() {
         Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
         jdbcTemplate.execute(dataManipulationLanguageAssembler.generateInsert(person));
@@ -71,6 +75,7 @@ class EntityManagerTest {
     }
 
     @Test
+    @DisplayName("저장 시 올바른 객체가 나온다.")
     void persist() {
         // when, then
         Person person = (Person) entityManager.persist(new Person("tongnamuu", 11, "tongnamuu@naver.com"));
@@ -83,6 +88,7 @@ class EntityManagerTest {
     }
 
     @Test
+    @DisplayName("삭제 시 null이 나온다.")
     void remove() {
         // given
         Person person = new Person("tongnamuu", 11, "tongnamuu@naver.com");
@@ -96,5 +102,41 @@ class EntityManagerTest {
         // then
         assertThat(findPerson).isNotNull();
         assertThat(findPerson2).isNull();
+    }
+
+    @Test
+    @DisplayName("업데이트 후 조회하면 업데이트 된 객체가 반환한다.")
+    void test_update_find() {
+        // given
+        Person p = new Person("hello", 21, "hello@naver.com");
+        entityManager.persist(p);
+
+        // when
+        p.updateEmail("test@naver.com");
+        entityManager.persist(p);
+
+        // then
+        Person findPerson = entityManager.find(Person.class, p.getId());
+        assertAll(
+            () -> assertThat(p == findPerson).isTrue(),
+            () -> assertThat(findPerson.getEmail()).isEqualTo("test@naver.com")
+        );
+    }
+
+    @Test
+    @DisplayName("삭제 후 조회하면 null 반환한다.")
+    void test_delete_find() {
+        // given
+        Person p = new Person("hello", 21, "hello@naver.com");
+        entityManager.persist(p);
+
+        // when
+        entityManager.remove(p);
+
+        // then
+        Person findPerson = entityManager.find(Person.class, p.getId());
+        assertAll(
+            () -> assertThat(findPerson).isNull()
+        );
     }
 }

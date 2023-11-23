@@ -47,9 +47,11 @@ class CustomJpaRepositoryTest {
         entityPersister = new EntityPersister(dataManipulationLanguageAssembler, jdbcTemplate);
         entityLoader = new EntityLoader(new GetFieldFromClass(), new SetFieldValue(), jdbcTemplate, dataManipulationLanguageAssembler);
         persistenceContext = new PersistenceContextImpl();
-        entityEntry = new EntityEntry(entityPersister, entityLoader, persistenceContext);
+        entityEntry = new EntityEntry();
         entityManager = new EntityManagerImpl(
             entityEntry,
+            entityPersister,
+            entityLoader,
             persistenceContext
         );
         jdbcTemplate.execute(dataDefinitionLanguageAssembler.assembleCreateTableQuery(Person.class));
