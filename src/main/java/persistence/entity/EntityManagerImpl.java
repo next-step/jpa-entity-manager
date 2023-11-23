@@ -63,7 +63,7 @@ public class EntityManagerImpl implements EntityManager {
             return insertIfNotExist(entity);
         }
 
-        return updatetIfAlreadyExist(entity, (Long) idValue);
+        return updateIfAlreadyExist(entity, (Long) idValue);
 
     }
 
@@ -83,7 +83,7 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.clear();
     }
 
-    private Object updatetIfAlreadyExist(Object entity, Long idValue) {
+    private Object updateIfAlreadyExist(Object entity, Long idValue) {
         if (entity == null) {
             throw new NullPointerException("Can not be update with null");
         }
