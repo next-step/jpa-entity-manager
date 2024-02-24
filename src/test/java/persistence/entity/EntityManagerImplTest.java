@@ -14,6 +14,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityManagerImplTest {
+// XXX: mock 제거하고 h2로
+//    @Test
+//    void findMissingRecord() {
+//        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+//        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () ->
+//                entityManager.find(Person.class, 1L)
+//        );
+//        assertThat(exception.getMessage()).isEqualTo("Expected 1 result, got 0");
+//    }
+
     @Test
     void find() {
         Person person = new Person("abc123", 14, "c123@d.com");
@@ -40,6 +50,11 @@ class EntityManagerImplTest {
 
         assertThat(executedQueries)
                 .containsExactly("INSERT INTO users (nick_name, old, email) VALUES ('abc123', 14, 'c123@d.com')");
+    }
+
+    // XXX
+    @Test
+    void persistExistingObject() {
     }
 
     @Test

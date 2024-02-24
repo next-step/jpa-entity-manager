@@ -69,4 +69,9 @@ public class Person {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    // TODO: 테스트 목적으로 추가. 필요 없어지면 바로 삭제할 것..
+    public void setIdForTesting(Long id) {
+        this.id = id;
+    }
 }

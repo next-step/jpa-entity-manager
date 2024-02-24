@@ -6,17 +6,22 @@ import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class EntityManagerImpl implements EntityManager {
-    private static final RowMapper<Person> PERSON_ROW_MAPPER = resultSet -> new Person(
+    public static final RowMapper<Person> PERSON_ROW_MAPPER = resultSet -> new Person(
             resultSet.getLong("id"),
             resultSet.getString("nick_name"),
             resultSet.getInt("old"),
             resultSet.getString("email"));
 
     private final JdbcTemplate jdbcTemplate;
+    private final Map<Class<?>, EntityPersister> entityPersisters;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        entityPersisters = new HashMap<>();
     }
 
     @Override
@@ -27,18 +32,30 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        String query = QueryBuilder.getInstance().buildInsertQuery(entity);
-        jdbcTemplate.execute(query);
+        EntityPersister entityPersister = getEntityPersister(entity.getClass());
+
+        if (getId(entity) == 0) {
+            entityPersister.insert(entity);
+            return;
+        }
+        // XXX: 테스트 안됨
+        entityPersister.update(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        EntityMetadata entityMetadata = new EntityMetadata(entity);
-        long id = entityMetadata.getPrimaryKeyValue(entity);
+        getEntityPersister(entity.getClass()).delete(entity);
+    }
 
-        QueryBuilder instance = QueryBuilder.getInstance();
-        String query = instance.buildDeleteQuery(entity.getClass(), id);
+    private EntityPersister getEntityPersister(Class<?> entityClass) {
+        if (!entityPersisters.containsKey(entityClass)) {
+            entityPersisters.put(entityClass, new EntityPersister(jdbcTemplate, entityClass));
+        }
+        return entityPersisters.get(entityClass);
+    }
 
-        jdbcTemplate.execute(query);
+    private static long getId(Object entity) {
+        EntityMetadata metadata = new EntityMetadata(entity.getClass());
+        return metadata.getPrimaryKeyValue(entity);
     }
 }
