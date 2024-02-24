@@ -1,10 +1,8 @@
 package persistence.entity;
 
-import database.DatabaseServer;
 import database.H2;
 import database.sql.Person;
 import database.sql.ddl.CreateQueryBuilder;
-import database.sql.dml.SelectQueryBuilder;
 import database.sql.util.type.MySQLTypeConverter;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,26 +13,26 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static persistence.entity.EntityTestUtils.*;
 
 class EntityPersisterTest {
     private static final MySQLTypeConverter typeConverter = new MySQLTypeConverter();
 
-    private static JdbcTemplate jdbcTemplate;
+    private static H2 server;
+    private JdbcTemplate jdbcTemplate;
     private EntityPersister entityPersister;
 
     @BeforeAll
     static void beforeAll() throws SQLException {
-        DatabaseServer server = new H2();
+        server = new H2();
         server.start();
-
-        jdbcTemplate = new JdbcTemplate(server.getConnection());
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class, typeConverter).buildQuery());
     }
 
     @BeforeEach
-    void setUp() {
-        jdbcTemplate.execute("TRUNCATE TABLE users");
+    void beforeEach() throws SQLException {
+        jdbcTemplate = new JdbcTemplate(server.getConnection());
+        jdbcTemplate.execute("DROP TABLE users IF EXISTS");
+        jdbcTemplate.execute(new CreateQueryBuilder(Person.class, typeConverter).buildQuery());
         entityPersister = new EntityPersister(jdbcTemplate, Person.class);
     }
 
@@ -47,7 +45,7 @@ class EntityPersisterTest {
         entityPersister.insert(person2);
 
         // 잘 들어가있어야 한다
-        List<Person> people = findPeople();
+        List<Person> people = findPeople(jdbcTemplate);
         assertSamePerson(people.get(0), person, false);
         assertThat(people.get(0).getId()).isNotZero();
         assertSamePerson(people.get(1), person2, false);
@@ -61,13 +59,13 @@ class EntityPersisterTest {
         entityPersister.insert(person);
 
         // 동일한 id 의 Person 객체로 update 한 후
-        Long savedId = findPeople().get(0).getId();
+        Long savedId = getLastSavedId(jdbcTemplate);
         Person personUpdating = newPerson(savedId, "updated name", 20, "updated@email.com");
         boolean res = entityPersister.update(personUpdating);
 
         // 남아있는 한개의 row 가 잘 업데이트돼야 한다
         assertThat(res).isTrue();
-        List<Person> people = findPeople();
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(1);
         Person found = people.get(0);
         assertSamePerson(found, personUpdating, true);
@@ -88,39 +86,12 @@ class EntityPersisterTest {
         entityPersister.insert(person);
 
         // 그 row 를 삭제하고
-        Long savedId = findPeople().get(0).getId();
+        Long savedId = getLastSavedId(jdbcTemplate);
         entityPersister.delete(newPerson(savedId, "aaaa", 100, "bbbb@ccc.com"));
 
         // 개수를 세면 0개여야 한다.
-        List<Person> people = findPeople();
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(0);
     }
 
-    private static List<Person> findPeople() {
-        String query = new SelectQueryBuilder(Person.class).buildQuery();
-        return jdbcTemplate.query(query, resultSet -> new Person(
-                resultSet.getLong("id"),
-                resultSet.getString("nick_name"),
-                resultSet.getInt("old"),
-                resultSet.getString("email")));
-    }
-
-    private Person newPerson(Long id, String name, int age, String email) {
-        Person person = new Person();
-        person.setIdForTesting(id);
-        person.setName(name);
-        person.setAge(age);
-        person.setEmail(email);
-        return person;
-    }
-
-    private static void assertSamePerson(Person actual, Person expected, boolean compareIdField) {
-        assertAll(
-                () -> {
-                    if (compareIdField) assertThat(actual.getId()).isEqualTo(expected.getId());
-                },
-                () -> assertThat(actual.getName()).isEqualTo(expected.getName()),
-                () -> assertThat(actual.getAge()).isEqualTo(expected.getAge()),
-                () -> assertThat(actual.getEmail()).isEqualTo(expected.getEmail()));
-    }
 }

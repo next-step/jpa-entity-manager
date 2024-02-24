@@ -38,7 +38,6 @@ public class EntityManagerImpl implements EntityManager {
             entityPersister.insert(entity);
             return;
         }
-        // XXX: 테스트 안됨
         entityPersister.update(entity);
     }
 
