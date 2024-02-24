@@ -34,7 +34,7 @@ public class EntityManagerImpl implements EntityManager {
     public void persist(Object entity) {
         EntityPersister entityPersister = getEntityPersister(entity.getClass());
 
-        if (getId(entity) == 0) {
+        if (getId(entity) == null) {
             entityPersister.insert(entity);
             return;
         }
@@ -54,7 +54,7 @@ public class EntityManagerImpl implements EntityManager {
         return entityPersisters.get(entityClass);
     }
 
-    private static long getId(Object entity) {
+    private static Long getId(Object entity) {
         EntityMetadata metadata = new EntityMetadata(entity.getClass());
         return metadata.getPrimaryKeyValue(entity);
     }

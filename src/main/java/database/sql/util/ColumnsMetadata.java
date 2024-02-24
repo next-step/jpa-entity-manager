@@ -51,10 +51,7 @@ public class ColumnsMetadata {
         return generalColumns;
     }
 
-    // XXX: Long 으로 바꿀 수 있는지 확인..
-    public long getPrimaryKeyValue(Object entity) {
-        Object value = primaryKey.getValue(entity);
-        if (value == null) return 0L;
-        return (long) value;
+    public Long getPrimaryKeyValue(Object entity) {
+        return (Long) primaryKey.getValue(entity);
     }
 }

@@ -41,9 +41,9 @@ class EntityPersisterTest {
     @Test
     void insert() {
         // row 두개를 추가하면
-        Person person = newPerson(0L, "some name", 11, "some@name.com");
+        Person person = newPerson(null, "some name", 11, "some@name.com");
         entityPersister.insert(person);
-        Person person2 = newPerson(0L, "another name", 22, "another@name.com");
+        Person person2 = newPerson(null, "another name", 22, "another@name.com");
         entityPersister.insert(person2);
 
         // 잘 들어가있어야 한다
@@ -57,7 +57,7 @@ class EntityPersisterTest {
     @Test
     void update() {
         // row 한 개를 삽입하고,
-        Person person = newPerson(0L, "some name", 11, "some@name.com");
+        Person person = newPerson(null, "some name", 11, "some@name.com");
         entityPersister.insert(person);
 
         // 동일한 id 의 Person 객체로 update 한 후
@@ -84,7 +84,7 @@ class EntityPersisterTest {
     @Test
     void delete() {
         // row 한 개를 저장 후에
-        Person person = newPerson(0L, "some name", 11, "some@name.com");
+        Person person = newPerson(null, "some name", 11, "some@name.com");
         entityPersister.insert(person);
 
         // 그 row 를 삭제하고
@@ -105,7 +105,7 @@ class EntityPersisterTest {
                 resultSet.getString("email")));
     }
 
-    private Person newPerson(long id, String name, int age, String email) {
+    private Person newPerson(Long id, String name, int age, String email) {
         Person person = new Person();
         person.setIdForTesting(id);
         person.setName(name);

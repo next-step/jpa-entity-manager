@@ -45,7 +45,7 @@ public class EntityPersister {
         jdbcTemplate.execute(query);
     }
 
-    private long getId(Object entity) {
+    private Long getId(Object entity) {
         return metadata.getPrimaryKeyValue(entity);
     }
 }

@@ -46,7 +46,7 @@ public class EntityMetadata {
         return columnsMetadata.getGeneralColumns();
     }
 
-    public long getPrimaryKeyValue(Object entity) {
+    public Long getPrimaryKeyValue(Object entity) {
         return columnsMetadata.getPrimaryKeyValue(entity);
     }
 }
