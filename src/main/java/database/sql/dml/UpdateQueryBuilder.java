@@ -8,7 +8,6 @@ import java.util.StringJoiner;
 
 import static database.sql.Util.quote;
 
-// XXX: test
 public class UpdateQueryBuilder {
     private final String tableName;
     private final List<EntityColumn> generalColumns;

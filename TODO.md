@@ -4,7 +4,7 @@
 - JavaTypes 사용해서 타입 관련 코드 개선
 - EntityManagerImpl 에서 PERSON_ROW_MAPPER 구현을 일반화시키기
 - mock 대신 h2 사용한 방식으로 테스트코드 작성(delete test) -- 여러 테스트에서 사용할 수 있게..
-- ParameterizedTest 의 MethodSource 를 fixture, constant class, enum 중 하나로 바꿔보기
+- ParameterizedTest 의 MethodSource 를 fixture, constant class, enum(써봄) 중 하나로 바꿔보기
 - dialect 개념을 만들고 typeconverter 를 집어넣기
 
 # 커밋 전에 확인할 것
