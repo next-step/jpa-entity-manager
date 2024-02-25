@@ -50,7 +50,7 @@ class SimpleEntityManagerTest {
 
         @DisplayName("Person entity를 저장 한다.")
         @Test
-        void persistTest() {
+        void persistTest_whenInsert() {
             //given
             Person person = Person.of("user1", 1, "abc@gtest.com", 1);
 
@@ -65,6 +65,26 @@ class SimpleEntityManagerTest {
                 () -> assertEquals(person.getEmail(), foundPerson.getEmail())
             );
         }
+
+        @DisplayName("등록된 Person entity를 수정 한다.")
+        @Test
+        void persistTest_whenUpdate() {
+            //given
+            entityManager.persist(createPerson());
+            Person person  = entityManager.find(Person.class, 1L);
+
+            //when
+            person.updateName("user2");
+            entityManager.persist(person);
+
+            //then
+            Person foundPerson = entityManager.find(person.getClass(), 1L);
+            assertAll(
+                () -> assertEquals(person.getName(), "user2"),
+                () -> assertEquals(person.getAge(), foundPerson.getAge()),
+                () -> assertEquals(person.getEmail(), foundPerson.getEmail())
+            );
+        }
     }
 
     @DisplayName("find 메서드는")
@@ -75,7 +95,7 @@ class SimpleEntityManagerTest {
         @Test
         void findTest() {
             // given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
             entityManager.persist(person);
 
             // when
@@ -98,7 +118,7 @@ class SimpleEntityManagerTest {
         @Test
         void deleteTest() {
             //given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
             entityManager.persist(person);
             person = entityManager.find(Person.class, 1L);
             //when
@@ -108,5 +128,9 @@ class SimpleEntityManagerTest {
             assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
                 .isInstanceOf(RuntimeException.class);
         }
+    }
+
+    private Person createPerson() {
+        return Person.of("user1", 1, "abc@gtest.com", 1);
     }
 }

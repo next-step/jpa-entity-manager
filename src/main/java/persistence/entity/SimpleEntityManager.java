@@ -3,16 +3,20 @@ package persistence.entity;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
-import persistence.sql.meta.Columns;
 
 public class SimpleEntityManager implements EntityManager {
 
-    private final DmlGenerator dmlGenerator;
+    //TODO : step3에서 persistcontext로 이동
+   private final EntityPersister entityPersister;
+
+   //TODO : step2에서 제거 예정
+   private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
 
 
     private SimpleEntityManager(JdbcTemplate jdbcTemplate) {
-        this.dmlGenerator = DmlGenerator.from();
+        entityPersister = EntityPersister.from(jdbcTemplate);
+        dmlGenerator = DmlGenerator.from();
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -20,6 +24,7 @@ public class SimpleEntityManager implements EntityManager {
         return new SimpleEntityManager(jdbcTemplate);
     }
 
+    //TODO : step2에서 변경예정
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         return jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(clazz, id),
@@ -28,13 +33,15 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        jdbcTemplate.execute(dmlGenerator.generateInsertQuery(entity));
+        if (entityPersister.isExist(entity)) {
+            entityPersister.update(entity);
+            return;
+        }
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        Columns columns = Columns.from(entity.getClass().getDeclaredFields());
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(entity.getClass(),
-            columns.getIdValue(entity)));
+        entityPersister.delete(entity);
     }
 }
