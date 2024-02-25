@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {
-    public static final RowMapper<Person> PERSON_ROW_MAPPER = resultSet -> new Person(
+    private static final RowMapper<Person> PERSON_ROW_MAPPER = resultSet -> new Person(
             resultSet.getLong("id"),
             resultSet.getString("nick_name"),
             resultSet.getInt("old"),
