@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// XXX: test
 public class EntityLoader {
     private final JdbcTemplate jdbcTemplate;
     private final SelectOneQueryBuilder selectOneQueryBuilder;
