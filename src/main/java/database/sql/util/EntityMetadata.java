@@ -6,7 +6,6 @@ import database.sql.util.type.TypeConverter;
 import java.lang.reflect.Field;
 import java.util.List;
 
-// XXX: 팩토리 만들어볼까?
 public class EntityMetadata {
     private final TableMetadata tableMetadata;
     private final ColumnsMetadata columnsMetadata;

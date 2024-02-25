@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import database.sql.dml.SelectOneQueryBuilder;
-import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 
@@ -18,23 +17,23 @@ public class EntityLoader {
     public EntityLoader(JdbcTemplate jdbcTemplate, Class<?> entityClass) {
         this.jdbcTemplate = jdbcTemplate;
         this.selectOneQueryBuilder = new SelectOneQueryBuilder(entityClass);
-        this.rowMapper = RowMapperFactory.from(entityClass);
+        this.rowMapper = RowMapperFactory.create(entityClass);
     }
 
     // XXX: SELECT 쿼리 빌더로 변경하기
-    public <T> List<T> load(Collection<Long> ids) {
+    public List<Object> load(Collection<Long> ids) {
         return ids.stream()
                 .map(id -> {
                          String query = selectOneQueryBuilder.buildQuery(id);
                          jdbcTemplate.queryForObject(query, rowMapper);
-                         return (T) jdbcTemplate.queryForObject(query, rowMapper);
+                         return jdbcTemplate.queryForObject(query, rowMapper);
                      }
                 )
                 .collect(Collectors.toList());
     }
 
-    public <T> T load(Long id) {
+    public Object load(Long id) {
         String query = selectOneQueryBuilder.buildQuery(id);
-        return (T) jdbcTemplate.queryForObject(query, rowMapper);
+        return jdbcTemplate.queryForObject(query, rowMapper);
     }
 }

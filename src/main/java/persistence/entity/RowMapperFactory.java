@@ -12,11 +12,11 @@ import java.sql.SQLException;
 
 import static java.sql.Types.*;
 
-class RowMapperFactory {
+public class RowMapperFactory {
     private RowMapperFactory() {
     }
 
-    public static RowMapper<Object> from(Class<?> entityClass) {
+    public static RowMapper<Object> create(Class<?> entityClass) {
         EntityMetadata entityMetadata = new EntityMetadata(entityClass);
         return rowMapper(entityClass, entityMetadata);
     }
@@ -32,7 +32,7 @@ class RowMapperFactory {
                     String columnName = rsMetaData.getColumnName(i);
                     int columnType = rsMetaData.getColumnType(i);
                     try {
-                        getSet(resultSet, columnName, columnType, object, entityMetadata);
+                        setFieldValue(resultSet, columnName, columnType, object, entityMetadata);
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
@@ -46,9 +46,8 @@ class RowMapperFactory {
         };
     }
 
-    // XXX: 이름
-    private static void getSet(ResultSet resultSet, String columnName, int columnType, Object entity,
-                               EntityMetadata entityMetadata) throws SQLException, IllegalAccessException {
+    private static void setFieldValue(ResultSet resultSet, String columnName, int columnType, Object entity,
+                                      EntityMetadata entityMetadata) throws SQLException, IllegalAccessException {
         Object value;
         // TODO: JavaTypes 사용해서 타입 관련 코드 개선
         switch (columnType) {

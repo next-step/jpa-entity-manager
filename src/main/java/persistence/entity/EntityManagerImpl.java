@@ -20,7 +20,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> entityClass, Long id) {
         EntityLoader entityLoader = getEntityLoader(entityClass);
-        return entityLoader.load(id);
+        return (T) entityLoader.load(id);
     }
 
     @Override
