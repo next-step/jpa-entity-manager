@@ -28,7 +28,7 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
 
-        entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()));
+        entityManager = new EntityManagerImpl(server);
     }
 
     @AfterEach

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DDLQueryBuilderTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private DDLQueryBuilder ddlQueryBuilder = DDLQueryBuilder.getInstance();
+    private DDLQueryBuilder ddlQueryBuilder = new H2DDLQueryBuilder();
 
     @Test
     @DisplayName("CreateTableQuery_@Id 어노테이션은 Primary key 생성")
