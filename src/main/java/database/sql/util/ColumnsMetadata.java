@@ -5,6 +5,7 @@ import database.sql.util.column.FieldToEntityColumnConverter;
 import database.sql.util.type.TypeConverter;
 import jakarta.persistence.Transient;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,5 +54,15 @@ public class ColumnsMetadata {
 
     public Long getPrimaryKeyValue(Object entity) {
         return (Long) primaryKey.getValue(entity);
+    }
+
+    public Field getFieldByColumnName(String columnName) {
+        // XXX: 너무 길다. 코드정리
+        // 미리 맵으로 뽑아두기
+        return allEntityColumns.stream()
+                .filter(entityColumn -> entityColumn.getColumnName().equalsIgnoreCase(columnName))
+                .findFirst()
+                .get()
+                .getField();
     }
 }

@@ -20,6 +20,12 @@ public abstract class AbstractEntityColumn implements EntityColumn {
         this.columnLength = columnLength;
     }
 
+
+    @Override
+    public Field getField() {
+        return field;
+    }
+
     @Override
     public String getColumnName() {
         return columnName;

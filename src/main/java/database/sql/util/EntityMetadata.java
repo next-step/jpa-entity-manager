@@ -3,6 +3,7 @@ package database.sql.util;
 import database.sql.util.column.EntityColumn;
 import database.sql.util.type.TypeConverter;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class EntityMetadata {
@@ -13,6 +14,7 @@ public class EntityMetadata {
         this(entity.getClass());
     }
 
+    // XXX: metadata 를 entityMetadata 로
     public EntityMetadata(Class<?> entityClass) {
         tableMetadata = new TableMetadata(entityClass);
         columnsMetadata = new ColumnsMetadata(entityClass);
@@ -48,5 +50,9 @@ public class EntityMetadata {
 
     public Long getPrimaryKeyValue(Object entity) {
         return columnsMetadata.getPrimaryKeyValue(entity);
+    }
+
+    public Field getFieldByColumnName(String columnName) {
+        return columnsMetadata.getFieldByColumnName(columnName);
     }
 }
