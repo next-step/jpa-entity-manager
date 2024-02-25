@@ -12,7 +12,6 @@ public class FieldQueryGenerator {
     private static final String PRIMARY_KEY_DEFINITION = "PRIMARY KEY";
     private static final String NOTNULL_DEFINITION = "NOT NULL";
 
-
     private FieldQueryGenerator(Dialect dialect) {
         this.dialect = dialect;
     }

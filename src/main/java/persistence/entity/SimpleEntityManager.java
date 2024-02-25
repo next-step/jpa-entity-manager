@@ -7,10 +7,10 @@ import persistence.sql.dml.DmlGenerator;
 public class SimpleEntityManager implements EntityManager {
 
     //TODO : step3에서 persistcontext로 이동
-   private final EntityPersister entityPersister;
+    private final EntityPersister entityPersister;
 
-   //TODO : step2에서 제거 예정
-   private final DmlGenerator dmlGenerator;
+    //TODO : step2에서 제거 예정
+    private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
 
 

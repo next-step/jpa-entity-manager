@@ -18,7 +18,6 @@ public class SelectQueryBuilder implements QueryBuilder {
         return new SelectQueryBuilder();
     }
 
-
     @Override
     public String generateQuery(Object object) {
 

@@ -1,6 +1,5 @@
 package persistence.entity;
 
-import java.util.Objects;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
 import persistence.sql.meta.Columns;
@@ -31,10 +30,5 @@ public class EntityPersister {
         Columns columns = Columns.from(entity.getClass().getDeclaredFields());
         jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(entity.getClass(),
             columns.getIdValue(entity)));
-    }
-
-    public boolean isExist(Object entity) {
-        Columns columns = Columns.from(entity.getClass().getDeclaredFields());
-        return Objects.nonNull(columns.getIdValue(entity));
     }
 }
