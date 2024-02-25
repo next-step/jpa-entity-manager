@@ -1,4 +1,4 @@
-package util.persistence.sql;
+package persistence.sql;
 
 import database.DatabaseServer;
 import database.H2;

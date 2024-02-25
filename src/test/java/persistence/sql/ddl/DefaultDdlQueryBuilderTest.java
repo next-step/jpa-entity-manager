@@ -1,9 +1,7 @@
-package util.persistence.sql.ddl;
+package persistence.sql.ddl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.ddl.DdlQueryBuilder;
-import persistence.sql.ddl.DefaultDdlQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
 import persistence.sql.mapping.ColumnBinder;

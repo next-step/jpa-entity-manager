@@ -1,4 +1,4 @@
-package util.persistence.sql.ddl;
+package persistence.sql.ddl;
 
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -6,8 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.JdbcServerTest;
 import persistence.sql.TestJdbcServerExtension;
-import persistence.sql.ddl.DdlQueryBuilder;
-import persistence.sql.ddl.DefaultDdlQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
 import persistence.sql.mapping.Table;

@@ -1,4 +1,4 @@
-package util.persistence.sql.dialect.identity;
+package persistence.sql.dialect.identity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

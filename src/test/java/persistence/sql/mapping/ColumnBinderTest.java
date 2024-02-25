@@ -1,4 +1,4 @@
-package util.persistence.sql.mapping;
+package persistence.sql.mapping;
 
 import jakarta.persistence.Transient;
 import org.assertj.core.groups.Tuple;

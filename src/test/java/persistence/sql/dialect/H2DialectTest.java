@@ -1,4 +1,4 @@
-package util.persistence.sql.dialect;
+package persistence.sql.dialect;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

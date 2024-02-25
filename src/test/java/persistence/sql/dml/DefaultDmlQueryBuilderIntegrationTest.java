@@ -1,4 +1,4 @@
-package util.persistence.sql.dml;
+package persistence.sql.dml;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.JdbcServerTest;

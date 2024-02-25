@@ -1,4 +1,4 @@
-package util.persistence.study;
+package persistence.study;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package util.persistence.sql.mapping;
+package persistence.sql.mapping;
 
 import jakarta.persistence.Table;
 import org.junit.jupiter.api.DisplayName;

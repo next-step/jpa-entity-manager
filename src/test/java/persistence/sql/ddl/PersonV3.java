@@ -1,9 +1,10 @@
-package util.persistence.sql.ddl;
+package persistence.sql.ddl;
 
 import jakarta.persistence.*;
 
+@Table(name = "users")
 @Entity
-public class PersonV2 {
+public class PersonV3 {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,14 +19,18 @@ public class PersonV2 {
     @Column(nullable = false)
     private String email;
 
-    public PersonV2() {
+    @Transient
+    private Integer index;
+
+    public PersonV3() {
     }
 
-    public PersonV2(final Long id, final String name, final Integer age, final String email) {
+    public PersonV3(final Long id, final String name, final Integer age, final String email, final int index) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.email = email;
+        this.index = index;
     }
 
 }

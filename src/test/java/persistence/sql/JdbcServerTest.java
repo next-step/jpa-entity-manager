@@ -1,4 +1,4 @@
-package util.persistence.sql;
+package persistence.sql;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
