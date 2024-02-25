@@ -8,9 +8,11 @@ import persistence.sql.dml.SelectQueryBuilder;
 public class MyEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
 
     public MyEntityManager(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
