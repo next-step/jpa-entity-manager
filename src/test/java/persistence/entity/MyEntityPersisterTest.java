@@ -18,7 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class EntityPersisterTest {
+class MyEntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
@@ -41,7 +41,7 @@ class EntityPersisterTest {
     @Test
     void insert() {
         //given
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
+        EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
 
         //when
         entityPersister.insert(new Person(1L, "ABC", 10, "ABC@email.com", 10));
@@ -56,7 +56,7 @@ class EntityPersisterTest {
     @Test
     void update() {
         //given
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
+        EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
 
         //when
         entityPersister.insert(new Person(1L, "ABC", 10, "ABC@email.com", 10));
@@ -78,7 +78,7 @@ class EntityPersisterTest {
     @Test
     void delete() {
         //given
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
+        EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
 
         //when
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);

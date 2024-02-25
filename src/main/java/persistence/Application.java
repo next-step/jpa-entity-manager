@@ -6,6 +6,7 @@ import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.EntityPersister;
+import persistence.entity.MyEntityPersister;
 import persistence.sql.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
@@ -26,7 +27,7 @@ public class Application {
 
             Person person = new Person(1L, "John", 25, "email", 1);
             Person person2 = new Person(2L, "James", 45, "james@asdf.com", 10);
-            EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
+            EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
             entityPersister.insert(person);
             entityPersister.insert(person2);
             Person updatedPerson = new Person(2L, "Tom", 20, "james@asdf.com", 1);
