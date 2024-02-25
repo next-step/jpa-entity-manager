@@ -37,7 +37,6 @@ public enum ResultSetColumnReader {
         Arrays.stream(ResultSetColumnReader.values())
             .collect(Collectors.toMap(type -> type.clazz, type -> type));
 
-
     ResultSetColumnReader(Class<?> clazz, BiFunction<ResultSet, String, ?> mapper) {
         this.clazz = clazz;
         this.mapper = mapper;
