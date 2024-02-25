@@ -31,8 +31,12 @@ public abstract class AbstractEntityColumn implements EntityColumn {
     }
 
     @Override
-    public Object getValue(Object entity) throws IllegalAccessException {
+    public Object getValue(Object entity) {
         field.setAccessible(true);
-        return field.get(entity);
+        try {
+            return field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

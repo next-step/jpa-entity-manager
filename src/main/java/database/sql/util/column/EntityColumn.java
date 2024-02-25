@@ -11,5 +11,5 @@ public interface EntityColumn {
 
     String getFieldName();
 
-    Object getValue(Object entity) throws IllegalAccessException;
+    Object getValue(Object entity);
 }

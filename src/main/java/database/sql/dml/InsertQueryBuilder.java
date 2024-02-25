@@ -26,7 +26,7 @@ public class InsertQueryBuilder {
     }
 
     public String buildQuery(Object entity) {
-        return buildQuery(valuesFromEntity(entity));
+        return buildQuery(columnValues(entity));
     }
 
     private List<String> columnClauses(Map<String, Object> valueMap) {
@@ -41,7 +41,7 @@ public class InsertQueryBuilder {
                 .collect(Collectors.joining(", "));
     }
 
-    private Map<String, Object> valuesFromEntity(Object entity) {
-        return new ValueMap(entity).getValuesMap();
+    private Map<String, Object> columnValues(Object entity) {
+        return new ColumnValueMap(entity).getColumnValueMap();
     }
 }

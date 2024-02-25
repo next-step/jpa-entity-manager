@@ -52,10 +52,6 @@ public class ColumnsMetadata {
     }
 
     public long getPrimaryKeyValue(Object entity) {
-        try {
-            return (long) primaryKey.getValue(entity);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return (long) primaryKey.getValue(entity);
     }
 }
