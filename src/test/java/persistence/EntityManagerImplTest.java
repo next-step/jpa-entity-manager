@@ -2,13 +2,14 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
-import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.core.EntityManager;
+import persistence.core.EntityManagerImpl;
 import persistence.entity.Person;
 
 import java.sql.SQLException;

@@ -1,5 +1,6 @@
 package persistence.sql.ddl;
 
+import database.H2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -8,12 +9,17 @@ import persistence.entity.Person;
 import persistence.entity.Person1;
 import persistence.entity.Person2;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DDLQueryBuilderTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private DDLQueryBuilder ddlQueryBuilder = new H2DDLQueryBuilder();
+    private DDLQueryBuilder ddlQueryBuilder = DDLQueryBuilderFactory.getDDLQueryBuilder(new H2());
+
+    DDLQueryBuilderTest() throws SQLException {
+    }
 
     @Test
     @DisplayName("CreateTableQuery_@Id 어노테이션은 Primary key 생성")

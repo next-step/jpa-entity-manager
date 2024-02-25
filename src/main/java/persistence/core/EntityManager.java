@@ -1,4 +1,4 @@
-package persistence;
+package persistence.core;
 
 import persistence.entity.Person;
 

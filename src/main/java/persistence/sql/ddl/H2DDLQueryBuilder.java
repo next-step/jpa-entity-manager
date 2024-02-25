@@ -1,14 +1,22 @@
 package persistence.sql.ddl;
 
+import jakarta.persistence.Column;
 import persistence.inspector.ClsssMetadataInspector;
 import persistence.inspector.EntityFieldInspector;
 import persistence.inspector.EntityInfoExtractor;
+import persistence.sql.Dialect;
+import persistence.sql.h2.H2Dialect;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class H2DDLQueryBuilder implements DDLQueryBuilder {
+    private final Dialect dialect;
+
+    public H2DDLQueryBuilder() {
+        this.dialect = new H2Dialect();
+    }
 
     @Override
     public String createTableQuery(Class<?> clazz) {
@@ -50,10 +58,33 @@ public class H2DDLQueryBuilder implements DDLQueryBuilder {
 
         return String.format(columnTypeFormat,
                 EntityInfoExtractor.getColumnName(field),
-                EntityInfoExtractor.getColumnType(field).getMysqlType(),
+                getColumnDataType(field),
                 getColumnProperty(field)
         );
     }
+
+    // TODO getColumnType Refactoring
+    private String getColumnDataType(Field field) {
+        String columnType = dialect.getColumnType(field.getType());
+        int length = 0;
+        if (field.isAnnotationPresent(Column.class)) {
+            Column column = field.getAnnotation(Column.class);
+            if (column.columnDefinition().length() > 0) {
+                length = column.columnDefinition().length();
+            }
+        }
+
+        if ("VARCHAR".equals(columnType) && length == 0) {
+            length = 255;
+        }
+
+        if (length > 0) {
+            return columnType + "(" + length + ")";
+        }
+
+        return columnType;
+    }
+
 
     private String createPrimaryKeyClause(Class<?> clazz) {
         final String primaryKeyClauseFormat = ", PRIMARY KEY (%s)";
