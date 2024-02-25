@@ -72,18 +72,19 @@ public class ColumnBinder {
     }
 
     private Column getColumn(final Field field, final String columnName, final int sqlType) {
-        int length = 255;
-        boolean nullable = true;
-        boolean unique = false;
+        final Value value = new Value(field.getType(), sqlType);
 
         final jakarta.persistence.Column columnAnnotation = field.getAnnotation(jakarta.persistence.Column.class);
+
         if (columnAnnotation != null) {
-            length = columnAnnotation.length();
-            nullable = columnAnnotation.nullable();
-            unique = columnAnnotation.unique();
+            int length = columnAnnotation.length();
+            boolean nullable = columnAnnotation.nullable();
+            boolean unique = columnAnnotation.unique();
+
+            return new Column(columnName, sqlType, value, length, nullable, unique);
         }
 
-        return new Column(columnName, sqlType, new Value(field.getType(), sqlType), length, nullable, unique);
+        return new Column(columnName, sqlType, value);
     }
 
     private Column createColumn(final Field field, final Object object) {

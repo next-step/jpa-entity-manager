@@ -23,6 +23,12 @@ public class Column {
 
     private Column() {}
 
+    public Column(final String columnName, final int sqlType, final Value value) {
+        this.name = columnName;
+        this.type = sqlType;
+        this.value = value;
+    }
+
     public Column(final String columnName, final int sqlType, final Value value, final int length, final boolean nullable, final boolean unique) {
         this.name = columnName;
         this.type = sqlType;
