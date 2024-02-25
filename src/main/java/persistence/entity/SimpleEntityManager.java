@@ -33,10 +33,6 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        if (entityPersister.isExist(entity)) {
-            entityPersister.update(entity);
-            return;
-        }
         entityPersister.insert(entity);
     }
 

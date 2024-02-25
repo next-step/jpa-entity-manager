@@ -5,16 +5,14 @@ import database.H2;
 import domain.Person;
 import java.sql.SQLException;
 import jdbc.JdbcTemplate;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.entity.EntityManager;
-import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 
@@ -52,7 +50,7 @@ class SimpleEntityManagerTest {
         @Test
         void persistTest_whenInsert() {
             //given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
 
             //when
             entityManager.persist(person);
@@ -61,26 +59,6 @@ class SimpleEntityManagerTest {
             Person foundPerson = entityManager.find(person.getClass(), 1L);
             assertAll(
                 () -> assertEquals(person.getName(), foundPerson.getName()),
-                () -> assertEquals(person.getAge(), foundPerson.getAge()),
-                () -> assertEquals(person.getEmail(), foundPerson.getEmail())
-            );
-        }
-
-        @DisplayName("등록된 Person entity를 수정 한다.")
-        @Test
-        void persistTest_whenUpdate() {
-            //given
-            entityManager.persist(createPerson());
-            Person person  = entityManager.find(Person.class, 1L);
-
-            //when
-            person.updateName("user2");
-            entityManager.persist(person);
-
-            //then
-            Person foundPerson = entityManager.find(person.getClass(), 1L);
-            assertAll(
-                () -> assertEquals(person.getName(), "user2"),
                 () -> assertEquals(person.getAge(), foundPerson.getAge()),
                 () -> assertEquals(person.getEmail(), foundPerson.getEmail())
             );

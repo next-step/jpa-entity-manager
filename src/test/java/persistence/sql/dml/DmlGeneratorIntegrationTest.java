@@ -5,6 +5,7 @@ import database.H2;
 import domain.Person;
 import java.sql.SQLException;
 import java.util.List;
+import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.AfterEach;
@@ -65,12 +66,8 @@ class DmlGeneratorIntegrationTest {
         insertQueryTest("user3", 1, "abc@test.co", 1);
         insertQueryTest("user4", 1, "abc@test.co", 1);
 
-        List<Person> people = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet -> Person.of(
-            resultSet.getLong("id"),
-            resultSet.getString("nick_name"),
-            resultSet.getInt("old"),
-            resultSet.getString("email")
-        ));
+        List<Person> people = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet ->
+            new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
             () -> assertThat(people).isNotNull(),
@@ -94,12 +91,8 @@ class DmlGeneratorIntegrationTest {
     void selectQueryWithIdTest(String name, int age, String email, int index, long id) {
         insertQueryTest(name, age, email, index);
 
-        Person person = jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(Person.class, id), resultSet -> Person.of(
-            resultSet.getLong("id"),
-            resultSet.getString("nick_name"),
-            resultSet.getInt("old"),
-            resultSet.getString("email")
-        ));
+        Person person = jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(Person.class, id), resultSet ->
+            new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
             () -> assertThat(person).isNotNull(),
@@ -122,16 +115,12 @@ class DmlGeneratorIntegrationTest {
         jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 3));
         jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 4));
 
-        List<Person> people = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet -> Person.of(
-            resultSet.getLong("id"),
-            resultSet.getString("nick_name"),
-            resultSet.getInt("old"),
-            resultSet.getString("email")
-        ));
+        List<Person> personList = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet ->
+            new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
-            () -> assertThat(people).isNotNull(),
-            () -> assertThat(people).isEmpty()
+            () -> assertThat(personList).isNotNull(),
+            () -> assertThat(personList).isEmpty()
         );
     }
 
@@ -145,17 +134,31 @@ class DmlGeneratorIntegrationTest {
 
         jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 4));
 
-        List<Person> people = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet -> Person.of(
-            resultSet.getLong("id"),
-            resultSet.getString("nick_name"),
-            resultSet.getInt("old"),
-            resultSet.getString("email")
-        ));
+        List<Person> personList = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet ->
+            new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
-            () -> assertThat(people).isNotNull(),
-            () -> assertThat(people).isNotEmpty(),
-            () -> assertThat(people).hasSize(3)
+            () -> assertThat(personList).isNotNull(),
+            () -> assertThat(personList).isNotEmpty(),
+            () -> assertThat(personList).hasSize(3)
+        );
+    }
+
+    @DisplayName("generateUpdateQuery Update 쿼리가 정상적으로 호출되는지 확인한다.")
+    @Test
+    void updateQueryTest() {
+        insertQueryTest("user1", 1, "abc@test.co", 1);
+
+        jdbcTemplate.execute(dmlGenerator.generateUpdateQuery(Person.of(1L, "user2", 2, "abcd@test.co")));
+
+        Person person = jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(Person.class, 1L), resultSet ->
+            new EntityRowMapper<>(Person.class).mapRow(resultSet));
+
+        assertAll(
+            () -> assertThat(person).isNotNull(),
+            () -> assertThat(person.getName()).isEqualTo("user2"),
+            () -> assertThat(person.getAge()).isEqualTo(2),
+            () -> assertThat(person.getEmail()).isEqualTo("abcd@test.co")
         );
     }
 }

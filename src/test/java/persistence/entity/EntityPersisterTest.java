@@ -49,7 +49,7 @@ class EntityPersisterTest {
     @DisplayName("insert 메서드는")
     @Nested
     class Insert {
-        @DisplayName("Entity를 저장한다.")
+        @DisplayName("Person Entity를 저장한다.")
         @Test
         void insertTest() {
             //given
@@ -60,7 +60,6 @@ class EntityPersisterTest {
 
             //then
             Person foundPerson = findPerson(1L);
-
             assertAll(
                 () -> assertThat(person).isNotNull(),
                 () -> assertThat(person.getName()).isEqualTo(foundPerson.getName()),
@@ -73,19 +72,20 @@ class EntityPersisterTest {
     @DisplayName("update 메서드는")
     @Nested
     class Update {
-        @DisplayName("Entity를 수정한다.")
+        @DisplayName("Person Entity를 수정한다.")
         @Test
         void updateTest() {
             //given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
             entityPersister.insert(person);
-            person = jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(Person.class, 1L),
-                resultSet -> new EntityRowMapper<>(Person.class).mapRow(resultSet));
+            person = findPerson(1L);
 
             person.updateName("user2");
 
             //when & then
             assertThat(entityPersister.update(person)).isTrue();
+            person = findPerson(1L);
+            assertThat(person.getName()).isEqualTo("user2");
         }
     }
 
@@ -106,8 +106,6 @@ class EntityPersisterTest {
             //then
             assertThatThrownBy(() -> findPerson(1L))
                 .isInstanceOf(RuntimeException.class);
-
-
         }
     }
     private Person createPerson() {
