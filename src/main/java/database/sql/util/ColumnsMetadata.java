@@ -8,6 +8,7 @@ import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ColumnsMetadata {
@@ -15,6 +16,7 @@ public class ColumnsMetadata {
     private final List<EntityColumn> allEntityColumns;
     private final EntityColumn primaryKey;
     private final List<EntityColumn> generalColumns;
+    private final Map<String, Field> fieldByColumnNameMap;
 
     public ColumnsMetadata(Class<?> entityClass) {
         allEntityColumns = Arrays.stream(entityClass.getDeclaredFields())
@@ -28,6 +30,10 @@ public class ColumnsMetadata {
         generalColumns = allEntityColumns.stream()
                 .filter(columnMetadata -> !columnMetadata.isPrimaryKeyField())
                 .collect(Collectors.toList());
+
+        fieldByColumnNameMap = allEntityColumns.stream()
+                .collect(Collectors.toMap(entityColumn -> entityColumn.getColumnName().toUpperCase(),
+                                          EntityColumn::getField));
     }
 
     public List<String> getAllColumnNames() {
@@ -57,12 +63,6 @@ public class ColumnsMetadata {
     }
 
     public Field getFieldByColumnName(String columnName) {
-        // XXX: 너무 길다. 코드정리
-        // 미리 맵으로 뽑아두기
-        return allEntityColumns.stream()
-                .filter(entityColumn -> entityColumn.getColumnName().equalsIgnoreCase(columnName))
-                .findFirst()
-                .get()
-                .getField();
+        return fieldByColumnNameMap.get(columnName.toUpperCase());
     }
 }
