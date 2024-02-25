@@ -11,11 +11,11 @@ public class InsertQueryBuilder implements QueryBuilder {
 
     private static final String INSERT_DEFINITION = "INSERT INTO %s (%s) VALUES (%s)";
 
-    public static InsertQueryBuilder from() {
-        return new InsertQueryBuilder();
+    private InsertQueryBuilder() {
     }
 
-    private InsertQueryBuilder() {
+    public static InsertQueryBuilder from() {
+        return new InsertQueryBuilder();
     }
 
     @Override

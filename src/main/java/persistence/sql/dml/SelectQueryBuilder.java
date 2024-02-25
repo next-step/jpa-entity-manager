@@ -10,12 +10,14 @@ import persistence.sql.meta.Table;
 public class SelectQueryBuilder implements QueryBuilder {
 
     private static final String SELECT_DEFINITION = "SELECT %s FROM %s";
+
+    private SelectQueryBuilder() {
+    }
+
     public static SelectQueryBuilder from() {
         return new SelectQueryBuilder();
     }
 
-    private SelectQueryBuilder() {
-    }
 
     @Override
     public String generateQuery(Object object) {
