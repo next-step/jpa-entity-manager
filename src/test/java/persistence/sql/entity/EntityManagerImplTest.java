@@ -8,7 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.dialect.h2.H2Dialect;
-import persistence.sql.dml.QueryBuilder;
+import persistence.sql.dml.InsertQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.domain.Person;
 
 import java.sql.Connection;
@@ -39,7 +40,7 @@ class EntityManagerImplTest {
     @Test
     void findTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final QueryBuilder queryBuilder = new QueryBuilder(Person.class, new H2Dialect());
+        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(Person.class, new H2Dialect());
         jdbcTemplate.execute(queryBuilder.createInsertQuery(person));
 
         final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
@@ -64,7 +65,7 @@ class EntityManagerImplTest {
     @Test
     void removeTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final QueryBuilder queryBuilder = new QueryBuilder(Person.class, new H2Dialect());
+        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(Person.class, new H2Dialect());
         jdbcTemplate.execute(queryBuilder.createInsertQuery(person));
         final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
 

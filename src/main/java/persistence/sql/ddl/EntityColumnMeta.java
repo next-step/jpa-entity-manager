@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import static persistence.sql.ddl.DdlKeyGenerator.createPrimaryKeyGenerateDDL;
+import static persistence.sql.ddl.DdlGenerator.createPrimaryKeyGenerateDDL;
 import static persistence.sql.dialect.JavaClassCodeTypeMappings.getJavaClassToJdbcCodeType;
 
 public class EntityColumnMeta {

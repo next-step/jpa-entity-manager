@@ -1,4 +1,4 @@
-package persistence.sql.ddl;
+package persistence.sql.meta;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -16,7 +16,7 @@ public class EntityTableMeta {
 
     public String name() {
         if (!this.clazz.isAnnotationPresent(Entity.class)) {
-            throw new IllegalArgumentException();
+            throw new IllegalStateException();
         }
 
         if (this.clazz.isAnnotationPresent(Table.class)) {

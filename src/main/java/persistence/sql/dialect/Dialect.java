@@ -22,8 +22,7 @@ public abstract class Dialect {
         return result;
     }
 
-    public abstract String generatorCreateDdl(final GenerationType strategy);
-    public abstract String generatorKeyValue(final GenerationType strategy);
+    public abstract String generatorCreatePrimaryDdl(final GenerationType strategy);
 
     public abstract String getCreateDefaultDdlQuery();
     public abstract String getDropDefaultDdlQuery();
