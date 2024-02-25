@@ -14,14 +14,14 @@ import java.util.Map;
  */
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
-    private final EntityMetadata metadata;
+    private final EntityMetadata entityMetadata;
     private final InsertQueryBuilder insertQueryBuilder;
     private final UpdateQueryBuilder updateQueryBuilder;
     private final DeleteQueryBuilder deleteQueryBuilder;
 
     public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> entityClass) {
         this.jdbcTemplate = jdbcTemplate;
-        this.metadata = new EntityMetadata(entityClass);
+        this.entityMetadata = new EntityMetadata(entityClass);
         this.insertQueryBuilder = new InsertQueryBuilder(entityClass);
         this.updateQueryBuilder = new UpdateQueryBuilder(entityClass);
         this.deleteQueryBuilder = new DeleteQueryBuilder(entityClass);
@@ -42,11 +42,10 @@ public class EntityPersister {
 
     public void delete(Object entity) {
         String query = deleteQueryBuilder.buildQuery(Map.of("id", getId(entity)));
-
         jdbcTemplate.execute(query);
     }
 
     private Long getId(Object entity) {
-        return metadata.getPrimaryKeyValue(entity);
+        return entityMetadata.getPrimaryKeyValue(entity);
     }
 }

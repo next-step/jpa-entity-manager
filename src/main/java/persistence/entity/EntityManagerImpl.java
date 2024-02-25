@@ -54,7 +54,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private static Long getId(Object entity) {
-        EntityMetadata metadata = new EntityMetadata(entity.getClass());
-        return metadata.getPrimaryKeyValue(entity);
+        EntityMetadata entityMetadata = new EntityMetadata(entity.getClass());
+        return entityMetadata.getPrimaryKeyValue(entity);
     }
 }

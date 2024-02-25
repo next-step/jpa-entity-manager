@@ -8,10 +8,10 @@ public class CreateQueryBuilder {
     private final String columnsWithDefinition;
 
     public CreateQueryBuilder(Class<?> entityClass, TypeConverter typeConverter) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
 
-        this.tableName = metadata.getTableName();
-        this.columnsWithDefinition = String.join(", ", metadata.getColumnDefinitions(typeConverter));
+        this.tableName = entityMetadata.getTableName();
+        this.columnsWithDefinition = String.join(", ", entityMetadata.getColumnDefinitions(typeConverter));
     }
 
     public String buildQuery() {

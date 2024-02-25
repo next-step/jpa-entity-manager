@@ -7,9 +7,9 @@ public class SelectQueryBuilder {
     private final String joinedAllColumnNames;
 
     public SelectQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
-        this.tableName = metadata.getTableName();
-        this.joinedAllColumnNames = metadata.getJoinedAllColumnNames();
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+        this.tableName = entityMetadata.getTableName();
+        this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
     }
 
     public String buildQuery() {

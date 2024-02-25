@@ -6,8 +6,8 @@ public class DropQueryBuilder {
     private final String tableName;
 
     public DropQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
-        this.tableName = metadata.getTableName();
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+        this.tableName = entityMetadata.getTableName();
     }
 
     public String buildQuery() {

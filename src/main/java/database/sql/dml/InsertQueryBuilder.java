@@ -13,9 +13,9 @@ public class InsertQueryBuilder {
     private final List<String> generalColumnNames;
 
     public InsertQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
-        this.tableName = metadata.getTableName();
-        this.generalColumnNames = metadata.getGeneralColumnNames();
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+        this.tableName = entityMetadata.getTableName();
+        this.generalColumnNames = entityMetadata.getGeneralColumnNames();
     }
 
     public String buildQuery(Map<String, Object> valueMap) {

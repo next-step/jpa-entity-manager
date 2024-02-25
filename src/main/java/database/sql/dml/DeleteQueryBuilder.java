@@ -14,10 +14,10 @@ public class DeleteQueryBuilder {
     private final String primaryKeyColumnName;
 
     public DeleteQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
-        this.tableName = metadata.getTableName();
-        this.primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
-        this.allColumnNames = metadata.getAllColumnNames();
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+        this.tableName = entityMetadata.getTableName();
+        this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
+        this.allColumnNames = entityMetadata.getAllColumnNames();
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {

@@ -14,7 +14,6 @@ public class EntityMetadata {
         this(entity.getClass());
     }
 
-    // XXX: metadata 를 entityMetadata 로
     public EntityMetadata(Class<?> entityClass) {
         tableMetadata = new TableMetadata(entityClass);
         columnsMetadata = new ColumnsMetadata(entityClass);
