@@ -12,7 +12,7 @@ class SelectAllQueryBuilderTest {
     @DisplayName("findAll 쿼리를 만들 수 있다.")
     void buildFindAllQuery() {
         //given
-        SelectAllQueryBuilder selectAllQueryBuilder = new SelectAllQueryBuilder();
+        SelectAllQueryBuilder selectAllQueryBuilder = SelectAllQueryBuilder.getInstance();
 
         //when
         String query = selectAllQueryBuilder.build(Person.class);

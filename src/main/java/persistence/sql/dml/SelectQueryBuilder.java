@@ -11,6 +11,15 @@ public class SelectQueryBuilder {
     private static final String WHERE_CLAUSE_TEMPLATE = " WHERE %s = %d";
     private static final String COLUMN_DELIMITER = ", ";
 
+    private static class InstanceHolder {
+        private static final SelectQueryBuilder INSTANCE = new SelectQueryBuilder();
+    }
+
+    public static SelectQueryBuilder getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+
     public String build(Class<?> target, Object id) {
         Table table = Table.from(target);
         String columnsNames = getColumnsNames(table.getColumns());

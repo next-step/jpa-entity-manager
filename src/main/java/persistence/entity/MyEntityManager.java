@@ -16,7 +16,7 @@ public class MyEntityManager implements EntityManager {
     //TODO entityLoader 생성 후 jdbcTemplate 제거 및 해당 메서드 책임 이전
     @Override
     public <T> T find(Class<T> clazz, Long Id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.getInstance();
         String query = selectQueryBuilder.build(clazz, Id);
         return jdbcTemplate.queryForObject(query, RowMapperFactory.create(clazz));
     }

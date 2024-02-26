@@ -14,6 +14,15 @@ import java.util.stream.Collectors;
 public class UpdateQueryBuilder {
     private static final String UPDATE_QUERY_TEMPLATE = "UPDATE %s SET %s WHERE %s = %s";
 
+    private static class InstanceHolder {
+        private static final UpdateQueryBuilder INSTANCE = new UpdateQueryBuilder();
+    }
+
+    public static UpdateQueryBuilder getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+
     public String build(Object object) {
         Table table = Table.from(object.getClass());
         IdColumn idColumn = table.getIdColumn();

@@ -8,25 +8,28 @@ import persistence.sql.dml.UpdateQueryBuilder;
 public class MyEntityPersister implements EntityPersister {
 
     private final JdbcTemplate jdbcTemplate;
+    private final InsertQueryBuilder insertQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
 
     public MyEntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.insertQueryBuilder = InsertQueryBuilder.getInstance();
+        this.updateQueryBuilder = UpdateQueryBuilder.getInstance();
+        this.deleteQueryBuilder = DeleteQueryBuilder.getInstance();
     }
 
     public boolean update(Object entity) {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
         String query = updateQueryBuilder.build(entity);
         return jdbcTemplate.executeForUpdate(query);
     }
 
     public void insert(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
         String query = insertQueryBuilder.build(entity);
         jdbcTemplate.execute(query);
     }
 
     public void delete(Object entity) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         String query = deleteQueryBuilder.build(entity);
         jdbcTemplate.execute(query);
     }

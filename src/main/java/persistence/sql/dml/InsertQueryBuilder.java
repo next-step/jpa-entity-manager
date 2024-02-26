@@ -14,6 +14,15 @@ public class InsertQueryBuilder {
     private static final String INSERT_QUERY_TEMPLATE = "INSERT INTO %s (%s) VALUES (%s)";
     private static final String CLAUSE_DELIMITER = ", ";
 
+    private static class InstanceHolder {
+        private static final InsertQueryBuilder INSTANCE = new InsertQueryBuilder();
+    }
+
+    public static InsertQueryBuilder getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+
     public String build(Object object) {
         Table table = Table.from(object.getClass());
         List<Column> columns = table.getColumns();
