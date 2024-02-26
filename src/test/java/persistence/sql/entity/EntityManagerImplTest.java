@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DdlCreateQueryBuilder;
 import persistence.sql.ddl.DdlDropQueryBuilder;
 import persistence.sql.dialect.h2.H2Dialect;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.domain.Person;
 
 import java.sql.Connection;
@@ -41,10 +40,9 @@ class EntityManagerImplTest {
     @Test
     void findTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(Person.class, new H2Dialect());
-        jdbcTemplate.execute(queryBuilder.createInsertQuery(person));
+        final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(jdbcTemplate, new H2Dialect()), jdbcTemplate);
+        entityManager.persist(person);
 
-        final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
         final Person findPerson = entityManager.find(person.getClass(), 1L);
 
         assertThat(person).isEqualTo(findPerson);
@@ -54,7 +52,7 @@ class EntityManagerImplTest {
     @Test
     void persistTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(jdbcTemplate, new H2Dialect()), jdbcTemplate);
 
         entityManager.persist(person);
 
@@ -66,9 +64,8 @@ class EntityManagerImplTest {
     @Test
     void removeTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(Person.class, new H2Dialect());
-        jdbcTemplate.execute(queryBuilder.createInsertQuery(person));
-        final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(jdbcTemplate, new H2Dialect()), jdbcTemplate);
+        entityManager.persist(person);
 
         entityManager.remove(person);
 

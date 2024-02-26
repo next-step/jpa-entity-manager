@@ -1,7 +1,6 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.EntityColumns;
 import persistence.sql.meta.EntityPrimaryKey;
 import persistence.sql.meta.EntityTableMeta;
@@ -16,7 +15,7 @@ public class UpdateQueryBuilder {
     private final EntityColumns entityColumns;
     private final Dialect dialect;
 
-    public UpdateQueryBuilder(Class<Person> clazz, Dialect dialect) {
+    public UpdateQueryBuilder(Class<?> clazz, Dialect dialect) {
         this.entityTableMeta = EntityTableMeta.of(clazz);
         this.entityPrimaryKey = EntityPrimaryKey.of(clazz);
         this.entityColumns = EntityColumns.of(clazz);
