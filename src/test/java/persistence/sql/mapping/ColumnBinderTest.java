@@ -5,9 +5,6 @@ import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.PersonV3;
-import persistence.sql.mapping.Column;
-import persistence.sql.mapping.ColumnBinder;
-import persistence.sql.mapping.ColumnTypeMapper;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

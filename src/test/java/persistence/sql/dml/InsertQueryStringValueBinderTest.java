@@ -2,8 +2,6 @@ package persistence.sql.dml;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.dml.QueryStringValueBinder;
-import persistence.sql.dml.QueryValueBinder;
 import persistence.sql.mapping.Value;
 
 import static org.assertj.core.api.Assertions.assertThat;

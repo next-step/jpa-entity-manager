@@ -2,9 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
-import persistence.entity.EntityManager;
-import persistence.entity.EntityRowMapper;
-import persistence.entity.SimpleEntityManager;
+import org.junit.jupiter.api.*;
 import persistence.sql.JdbcServerTest;
 import persistence.sql.TestJdbcServerExtension;
 import persistence.sql.ddl.PersonV3;

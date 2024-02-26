@@ -2,7 +2,6 @@ package persistence.sql.mapping;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.mapping.ColumnTypeMapper;
 
 import java.sql.Types;
 

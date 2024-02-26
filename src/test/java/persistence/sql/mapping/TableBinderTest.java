@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.QueryException;
 import persistence.sql.ddl.PersonV0;
 import persistence.sql.ddl.PersonV3;
-import persistence.sql.mapping.TableBinder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

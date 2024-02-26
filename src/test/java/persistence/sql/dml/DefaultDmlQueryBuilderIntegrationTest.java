@@ -1,12 +1,12 @@
 package persistence.sql.dml;
 
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.*;
 import persistence.sql.JdbcServerTest;
 import persistence.sql.TestJdbcServerExtension;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
-import persistence.sql.dml.*;
 import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Table;
 import persistence.sql.mapping.TableBinder;

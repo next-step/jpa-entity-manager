@@ -2,8 +2,6 @@ package persistence.sql.dialect.identity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.dialect.identity.H2IdentityColumnSupport;
-import persistence.sql.dialect.identity.IdentityColumnSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

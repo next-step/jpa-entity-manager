@@ -2,9 +2,6 @@ package persistence.sql.dialect;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.dialect.Dialect;
-import persistence.sql.dialect.DialectException;
-import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dialect.identity.H2IdentityColumnSupport;
 import persistence.sql.dialect.identity.IdentityColumnSupport;
 

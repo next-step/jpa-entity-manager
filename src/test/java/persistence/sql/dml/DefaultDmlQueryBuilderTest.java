@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
-import persistence.sql.dml.*;
 import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Table;
 import persistence.sql.mapping.TableBinder;
