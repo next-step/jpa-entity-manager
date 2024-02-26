@@ -31,6 +31,8 @@ public class ColumnsMetadata {
                 .filter(columnMetadata -> !columnMetadata.isPrimaryKeyField())
                 .collect(Collectors.toList());
 
+        // TODO: H2 에서는 ResultSet 에서 돌아온 결과의 컬럼명이 대문자로 구성되어 있어서, 쉬운 비교를 위해서 미리 변환해서 저장해둠.
+        // dialect 마다 상황이 다를 수도 있음. (대소문자를 구별해서 nick_name과 NICK_NAME 을 다르게 처리하는 경우에는 에러 발생한다)
         fieldByColumnNameMap = allEntityColumns.stream()
                 .collect(Collectors.toMap(entityColumn -> entityColumn.getColumnName().toUpperCase(),
                                           EntityColumn::getField));
@@ -63,6 +65,7 @@ public class ColumnsMetadata {
     }
 
     public Field getFieldByColumnName(String columnName) {
-        return fieldByColumnNameMap.get(columnName.toUpperCase());
+        String upperCase = columnName.toUpperCase();
+        return fieldByColumnNameMap.get(upperCase);
     }
 }

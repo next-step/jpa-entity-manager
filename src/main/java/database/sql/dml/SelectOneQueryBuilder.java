@@ -2,6 +2,7 @@ package database.sql.dml;
 
 import database.sql.util.EntityMetadata;
 
+// TODO: 얘를 SelectOne 이 아니라 SelectIdQueryBuilder 로 바꿔볼까?
 public class SelectOneQueryBuilder {
     private final String tableName;
     private final String primaryKeyColumnName;
