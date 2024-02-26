@@ -10,11 +10,14 @@ public class DeleteQueryBuilder {
     private final List<String> allColumnNames;
     private final String primaryKeyColumnName;
 
-    public DeleteQueryBuilder(Class<?> entityClass) {
-        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+    public DeleteQueryBuilder(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
         this.allColumnNames = entityMetadata.getAllColumnNames();
+    }
+
+    public DeleteQueryBuilder(Class<?> entityClass) {
+        this(new EntityMetadata(entityClass));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {

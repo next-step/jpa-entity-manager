@@ -2,6 +2,7 @@ package persistence.entity;
 
 import database.sql.dml.SelectOneQueryBuilder;
 import database.sql.dml.SelectQueryBuilder;
+import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 
@@ -17,8 +18,9 @@ public class EntityLoader {
 
     public EntityLoader(JdbcTemplate jdbcTemplate, Class<?> entityClass) {
         this.jdbcTemplate = jdbcTemplate;
-        this.selectOneQueryBuilder = new SelectOneQueryBuilder(entityClass);
-        this.selectQueryBuilder = new SelectQueryBuilder(entityClass);
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+        this.selectOneQueryBuilder = new SelectOneQueryBuilder(entityMetadata);
+        this.selectQueryBuilder = new SelectQueryBuilder(entityMetadata);
         this.rowMapper = RowMapperFactory.create(entityClass);
     }
 

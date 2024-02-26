@@ -10,11 +10,14 @@ public class SelectQueryBuilder {
     private final List<String> allColumnNames;
     private final String joinedAllColumnNames;
 
-    public SelectQueryBuilder(Class<?> entityClass) {
-        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+    public SelectQueryBuilder(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.allColumnNames = entityMetadata.getAllColumnNames();
         this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
+    }
+
+    public SelectQueryBuilder(Class<?> entityClass) {
+        this(new EntityMetadata(entityClass));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {

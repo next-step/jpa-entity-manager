@@ -22,9 +22,9 @@ public class EntityPersister {
     public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> entityClass) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityMetadata = new EntityMetadata(entityClass);
-        this.insertQueryBuilder = new InsertQueryBuilder(entityClass);
-        this.updateQueryBuilder = new UpdateQueryBuilder(entityClass);
-        this.deleteQueryBuilder = new DeleteQueryBuilder(entityClass);
+        this.insertQueryBuilder = new InsertQueryBuilder(entityMetadata);
+        this.updateQueryBuilder = new UpdateQueryBuilder(entityMetadata);
+        this.deleteQueryBuilder = new DeleteQueryBuilder(entityMetadata);
     }
 
     public void insert(Object entity) {

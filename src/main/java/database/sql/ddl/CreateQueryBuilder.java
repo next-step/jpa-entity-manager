@@ -7,11 +7,13 @@ public class CreateQueryBuilder {
     private final String tableName;
     private final String columnsWithDefinition;
 
-    public CreateQueryBuilder(Class<?> entityClass, TypeConverter typeConverter) {
-        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
-
+    public CreateQueryBuilder(EntityMetadata entityMetadata, TypeConverter typeConverter) {
         this.tableName = entityMetadata.getTableName();
         this.columnsWithDefinition = String.join(", ", entityMetadata.getColumnDefinitions(typeConverter));
+    }
+
+    public CreateQueryBuilder(Class<?> entityClass, TypeConverter typeConverter) {
+        this(new EntityMetadata(entityClass), typeConverter);
     }
 
     public String buildQuery() {

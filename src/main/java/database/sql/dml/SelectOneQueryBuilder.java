@@ -8,11 +8,14 @@ public class SelectOneQueryBuilder {
     private final String primaryKeyColumnName;
     private final String joinedAllColumnNames;
 
-    public SelectOneQueryBuilder(Class<?> entityClass) {
-        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+    public SelectOneQueryBuilder(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
         this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
+    }
+
+    public SelectOneQueryBuilder(Class<?> entityClass) {
+        this(new EntityMetadata(entityClass));
     }
 
     public String buildQuery(Long id) {
