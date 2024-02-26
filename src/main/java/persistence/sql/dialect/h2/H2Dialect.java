@@ -12,6 +12,7 @@ public class H2Dialect extends Dialect {
     public static final String SELECT_FIND_ALL_DEFAULT_DML = "select %s from %s";
     public static final String SELECT_FIND_ID_DEFAULT_DML = "%s where %s";
     public static final String DELETE_DEFAULT_DML = "delete from %s where %s";
+    public static final String UPDATE_DEFAULT_DML = "update %s set %s where %s";
 
     public H2Dialect() {
         registerColumnType(Types.BIGINT, "bigint");
@@ -65,5 +66,10 @@ public class H2Dialect extends Dialect {
     @Override
     public String getDeleteDefaultDmlQuery() {
         return DELETE_DEFAULT_DML;
+    }
+
+    @Override
+    public String getUpdateDefaultDmlQuery() {
+        return UPDATE_DEFAULT_DML;
     }
 }

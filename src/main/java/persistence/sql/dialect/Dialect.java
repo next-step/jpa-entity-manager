@@ -31,5 +31,6 @@ public abstract class Dialect {
     public abstract String getFindAllDefaultDmlQuery();
     public abstract String getFindByIdDefaultDmlQuery();
     public abstract String getDeleteDefaultDmlQuery();
+    public abstract String getUpdateDefaultDmlQuery();
 
 }
