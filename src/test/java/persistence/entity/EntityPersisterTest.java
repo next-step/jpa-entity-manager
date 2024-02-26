@@ -61,23 +61,14 @@ class EntityPersisterTest {
         // 동일한 id 의 Person 객체로 update 한 후
         Long savedId = getLastSavedId(jdbcTemplate);
         Person personUpdating = newPerson(savedId, "updated name", 20, "updated@email.com");
-        boolean res = entityPersister.update(personUpdating);
+        entityPersister.update(personUpdating);
 
         // 남아있는 한개의 row 가 잘 업데이트돼야 한다
-        assertThat(res).isTrue();
         List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(1);
         Person found = people.get(0);
         assertSamePerson(found, personUpdating, true);
     }
-
-//    @Test
-//    void updateReturningFalseWhenMissingRecord() {
-//        Person person = newPerson(1L, "some name", 11, "some@name.com");
-//        boolean res = entityPersister.update(person);
-//
-//        assertThat(res).isFalse();
-//    }
 
     @Test
     void delete() {

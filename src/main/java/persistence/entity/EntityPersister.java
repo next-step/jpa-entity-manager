@@ -32,12 +32,9 @@ public class EntityPersister {
         jdbcTemplate.execute(query);
     }
 
-    public boolean update(Object entity) {
+    public void update(Object entity) {
         String query = updateQueryBuilder.buildQuery(getId(entity), entity);
         jdbcTemplate.execute(query);
-        return true;
-
-        // TODO: return false 상황이 있을텐데? update 실패의 상황을 어떻게 캐치할 수 있을까(affected row 개수를 보고 싶은데)
     }
 
     public void delete(Object entity) {
