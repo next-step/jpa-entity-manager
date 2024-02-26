@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import static database.sql.Util.quote;
 
-// TODO: 이걸 DELETE WHERE 절, UPDATE WHERE 절에도 쓸 수 있음
 public class WhereClause {
     private final Map<String, Object> conditionMap;
     private final List<String> allColumnNames;

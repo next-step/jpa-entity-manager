@@ -4,9 +4,6 @@ import database.sql.util.EntityMetadata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static database.sql.Util.quote;
 
 public class DeleteQueryBuilder {
     private final String tableName;
@@ -29,11 +26,6 @@ public class DeleteQueryBuilder {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return allColumnNames.stream()
-                .filter(conditionMap::containsKey)
-                .map(columnName -> {
-                    String quotedValue = quote(conditionMap.get(columnName));
-                    return String.format("%s = %s", columnName, quotedValue);
-                }).collect(Collectors.joining(" AND "));
+        return new WhereClause(conditionMap, allColumnNames).toQuery();
     }
 }

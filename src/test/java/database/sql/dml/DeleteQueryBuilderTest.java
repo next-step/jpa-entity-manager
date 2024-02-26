@@ -25,6 +25,9 @@ class DeleteQueryBuilderTest {
     void deleteQueryWithMultipleCond() {
         Map<String, Object> where = Map.of("old", 18, "email", "example@email.com");
         assertDeleteQuery(where, "DELETE FROM users WHERE old = 18 AND email = 'example@email.com'");
+
+        Map<String, Object> where2 = Map.of("old", 18);
+        assertDeleteQuery(where2, "DELETE FROM users WHERE old = 18");
     }
 
     void assertDeleteQuery(Map<String, Object> where, String expected) {
