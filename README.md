@@ -18,5 +18,5 @@
 - [x] RowMapperFactory를 이용해 RowMapper를 만들 수 있다.
 
 ## 요구사항 2 - EntityManager의 책임 줄여주기
-- [ ] find 책임을 EntityLoader로 이동
+- [x] find 책임을 EntityLoader로 이동
 
