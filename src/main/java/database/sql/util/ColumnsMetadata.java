@@ -51,7 +51,7 @@ public class ColumnsMetadata {
         return generalColumns;
     }
 
-    public long getPrimaryKeyValue(Object entity) {
-        return (long) primaryKey.getValue(entity);
+    public Long getPrimaryKeyValue(Object entity) {
+        return (Long) primaryKey.getValue(entity);
     }
 }

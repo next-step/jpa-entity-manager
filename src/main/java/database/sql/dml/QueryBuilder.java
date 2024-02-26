@@ -12,16 +12,7 @@ public class QueryBuilder {
         return INSTANCE;
     }
 
-    public String buildInsertQuery(Class<?> entityClass, Map<String, Object> valueMap) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityClass);
-        return insertQueryBuilder.buildQuery(valueMap);
-    }
-
-    public String buildInsertQuery(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity.getClass());
-        return insertQueryBuilder.buildQuery(entity);
-    }
-
+    /* SELECT */
     public String buildSelectQuery(Class<?> entityClass) {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityClass);
         return selectQueryBuilder.buildQuery();
@@ -32,6 +23,23 @@ public class QueryBuilder {
         return selectOneQueryBuilder.buildQuery(id);
     }
 
+    /* INSERT */
+    public String buildInsertQuery(Class<?> entityClass, Map<String, Object> valueMap) {
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityClass);
+        return insertQueryBuilder.buildQuery(valueMap);
+    }
+
+    public String buildInsertQuery(Object entity) {
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity.getClass());
+        return insertQueryBuilder.buildQuery(entity);
+    }
+
+    /* UPDATE */
+    public String buildUpdateQuery(long id, Object entity) {
+        return new UpdateQueryBuilder(entity.getClass()).buildQuery(id, entity);
+    }
+
+    /* DELETE */
     public String buildDeleteQuery(Class<?> entityClass, Map<String, Object> conditionMap) {
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entityClass);
         return deleteQueryBuilder.buildQuery(conditionMap);
