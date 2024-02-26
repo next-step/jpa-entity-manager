@@ -1,18 +1,19 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 
 public class MyEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
+    private final MyEntityPersister entityPersister;
 
     public MyEntityManager(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityPersister = new MyEntityPersister(jdbcTemplate);
     }
 
+    //TODO entityLoader 생성 후 jdbcTemplate 제거 및 해당 메서드 책임 이전
     @Override
     public <T> T find(Class<T> clazz, Long Id) {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
@@ -22,15 +23,11 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
-        String query = insertQueryBuilder.build(entity);
-        jdbcTemplate.execute(query);
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-        String query = deleteQueryBuilder.build(entity);
-        jdbcTemplate.execute(query);
+        entityPersister.delete(entity);
     }
 }
