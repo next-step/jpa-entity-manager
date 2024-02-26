@@ -22,8 +22,8 @@ public abstract class Dialect {
         return result;
     }
 
-    public abstract String generatorCreateDdl(final GenerationType strategy);
-    public abstract String generatorKeyValue(final GenerationType strategy);
+    public abstract String generatorCreatePrimaryDdl(final GenerationType strategy);
+    public abstract String getNotNullConstraint(boolean nullable);
 
     public abstract String getCreateDefaultDdlQuery();
     public abstract String getDropDefaultDdlQuery();
@@ -31,4 +31,6 @@ public abstract class Dialect {
     public abstract String getFindAllDefaultDmlQuery();
     public abstract String getFindByIdDefaultDmlQuery();
     public abstract String getDeleteDefaultDmlQuery();
+    public abstract String getUpdateDefaultDmlQuery();
+
 }

@@ -6,9 +6,9 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.ddl.DdlQueryBuilder;
+import persistence.sql.ddl.DdlCreateQueryBuilder;
+import persistence.sql.ddl.DdlDropQueryBuilder;
 import persistence.sql.dialect.h2.H2Dialect;
-import persistence.sql.dml.QueryBuilder;
 import persistence.sql.dml.domain.Person;
 
 import java.sql.Connection;
@@ -22,16 +22,17 @@ class EntityManagerImplTest {
 
     @BeforeEach
     void init() throws SQLException {
-        final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(Person.class, new H2Dialect());
         final DatabaseServer databaseServer = new H2();
         databaseServer.start();
         final Connection connection = databaseServer.getConnection();
         jdbcTemplate = new JdbcTemplate(connection);
 
-        final String dropSql = ddlQueryBuilder.dropDdl();
+        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(Person.class, new H2Dialect());
+        final String dropSql = ddlDropQueryBuilder.dropDdl();
         jdbcTemplate.execute(dropSql);
 
-        final String createSql = ddlQueryBuilder.createDdl();
+        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(Person.class, new H2Dialect());
+        final String createSql = ddlCreateQueryBuilder.createDdl();
         jdbcTemplate.execute(createSql);
     }
 
@@ -39,10 +40,9 @@ class EntityManagerImplTest {
     @Test
     void findTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final QueryBuilder queryBuilder = new QueryBuilder(Person.class, new H2Dialect());
-        jdbcTemplate.execute(queryBuilder.createInsertQuery(person));
+        final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(jdbcTemplate, new H2Dialect()), jdbcTemplate);
+        entityManager.persist(person);
 
-        final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
         final Person findPerson = entityManager.find(person.getClass(), 1L);
 
         assertThat(person).isEqualTo(findPerson);
@@ -52,7 +52,7 @@ class EntityManagerImplTest {
     @Test
     void persistTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(jdbcTemplate, new H2Dialect()), jdbcTemplate);
 
         entityManager.persist(person);
 
@@ -64,9 +64,8 @@ class EntityManagerImplTest {
     @Test
     void removeTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        final QueryBuilder queryBuilder = new QueryBuilder(Person.class, new H2Dialect());
-        jdbcTemplate.execute(queryBuilder.createInsertQuery(person));
-        final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(jdbcTemplate, new H2Dialect()), jdbcTemplate);
+        entityManager.persist(person);
 
         entityManager.remove(person);
 
