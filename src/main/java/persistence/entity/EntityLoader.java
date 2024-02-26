@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import database.sql.dml.SelectOneQueryBuilder;
+import database.sql.dml.SelectByPrimaryKeyQueryBuilder;
 import database.sql.dml.SelectQueryBuilder;
 import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
@@ -12,14 +12,14 @@ import java.util.Map;
 
 public class EntityLoader {
     private final JdbcTemplate jdbcTemplate;
-    private final SelectOneQueryBuilder selectOneQueryBuilder;
+    private final SelectByPrimaryKeyQueryBuilder selectByPrimaryKeyQueryBuilder;
     private final SelectQueryBuilder selectQueryBuilder;
     private final RowMapper<Object> rowMapper;
 
     public EntityLoader(JdbcTemplate jdbcTemplate, Class<?> entityClass) {
         this.jdbcTemplate = jdbcTemplate;
         EntityMetadata entityMetadata = new EntityMetadata(entityClass);
-        this.selectOneQueryBuilder = new SelectOneQueryBuilder(entityMetadata);
+        this.selectByPrimaryKeyQueryBuilder = new SelectByPrimaryKeyQueryBuilder(entityMetadata);
         this.selectQueryBuilder = new SelectQueryBuilder(entityMetadata);
         this.rowMapper = RowMapperFactory.create(entityClass);
     }
@@ -30,7 +30,7 @@ public class EntityLoader {
     }
 
     public Object load(Long id) {
-        String query = selectOneQueryBuilder.buildQuery(id);
+        String query = selectByPrimaryKeyQueryBuilder.buildQuery(id);
         return jdbcTemplate.queryForObject(query, rowMapper);
     }
 }

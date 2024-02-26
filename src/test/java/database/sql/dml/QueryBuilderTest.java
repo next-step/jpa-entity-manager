@@ -13,7 +13,6 @@ class QueryBuilderTest {
     @Test
     void singletonTest() {
         QueryBuilder anotherBuilder = QueryBuilder.getInstance();
-
         assertThat(builder).isEqualTo(anotherBuilder);
     }
 
@@ -37,22 +36,20 @@ class QueryBuilderTest {
     }
 
     @Test
-    void buildSelectOneQuery() {
-        String actual = builder.buildSelectOneQuery(Person4.class, 1L);
+    void buildSelectPrimaryKeyQuery() {
+        String actual = builder.buildSelectPrimaryKeyQuery(Person4.class, 1L);
         assertThat(actual).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id = 1");
     }
 
     @Test
     void deleteQuery() {
         String actual = builder.buildDeleteQuery(Person4.class, Map.of("email", "a@b.com"));
-
         assertThat(actual).isEqualTo("DELETE FROM users WHERE email = 'a@b.com'");
     }
 
     @Test
     void deleteQueryWithPrimaryKeyField() {
         String actual = builder.buildDeleteQuery(Person4.class, 3L);
-
         assertThat(actual).isEqualTo("DELETE FROM users WHERE id = 3");
     }
 }
