@@ -1,38 +1,21 @@
 package persistence.entity;
 
-import database.H2;
 import database.sql.Person;
-import database.sql.ddl.CreateQueryBuilder;
-import database.sql.util.type.MySQLTypeConverter;
-import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static persistence.entity.EntityTestUtils.*;
 
-class EntityPersisterTest {
-    private static final MySQLTypeConverter typeConverter = new MySQLTypeConverter();
-
-    private static H2 server;
-    private JdbcTemplate jdbcTemplate;
+class EntityPersisterTest extends H2DatabaseTest {
+    private EntityManagerImpl entityManager;
     private EntityPersister entityPersister;
 
-    @BeforeAll
-    static void beforeAll() throws SQLException {
-        server = new H2();
-        server.start();
-    }
-
     @BeforeEach
-    void beforeEach() throws SQLException {
-        jdbcTemplate = new JdbcTemplate(server.getConnection());
-        jdbcTemplate.execute("DROP TABLE users IF EXISTS");
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class, typeConverter).buildQuery());
+    void setUp() {
+        entityManager = new EntityManagerImpl(jdbcTemplate);
         entityPersister = new EntityPersister(jdbcTemplate, Person.class);
     }
 

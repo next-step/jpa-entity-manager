@@ -1,39 +1,21 @@
 package persistence.entity;
 
-import database.H2;
 import database.sql.Person;
-import database.sql.ddl.CreateQueryBuilder;
-import database.sql.util.type.MySQLTypeConverter;
-import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.entity.EntityTestUtils.assertSamePerson;
 
-class EntityLoaderTest {
-    private static final MySQLTypeConverter typeConverter = new MySQLTypeConverter();
-
-    private static H2 server;
+class EntityLoaderTest extends H2DatabaseTest {
     private EntityManagerImpl entityManager;
     private EntityLoader entityLoader;
 
-    @BeforeAll
-    static void beforeAll() throws SQLException {
-        server = new H2();
-        server.start();
-    }
-
     @BeforeEach
-    void setUp() throws SQLException {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-        jdbcTemplate.execute("DROP TABLE users IF EXISTS");
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class, typeConverter).buildQuery());
+    void setUp() {
         entityManager = new EntityManagerImpl(jdbcTemplate);
         entityLoader = new EntityLoader(jdbcTemplate, Person.class);
     }
