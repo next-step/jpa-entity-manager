@@ -6,7 +6,7 @@ import persistence.sql.dml.SelectQueryBuilder;
 public class MyEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
-    private final MyEntityPersister entityPersister;
+    private final EntityPersister entityPersister;
 
     public MyEntityManager(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
