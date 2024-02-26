@@ -3,8 +3,6 @@ package persistence.sql.meta;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
 
@@ -33,27 +31,23 @@ public class EntityColumn {
         return this.field.getType();
     }
 
-    private boolean isNotBlankOf(final Field field) {
-        return field.isAnnotationPresent(Column.class) && !field.getAnnotation(Column.class).name().isBlank();
-    }
-
-    public boolean isstrategy() {
-        throw new UnsupportedOperationException("Unsupported strategy");
-    }
-
-    public static String createPrimaryKeyGenerateDDL(final Field field, final Dialect dialect) {
-        if (field.isAnnotationPresent(Id.class)) {
-            return createGenerateTypeDDL(field, dialect);
-        }
-
-        return "";
-    }
-
-    private GenerationType generationType() {
+    public GenerationType generateType() {
         if (this.field.isAnnotationPresent(GeneratedValue.class)) {
             return this.field.getAnnotation(GeneratedValue.class).strategy();
         }
 
         return GenerationType.AUTO;
+    }
+
+    public boolean isNullable() {
+        if (this.field.isAnnotationPresent(Column.class)) {
+            return this.field.getAnnotation(Column.class).nullable();
+        }
+
+        return true;
+    }
+
+    private boolean isNotBlankOf(final Field field) {
+        return field.isAnnotationPresent(Column.class) && !field.getAnnotation(Column.class).name().isBlank();
     }
 }

@@ -1,9 +1,8 @@
 package persistence.sql.meta;
 
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
-import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -12,7 +11,6 @@ import java.util.stream.Collectors;
 
 public class EntityPrimaryKey {
     private List<EntityColumn> entityColumns;
-
     private EntityPrimaryKey(final Class<?> clazz) {
         this.entityColumns = Arrays.stream(clazz.getDeclaredFields())
                 .filter(this::isNotTransientField)
@@ -20,7 +18,6 @@ public class EntityPrimaryKey {
                 .map(EntityColumn::new)
                 .collect(Collectors.toList());
     }
-
     public static EntityPrimaryKey of(Class<?> clazz) {
         return new EntityPrimaryKey(clazz);
     }
@@ -41,10 +38,8 @@ public class EntityPrimaryKey {
     public Class<?> type() {
         return this.entityColumns.get(0).type();
     }
-
-    public void strategy() {
-        this.entityColumns.get(0).strategy();
-//        return this.entityColumns.strategy();
+    public GenerationType strategy() {
+        return this.entityColumns.get(0).generateType();
     }
 
     private boolean isIdField(Field field) {

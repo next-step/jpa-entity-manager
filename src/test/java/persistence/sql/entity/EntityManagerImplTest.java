@@ -6,10 +6,10 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.ddl.DdlQueryBuilder;
+import persistence.sql.ddl.DdlCreateQueryBuilder;
+import persistence.sql.ddl.DdlDropQueryBuilder;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.domain.Person;
 
 import java.sql.Connection;
@@ -23,16 +23,17 @@ class EntityManagerImplTest {
 
     @BeforeEach
     void init() throws SQLException {
-        final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(Person.class, new H2Dialect());
         final DatabaseServer databaseServer = new H2();
         databaseServer.start();
         final Connection connection = databaseServer.getConnection();
         jdbcTemplate = new JdbcTemplate(connection);
 
-        final String dropSql = ddlQueryBuilder.dropDdl();
+        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(Person.class, new H2Dialect());
+        final String dropSql = ddlDropQueryBuilder.dropDdl();
         jdbcTemplate.execute(dropSql);
 
-        final String createSql = ddlQueryBuilder.createDdl();
+        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(Person.class, new H2Dialect());
+        final String createSql = ddlCreateQueryBuilder.createDdl();
         jdbcTemplate.execute(createSql);
     }
 
