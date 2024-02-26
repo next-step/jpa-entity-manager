@@ -36,7 +36,8 @@ public class QueryBuilder {
 
     /* UPDATE */
     public String buildUpdateQuery(long id, Object entity) {
-        return new UpdateQueryBuilder(entity.getClass()).buildQuery(id, entity);
+        Map<String, Object> map = new ColumnValueMap(entity).getColumnValueMap();
+        return new UpdateQueryBuilder(entity.getClass()).buildQuery(id, map);
     }
 
     /* DELETE */

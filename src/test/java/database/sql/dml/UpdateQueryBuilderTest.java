@@ -3,6 +3,8 @@ package database.sql.dml;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UpdateQueryBuilderTest {
@@ -27,7 +29,8 @@ class UpdateQueryBuilderTest {
     @ParameterizedTest
     @EnumSource(TestCases.class)
     void buildUpdateQuery(TestCases testCase) {
-        String actual = updateQueryBuilder.buildQuery(testCase.id, testCase.entity);
+        Map<String, Object> map = new ColumnValueMap(testCase.entity).getColumnValueMap();
+        String actual = updateQueryBuilder.buildQuery(testCase.id, map);
         assertThat(actual).isEqualTo(testCase.expectedQuery);
     }
 

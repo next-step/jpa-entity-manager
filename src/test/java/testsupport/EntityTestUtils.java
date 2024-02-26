@@ -1,4 +1,4 @@
-package persistence.entity;
+package testsupport;
 
 import database.sql.Person;
 import database.sql.dml.SelectQueryBuilder;
