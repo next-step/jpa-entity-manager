@@ -41,11 +41,11 @@ public class UpdateQueryBuilder {
     private LinkedHashMap<String, String> getColumnClause(Object object, List<Column> columns) {
         return columns.stream()
                 .filter(column -> !column.isId())
-                .collect(Collectors.toMap(Column::getName, column -> getDmlName(object, column),
+                .collect(Collectors.toMap(Column::getName, column -> getDmlValue(object, column),
                         (existingValue, newValue) -> existingValue, LinkedHashMap::new));
     }
 
-    private String getDmlName(Object object, Column column) {
+    private String getDmlValue(Object object, Column column) {
         Object value = getValue(object, column);
         DataType columnType = column.getType();
         if (columnType.isVarchar()) {

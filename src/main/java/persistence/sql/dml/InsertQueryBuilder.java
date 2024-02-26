@@ -36,7 +36,7 @@ public class InsertQueryBuilder {
         return columns.stream()
                 .filter(column -> !column.isAutoIncrementId())
                 .peek(column -> checkNullableValue(object, column))
-                .collect(Collectors.toMap(Column::getName, column -> getDmlName(object, column),
+                .collect(Collectors.toMap(Column::getName, column -> getDmlValue(object, column),
                         (existingValue, newValue) -> existingValue, LinkedHashMap::new));
     }
 
@@ -56,7 +56,7 @@ public class InsertQueryBuilder {
         }
     }
 
-    private String getDmlName(Object object, Column column) {
+    private String getDmlValue(Object object, Column column) {
         Object value = getObject(object, column);
         DataType columnType = column.getType();
         if (columnType.isVarchar()) {
