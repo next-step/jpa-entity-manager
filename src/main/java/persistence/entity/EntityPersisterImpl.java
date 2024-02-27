@@ -13,14 +13,12 @@ public class EntityPersisterImpl implements EntityPersister {
 
     private static Logger log = LoggerFactory.getLogger(EntityPersisterImpl.class);
     private final JdbcTemplate jdbcTemplate;
-    private final Dialect dialect;
     private final UpdateQueryBuilder updateQueryBuilder;
     private final InsertQueryBuilder insertQueryBuilder;
     private final DeleteQueryBuilder deleteQueryBuilder;
 
     public EntityPersisterImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
-        this.dialect = dialect;
         this.updateQueryBuilder = new UpdateQueryBuilder(dialect);
         this.insertQueryBuilder = new InsertQueryBuilder(dialect);
         this.deleteQueryBuilder = new DeleteQueryBuilder(dialect);

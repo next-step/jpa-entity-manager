@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
@@ -15,20 +14,18 @@ public class EntityManagerImpl implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
     private final Dialect dialect;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
+        this.entityLoader = new EntityLoader(jdbcTemplate, dialect);
         this.entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-
-        SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
-        SelectQueryBuilder build = queryBuilder.build(clazz);
-        String query = build.findById(id);
-        return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz, dialect));
+        return entityLoader.find(clazz, id);
     }
 
     @Override
@@ -78,7 +75,6 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public boolean update(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-
         return entityPersister.update(entity, idColumn);
     }
 }
