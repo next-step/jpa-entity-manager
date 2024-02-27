@@ -1,21 +1,16 @@
 package persistence.entity;
 
-import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.DmlGenerator;
 
 public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
 
-    private final DmlGenerator dmlGenerator;
-    private final JdbcTemplate jdbcTemplate;
-
+    private final EntityLoader entityLoader;
 
     private SimpleEntityManager(JdbcTemplate jdbcTemplate) {
-        entityPersister = EntityPersister.from(jdbcTemplate);
-        dmlGenerator = DmlGenerator.getInstance();
-        this.jdbcTemplate = jdbcTemplate;
+        entityPersister = SimpleEntityPersister.from(jdbcTemplate);
+        entityLoader = SimpleEntityLoader.from(jdbcTemplate);
     }
 
     public static SimpleEntityManager from(JdbcTemplate jdbcTemplate) {
@@ -24,8 +19,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(clazz, id),
-            resultSet -> new EntityRowMapper<>(clazz).mapRow(resultSet));
+        return entityLoader.find(clazz, id);
     }
 
     @Override

@@ -18,8 +18,8 @@ import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.DmlGenerator;
 
-@DisplayName("EntityPersister class 의")
-class EntityPersisterTest {
+@DisplayName("SimpleEntityPersister class 의")
+class SimpleEntityPersisterTest {
 
     private DatabaseServer server;
 
@@ -36,7 +36,7 @@ class EntityPersisterTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
         dmlGenerator = DmlGenerator.getInstance();
-        entityPersister = EntityPersister.from(jdbcTemplate);
+        entityPersister = SimpleEntityPersister.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
     }
 
