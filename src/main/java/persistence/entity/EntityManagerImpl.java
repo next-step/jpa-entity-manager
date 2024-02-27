@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
@@ -72,5 +73,12 @@ public class EntityManagerImpl implements EntityManager {
     public void remove(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
         entityPersister.delete(entity, idColumn);
+    }
+
+    @Override
+    public boolean update(Object entity) {
+        IdColumn idColumn = new IdColumn(entity, dialect);
+
+        return entityPersister.update(entity, idColumn);
     }
 }

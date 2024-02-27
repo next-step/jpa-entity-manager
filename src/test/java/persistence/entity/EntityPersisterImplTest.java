@@ -72,7 +72,7 @@ class EntityPersisterImplTest {
 
         //when
         savedPerson.setName("김길동");
-        entityPersister.update(savedPerson);
+        entityPersister.update(savedPerson, new IdColumn(savedPerson, dialect));
 
         //then
         Person foundPerson = entityManager.find(Person.class, savedPerson.getId());

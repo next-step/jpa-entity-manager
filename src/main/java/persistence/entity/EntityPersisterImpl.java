@@ -1,6 +1,8 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.DeleteQueryBuilder;
@@ -9,6 +11,7 @@ import persistence.sql.dml.UpdateQueryBuilder;
 
 public class EntityPersisterImpl implements EntityPersister {
 
+    private static Logger log = LoggerFactory.getLogger(EntityPersisterImpl.class);
     private final JdbcTemplate jdbcTemplate;
     private final Dialect dialect;
     private final UpdateQueryBuilder updateQueryBuilder;
@@ -24,16 +27,15 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public boolean update(Object entity) {
+    public boolean update(Object entity, IdColumn idColumn) {
 
-        IdColumn idColumn = new IdColumn(entity, dialect);
         UpdateQueryBuilder queryBuilder = updateQueryBuilder.build(entity);
         String query = queryBuilder.updateById(idColumn.getValue());
         try {
             jdbcTemplate.execute(query);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("Error updating entity: {} and id: {}", entity.getClass().getSimpleName(), idColumn.getValue());
             return false;
         }
     }
