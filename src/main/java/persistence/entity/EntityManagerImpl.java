@@ -22,7 +22,7 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
 
     @Override
     public T find(Class<T> clazz, Long id) {
-        return jdbcTemplate.queryForObject(selectQueryBuilder.findAll(clazz), new RowMapperImpl<>(clazz));
+        return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new RowMapperImpl<>(clazz));
     }
 
     @Override
