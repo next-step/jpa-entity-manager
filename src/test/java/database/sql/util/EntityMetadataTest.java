@@ -8,17 +8,17 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityMetadataTest {
-    private final EntityMetadata metadata = new EntityMetadata(Person4.class);
+    private final EntityMetadata entityMetadata = new EntityMetadata(Person4.class);
 
     @Test
     void getTableName() {
-        String tableName = metadata.getTableName();
+        String tableName = entityMetadata.getTableName();
         assertThat(tableName).isEqualTo("users");
     }
 
     @Test
     void getAllColumnNames() {
-        List<String> allColumnNames = metadata.getAllColumnNames();
+        List<String> allColumnNames = entityMetadata.getAllColumnNames();
         assertThat(allColumnNames).containsExactly("id", "nick_name", "old", "email");
     }
 }

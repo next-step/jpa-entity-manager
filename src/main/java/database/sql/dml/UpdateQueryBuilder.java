@@ -12,11 +12,13 @@ public class UpdateQueryBuilder {
     private final String tableName;
     private final List<EntityColumn> generalColumns;
 
-    public UpdateQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
+    public UpdateQueryBuilder(EntityMetadata entityMetadata) {
+        this.tableName = entityMetadata.getTableName();
+        this.generalColumns = entityMetadata.getGeneralColumns();
+    }
 
-        this.tableName = metadata.getTableName();
-        this.generalColumns = metadata.getGeneralColumns();
+    public UpdateQueryBuilder(Class<?> entityClass) {
+        this(new EntityMetadata(entityClass));
     }
 
     public String buildQuery(long id, Object entity) {

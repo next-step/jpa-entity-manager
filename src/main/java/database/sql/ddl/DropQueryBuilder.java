@@ -5,9 +5,12 @@ import database.sql.util.EntityMetadata;
 public class DropQueryBuilder {
     private final String tableName;
 
+    public DropQueryBuilder(EntityMetadata entityMetadata) {
+        this.tableName = entityMetadata.getTableName();
+    }
+
     public DropQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
-        this.tableName = metadata.getTableName();
+        this(new EntityMetadata(entityClass));
     }
 
     public String buildQuery() {

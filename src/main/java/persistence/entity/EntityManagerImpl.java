@@ -1,33 +1,26 @@
 package persistence.entity;
 
-import database.sql.Person;
-import database.sql.dml.QueryBuilder;
 import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {
-    private static final RowMapper<Person> PERSON_ROW_MAPPER = resultSet -> new Person(
-            resultSet.getLong("id"),
-            resultSet.getString("nick_name"),
-            resultSet.getInt("old"),
-            resultSet.getString("email"));
-
     private final JdbcTemplate jdbcTemplate;
     private final Map<Class<?>, EntityPersister> entityPersisters;
+    private final Map<Class<?>, EntityLoader> entityLoaders;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         entityPersisters = new HashMap<>();
+        entityLoaders = new HashMap<>();
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) {
-        String query = QueryBuilder.getInstance().buildSelectOneQuery(clazz, Id);
-        return (T) jdbcTemplate.queryForObject(query, PERSON_ROW_MAPPER); // 여기도 하드코딩
+    public <T> T find(Class<T> entityClass, Long id) {
+        EntityLoader entityLoader = getEntityLoader(entityClass);
+        return (T) entityLoader.load(id);
     }
 
     @Override
@@ -53,8 +46,15 @@ public class EntityManagerImpl implements EntityManager {
         return entityPersisters.get(entityClass);
     }
 
+    private EntityLoader getEntityLoader(Class<?> entityClass) {
+        if (!entityLoaders.containsKey(entityClass)) {
+            entityLoaders.put(entityClass, new EntityLoader(jdbcTemplate, entityClass));
+        }
+        return entityLoaders.get(entityClass);
+    }
+
     private static Long getId(Object entity) {
-        EntityMetadata metadata = new EntityMetadata(entity.getClass());
-        return metadata.getPrimaryKeyValue(entity);
+        EntityMetadata entityMetadata = new EntityMetadata(entity.getClass());
+        return entityMetadata.getPrimaryKeyValue(entity);
     }
 }

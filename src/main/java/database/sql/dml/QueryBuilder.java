@@ -18,9 +18,9 @@ public class QueryBuilder {
         return selectQueryBuilder.buildQuery();
     }
 
-    public String buildSelectOneQuery(Class<?> entityClass, Long id) {
-        SelectOneQueryBuilder selectOneQueryBuilder = new SelectOneQueryBuilder(entityClass);
-        return selectOneQueryBuilder.buildQuery(id);
+    public String buildSelectPrimaryKeyQuery(Class<?> entityClass, Long id) {
+        SelectByPrimaryKeyQueryBuilder selectByPrimaryKeyQueryBuilder = new SelectByPrimaryKeyQueryBuilder(entityClass);
+        return selectByPrimaryKeyQueryBuilder.buildQuery(id);
     }
 
     /* INSERT */

@@ -4,20 +4,20 @@ import database.sql.util.EntityMetadata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static database.sql.Util.quote;
 
 public class DeleteQueryBuilder {
     private final String tableName;
     private final List<String> allColumnNames;
     private final String primaryKeyColumnName;
 
+    public DeleteQueryBuilder(EntityMetadata entityMetadata) {
+        this.tableName = entityMetadata.getTableName();
+        this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
+        this.allColumnNames = entityMetadata.getAllColumnNames();
+    }
+
     public DeleteQueryBuilder(Class<?> entityClass) {
-        EntityMetadata metadata = new EntityMetadata(entityClass);
-        this.tableName = metadata.getTableName();
-        this.primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
-        this.allColumnNames = metadata.getAllColumnNames();
+        this(new EntityMetadata(entityClass));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
@@ -29,11 +29,6 @@ public class DeleteQueryBuilder {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return allColumnNames.stream()
-                .filter(conditionMap::containsKey)
-                .map(columnName -> {
-                    String quotedValue = quote(conditionMap.get(columnName));
-                    return String.format("%s = %s", columnName, quotedValue);
-                }).collect(Collectors.joining(" AND "));
+        return new WhereClause(conditionMap, allColumnNames).toQuery();
     }
 }

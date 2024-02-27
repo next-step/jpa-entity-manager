@@ -14,12 +14,7 @@ public class EntityTestUtils {
     }
 
     public static Person newPerson(Long id, String name, int age, String email) {
-        Person person = new Person();
-        person.setIdForTesting(id);
-        person.setName(name);
-        person.setAge(age);
-        person.setEmail(email);
-        return person;
+        return new Person(id, name, age, email);
     }
 
     public static void assertSamePerson(Person actual, Person expected, boolean compareIdField) {
