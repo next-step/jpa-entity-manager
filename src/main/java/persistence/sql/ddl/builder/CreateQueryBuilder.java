@@ -13,12 +13,13 @@ public class CreateQueryBuilder implements QueryBuilder {
     @Override
     public String generateSQL(final Class<?> clazz) {
         Create create = new Create(clazz, dialect);
-        StringBuilder sb = new StringBuilder();
-        sb.append("create table ");
-        sb.append(create.getTableName());
-        sb.append("\n(\n");
-        sb.append(create.getColumns());
-        sb.append("\n);\n");
-        return sb.toString();
+        return String.format(
+                "create table %s\n" +
+                        "(\n" +
+                        "%s\n" +
+                        ");\n"
+                , create.getTableName()
+                , create.getColumns()
+        );
     }
 }
