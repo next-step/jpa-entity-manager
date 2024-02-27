@@ -17,13 +17,19 @@ public class GeneralColumn implements Column {
     public GeneralColumn(Field field, Dialect dialect) {
         this.columnType = dialect.getColumn(field.getType());
         this.nullable = new NullableType();
+        String columnName = getColumnNameWithColumn(field);
+        this.name = new NameType(field.getName(), columnName);
+    }
+
+    private String getColumnNameWithColumn(Field field) {
         String columnName = field.getName();
+
         if (field.isAnnotationPresent(jakarta.persistence.Column.class)) {
             boolean isNullable = field.getAnnotation(jakarta.persistence.Column.class).nullable();
             this.nullable.update(isNullable);
             columnName = field.getAnnotation(jakarta.persistence.Column.class).name();
         }
-        this.name = new NameType(field.getName(), columnName);
+        return columnName;
     }
 
     @Override

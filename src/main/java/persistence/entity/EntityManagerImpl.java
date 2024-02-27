@@ -27,8 +27,7 @@ public class EntityManagerImpl implements EntityManager {
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
         SelectQueryBuilder build = queryBuilder.build(clazz);
         String query = build.findById(id);
-        RowMapper<T> rowMapper = new GenericRowMapper<>(clazz, dialect);
-        return jdbcTemplate.queryForObject(query, rowMapper);
+        return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz, dialect));
     }
 
     @Override
