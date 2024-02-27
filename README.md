@@ -11,6 +11,7 @@
 ## 요구사항 2 - EntityManager의 책임 줄여주기
 - [x] EntityManager의 persist, remove 책임 EntityPersister로 이동
 
+
 # 2단계 - 엔터티 초기화
 
 ## 요구사항 1 - RowMapper 리팩터링
@@ -19,4 +20,12 @@
 
 ## 요구사항 2 - EntityManager의 책임 줄여주기
 - [x] find 책임을 EntityLoader로 이동
+
+
+# 3단계 - First Level Cache, Dirty Check
+
+## 요구사항 1 - PersistenceContext 구현체를 만들어보고 1차 캐싱을 적용해보자
+- [x] 1차 캐시에서 getEntity 기능 구현
+- [x] 1차 캐시에서 addEntity 기능 구현
+- [x] 1차 캐시에서 removeEntity 기능 구현
 
