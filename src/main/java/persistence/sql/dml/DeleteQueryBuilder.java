@@ -20,7 +20,7 @@ public class DeleteQueryBuilder {
     public DeleteQueryBuilder build(Object entity) {
         Class<?> clazz = entity.getClass();
         TableColumn tableColumn = new TableColumn(clazz);
-        this.idColumn = new IdColumn(clazz.getDeclaredFields(), dialect);
+        this.idColumn = new IdColumn(entity, dialect);
         this.query = String.format(DELETE_QUERY_FORMAT, tableColumn.getName());
         return this;
     }

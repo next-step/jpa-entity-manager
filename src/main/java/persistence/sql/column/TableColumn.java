@@ -8,10 +8,6 @@ public class TableColumn {
 
     private final NameType name;
 
-    public TableColumn(NameType name) {
-        this.name = name;
-    }
-
     public TableColumn(Class<?> clazz) {
         validateEntityAnnotation(clazz);
         String tableColumnName = clazz.getSimpleName();

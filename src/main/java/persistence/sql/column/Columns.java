@@ -5,8 +5,11 @@ import jakarta.persistence.Transient;
 import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Columns {
@@ -14,11 +17,20 @@ public class Columns {
 
     private final List<GeneralColumn> values;
 
+    public Columns(Object object, Dialect dialect) {
+        Field[] fields = object.getClass().getDeclaredFields();
+        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(object, field, dialect));
+    }
+
     public Columns(Field[] fields, Dialect dialect) {
-        this.values = Arrays.stream(fields)
+        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(field, dialect));
+    }
+
+    private List<GeneralColumn> createGeneralColumns(Field[] fields, Function<Field, GeneralColumn> columnCreator) {
+        return Arrays.stream(fields)
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(Id.class))
-                .map(field -> new GeneralColumn(field, dialect))
+                .map(columnCreator)
                 .collect(Collectors.toList());
     }
 
@@ -37,6 +49,13 @@ public class Columns {
     }
 
     public List<GeneralColumn> getValues() {
-        return values;
+        return Collections.unmodifiableList(values);
+    }
+
+    public String getColumnValues() {
+        return this.values.stream()
+                .map(GeneralColumn::getValue)
+                .map(String::valueOf)
+                .collect(Collectors.joining(COMMA));
     }
 }

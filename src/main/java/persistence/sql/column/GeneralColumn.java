@@ -9,21 +9,43 @@ import java.lang.reflect.Field;
 public class GeneralColumn implements Column {
 
     private static final String DEFAULT_COLUMN_FORMAT = "%s %s";
+    private static final String QUOTES = "'";
 
     private final NameType name;
+    private Object value;
     private final ColumnType columnType;
     private final NullableType nullable;
 
     public GeneralColumn(Field field, Dialect dialect) {
         this.columnType = dialect.getColumn(field.getType());
         this.nullable = new NullableType();
+        String columnName = getColumnNameWithColumn(field);
+        this.name = new NameType(field.getName(), columnName);
+    }
+
+    public GeneralColumn(Object object, Field field, Dialect dialect) {
+        this(field, dialect);
+        this.value = getValue(object, field);
+    }
+
+    private Object getValue(Object entity, Field field) {
+        try {
+            field.setAccessible(true);
+            return field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getColumnNameWithColumn(Field field) {
         String columnName = field.getName();
+
         if (field.isAnnotationPresent(jakarta.persistence.Column.class)) {
             boolean isNullable = field.getAnnotation(jakarta.persistence.Column.class).nullable();
             this.nullable.update(isNullable);
             columnName = field.getAnnotation(jakarta.persistence.Column.class).name();
         }
-        this.name = new NameType(field.getName(), columnName);
+        return columnName;
     }
 
     @Override
@@ -42,4 +64,11 @@ public class GeneralColumn implements Column {
         return name.getFieldName();
     }
 
+
+    public Object getValue() {
+        if (value instanceof String) {
+            return QUOTES + value + QUOTES;
+        }
+        return value;
+    }
 }
