@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UpdateQueryBuilderTest {
 
-    @DisplayName("Person객체를 통해 findAll 기능을 구현한다.")
+    @DisplayName("Person객체를 통해 update 기능을 구현한다.")
     @Test
     void dml_findAll_create() {
         Person person = new Person(1L, "simpson", 31, "qwe5507@gmail.com");
