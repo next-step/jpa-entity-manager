@@ -7,4 +7,6 @@ public interface EntityManager {
     Object persist(Object entity);
 
     void remove(Object entity);
+
+    boolean update(Object entity);
 }

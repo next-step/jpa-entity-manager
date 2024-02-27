@@ -27,8 +27,6 @@ class EntityManagerImplTest {
 
     private JdbcTemplate jdbcTemplate;
     private TableColumn table;
-    private Columns columns;
-    private IdColumn idColumn;
     private Dialect dialect;
 
 
@@ -41,8 +39,8 @@ class EntityManagerImplTest {
         Class<Person> personEntity = Person.class;
         table = new TableColumn(personEntity);
         dialect = new MysqlDialect();
-        columns = new Columns(personEntity.getDeclaredFields(), dialect);
-        idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
+        Columns columns = new Columns(personEntity.getDeclaredFields(), dialect);
+        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
 
         CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn);
 

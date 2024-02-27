@@ -8,7 +8,7 @@ public class NullableType {
         this(true);
     }
 
-    private NullableType(boolean isNullable) {
+    public NullableType(boolean isNullable) {
         this.isNullable = isNullable;
     }
 

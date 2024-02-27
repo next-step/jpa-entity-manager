@@ -1,6 +1,7 @@
 package persistence.sql.mapper;
 
 import jdbc.RowMapper;
+import persistence.sql.column.Column;
 import persistence.sql.column.Columns;
 import persistence.sql.column.GeneralColumn;
 import persistence.sql.column.IdColumn;
@@ -21,37 +22,44 @@ public class GenericRowMapper<T> implements RowMapper<T> {
     }
 
     @Override
-    public T mapRow(ResultSet resultSet) throws SQLException {
+    public T mapRow(ResultSet resultSet) {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             mapIdColumn(resultSet, instance);
             mapGeneralColumns(resultSet, instance);
             return instance;
-        } catch (InstantiationException | IllegalAccessException | NoSuchFieldException | NoSuchMethodException e) {
-            throw new SQLException(e);
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException | InstantiationException |
+                 IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void mapGeneralColumns(ResultSet resultSet, T instance) throws SQLException, NoSuchFieldException, IllegalAccessException {
-        Columns columns = new Columns(clazz.getDeclaredFields(), dialect);
-        for (GeneralColumn column : columns.getValues()) {
-            String fieldName = column.getFieldName();
-            String columnName = column.getName();
-            Field field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(instance, resultSet.getObject(columnName));
-        }
+    private void mapIdColumn(ResultSet resultSet, T instance) {
+        IdColumn idColumn = new IdColumn(clazz.getDeclaredFields(), dialect);
+        setColumnValue(resultSet, instance, idColumn);
     }
 
-    private void mapIdColumn(ResultSet resultSet, T instance) throws SQLException, NoSuchFieldException, IllegalAccessException {
-        IdColumn idColumn = new IdColumn(clazz.getDeclaredFields(), dialect);
+    private void mapGeneralColumns(ResultSet resultSet, T instance) {
+        Columns columns = new Columns(clazz.getDeclaredFields(), dialect);
+        columns.getValues()
+                .forEach(column -> setColumnValue(resultSet, instance, column));
+    }
+
+    private void setColumnValue(ResultSet resultSet, T instance, Column idColumn) {
         String fieldName = idColumn.getFieldName();
         String idColumnName = idColumn.getName();
 
-        Field idField = clazz.getDeclaredField(fieldName);
+        Field idField = null;
+        try {
+            idField = clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
         idField.setAccessible(true);
-        idField.set(instance, resultSet.getObject(idColumnName));
+        try {
+            idField.set(instance, resultSet.getObject(idColumnName));
+        } catch (IllegalAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
