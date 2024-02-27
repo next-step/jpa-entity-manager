@@ -95,4 +95,30 @@ class TableTest {
             assertEquals("EntityWithoutTableAnnotation", table.getTableName());
         }
     }
+
+
+    @DisplayName("getIdColumn 메서드는")
+    @Nested
+    class GetIdColumn {
+        @DisplayName("Entity 클래스의 Id 필드에 대한 Column 객체를 반환한다.")
+        @Test
+        void testGetIdColumn() {
+            Table table = Table.from(Person.class);
+            Column idColumn = table.getIdColumn();
+            assertEquals("id", idColumn.getColumnName());
+        }
+    }
+
+    @DisplayName("getIdValue 메서드는")
+    @Nested
+    class GetIdValue {
+        @DisplayName("Entity 클래스의 Id 필드의 값을 반환한다.")
+        @Test
+        void testGetIdValue() {
+            Table table = Table.from(Person.class);
+            Person person = Person.of(1L, "name", 20, "email");
+            Object idValue = table.getIdValue(person);
+            assertEquals(String.valueOf(1L), idValue);
+        }
+    }
 }

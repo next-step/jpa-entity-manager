@@ -67,4 +67,8 @@ public class Person {
     public Integer getIndex() {
         return index;
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }

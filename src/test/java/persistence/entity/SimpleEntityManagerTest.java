@@ -5,16 +5,14 @@ import database.H2;
 import domain.Person;
 import java.sql.SQLException;
 import jdbc.JdbcTemplate;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.entity.EntityManager;
-import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 
@@ -33,7 +31,7 @@ class SimpleEntityManagerTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        ddlGenerator = DdlGenerator.from(H2Dialect.getInstance());
+        ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
         entityManager = SimpleEntityManager.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
     }
@@ -50,9 +48,9 @@ class SimpleEntityManagerTest {
 
         @DisplayName("Person entity를 저장 한다.")
         @Test
-        void persistTest() {
+        void persistTest_whenInsert() {
             //given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
 
             //when
             entityManager.persist(person);
@@ -75,7 +73,7 @@ class SimpleEntityManagerTest {
         @Test
         void findTest() {
             // given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
             entityManager.persist(person);
 
             // when
@@ -98,7 +96,7 @@ class SimpleEntityManagerTest {
         @Test
         void deleteTest() {
             //given
-            Person person = Person.of("user1", 1, "abc@gtest.com", 1);
+            Person person = createPerson();
             entityManager.persist(person);
             person = entityManager.find(Person.class, 1L);
             //when
@@ -108,5 +106,9 @@ class SimpleEntityManagerTest {
             assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
                 .isInstanceOf(RuntimeException.class);
         }
+    }
+
+    private Person createPerson() {
+        return Person.of("user1", 1, "abc@gtest.com", 1);
     }
 }

@@ -35,7 +35,7 @@ public class H2Dialect implements Dialect {
     @Override
     public String getSqlTypeDefinition(Class<?> clazz) {
         if (!typeMap.containsKey(clazz)) {
-            throw new IllegalArgumentException("존재하지 않은 타입니다.");
+            throw new IllegalArgumentException("존재하지 않은 타입 입니다.");
         }
         return typeMap.get(clazz);
     }

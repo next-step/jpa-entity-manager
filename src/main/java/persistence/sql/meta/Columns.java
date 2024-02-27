@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class Columns {
 
     private static final String ID_NOT_FOUND_MESSAGE =  "Id 필드가 존재하지 않습니다.";
-    private List<Column> columns;
+    private final List<Column> columns;
 
     public Columns(List<Column> columns) {
         this.columns = columns;
@@ -41,5 +41,17 @@ public class Columns {
 
     public Object getIdValue(Object entity) {
         return getIdColumn().getFieldValue(entity);
+    }
+
+    public List<Column> getInsertColumns() {
+        return columns.stream()
+            .filter(column -> !column.isGeneratedValueAnnotation())
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getUpdateColumns() {
+        return columns.stream()
+            .filter(column -> !column.isIdAnnotation())
+            .collect(Collectors.toList());
     }
 }

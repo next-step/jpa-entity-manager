@@ -49,15 +49,6 @@ public class Column {
         return column == null || column.nullable();
     }
 
-    private String convertCamelToSnakeString(String str) {
-        Matcher matcher = CAMEL_CASE_FIELD_NAME_PATTERN.matcher(str);
-        return matcher.replaceAll(matchResult -> String.format(
-            SNAKE_CASE_FORMAT,
-            matchResult.group(1).toLowerCase(),
-            matchResult.group(2).toUpperCase()
-        )).toLowerCase();
-    }
-
     public String getFieldValue(Object object) {
         try {
             field.setAccessible(true);
@@ -65,13 +56,6 @@ public class Column {
         } catch (IllegalAccessException e) {
             return "";
         }
-    }
-
-    private String valueOf(Object object) {
-        if (object instanceof String) {
-            return String.format("'%s'", object);
-        }
-        return String.valueOf(object);
     }
 
     public void setFieldValue(Object object, Object value) {
@@ -85,5 +69,29 @@ public class Column {
 
     public boolean isInsertable() {
         return !isGeneratedValueAnnotation();
+    }
+
+    public boolean isUpdatable() {
+        return !isIdAnnotation();
+    }
+
+    private String valueOf(Object object) {
+        if (object == null) {
+            return null;
+        }
+
+        if (object instanceof String) {
+            return String.format("'%s'", object);
+        }
+        return String.valueOf(object);
+    }
+
+    private String convertCamelToSnakeString(String str) {
+        Matcher matcher = CAMEL_CASE_FIELD_NAME_PATTERN.matcher(str);
+        return matcher.replaceAll(matchResult -> String.format(
+            SNAKE_CASE_FORMAT,
+            matchResult.group(1).toLowerCase(),
+            matchResult.group(2).toUpperCase()
+        )).toLowerCase();
     }
 }

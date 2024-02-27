@@ -3,16 +3,18 @@ package persistence.entity;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
-import persistence.sql.meta.Columns;
 
 public class SimpleEntityManager implements EntityManager {
+
+    private final EntityPersister entityPersister;
 
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
 
 
     private SimpleEntityManager(JdbcTemplate jdbcTemplate) {
-        this.dmlGenerator = DmlGenerator.from();
+        entityPersister = EntityPersister.from(jdbcTemplate);
+        dmlGenerator = DmlGenerator.getInstance();
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -28,13 +30,11 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        jdbcTemplate.execute(dmlGenerator.generateInsertQuery(entity));
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        Columns columns = Columns.from(entity.getClass().getDeclaredFields());
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(entity.getClass(),
-            columns.getIdValue(entity)));
+        entityPersister.delete(entity);
     }
 }
