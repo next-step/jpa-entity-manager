@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
 import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.conditional.Criteria;
-import persistence.sql.entity.conditional.Criterion;
+import persistence.sql.dml.conditional.Criteria;
+import persistence.sql.dml.conditional.Criterion;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.Operators;
 

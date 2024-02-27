@@ -1,4 +1,4 @@
-package persistence.sql.entity.conditional;
+package persistence.sql.dml.conditional;
 
 import persistence.sql.entity.model.Operators;
 

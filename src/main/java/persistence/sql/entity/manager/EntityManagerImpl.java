@@ -5,8 +5,8 @@ import persistence.sql.dml.query.builder.DeleteQueryBuilder;
 import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
 import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.conditional.Criteria;
-import persistence.sql.entity.conditional.Criterion;
+import persistence.sql.dml.conditional.Criteria;
+import persistence.sql.dml.conditional.Criterion;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.Operators;
 

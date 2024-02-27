@@ -1,7 +1,7 @@
 package persistence.sql.dml.query.builder;
 
 import persistence.sql.dml.query.clause.WhereClause;
-import persistence.sql.entity.conditional.Criteria;
+import persistence.sql.dml.conditional.Criteria;
 
 public class DeleteQueryBuilder {
 
