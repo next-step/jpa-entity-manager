@@ -43,7 +43,7 @@ class EntityManagerImplTest {
     @DisplayName("entity manager integration test")
     void should_remove_entity() {
         Long id = 1L;
-        Person person = new Person(id,"cs", 29, "katd216@gmail.com", 0);
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
         entityManager.persist(person);
         Person foundPerson = entityManager.find(Person.class, id);
         entityManager.remove(foundPerson);
@@ -52,14 +52,14 @@ class EntityManagerImplTest {
     }
 
     @Test
-    void should_update_entity(){
+    void should_update_entity() {
         Long id = 2L;
         String updateName = "test";
         Integer updateAge = 32;
         String updateEmail = "katd6@naver.com";
-        Person person = new Person(id,"cs", 29, "katd216@gmail.com", 0);
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
         entityManager.persist(person);
-        entityManager.update(new Person(updateName,updateAge, updateEmail,2), id);
+        entityManager.update(new Person(updateName, updateAge, updateEmail, 2), id);
 
         Person updatePerson = entityManager.find(Person.class, id);
 

@@ -22,7 +22,7 @@ public class Insert {
                 .filter(ColumnOperation::hasColumnValue)
                 .map(function)
                 .reduce((columnA, columnB) -> String.join(COLUMN_SEPARATOR, columnA, columnB))
-                .orElseThrow(()-> new IllegalStateException("fail to generate insert clause"));
+                .orElseThrow(() -> new IllegalStateException("fail to generate insert clause"));
     }
 
     public String getColumnClause() {

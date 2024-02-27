@@ -19,10 +19,10 @@ public class EntityPersister {
 
     public <T> boolean update(T entity, Object id) {
         Query query = dmlQueryBuilder.update(entity, id);
-        try{
+        try {
             executeQuery(query);
             return true;
-        }catch (RuntimeException ex){
+        } catch (RuntimeException ex) {
             return false;
         }
     }

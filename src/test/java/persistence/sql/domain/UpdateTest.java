@@ -9,7 +9,7 @@ class UpdateTest {
 
     @Test
     void should_return_update_set_clause() {
-        Person person = new Person(1l,"cs", 29, "katd216@gmail.com", 0);
+        Person person = new Person(1l, "cs", 29, "katd216@gmail.com", 0);
         DatabaseTable table = new DatabaseTable(person);
 
         String updateClause = new Update(table)

@@ -7,7 +7,7 @@ public class Update {
     private final String updateClause;
 
     public Update(DatabaseTable table) {
-        updateClause =  table.getNormalColumn().stream()
+        updateClause = table.getNormalColumn().stream()
                 .map(Condition::equal)
                 .map(Condition::getCondition)
                 .reduce((columnA, columnB) -> String.join(COLUMN_SEPARATOR, columnA, columnB))
