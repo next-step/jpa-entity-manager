@@ -12,7 +12,7 @@ class SelectQueryBuilderTest {
     @DisplayName("select 쿼리를 만들 수 있다.")
     void buildFindQuery() {
         //given
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.getInstance();
 
         //when
         String query = selectQueryBuilder.build(Person.class, 1L);

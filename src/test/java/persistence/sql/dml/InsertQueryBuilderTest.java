@@ -13,7 +13,7 @@ class InsertQueryBuilderTest {
     void buildInsertQuery() {
         //given
         Person person = new Person(1L, "name", 1, "email", 1);
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.getInstance();
 
         //when
         String query = insertQueryBuilder.build(person);

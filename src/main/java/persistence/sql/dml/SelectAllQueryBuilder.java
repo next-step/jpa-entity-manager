@@ -10,6 +10,15 @@ public class SelectAllQueryBuilder {
     private static final String FIND_ALL_QUERY_TEMPLATE = "SELECT %s FROM %s";
     private static final String COLUMN_DELIMITER = ", ";
 
+    private static class InstanceHolder {
+        private static final SelectAllQueryBuilder INSTANCE = new SelectAllQueryBuilder();
+    }
+
+    public static SelectAllQueryBuilder getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+
     public String build(Class<?> target) {
         Table table = Table.from(target);
         String columnNames = getColumnsNames(table.getColumns());

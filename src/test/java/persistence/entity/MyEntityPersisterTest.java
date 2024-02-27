@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import database.DatabaseServer;
-import database.H2;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,28 +9,27 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.SelectAllQueryBuilder;
 import persistence.sql.domain.dialect.H2Dialect;
+import persistence.support.DatabaseSetup;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@DatabaseSetup
 class MyEntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        DatabaseServer server = new H2();
-        server.start();
-        jdbcTemplate = new JdbcTemplate(server.getConnection());
+    void setUp(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect());
         String createQuery = createQueryBuilder.build(Person.class);
         jdbcTemplate.execute(createQuery);
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown(JdbcTemplate jdbcTemplate) {
         DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(new H2Dialect());
         String dropQuery = dropQueryBuilder.build(Person.class);
         jdbcTemplate.execute(dropQuery);

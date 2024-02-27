@@ -14,6 +14,15 @@ import java.util.stream.Collectors;
 public class UpdateQueryBuilder {
     private static final String UPDATE_QUERY_TEMPLATE = "UPDATE %s SET %s WHERE %s = %s";
 
+    private static class InstanceHolder {
+        private static final UpdateQueryBuilder INSTANCE = new UpdateQueryBuilder();
+    }
+
+    public static UpdateQueryBuilder getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+
     public String build(Object object) {
         Table table = Table.from(object.getClass());
         IdColumn idColumn = table.getIdColumn();
@@ -32,11 +41,11 @@ public class UpdateQueryBuilder {
     private LinkedHashMap<String, String> getColumnClause(Object object, List<Column> columns) {
         return columns.stream()
                 .filter(column -> !column.isId())
-                .collect(Collectors.toMap(Column::getName, column -> getDmlName(object, column),
+                .collect(Collectors.toMap(Column::getName, column -> getDmlValue(object, column),
                         (existingValue, newValue) -> existingValue, LinkedHashMap::new));
     }
 
-    private String getDmlName(Object object, Column column) {
+    private String getDmlValue(Object object, Column column) {
         Object value = getValue(object, column);
         DataType columnType = column.getType();
         if (columnType.isVarchar()) {

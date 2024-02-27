@@ -13,7 +13,7 @@ class DeleteQueryBuilderTest {
     void buildDeleteQuery() {
         //given
         Person person = new Person(1L, "name", 1, "email", 1);
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.getInstance();
 
         //when
         String query = deleteQueryBuilder.build(person);
