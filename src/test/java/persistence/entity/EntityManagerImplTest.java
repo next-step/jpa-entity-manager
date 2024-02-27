@@ -3,7 +3,9 @@ package persistence.entity;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,14 +22,23 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityManagerImplTest {
 
-    private DatabaseServer server;
+    private static DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
     private EntityManager<Person> entityManager;
 
-    @BeforeEach
-    void setup() throws SQLException {
+    @BeforeAll
+    static void init() throws SQLException {
         server = new H2();
         server.start();
+    }
+
+    @AfterAll
+    static void shutDown() {
+        server.stop();
+    }
+
+    @BeforeEach
+    void setup() throws SQLException {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityManager = new EntityManagerImpl<>(jdbcTemplate);
 
@@ -39,7 +50,6 @@ class EntityManagerImplTest {
     void clean() {
         String sql = new DropQueryBuilder(new H2Dialect()).generateSQL(Person.class);
         jdbcTemplate.execute(sql);
-        server.stop();
     }
 
     @DisplayName("find/id로 조회/성공")
