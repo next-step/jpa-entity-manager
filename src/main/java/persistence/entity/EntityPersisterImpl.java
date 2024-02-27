@@ -10,7 +10,6 @@ import persistence.sql.dml.UpdateQueryBuilder;
 public class EntityPersisterImpl implements EntityPersister {
 
     private final JdbcTemplate jdbcTemplate;
-
     private final Dialect dialect;
     private final UpdateQueryBuilder updateQueryBuilder;
     private final InsertQueryBuilder insertQueryBuilder;
@@ -46,8 +45,7 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public void delete(Object entity) {
-        IdColumn idColumn = new IdColumn(entity, dialect);
+    public void delete(Object entity, IdColumn idColumn) {
         DeleteQueryBuilder queryBuilder = deleteQueryBuilder.build(entity);
         String query = queryBuilder.deleteById(idColumn.getValue());
         jdbcTemplate.execute(query);

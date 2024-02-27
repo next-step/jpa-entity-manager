@@ -31,6 +31,7 @@ class EntityPersisterImplTest {
     private TableColumn table;
     private EntityPersister entityPersister;
     private EntityManager entityManager;
+    private Dialect dialect;
 
 
     @BeforeEach
@@ -41,7 +42,7 @@ class EntityPersisterImplTest {
 
         Class<Person> personEntity = Person.class;
         table = new TableColumn(personEntity);
-        Dialect dialect = new MysqlDialect();
+        dialect = new MysqlDialect();
         entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect);
         entityManager = new EntityManagerImpl(jdbcTemplate, dialect);
         createTable(personEntity, dialect);
@@ -62,7 +63,7 @@ class EntityPersisterImplTest {
         jdbcTemplate.execute(dropQuery);
     }
 
-    @DisplayName("엔티티를 수정한다.")
+    @DisplayName("엔티티의 이름을 수정한다.")
     @Test
     void update() {
         //given
@@ -106,9 +107,9 @@ class EntityPersisterImplTest {
         //given
         Person person = new Person(1L, "홍길동", 20, "jon@test.com", 20);
         entityPersister.insert(person);
-
+        IdColumn idColumn = new IdColumn(person, dialect);
         //when
-        entityPersister.delete(person);
+        entityPersister.delete(person, idColumn);
 
         //then
         assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))

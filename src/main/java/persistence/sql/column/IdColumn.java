@@ -6,6 +6,7 @@ import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.function.Function;
 
 public class IdColumn implements Column {
 
@@ -16,25 +17,27 @@ public class IdColumn implements Column {
     private final IdGeneratedStrategy idGeneratedStrategy;
 
     public IdColumn(Field[] fields, Dialect dialect) {
-        Field idField = Arrays.stream(fields)
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("[INFO] No @Id annotation"));
-
-        validateGeneratedValue(idField);
-        this.generalColumn = new GeneralColumn(idField, dialect);
-        this.idGeneratedStrategy = getIdGeneratedStrategy(dialect, idField);
+        this(getIdField(fields),
+                field -> new GeneralColumn(field, dialect),
+                dialect);
     }
 
     public IdColumn(Object object, Dialect dialect) {
-        Field[] fields = object.getClass().getDeclaredFields();
-        Field idField = Arrays.stream(fields)
+        this(getIdField(object.getClass().getDeclaredFields()),
+                field -> new GeneralColumn(object, field, dialect),
+                dialect);
+    }
+
+    private static Field getIdField(Field[] object) {
+        return Arrays.stream(object)
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("[INFO] No @Id annotation"));
+    }
 
+    private IdColumn(Field idField, Function<Field, GeneralColumn> generalColumnCreator, Dialect dialect) {
         validateGeneratedValue(idField);
-        this.generalColumn = new GeneralColumn(object, idField, dialect);
+        this.generalColumn = generalColumnCreator.apply(idField);
         this.idGeneratedStrategy = getIdGeneratedStrategy(dialect, idField);
     }
 
@@ -47,6 +50,10 @@ public class IdColumn implements Column {
         if (!field.isAnnotationPresent(GeneratedValue.class)) {
             throw new IllegalArgumentException("[INFO] No @GeneratedValue annotation");
         }
+    }
+
+    public boolean isNull() {
+        return getValue() == null;
     }
 
     public IdGeneratedStrategy getIdGeneratedStrategy() {
