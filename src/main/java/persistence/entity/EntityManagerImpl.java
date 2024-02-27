@@ -32,7 +32,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object persist(Object entity) {
-        IdColumn idColumn = new IdColumn(entity.getClass().getDeclaredFields(), dialect);
+        IdColumn idColumn = new IdColumn(entity, dialect);
 
         GenerationType generationType = idColumn.getIdGeneratedStrategy().getGenerationType();
         if (!dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
@@ -89,7 +89,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void remove(Object entity) {
         DeleteQueryBuilder build = new DeleteQueryBuilder(dialect).build(entity);
-        IdColumn idColumn = new IdColumn(entity.getClass().getDeclaredFields(), dialect);
+        IdColumn idColumn = new IdColumn(entity, dialect);
         Field idField = getIdField(entity, idColumn);
         Long id = getIdValue(entity, idField);
         String deleteQuery = build.deleteById(id);

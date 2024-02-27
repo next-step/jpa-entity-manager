@@ -26,6 +26,18 @@ public class IdColumn implements Column {
         this.idGeneratedStrategy = getIdGeneratedStrategy(dialect, idField);
     }
 
+    public IdColumn(Object object, Dialect dialect) {
+        Field[] fields = object.getClass().getDeclaredFields();
+        Field idField = Arrays.stream(fields)
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[INFO] No @Id annotation"));
+
+        validateGeneratedValue(idField);
+        this.generalColumn = new GeneralColumn(object, idField, dialect);
+        this.idGeneratedStrategy = getIdGeneratedStrategy(dialect, idField);
+    }
+
     private IdGeneratedStrategy getIdGeneratedStrategy(Dialect dialect, Field idField) {
         GeneratedValue annotation = idField.getAnnotation(GeneratedValue.class);
         return dialect.getIdGeneratedStrategy(annotation.strategy());
@@ -39,6 +51,10 @@ public class IdColumn implements Column {
 
     public IdGeneratedStrategy getIdGeneratedStrategy() {
         return idGeneratedStrategy;
+    }
+
+    public Long getValue(){
+        return (Long) generalColumn.getValue();
     }
 
     @Override

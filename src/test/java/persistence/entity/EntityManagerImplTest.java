@@ -51,7 +51,7 @@ class EntityManagerImplTest {
     }
 
     @AfterEach
-    void tearDown() throws SQLException {
+    void tearDown() {
         DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(table);
         String dropQuery = dropQueryBuilder.build();
         jdbcTemplate.execute(dropQuery);

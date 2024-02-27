@@ -58,4 +58,7 @@ public class Person {
         return email;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 }
