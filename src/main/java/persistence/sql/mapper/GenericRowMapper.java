@@ -1,6 +1,7 @@
 package persistence.sql.mapper;
 
 import jdbc.RowMapper;
+import persistence.sql.column.Column;
 import persistence.sql.column.Columns;
 import persistence.sql.column.GeneralColumn;
 import persistence.sql.column.IdColumn;
@@ -33,28 +34,18 @@ public class GenericRowMapper<T> implements RowMapper<T> {
         }
     }
 
-    private void mapGeneralColumns(ResultSet resultSet, T instance) {
-        Columns columns = new Columns(clazz.getDeclaredFields(), dialect);
-        for (GeneralColumn column : columns.getValues()) {
-            String fieldName = column.getFieldName();
-            String columnName = column.getName();
-            Field field = null;
-            try {
-                field = clazz.getDeclaredField(fieldName);
-            } catch (NoSuchFieldException e) {
-                throw new RuntimeException(e);
-            }
-            field.setAccessible(true);
-            try {
-                field.set(instance, resultSet.getObject(columnName));
-            } catch (IllegalAccessException | SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     private void mapIdColumn(ResultSet resultSet, T instance) {
         IdColumn idColumn = new IdColumn(clazz.getDeclaredFields(), dialect);
+        setColumnValue(resultSet, instance, idColumn);
+    }
+
+    private void mapGeneralColumns(ResultSet resultSet, T instance) {
+        Columns columns = new Columns(clazz.getDeclaredFields(), dialect);
+        columns.getValues()
+                .forEach(column -> setColumnValue(resultSet, instance, column));
+    }
+
+    private void setColumnValue(ResultSet resultSet, T instance, Column idColumn) {
         String fieldName = idColumn.getFieldName();
         String idColumnName = idColumn.getName();
 
