@@ -42,4 +42,16 @@ public class Columns {
     public Object getIdValue(Object entity) {
         return getIdColumn().getFieldValue(entity);
     }
+
+    public List<Column> getInsertColumns() {
+        return columns.stream()
+            .filter(column -> !column.isGeneratedValueAnnotation())
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getUpdateColumns() {
+        return columns.stream()
+            .filter(column -> !column.isIdAnnotation())
+            .collect(Collectors.toList());
+    }
 }

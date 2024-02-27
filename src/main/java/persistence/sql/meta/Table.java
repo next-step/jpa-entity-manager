@@ -21,18 +21,6 @@ public class Table {
         return new Table(clazz, columns);
     }
 
-    private static void validate(Class<?> clazz, Columns columns) {
-        if (!clazz.isAnnotationPresent(Entity.class)) {
-            throw new IllegalArgumentException("엔티티 객체가 아닙니다.");
-        }
-
-        long idFieldCount = columns.getIdCount();
-
-        if (idFieldCount != 1) {
-            throw new IllegalArgumentException("Id 필드는 필수로 1개를 가져야 합니다.");
-        }
-    }
-
     public List<Column> getColumns() {
         return columns.getColumns();
     }
@@ -43,5 +31,33 @@ public class Table {
             return clazz.getSimpleName();
         }
         return table.name();
+    }
+
+    public List<Column> getInsertColumns() {
+        return columns.getInsertColumns();
+    }
+
+    public List<Column> getUpdateColumns() {
+        return columns.getUpdateColumns();
+    }
+
+    public Column getIdColumn() {
+        return columns.getIdColumn();
+    }
+
+    public Object getIdValue(Object entity) {
+        return columns.getIdValue(entity);
+    }
+
+    private static void validate(Class<?> clazz, Columns columns) {
+        if (!clazz.isAnnotationPresent(Entity.class)) {
+            throw new IllegalArgumentException("엔티티 객체가 아닙니다.");
+        }
+
+        long idFieldCount = columns.getIdCount();
+
+        if (idFieldCount != 1) {
+            throw new IllegalArgumentException("Id 필드는 필수로 1개를 가져야 합니다.");
+        }
     }
 }
