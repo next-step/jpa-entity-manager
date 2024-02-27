@@ -49,4 +49,12 @@ class DmlQueryBuilderTest {
         assertThat(query.getSql()).isEqualTo("delete users where id=1 and nick_name='cs' and old=29 and email='katd216@gmail.com';");
     }
 
+    @Test
+    void should_create_update_query() {
+        Person person = new Person(1l, "cs", 29, "katd216@gmail.com", 1);
+        Query query = dmlQueryBuilder.update(person,1l);
+
+        assertThat(query.getSql()).isEqualTo("update users set nick_name='cs',old=29,email='katd216@gmail.com' where id=1;");
+    }
+
 }
