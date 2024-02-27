@@ -27,6 +27,11 @@ public class ClsssMetadataInspector extends EntityFieldInspector{
                 .collect(Collectors.toList());
     }
 
+    public static List<Field> getAllFields(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+            .collect(Collectors.toList());
+    }
+
     public static Field getIdField(Class<?> clazz) {
         return getFields(clazz).stream().filter(ClsssMetadataInspector::isPrimaryKey).findFirst().orElse(null);
     }

@@ -4,6 +4,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,10 +51,6 @@ public class EntityInfoExtractor {
         return EntityFieldInspector.hasAnnotation(id, Id.class);
     }
 
-    public static EntityColumnType getColumnType(Field field) {
-        return EntityColumnType.get(field.getType());
-    }
-
     public static Object getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
@@ -61,5 +58,12 @@ public class EntityInfoExtractor {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<Field> getColumns(Class<?> clazz) {
+        return ClsssMetadataInspector.getAllFields(clazz)
+                .stream()
+                .filter(EntityFieldInspector::isPersistable)
+                    .collect(Collectors.toList());
     }
 }

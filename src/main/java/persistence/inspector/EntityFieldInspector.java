@@ -2,6 +2,7 @@ package persistence.inspector;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
@@ -37,5 +38,19 @@ public class EntityFieldInspector {
 
     public static boolean hasAnnotation(Field field, Class<? extends Annotation> annotation) {
         return field.isAnnotationPresent(annotation);
+    }
+
+    public static GenerationType getGenerationType(Field field) {
+        if (field.isAnnotationPresent(GeneratedValue.class)) {
+            return field.getAnnotation(GeneratedValue.class).strategy();
+        }
+        return null;
+    }
+
+    public static int getLength(Field field) {
+        if (field.isAnnotationPresent(Column.class)) {
+            return field.getAnnotation(Column.class).length();
+        }
+        return 0;
     }
 }
