@@ -1,72 +1,62 @@
 package persistence.sql.dml;
 
 import java.util.Map;
-import persistence.sql.QueryBuilder;
 import static persistence.sql.constant.SqlConstant.EQUALS;
 import static persistence.sql.constant.SqlConstant.SPACE;
 import persistence.sql.meta.Column;
-import persistence.sql.meta.Columns;
+import persistence.sql.meta.Table;
 
 public class DmlGenerator {
 
-    private final QueryBuilder selectQueryBuilder;
-    private final QueryBuilder insertQueryBuilder;
-    private final QueryBuilder updateQueryBuilder;
-    private final QueryBuilder deleteQueryBuilder;
+    private final SelectQueryBuilder selectQueryBuilder;
+    private final InsertQueryBuilder insertQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
 
     private static final String WHERE_CLAUSE = "WHERE";
     private static final String AND = "AND";
 
     private DmlGenerator() {
-        this.selectQueryBuilder = SelectQueryBuilder.from();
-        this.insertQueryBuilder = InsertQueryBuilder.from();
-        this.updateQueryBuilder = UpdateQueryBuilder.from();
-        this.deleteQueryBuilder = DeleteQueryBuilder.from();
+        this.selectQueryBuilder = SelectQueryBuilder.getInstance();
+        this.insertQueryBuilder = InsertQueryBuilder.getInstance();
+        this.updateQueryBuilder = UpdateQueryBuilder.getInstance();
+        this.deleteQueryBuilder = DeleteQueryBuilder.getInstance();
     }
 
-    public static DmlGenerator from() {
-        return new DmlGenerator();
+    private static class Holder {
+        static final DmlGenerator INSTANCE = new DmlGenerator();
+    }
+
+    public static DmlGenerator getInstance() {
+        return Holder.INSTANCE;
     }
 
     public String generateInsertQuery(Object object) {
-        return insertQueryBuilder.generateQuery(object);
+        Table table = Table.from(object.getClass());
+        return insertQueryBuilder.generateQuery(table, object);
     }
 
     public String generateSelectQuery(Class<?> clazz) {
-        return selectQueryBuilder.generateQuery(clazz);
+        Table table = getTable(clazz);
+        return selectQueryBuilder.generateQuery(table);
     }
 
     public String generateSelectQuery(Class<?> clazz, Object id) {
-        return generateQuery(clazz, id, selectQueryBuilder);
+        Table table = getTable(clazz);
+        return selectQueryBuilder.generateQuery(table) +
+            whereClause(Map.of(table.getIdColumn(), id));
     }
 
     public String generateUpdateQuery(Object object) {
-       return generateQuery(object, updateQueryBuilder);
+        Table table = getTable(object.getClass());
+        return updateQueryBuilder.generateQuery(table, object) +
+            whereClause(Map.of(table.getIdColumn(), table.getIdValue(object)));
     }
 
-    public String generateDeleteQuery(Class<?> clazz, Object id) {
-        return generateQuery(clazz, id, deleteQueryBuilder);
-    }
-
-    private String generateQuery(Class<?> clazz, Object id, QueryBuilder queryBuilder) {
-        Columns columns = Columns.from(clazz.getDeclaredFields());
-        StringBuilder query = new StringBuilder();
-        query.append(queryBuilder.generateQuery(clazz));
-        query.append(SPACE.getValue());
-        query.append(whereClause(Map.of(columns.getIdColumn(), id)));
-
-        return query.toString();
-    }
-
-    private String generateQuery(Object object, QueryBuilder queryBuilder) {
-        Class<?> clazz = object.getClass();
-        Columns columns = Columns.from(clazz.getDeclaredFields());
-        StringBuilder query = new StringBuilder();
-        query.append(queryBuilder.generateQuery(object));
-        query.append(SPACE.getValue());
-        query.append(whereClause(Map.of(columns.getIdColumn(), columns.getIdValue(object))));
-
-        return query.toString();
+    public String generateDeleteQuery(Object object) {
+        Table table = Table.from(object.getClass());
+        return deleteQueryBuilder.generateQuery(table) +
+            whereClause(Map.of(table.getIdColumn(), table.getIdValue(object)));
     }
 
     private String whereClause(Map<Column, Object> conditions) {
@@ -74,7 +64,7 @@ public class DmlGenerator {
             return "";
         }
 
-        StringBuilder whereClause = new StringBuilder(WHERE_CLAUSE + SPACE.getValue());
+        StringBuilder whereClause = new StringBuilder(SPACE.getValue() + WHERE_CLAUSE + SPACE.getValue());
 
         conditions.forEach((key, value) -> {
                 whereClause.append(key.getColumnName());
@@ -90,5 +80,9 @@ public class DmlGenerator {
         whereClause.setLength(whereClause.length() - AND.length() - 1);
 
         return whereClause.toString();
+    }
+
+    public Table getTable(Class<?> clazz) {
+        return Table.from(clazz);
     }
 }

@@ -2,27 +2,26 @@ package persistence.sql.dml;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import persistence.sql.QueryBuilder;
 import static persistence.sql.constant.SqlConstant.COMMA;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
 
-public class SelectQueryBuilder implements QueryBuilder {
+public class SelectQueryBuilder {
 
     private static final String SELECT_DEFINITION = "SELECT %s FROM %s";
 
     private SelectQueryBuilder() {
     }
 
-    public static SelectQueryBuilder from() {
-        return new SelectQueryBuilder();
+    private static class Holder {
+        static final SelectQueryBuilder INSTANCE = new SelectQueryBuilder();
     }
 
-    @Override
-    public String generateQuery(Object object) {
+    public static SelectQueryBuilder getInstance() {
+        return Holder.INSTANCE;
+    }
 
-        Table table = Table.from((Class<?>) object);
-
+    public String generateQuery(Table table) {
         return String.format(SELECT_DEFINITION, columnsClause(table.getColumns()), table.getTableName());
     }
 

@@ -1,22 +1,23 @@
 package persistence.sql.dml;
 
-import persistence.sql.QueryBuilder;
 import persistence.sql.meta.Table;
 
-public class DeleteQueryBuilder implements QueryBuilder {
+public class DeleteQueryBuilder {
 
     private static final String DELETE_DEFINITION = "DELETE FROM %s";
 
     private DeleteQueryBuilder() {
     }
 
-    public static DeleteQueryBuilder from() {
-        return new DeleteQueryBuilder();
+    private static class Holder {
+        static final DeleteQueryBuilder INSTANCE = new DeleteQueryBuilder();
     }
 
-    @Override
-    public String generateQuery(Object object) {
-        Table table = Table.from((Class<?>) object);
+    public static DeleteQueryBuilder getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    public String generateQuery(Table table) {
         return String.format(DELETE_DEFINITION, table.getTableName());
     }
 }
