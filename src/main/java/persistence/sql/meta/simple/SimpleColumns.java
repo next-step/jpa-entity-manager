@@ -1,7 +1,9 @@
-package persistence.sql.meta;
+package persistence.sql.meta.simple;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.Columns;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -9,35 +11,39 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class EntityColumns {
-    private final List<EntityColumn> entityColumns;
+public class SimpleColumns implements Columns {
 
-    private EntityColumns(final Class<?> clazz) {
-        this.entityColumns = Arrays.stream(clazz.getDeclaredFields())
+    private final List<Column> columns;
+
+    private SimpleColumns(final Class<?> clazz) {
+        this.columns = Arrays.stream(clazz.getDeclaredFields())
                 .filter(this::isNotTransientField)
                 .filter(this::isNotIdField)
-                .map(EntityColumn::new)
+                .map(SimpleColumn::new)
                 .collect(Collectors.toList());
     }
 
-    public static EntityColumns of(Class<?> clazz) {
-        return new EntityColumns(clazz);
+    public static SimpleColumns of(Class<?> clazz) {
+        return new SimpleColumns(clazz);
     }
 
+    @Override
     public List<String> names() {
-        return this.entityColumns.stream()
-                .map(EntityColumn::getFieldName)
+        return this.columns.stream()
+                .map(Column::getFieldName)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<String> values(Object object) {
-        return this.entityColumns.stream()
+        return this.columns.stream()
                 .map(c -> c.value(object))
                 .collect(Collectors.toList());
     }
 
-    public List<EntityColumn> getEntityColumns() {
-        return entityColumns;
+    @Override
+    public List<Column> getColumns() {
+        return columns;
     }
 
     private boolean isNotIdField(Field field) {

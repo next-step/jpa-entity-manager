@@ -1,15 +1,15 @@
 package persistence.sql.ddl;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityTableMeta;
+import persistence.sql.meta.simple.SimpleTableName;
 
 public class DdlDropQueryBuilder {
 
-    private final EntityTableMeta entityTableMeta;
+    private final SimpleTableName entityTableMeta;
     private final Dialect dialect;
 
     public DdlDropQueryBuilder(final Class<?> clazz, final Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
+        this.entityTableMeta = SimpleTableName.of(clazz);
         this.dialect = dialect;
     }
 

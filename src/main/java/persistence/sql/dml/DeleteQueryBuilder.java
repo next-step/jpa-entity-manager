@@ -1,17 +1,17 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityPrimaryKey;
-import persistence.sql.meta.EntityTableMeta;
+import persistence.sql.meta.simple.SimplePrimaryKey;
+import persistence.sql.meta.simple.SimpleTableName;
 
 public class DeleteQueryBuilder {
-    private final EntityTableMeta entityTableMeta;
-    private final EntityPrimaryKey entityPrimaryKey;
+    private final SimpleTableName entityTableMeta;
+    private final SimplePrimaryKey entityPrimaryKey;
     private final Dialect dialect;
 
     public DeleteQueryBuilder(Class<?> clazz, Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
-        this.entityPrimaryKey = EntityPrimaryKey.of(clazz);
+        this.entityTableMeta = SimpleTableName.of(clazz);
+        this.entityPrimaryKey = SimplePrimaryKey.of(clazz);
         this.dialect = dialect;
     }
 

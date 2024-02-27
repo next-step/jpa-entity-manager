@@ -1,18 +1,18 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityColumns;
-import persistence.sql.meta.EntityTableMeta;
+import persistence.sql.meta.simple.SimpleColumns;
+import persistence.sql.meta.simple.SimpleTableName;
 
 public class InsertQueryBuilder {
     public static final String COMMA = ", ";
-    private final EntityTableMeta entityTableMeta;
-    private final EntityColumns entityColumns;
+    private final SimpleTableName entityTableMeta;
+    private final SimpleColumns entityColumns;
     private final Dialect dialect;
 
     public InsertQueryBuilder(Class<?> clazz, Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
-        this.entityColumns = EntityColumns.of(clazz);
+        this.entityTableMeta = SimpleTableName.of(clazz);
+        this.entityColumns = SimpleColumns.of(clazz);
         this.dialect = dialect;
     }
 

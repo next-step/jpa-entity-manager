@@ -1,25 +1,25 @@
 package persistence.sql.ddl;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityColumn;
-import persistence.sql.meta.EntityColumns;
-import persistence.sql.meta.EntityPrimaryKey;
-import persistence.sql.meta.EntityTableMeta;
+import persistence.sql.meta.simple.SimpleColumn;
+import persistence.sql.meta.simple.SimpleColumns;
+import persistence.sql.meta.simple.SimplePrimaryKey;
+import persistence.sql.meta.simple.SimpleTableName;
 
 import java.util.stream.Collectors;
 
 public class DdlCreateQueryBuilder {
 
     public static final String COMMA = ", ";
-    private final EntityTableMeta entityTableMeta;
-    private final EntityPrimaryKey entityPrimaryKey;
-    private final EntityColumns entityColumns;
+    private final SimpleTableName entityTableMeta;
+    private final SimplePrimaryKey entityPrimaryKey;
+    private final SimpleColumns entityColumns;
     private final Dialect dialect;
 
     public DdlCreateQueryBuilder(final Class<?> clazz, final Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
-        this.entityPrimaryKey = EntityPrimaryKey.of(clazz);
-        this.entityColumns = EntityColumns.of(clazz);
+        this.entityTableMeta = SimpleTableName.of(clazz);
+        this.entityPrimaryKey = SimplePrimaryKey.of(clazz);
+        this.entityColumns = SimpleColumns.of(clazz);
         this.dialect = dialect;
     }
 
@@ -36,7 +36,7 @@ public class DdlCreateQueryBuilder {
     }
 
     private String columns() {
-        return this.entityColumns.getEntityColumns()
+        return this.entityColumns.getColumns()
                 .stream()
                 .map(this::createColumnsClause)
                 .collect(Collectors.joining(", "));
@@ -46,7 +46,7 @@ public class DdlCreateQueryBuilder {
         return DdlGenerator.constraint(this.entityPrimaryKey, dialect);
     }
 
-    private String createColumnsClause(EntityColumn e) {
+    private String createColumnsClause(SimpleColumn e) {
         return DdlGenerator.columns(e, this.dialect);
     }
 

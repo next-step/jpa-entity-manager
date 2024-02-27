@@ -1,36 +1,44 @@
-package persistence.sql.meta;
+package persistence.sql.meta.simple;
 
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import persistence.sql.meta.PrimaryKey;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class EntityPrimaryKey {
-    private EntityColumn primaryKey;
-    private EntityPrimaryKey(final Class<?> clazz) {
+public class SimplePrimaryKey implements PrimaryKey {
+
+    private SimpleColumn primaryKey;
+
+    private SimplePrimaryKey(final Class<?> clazz) {
         this.primaryKey = Arrays.stream(clazz.getDeclaredFields())
                 .filter(this::isIdField)
                 .findFirst()
-                .map(EntityColumn::new)
+                .map(SimpleColumn::new)
                 .orElseThrow(IllegalArgumentException::new);
     }
-    public static EntityPrimaryKey of(Class<?> clazz) {
-        return new EntityPrimaryKey(clazz);
+
+    public static SimplePrimaryKey of(Class<?> clazz) {
+        return new SimplePrimaryKey(clazz);
     }
 
+    @Override
     public String name() {
         return this.primaryKey.getFieldName();
     }
 
+    @Override
     public String value(final Object object) {
         return this.primaryKey.value(object);
     }
 
+    @Override
     public Class<?> type() {
         return this.primaryKey.type();
     }
 
+    @Override
     public GenerationType strategy() {
         return this.primaryKey.generateType();
     }
