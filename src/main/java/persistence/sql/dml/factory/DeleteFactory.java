@@ -5,13 +5,13 @@ import persistence.sql.dml.clause.Delete;
 import java.util.HashMap;
 
 public class DeleteFactory {
-    private static final HashMap<Class<?>, Delete> deleteMap = new HashMap<>();
+    private static final HashMap<Class<?>, Delete> DELETE_MAP = new HashMap<>();
 
     public static Delete getDelete(Class<?> clazz) {
-        Delete delete = deleteMap.get(clazz);
+        Delete delete = DELETE_MAP.get(clazz);
         if (delete == null) {
             delete = new Delete(clazz);
-            deleteMap.put(clazz, delete);
+            DELETE_MAP.put(clazz, delete);
         }
         return delete;
     }
