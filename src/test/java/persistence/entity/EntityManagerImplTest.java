@@ -12,13 +12,14 @@ import persistence.sql.ddl.view.mysql.MySQLPrimaryKeyResolver;
 import persistence.sql.dml.DmlQueryBuilder;
 import persistence.sql.entity.Person;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityManagerImplTest {
-
 
     private static DatabaseServer server;
     private static EntityManager entityManager;
@@ -40,13 +41,39 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("entity manager integration test")
-    void persist() {
-        Person person = new Person("cs", 29, "katd216@gmail.com", 0);
-
+    void should_remove_entity() {
+        Long id = 1L;
+        Person person = new Person(id,"cs", 29, "katd216@gmail.com", 0);
         entityManager.persist(person);
-        Person foundPerson = entityManager.find(Person.class, 1l);
+        Person foundPerson = entityManager.find(Person.class, id);
         entityManager.remove(foundPerson);
 
-        assertThat(entityManager.find(Person.class, 1l)).isNull();
+        assertThat(entityManager.find(Person.class, id)).isNull();
     }
+
+    @Test
+    void should_update_entity(){
+        Long id = 2L;
+        String updateName = "test";
+        Integer updateAge = 32;
+        String updateEmail = "katd6@naver.com";
+        Person person = new Person(id,"cs", 29, "katd216@gmail.com", 0);
+        entityManager.persist(person);
+        entityManager.update(new Person(updateName,updateAge, updateEmail,2), id);
+
+        Person updatePerson = entityManager.find(Person.class, id);
+
+        assertAll(
+                () -> validateFieldValue(Person.class, "name", updateName, updatePerson),
+                () -> validateFieldValue(Person.class, "age", updateAge, updatePerson),
+                () -> validateFieldValue(Person.class, "email", updateEmail, updatePerson)
+        );
+    }
+
+    private void validateFieldValue(Class<?> clazz, String fieldName, Object fieldValue, Object instance) throws IllegalAccessException, NoSuchFieldException {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        assertThat(field.get(instance)).isEqualTo(fieldValue);
+    }
+
 }
