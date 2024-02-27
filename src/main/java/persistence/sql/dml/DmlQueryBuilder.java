@@ -2,7 +2,7 @@ package persistence.sql.dml;
 
 import persistence.sql.domain.Query;
 
-public class DmlQueryBuilder implements InsertQueryBuild, SelectQueryBuild, DeleteQueryBuild {
+public class DmlQueryBuilder implements InsertQueryBuild, SelectQueryBuild, DeleteQueryBuild, UpdateQueryBuild{
 
     private final InsertQueryBuild insertQueryBuilder;
 
@@ -10,10 +10,13 @@ public class DmlQueryBuilder implements InsertQueryBuild, SelectQueryBuild, Dele
 
     private final DeleteQueryBuild deleteQueryBuilder;
 
+    private final UpdateQueryBuild updateQueryBuilder;
+
     public DmlQueryBuilder() {
         this.insertQueryBuilder = new InsertQueryBuilder();
         this.selectQueryBuilder = new SelectQueryBuilder();
         this.deleteQueryBuilder = new DeleteQueryBuilder();
+        this.updateQueryBuilder = new UpdateQueryBuilder();
     }
 
 
@@ -36,5 +39,10 @@ public class DmlQueryBuilder implements InsertQueryBuild, SelectQueryBuild, Dele
     @Override
     public <T> Query delete(T entity) {
         return deleteQueryBuilder.delete(entity);
+    }
+
+    @Override
+    public Query update(Object entity, Object id) {
+        return updateQueryBuilder.update(entity,id);
     }
 }

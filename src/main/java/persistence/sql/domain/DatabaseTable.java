@@ -75,6 +75,9 @@ public class DatabaseTable {
     public DatabasePrimaryColumn getPrimaryColumn() {
         return DatabasePrimaryColumn.copy(primaryColumn);
     }
+    public List<ColumnOperation> getNormalColumn() {
+        return columns.stream().map(DatabaseColumn::copy).collect(Collectors.toList());
+    }
 
     public List<ColumnOperation> getAllColumns() {
         return Stream.concat(Stream.of(getPrimaryColumn()), columns.stream().map(DatabaseColumn::copy))
