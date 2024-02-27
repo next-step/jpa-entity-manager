@@ -31,7 +31,7 @@ class SimpleEntityManagerTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        ddlGenerator = DdlGenerator.from(H2Dialect.getInstance());
+        ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
         entityManager = SimpleEntityManager.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
     }

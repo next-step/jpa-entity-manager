@@ -33,8 +33,8 @@ class DmlGeneratorIntegrationTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        ddlGenerator = DdlGenerator.from(H2Dialect.getInstance());
-        dmlGenerator = DmlGenerator.from();
+        ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
+        dmlGenerator = DmlGenerator.getInstance();
 
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
     }
@@ -70,7 +70,6 @@ class DmlGeneratorIntegrationTest {
             new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
-            () -> assertThat(people).isNotNull(),
             () -> assertThat(people).isNotEmpty(),
             () -> assertThat(people).hasSize(4),
             () -> assertThat(people.get(0).getName()).isEqualTo("user1"),
@@ -110,16 +109,15 @@ class DmlGeneratorIntegrationTest {
         insertQueryTest("user3", 1, "abc@test.co", 1);
         insertQueryTest("user4", 1, "abc@test.co", 1);
 
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 1));
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 2));
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 3));
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 4));
+        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.of(1L, "user1", 1, "abc@test.co")));
+        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.of(2L, "user2", 1, "abc@test.co")));
+        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.of(3L, "user3", 1, "abc@test.co")));
+        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.of(4L, "user4", 1, "abc@test.co")));
 
         List<Person> personList = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet ->
             new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
-            () -> assertThat(personList).isNotNull(),
             () -> assertThat(personList).isEmpty()
         );
     }
@@ -132,13 +130,12 @@ class DmlGeneratorIntegrationTest {
         insertQueryTest("user3", 1, "abc@test.co", 1);
         insertQueryTest("user4", 1, "abc@test.co", 1);
 
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.class, 4));
+        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(Person.of(4L, "user4", 1, "abc@test.co")));
 
         List<Person> personList = jdbcTemplate.query(dmlGenerator.generateSelectQuery(Person.class), resultSet ->
             new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
-            () -> assertThat(personList).isNotNull(),
             () -> assertThat(personList).isNotEmpty(),
             () -> assertThat(personList).hasSize(3)
         );
@@ -155,7 +152,6 @@ class DmlGeneratorIntegrationTest {
             new EntityRowMapper<>(Person.class).mapRow(resultSet));
 
         assertAll(
-            () -> assertThat(person).isNotNull(),
             () -> assertThat(person.getName()).isEqualTo("user2"),
             () -> assertThat(person.getAge()).isEqualTo(2),
             () -> assertThat(person.getEmail()).isEqualTo("abcd@test.co")

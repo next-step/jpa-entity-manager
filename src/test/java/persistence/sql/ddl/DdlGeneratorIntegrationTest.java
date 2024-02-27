@@ -23,7 +23,7 @@ class DdlGeneratorIntegrationTest {
     void setUp() throws SQLException {
         server = new H2();
         server.start();
-        ddlGenerator = DdlGenerator.from(H2Dialect.getInstance());
+        ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
         jdbcTemplate = new JdbcTemplate(server.getConnection());
     }
 

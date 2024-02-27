@@ -6,13 +6,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.sql.QueryBuilder;
 import persistence.sql.meta.Table;
 
 @DisplayName("DropQueryBuilder class 의")
 class DropQueryBuilderTest {
 
-    private QueryBuilder builder;
+    private DropQueryBuilder builder;
 
     @BeforeEach
     public void setup() {
@@ -31,7 +30,7 @@ class DropQueryBuilderTest {
             Table table = Table.from(Person.class);
 
             // when
-            String result = builder.generateQuery(clazz);
+            String result = builder.generateQuery(table);
 
             // then
             String expectedQuery = "DROP TABLE " + table.getTableName();

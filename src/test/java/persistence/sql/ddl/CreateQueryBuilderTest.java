@@ -6,14 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.sql.QueryBuilder;
 import persistence.sql.meta.Table;
 import persistence.sql.dialect.h2.H2Dialect;
 
 @DisplayName("CreateQueryBuilder class 의")
 class CreateQueryBuilderTest {
 
-    private QueryBuilder builder;
+    private CreateQueryBuilder builder;
 
     @BeforeEach
     public void setup() {
@@ -28,11 +27,10 @@ class CreateQueryBuilderTest {
         @Test
         void testGenerateQuery_WhenPersonEntity_ThenGenerateDdl() {
             // given
-            Class<?> clazz = Person.class;
             Table table = Table.from(Person.class);
 
             //when
-            String ddl = builder.generateQuery(clazz);
+            String ddl = builder.generateQuery(table);
 
             //then
             assertThat(ddl).isEqualTo("CREATE TABLE " + table.getTableName()+ " (id BIGINT AUTO_INCREMENT PRIMARY KEY,nick_name VARCHAR,old INTEGER,email VARCHAR NOT NULL)");

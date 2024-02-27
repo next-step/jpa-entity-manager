@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Column class 의")
 class ColumnTest {
 
-
     @DisplayName("from 메서드는")
     @Nested
     class From {
@@ -138,6 +137,43 @@ class ColumnTest {
             boolean generatedValue = column.isGeneratedValueAnnotation();
 
             assertTrue(generatedValue);
+        }
+    }
+
+    @DisplayName("getFieldValue 메서드는")
+    @Nested
+    class GetFieldValue {
+        @DisplayName("Entity 객체의 필드 값을 반환한다.")
+        @Test
+        void testGetFieldValue() throws NoSuchFieldException {
+            class Entity {
+                private int id;
+
+                public Entity(int id) {
+                    this.id = id;
+                }
+            }
+            Column column = Column.from(Entity.class.getDeclaredField("id"));
+            Entity entity = new Entity(1);
+
+            assertEquals(column.getFieldValue(entity), String.valueOf(entity.id));
+        }
+    }
+
+    @DisplayName("setFieldValue 메서드는")
+    @Nested
+    class SetFieldValue {
+        @DisplayName("Entity 객체의 필드에 값을 설정한다.")
+        @Test
+        void testSetFieldValue() throws NoSuchFieldException {
+            class Entity {
+                private int id;
+            }
+            Column column = Column.from(Entity.class.getDeclaredField("id"));
+            Entity entity = new Entity();
+            column.setFieldValue(entity, 1);
+
+            assertEquals(String.valueOf(entity.id), "1");
         }
     }
 }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.sql.meta.Table;
 
 @DisplayName("DeleteQueryBuilder class 의")
 class DeleteQueryBuilderTest {
@@ -17,11 +18,10 @@ class DeleteQueryBuilderTest {
         @Test
         void testGenerateQuery() {
             // given
-            DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.from();
-            Class<?> clazz = Person.class;
+            DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.getInstance();
 
             // when
-            String query = deleteQueryBuilder.generateQuery(clazz);
+            String query = deleteQueryBuilder.generateQuery(Table.from(Person.class));
 
             // then
             assertEquals("DELETE FROM users", query);

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.sql.meta.Table;
 
 @DisplayName("SelectQueryBuilder class 의")
 class SelectQueryBuilderTest {
@@ -17,11 +18,10 @@ class SelectQueryBuilderTest {
         @Test
         void testGenerateQuery() {
             // given
-            SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.from();
-            Class<?> clazz = Person.class;
+            SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.getInstance();
 
             // when
-            String query = selectQueryBuilder.generateQuery(clazz);
+            String query = selectQueryBuilder.generateQuery(Table.from(Person.class));
 
             // then
             assertEquals("SELECT id,nick_name,old,email FROM users", query);

@@ -2,7 +2,6 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
-import persistence.sql.meta.Columns;
 
 public class EntityPersister {
 
@@ -10,7 +9,7 @@ public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
 
     private EntityPersister(JdbcTemplate jdbcTemplate) {
-        this.dmlGenerator = DmlGenerator.from();
+        this.dmlGenerator = DmlGenerator.getInstance();
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -27,8 +26,6 @@ public class EntityPersister {
     }
 
     public void delete(Object entity) {
-        Columns columns = Columns.from(entity.getClass().getDeclaredFields());
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(entity.getClass(),
-            columns.getIdValue(entity)));
+        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(entity));
     }
 }

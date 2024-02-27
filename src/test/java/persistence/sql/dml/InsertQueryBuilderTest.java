@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.sql.meta.Table;
 
 @DisplayName("InsertQueryBuilder class 의")
 class InsertQueryBuilderTest {
@@ -18,10 +19,10 @@ class InsertQueryBuilderTest {
         void testGenerateQuery() {
             // given
             Person person = Person.of("user1", 1, "abc@test.com", 1);
-            InsertQueryBuilder builder = InsertQueryBuilder.from();
+            InsertQueryBuilder builder = InsertQueryBuilder.getInstance();
 
             // when
-            String query = builder.generateQuery(person);
+            String query = builder.generateQuery(Table.from(Person.class), person);
 
             // then
             assertEquals("INSERT INTO users (nick_name,old,email) VALUES ('user1',1,'abc@test.com')", query);

@@ -34,8 +34,8 @@ class EntityPersisterTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        ddlGenerator = DdlGenerator.from(H2Dialect.getInstance());
-        dmlGenerator = DmlGenerator.from();
+        ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
+        dmlGenerator = DmlGenerator.getInstance();
         entityPersister = EntityPersister.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
     }
