@@ -5,7 +5,6 @@ import persistence.sql.domain.Query;
 import persistence.sql.entity.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteQueryBuilderTest {
 

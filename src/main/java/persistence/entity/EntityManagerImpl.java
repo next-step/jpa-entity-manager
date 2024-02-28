@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import org.h2.command.dml.Delete;
 import persistence.sql.dml.DeleteQueryBuild;
 import persistence.sql.dml.InsertQueryBuild;
 import persistence.sql.dml.SelectQueryBuild;
@@ -30,7 +29,7 @@ public class EntityManagerImpl implements EntityManager {
 
 
     @Override
-    public  void persist(Object entity) {
+    public void persist(Object entity) {
         entityPersister.insert(entity);
     }
 
@@ -48,7 +47,7 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T find(Class<T> clazz, Object id) {
         Query query = selectQueryBuilder.findById(clazz, id);
 
-        return jdbcTemplate.queryForObject(query.getSql(), new QueryResult<>(query.getTable(),clazz));
+        return jdbcTemplate.queryForObject(query.getSql(), new QueryResult<>(query.getTable(), clazz));
     }
 
 }
