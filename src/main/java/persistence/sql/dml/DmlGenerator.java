@@ -24,7 +24,7 @@ public class DmlGenerator {
     }
 
     private static class Holder {
-        static final DmlGenerator INSTANCE = new DmlGenerator();
+        private static final DmlGenerator INSTANCE = new DmlGenerator();
     }
 
     public static DmlGenerator getInstance() {
@@ -82,7 +82,7 @@ public class DmlGenerator {
         return whereClause.toString();
     }
 
-    public Table getTable(Class<?> clazz) {
+    private Table getTable(Class<?> clazz) {
         return Table.from(clazz);
     }
 }
