@@ -5,5 +5,5 @@
 - [x] 요구사항 2 - EntityManager 의 책임 줄여주기
 
 ### step2 요구사항
-- [ ] 요구사항 1 - RowMapper 리팩터링
-- [ ] 요구사항 2 - EntityManager 의 책임 줄여주기
+- [x] 요구사항 1 - RowMapper 리팩터링
+- [x] 요구사항 2 - EntityManager 의 책임 줄여주기
