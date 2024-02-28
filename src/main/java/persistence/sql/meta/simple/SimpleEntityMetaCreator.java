@@ -1,6 +1,5 @@
 package persistence.sql.meta.simple;
 
-
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;

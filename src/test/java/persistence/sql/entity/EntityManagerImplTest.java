@@ -42,7 +42,8 @@ class EntityManagerImplTest {
     void findTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
         entityManager.persist(person);
 
         final Person findPerson = entityManager.find(person.getClass(), 1L);
@@ -55,7 +56,8 @@ class EntityManagerImplTest {
     void persistTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
 
         entityManager.persist(person);
 
@@ -68,7 +70,8 @@ class EntityManagerImplTest {
     void removeTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
         entityManager.persist(person);
 
         entityManager.remove(person);

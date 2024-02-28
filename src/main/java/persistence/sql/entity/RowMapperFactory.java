@@ -25,7 +25,6 @@ public class RowMapperFactory {
                     .collect(Collectors.toList());
 
             for (Field field : fields) {
-                System.out.println(resultSet.getObject(getFieldName(field)));
                 field.setAccessible(true);
                 field.set(instance, resultSet.getObject(getFieldName(field)));
             }
