@@ -1,18 +1,20 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.simple.SimpleColumns;
-import persistence.sql.meta.simple.SimpleTableName;
+import persistence.sql.meta.Columns;
+import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.TableName;
 
 public class InsertQueryBuilder {
+
     public static final String COMMA = ", ";
-    private final SimpleTableName entityTableMeta;
-    private final SimpleColumns entityColumns;
+    private final TableName tableName;
+    private final Columns columns;
     private final Dialect dialect;
 
-    public InsertQueryBuilder(Class<?> clazz, Dialect dialect) {
-        this.entityTableMeta = SimpleTableName.of(clazz);
-        this.entityColumns = SimpleColumns.of(clazz);
+    public InsertQueryBuilder(EntityMetaCreator entityMetaCreator, Dialect dialect) {
+        this.tableName = entityMetaCreator.createTableName();
+        this.columns = entityMetaCreator.createColumns();
         this.dialect = dialect;
     }
 
@@ -20,13 +22,16 @@ public class InsertQueryBuilder {
     public String createInsertQuery(Object object) {
         return String.format(dialect.getInsertDefaultDmlQuery(), tableName(), insertColumns(), insertValues(object));
     }
+
     private String tableName() {
-        return entityTableMeta.name();
+        return tableName.name();
     }
+
     private String insertColumns() {
-        return String.join(COMMA, this.entityColumns.names());
+        return String.join(COMMA, this.columns.names());
     }
+
     private String insertValues(Object object) {
-        return String.join(COMMA, this.entityColumns.values(object));
+        return String.join(COMMA, this.columns.values(object));
     }
 }

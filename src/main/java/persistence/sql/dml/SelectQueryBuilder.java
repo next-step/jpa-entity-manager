@@ -1,35 +1,38 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.simple.SimpleColumns;
-import persistence.sql.meta.simple.SimplePrimaryKey;
-import persistence.sql.meta.simple.SimpleTableName;
+import persistence.sql.meta.Columns;
+import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.PrimaryKey;
+import persistence.sql.meta.TableName;
 
 public class SelectQueryBuilder {
-    private final SimpleTableName entityTableMeta;
-    private final SimplePrimaryKey entityPrimaryKey;
-    private final SimpleColumns entityColumns;
+
+    private final TableName tableName;
+    private final PrimaryKey primaryKey;
+    private final Columns columns;
     private final Dialect dialect;
 
-    public SelectQueryBuilder(final Class<?> clazz, final Dialect dialect) {
-        this.entityTableMeta = SimpleTableName.of(clazz);
-        this.entityPrimaryKey = SimplePrimaryKey.of(clazz);
-        this.entityColumns = SimpleColumns.of(clazz);
+    public SelectQueryBuilder(EntityMetaCreator entityMetaCreator, final Dialect dialect) {
+        this.tableName = entityMetaCreator.createTableName();
+        this.primaryKey = entityMetaCreator.createPrimaryKey();
+        this.columns = entityMetaCreator.createColumns();
         this.dialect = dialect;
     }
 
-    //select %s from %s
     public String createFindAllQuery() {
-        return String.format(dialect.getFindAllDefaultDmlQuery(), select(), this.entityTableMeta.name());
+        return String.format(dialect.getFindAllDefaultDmlQuery(), select(), this.tableName.name());
     }
-    // where %s = %dL
+
     public String createFindByIdQuery(Long id) {
         return String.format(dialect.getFindByIdDefaultDmlQuery(), createFindAllQuery(), selectWhere(id));
     }
+
     private String select() {
-        return String.format("%s, %s", this.entityPrimaryKey.name(), String.join(", ", this.entityColumns.names()));
+        return String.format("%s, %s", this.primaryKey.name(), String.join(", ", this.columns.names()));
     }
+
     private String selectWhere(Long id) {
-        return String.format("%s = %dL", this.entityPrimaryKey.name(), id);
+        return String.format("%s = %dL", this.primaryKey.name(), id);
     }
 }

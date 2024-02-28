@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.domain.Person;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +13,7 @@ public class InsertQueryBuilderTest {
     @Test
     void dml_insert_create() {
         Person person = new Person(1L, "simpson", 31, "qwe5507@gmail.com");
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class, new H2Dialect());
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
 
         String insertQuery = insertQueryBuilder.createInsertQuery(person);
 

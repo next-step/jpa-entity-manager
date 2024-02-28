@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.domain.Person;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +14,7 @@ class SelectQueryBuilderTest {
     @Test
     void dml_findAll_create() {
         Person person = new Person("simpson", 31, "qwe5507@gmail.com");
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(person.getClass(), new H2Dialect());
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
 
         String findAllQuery = selectQueryBuilder.createFindAllQuery();
 
@@ -25,7 +26,7 @@ class SelectQueryBuilderTest {
     @Test
     void dml_findById_create() {
         Person person = new Person(1L, "simpson", 31, "qwe5507@gmail.com");
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(person.getClass(), new H2Dialect());
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
 
         String findByIdQuery = selectQueryBuilder.createFindByIdQuery(1L);
 

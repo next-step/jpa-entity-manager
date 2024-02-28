@@ -1,30 +1,27 @@
 package persistence.sql.ddl;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.simple.SimpleColumn;
-import persistence.sql.meta.simple.SimpleColumns;
-import persistence.sql.meta.simple.SimplePrimaryKey;
-import persistence.sql.meta.simple.SimpleTableName;
+import persistence.sql.meta.*;
 
 import java.util.stream.Collectors;
 
 public class DdlCreateQueryBuilder {
 
     public static final String COMMA = ", ";
-    private final SimpleTableName entityTableMeta;
-    private final SimplePrimaryKey entityPrimaryKey;
-    private final SimpleColumns entityColumns;
+    private final TableName tableMeta;
+    private final PrimaryKey primaryKey;
+    private final Columns columns;
     private final Dialect dialect;
 
-    public DdlCreateQueryBuilder(final Class<?> clazz, final Dialect dialect) {
-        this.entityTableMeta = SimpleTableName.of(clazz);
-        this.entityPrimaryKey = SimplePrimaryKey.of(clazz);
-        this.entityColumns = SimpleColumns.of(clazz);
+    public DdlCreateQueryBuilder(final EntityMetaCreator entityMetaCreator, final Dialect dialect) {
+        this.tableMeta = entityMetaCreator.createTableName();
+        this.primaryKey = entityMetaCreator.createPrimaryKey();
+        this.columns = entityMetaCreator.createColumns();
         this.dialect = dialect;
     }
 
     public String createDdl() {
-        return String.format(dialect.getCreateDefaultDdlQuery(), this.entityTableMeta.name(), createColumns());
+        return String.format(dialect.getCreateDefaultDdlQuery(), this.tableMeta.name(), createColumns());
     }
 
     private String createColumns() {
@@ -32,22 +29,21 @@ public class DdlCreateQueryBuilder {
     }
 
     private String primaryKeyColumns() {
-        return DdlGenerator.createPrimaryKeyColumnsClause(this.entityPrimaryKey, dialect);
+        return DdlGenerator.createPrimaryKeyColumnsClause(this.primaryKey, dialect);
     }
 
     private String columns() {
-        return this.entityColumns.getColumns()
+        return this.columns.getColumns()
                 .stream()
-                .map(this::createColumnsClause)
+                .map(c-> createColumnsClause(c))
                 .collect(Collectors.joining(", "));
     }
 
     private String constraint() {
-        return DdlGenerator.constraint(this.entityPrimaryKey, dialect);
+        return DdlGenerator.constraint(this.primaryKey);
     }
 
-    private String createColumnsClause(SimpleColumn e) {
-        return DdlGenerator.columns(e, this.dialect);
+    private String createColumnsClause(Column c) {
+        return DdlGenerator.columns(c, this.dialect);
     }
-
 }
