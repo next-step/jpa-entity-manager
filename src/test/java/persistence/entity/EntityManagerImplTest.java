@@ -9,7 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.ddl.view.mysql.MySQLPrimaryKeyResolver;
-import persistence.sql.dml.DmlQueryBuilder;
+import persistence.sql.dml.DeleteQueryBuilder;
+import persistence.sql.dml.InsertQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 import persistence.sql.entity.Person;
 
 import java.lang.reflect.Field;
@@ -17,6 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityManagerImplTest {
@@ -30,8 +34,9 @@ class EntityManagerImplTest {
         server.start();
         DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(new MySQLPrimaryKeyResolver());
         Connection connection = server.getConnection();
-        new JdbcTemplate(connection).execute(ddlQueryBuilder.createQuery(Person.class));
-        entityManager = new EntityManagerImpl(connection, new DmlQueryBuilder());
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
+        jdbcTemplate.execute(ddlQueryBuilder.createQuery(Person.class));
+        entityManager = new EntityManagerImpl(jdbcTemplate, new UpdateQueryBuilder(), new InsertQueryBuilder(), new DeleteQueryBuilder(), new SelectQueryBuilder());
     }
 
     @AfterAll
@@ -48,7 +53,9 @@ class EntityManagerImplTest {
         Person foundPerson = entityManager.find(Person.class, id);
         entityManager.remove(foundPerson);
 
-        assertThat(entityManager.find(Person.class, id)).isNull();
+        assertThatThrownBy(()->entityManager.find(Person.class, id))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Expected 1 result, got 0");
     }
 
     @Test

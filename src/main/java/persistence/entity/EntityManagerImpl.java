@@ -1,32 +1,41 @@
 package persistence.entity;
 
-import persistence.sql.dml.DmlQueryBuilder;
-
-import java.sql.Connection;
+import jdbc.JdbcTemplate;
+import org.h2.command.dml.Delete;
+import persistence.sql.dml.DeleteQueryBuild;
+import persistence.sql.dml.InsertQueryBuild;
+import persistence.sql.dml.SelectQueryBuild;
+import persistence.sql.dml.UpdateQueryBuild;
+import persistence.sql.domain.Query;
+import persistence.sql.domain.QueryResult;
 
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityPersister entityPersister;
 
-    private final EntityLoader entityLoader;
+    private final SelectQueryBuild selectQueryBuilder;
 
-    public EntityManagerImpl(Connection connection, DmlQueryBuilder dmlQueryBuilder) {
-        this.entityPersister = new EntityPersister(connection, dmlQueryBuilder);
-        this.entityLoader = new EntityLoader(connection, dmlQueryBuilder);
+    private final JdbcTemplate jdbcTemplate;
+
+
+    public EntityManagerImpl(JdbcTemplate jdbcTemplate,
+                             UpdateQueryBuild updateQueryBuilder,
+                             InsertQueryBuild insertQueryBuilder,
+                             DeleteQueryBuild deleteQueryBuilder,
+                             SelectQueryBuild selectQueryBuilder) {
+        this.entityPersister = new EntityPersister(jdbcTemplate, insertQueryBuilder, updateQueryBuilder, deleteQueryBuilder);
+        this.selectQueryBuilder = selectQueryBuilder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
-    public <T> T find(Class<T> clazz, Object id) {
-        return entityLoader.find(clazz, id);
-    }
 
     @Override
-    public <T> void persist(T entity) {
+    public  void persist(Object entity) {
         entityPersister.insert(entity);
     }
 
     @Override
-    public <T> boolean update(T entity, Object id) {
+    public boolean update(Object entity, Object id) {
         return entityPersister.update(entity, id);
     }
 
@@ -34,4 +43,12 @@ public class EntityManagerImpl implements EntityManager {
     public void remove(Object entity) {
         entityPersister.delete(entity);
     }
+
+    @Override
+    public <T> T find(Class<T> clazz, Object id) {
+        Query query = selectQueryBuilder.findById(clazz, id);
+
+        return jdbcTemplate.queryForObject(query.getSql(), new QueryResult<>(query.getTable(),clazz));
+    }
+
 }

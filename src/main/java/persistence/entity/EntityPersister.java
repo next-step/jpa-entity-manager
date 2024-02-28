@@ -1,24 +1,30 @@
 package persistence.entity;
 
-import persistence.sql.dml.DmlQueryBuilder;
+import jdbc.JdbcTemplate;
+import persistence.sql.dml.DeleteQueryBuild;
+import persistence.sql.dml.InsertQueryBuild;
+import persistence.sql.dml.UpdateQueryBuild;
 import persistence.sql.domain.Query;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 public class EntityPersister {
 
-    private final Connection connection;
+    private final JdbcTemplate jdbcTemplate;
 
-    private final DmlQueryBuilder dmlQueryBuilder;
+    private final InsertQueryBuild insertQueryBuilder;
 
-    public EntityPersister(Connection connection, DmlQueryBuilder dmlQueryBuilder) {
-        this.connection = connection;
-        this.dmlQueryBuilder = dmlQueryBuilder;
+    private final UpdateQueryBuild updateQueryBuilder;
+
+    private final DeleteQueryBuild deleteQueryBuilder;
+
+    public EntityPersister(JdbcTemplate jdbcTemplate, InsertQueryBuild insertQueryBuilder, UpdateQueryBuild updateQueryBuilder, DeleteQueryBuild deleteQueryBuilder) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.insertQueryBuilder = insertQueryBuilder;
+        this.updateQueryBuilder = updateQueryBuilder;
+        this.deleteQueryBuilder = deleteQueryBuilder;
     }
 
     public <T> boolean update(T entity, Object id) {
-        Query query = dmlQueryBuilder.update(entity, id);
+        Query query = updateQueryBuilder.update(entity, id);
         try {
             executeQuery(query);
             return true;
@@ -28,20 +34,16 @@ public class EntityPersister {
     }
 
     public <T> void insert(T entity) {
-        Query query = dmlQueryBuilder.insert(entity);
+        Query query = insertQueryBuilder.insert(entity);
         executeQuery(query);
     }
 
     public <T> void delete(T entity) {
-        Query query = dmlQueryBuilder.delete(entity);
+        Query query = deleteQueryBuilder.delete(entity);
         executeQuery(query);
     }
 
     private void executeQuery(Query query) {
-        try (final Statement statement = connection.createStatement()) {
-            statement.execute(query.getSql());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        jdbcTemplate.execute(query.getSql());
     }
 }

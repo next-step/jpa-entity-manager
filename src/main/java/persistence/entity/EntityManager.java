@@ -4,9 +4,9 @@ public interface EntityManager {
 
     <T> T find(Class<T> clazz, Object id);
 
-    <T> void persist(T entity);
+    void persist(Object entity);
 
-    <T> void remove(T entity);
+    void remove(Object entity);
 
-    <T> boolean update(T entity, Object id);
+    boolean update(Object entity, Object id);
 }
