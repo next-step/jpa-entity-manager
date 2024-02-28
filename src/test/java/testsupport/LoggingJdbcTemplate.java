@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * 테스트 중에 무슨 쿼리를 실행했는지 assert 하기 위해서, execute()와 query() 를 감싸서 executedQueries 에 씁니다
  */
-public class MyJdbcTemplate extends JdbcTemplate {
+public class LoggingJdbcTemplate extends JdbcTemplate {
     public List<String> executedQueries;
 
-    public MyJdbcTemplate(Connection connection) {
+    public LoggingJdbcTemplate(Connection connection) {
         super(connection);
 
         executedQueries = new ArrayList<>();

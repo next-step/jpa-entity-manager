@@ -17,7 +17,7 @@ abstract public class H2DatabaseTest {
 
     protected static H2 server;
     protected Connection connection;
-    protected MyJdbcTemplate loggingJdbcTemplate;
+    protected LoggingJdbcTemplate loggingJdbcTemplate;
 
     @BeforeAll
     static void startServer() throws SQLException {
@@ -31,7 +31,7 @@ abstract public class H2DatabaseTest {
 
         createTable();
 
-        loggingJdbcTemplate = new MyJdbcTemplate(connection);
+        loggingJdbcTemplate = new LoggingJdbcTemplate(connection);
     }
 
     private void createTable() {
