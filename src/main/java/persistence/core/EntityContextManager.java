@@ -27,7 +27,7 @@ public class EntityContextManager extends EntityMap {
     }
 
     public static EntityMetadata getEntityMetadata(Class clazz) {
-        return entities.computeIfAbsent(clazz, EntityContextManager::putEntityMetadata);
+        return entities.putIfAbsent(clazz, EntityContextManager.putEntityMetadata(clazz));
     }
 
 
