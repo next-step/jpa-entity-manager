@@ -1,0 +1,47 @@
+package persistence.sql.dml.query.builder;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import persistence.entity.Person;
+import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.dml.conditional.Criteria;
+import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.Operators;
+
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class SelectQueryBuilderTest {
+
+    private EntityMappingTable entityMappingTable;
+
+    @BeforeEach
+    void setUp() {
+        this.entityMappingTable = EntityMappingTable.from(Person.class);
+    }
+
+    @DisplayName("조건문 없는 SELECT문을 반환한다.")
+    @Test
+    void sqlTest() {
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.from(entityMappingTable);
+
+        assertThat(selectQueryBuilder.toSql()).isEqualTo("SELECT id,nick_name,old,email FROM Person ");
+    }
+
+    @DisplayName("조건문 있는 SELECT문을 반환한다.")
+    @Test
+    void whereSqlTest() {
+        DomainType domainType = entityMappingTable.getPkDomainTypes();
+
+        Criterion criterion = new Criterion(domainType.getColumnName(), "1", Operators.EQUALS);
+        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(entityMappingTable, criteria);
+
+        assertThat(selectQueryBuilder.toSql()).isEqualTo("SELECT id,nick_name,old,email FROM Person where id='1'");
+    }
+
+}
