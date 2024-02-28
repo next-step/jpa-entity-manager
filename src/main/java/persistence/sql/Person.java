@@ -32,4 +32,8 @@ public class Person {
 
     @Transient
     private Integer index;
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -24,9 +24,9 @@ public class MyEntityPersister implements EntityPersister {
         return jdbcTemplate.executeForUpdate(query);
     }
 
-    public void insert(Object entity) {
+    public Object insert(Object entity) {
         String query = insertQueryBuilder.build(entity);
-        jdbcTemplate.execute(query);
+        return jdbcTemplate.executeForInsert(query);
     }
 
     public void delete(Object entity) {
