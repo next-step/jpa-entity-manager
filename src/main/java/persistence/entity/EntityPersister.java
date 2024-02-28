@@ -1,12 +1,10 @@
 package persistence.entity;
 
-import persistence.sql.column.IdColumn;
-
 public interface EntityPersister {
 
-    boolean update(Object entity, IdColumn idColumn);
+    boolean update(Object entity, Object id);
 
     void insert(Object entity);
 
-    void delete(Object entity, IdColumn idColumn);
+    void delete(Object entity, Object id);
 }

@@ -9,4 +9,6 @@ public interface EntityManager {
     void remove(Object entity);
 
     boolean update(Object entity);
+
+    PersistenceContext getPersistContext();
 }

@@ -4,28 +4,33 @@ import jakarta.persistence.GenerationType;
 import jdbc.JdbcTemplate;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.mapper.GenericRowMapper;
 
 import java.lang.reflect.Field;
 
 public class EntityManagerImpl implements EntityManager {
 
-    private final JdbcTemplate jdbcTemplate;
     private final Dialect dialect;
+    private final HibernatePersistContext persistContext;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
-        this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
+        this.persistContext = new HibernatePersistContext();
         this.entityLoader = new EntityLoaderImpl(jdbcTemplate, dialect);
         this.entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityLoader.find(clazz, id);
+        Object entity = persistContext.getEntity(id)
+                .orElseGet(() -> {
+                    T findEntity = entityLoader.find(clazz, id);
+                    persistContext.addEntity(id, findEntity);
+                    return findEntity;
+                });
+        return clazz.cast(entity);
+
     }
 
     @Override
@@ -34,6 +39,7 @@ public class EntityManagerImpl implements EntityManager {
 
         GenerationType generationType = idColumn.getIdGeneratedStrategy().getGenerationType();
         if (!dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
+            persistContext.addEntity(idColumn.getValue(), entity);
             entityPersister.insert(entity);
             return entity;
         }
@@ -42,6 +48,7 @@ public class EntityManagerImpl implements EntityManager {
             setIdValue(entity, getIdField(entity, idColumn), 1L);
         }
 
+        persistContext.addEntity(idColumn.getValue(), entity);
         entityPersister.insert(entity);
 
         return entity;
@@ -69,12 +76,19 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void remove(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-        entityPersister.delete(entity, idColumn);
+        persistContext.removeEntity(idColumn.getValue());
+        entityPersister.delete(entity, idColumn.getValue());
     }
 
     @Override
     public boolean update(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-        return entityPersister.update(entity, idColumn);
+        persistContext.addEntity(idColumn.getValue(), entity);
+        return entityPersister.update(entity, idColumn.getValue());
+    }
+
+    @Override
+    public PersistenceContext getPersistContext() {
+        return persistContext;
     }
 }

@@ -38,7 +38,7 @@ public class UpdateQueryBuilder {
                 .collect(Collectors.joining(COMMA));
     }
 
-    public String updateById(Long id) {
+    public String updateById(Object id) {
         return query + String.format(WHERE_CLAUSE_FORMAT, idColumn.getName(), id);
     }
 }
