@@ -5,7 +5,6 @@ import jdbc.JdbcTemplate;
 public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
-
     private final EntityLoader entityLoader;
 
     private SimpleEntityManager(JdbcTemplate jdbcTemplate) {
