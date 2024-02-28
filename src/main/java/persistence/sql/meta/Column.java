@@ -67,18 +67,7 @@ public class Column {
         }
     }
 
-    public boolean isInsertable() {
-        return !isGeneratedValueAnnotation();
-    }
-
-    public boolean isUpdatable() {
-        return !isIdAnnotation();
-    }
-
     private String valueOf(Object object) {
-        if (object == null) {
-            return null;
-        }
 
         if (object instanceof String) {
             return String.format("'%s'", object);

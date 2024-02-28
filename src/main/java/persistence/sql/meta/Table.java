@@ -1,13 +1,16 @@
 package persistence.sql.meta;
 
 import jakarta.persistence.Entity;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.h2.util.StringUtils;
 
 public class Table {
 
     private final Class<?> clazz;
     private final Columns columns;
+    private static final Map<Class<?>, Table> cashTable = new HashMap<>();
 
     private Table(Class<?> clazz, Columns columns) {
         this.clazz = clazz;
@@ -15,10 +18,14 @@ public class Table {
     }
 
     public static Table from(Class<?> clazz) {
+        if (cashTable.containsKey(clazz)) {
+            return cashTable.get(clazz);
+        }
+
         Columns columns = Columns.from(clazz.getDeclaredFields());
         validate(clazz, columns);
 
-        return new Table(clazz, columns);
+        return cashTable.computeIfAbsent(clazz, t -> new Table(clazz, columns));
     }
 
     public List<Column> getColumns() {
