@@ -58,7 +58,7 @@ class EntityLoaderTest {
         Person person = new Person("홍길동", "jon@test.com", 20);
         EntityManager entityManager = new EntityManagerImpl(jdbcTemplate, dialect);
         entityManager.persist(person);
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
+        EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, dialect);
 
         // when
         Person foundPerson = entityLoader.find(Person.class, 1L);

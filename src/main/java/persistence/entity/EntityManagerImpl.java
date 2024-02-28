@@ -19,7 +19,7 @@ public class EntityManagerImpl implements EntityManager {
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
-        this.entityLoader = new EntityLoader(jdbcTemplate, dialect);
+        this.entityLoader = new EntityLoaderImpl(jdbcTemplate, dialect);
         this.entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect);
     }
 
