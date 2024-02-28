@@ -7,16 +7,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
 
-class EntityLoaderTest {
+class EntityContextManagerTest {
 
     @Test
     @DisplayName("EntityLoader를 통해 EntityMetadata 정보가 로드되어야 한다.")
     public void loadEntities() {
-        EntityLoader.loadEntities();
+        EntityContextManager.loadEntities();
 
         assertAll(
-                () -> assertNotNull(EntityLoader.getEntityMetadata(Person.class)),
-                () -> assertThat(EntityLoader.getEntityMetadata(Person.class)).isNotNull()
+                () -> assertNotNull(EntityContextManager.getEntityMetadata(Person.class)),
+                () -> assertThat(EntityContextManager.getEntityMetadata(Person.class)).isNotNull()
         );
     }
 

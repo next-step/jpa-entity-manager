@@ -2,12 +2,14 @@ package persistence.sql.ddl.h2;
 
 import jakarta.persistence.GenerationType;
 import persistence.entity.metadata.EntityColumn;
-import persistence.sql.ddl.DDLQueryGenerator;
+import persistence.sql.Dialect;
+import persistence.sql.ddl.DDLSqlGenerator;
 import persistence.sql.h2.H2Dialect;
 
-public class H2DDLQueryGenerator extends DDLQueryGenerator {
-    public H2DDLQueryGenerator() {
-        super.dialect = new H2Dialect();
+public class H2DDLSqlGenerator extends DDLSqlGenerator {
+
+    public H2DDLSqlGenerator() {
+        super(new H2Dialect());
     }
 
     @Override

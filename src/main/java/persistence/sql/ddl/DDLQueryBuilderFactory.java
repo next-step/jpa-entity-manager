@@ -2,6 +2,7 @@ package persistence.sql.ddl;
 
 import database.DatabaseServer;
 import database.H2;
+import persistence.sql.ddl.h2.H2DDLQueryBuilder;
 
 public class DDLQueryBuilderFactory {
 

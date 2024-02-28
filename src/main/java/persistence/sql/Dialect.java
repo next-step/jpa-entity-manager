@@ -1,10 +1,9 @@
 package persistence.sql;
 
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Dialect extends DataType{
+public abstract class Dialect extends DataType {
     private final Map<Integer, String> dataTypes = new HashMap<>();
 
     public String getDataType(final int typeCode) {

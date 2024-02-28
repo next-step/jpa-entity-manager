@@ -11,12 +11,10 @@ public class H2Dialect extends Dialect{
     }
 
     private void registerColumnType(){
-        System.out.println("registerColumnType :: ==========================================");
         registerColumnType(Types.VARCHAR, "VARCHAR");
         registerColumnType(Types.INTEGER, "INT");
         registerColumnType(Types.BIGINT, "BIGINT");
 
-        System.out.println("registerColumnType :: " + getDataType(Types.VARCHAR));
     }
 
 }

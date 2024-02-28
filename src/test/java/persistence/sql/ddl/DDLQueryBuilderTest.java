@@ -1,18 +1,15 @@
 package persistence.sql.ddl;
 
-import database.H2;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.core.EntityLoader;
+import persistence.core.EntityContextManager;
 import persistence.entity.Person;
 import persistence.entity.Person1;
 import persistence.entity.Person2;
-
-import java.sql.SQLException;
+import persistence.sql.ddl.h2.H2DDLQueryBuilder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +20,7 @@ class DDLQueryBuilderTest {
 
     @BeforeEach
     public void beforeAll() {
-        EntityLoader.loadEntities();
+        EntityContextManager.loadEntities();
     }
 
     @Test

@@ -8,8 +8,8 @@ import persistence.entity.Person2;
 import persistence.entity.metadata.EntityMetadata;
 import persistence.entity.metadata.EntityMetadataBuilder;
 
-public class EntityLoader extends EntityMap {
-    private static final Logger LOG = LoggerFactory.getLogger(EntityLoader.class);
+public class EntityContextManager extends EntityMap {
+    private static final Logger LOG = LoggerFactory.getLogger(EntityContextManager.class);
 
     public static void loadEntities() {
         LOG.info("=============== Load EntityMetadata ===============");
@@ -19,13 +19,15 @@ public class EntityLoader extends EntityMap {
         putEntityMetadata(Person2.class);
     }
 
-    protected static void putEntityMetadata(Class clazz) {
+    protected static EntityMetadata putEntityMetadata(Class clazz) {
         EntityMetadata entityMetadata = EntityMetadataBuilder.build(clazz);
         entities.put(clazz, entityMetadata);
+
+        return entityMetadata;
     }
 
     public static EntityMetadata getEntityMetadata(Class clazz) {
-        return entities.get(clazz);
+        return entities.computeIfAbsent(clazz, EntityContextManager::putEntityMetadata);
     }
 
 

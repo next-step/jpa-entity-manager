@@ -2,15 +2,23 @@ package persistence.sql.ddl;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import persistence.core.EntityContextManager;
 import persistence.entity.metadata.EntityColumn;
 import persistence.entity.metadata.EntityMetadata;
 import persistence.sql.Dialect;
 
-public abstract class DDLQueryGenerator {
+public abstract class DDLSqlGenerator extends EntityContextManager {
+
     protected Dialect dialect;
     private final static String CREATE_TABLE_QUERY_FORMAT = "CREATE TABLE %s (%s)";
     private final static String DROP_TABLE_QUERY_FORMAT = "DROP TABLE %s";
-    public String createTableQuery(EntityMetadata entityMetadata) {
+
+
+    public DDLSqlGenerator(Dialect dialect) {
+        this.dialect = dialect;
+    }
+    public String genCreateTableQuery(Class<?> clazz) {
+        EntityMetadata entityMetadata = getEntityMetadata(clazz);
 
         String tableName = entityMetadata.getTableName();
         String columnClause = createColumnClause(entityMetadata);
@@ -18,7 +26,9 @@ public abstract class DDLQueryGenerator {
         return String.format(CREATE_TABLE_QUERY_FORMAT, tableName, columnClause);
     }
 
-    public String createDropQuery(EntityMetadata entityMetadata) {
+    public String genDropTableQuery(Class<?> clazz) {
+        EntityMetadata entityMetadata = getEntityMetadata(clazz);
+
         return String.format(DROP_TABLE_QUERY_FORMAT, entityMetadata.getTableName());
     }
 
@@ -31,7 +41,6 @@ public abstract class DDLQueryGenerator {
     }
 
     protected abstract String getColumnClause(EntityColumn entityColumn);
-
 
 
 }
