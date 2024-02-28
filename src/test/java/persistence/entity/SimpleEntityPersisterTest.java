@@ -79,11 +79,12 @@ class SimpleEntityPersisterTest {
             Person person = createPerson();
             entityPersister.insert(person);
             person = findPerson(1L);
-
             person.updateName("user2");
 
-            //when & then
+            //when
             assertThat(entityPersister.update(person)).isTrue();
+
+            //then
             person = findPerson(1L);
             assertThat(person.getName()).isEqualTo("user2");
         }
