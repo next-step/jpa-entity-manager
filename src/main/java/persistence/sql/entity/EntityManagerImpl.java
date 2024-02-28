@@ -1,7 +1,6 @@
 package persistence.sql.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
@@ -19,7 +18,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(final Class<T> clazz, final Long Id) {
-        final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(SimpleEntityMetaCreator.of(clazz), new H2Dialect());
+        final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(SimpleEntityMetaCreator.of(clazz));
         final String findByIdQuery = queryBuilder.createFindByIdQuery(Id);
 
         return jdbcTemplate.queryForObject(findByIdQuery, createRowMapper(clazz));

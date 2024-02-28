@@ -6,13 +6,6 @@ import persistence.sql.dialect.Dialect;
 import java.sql.Types;
 
 public class H2Dialect extends Dialect {
-    private static final String CREATE_DEFAULT_DDL = "create table %s (%s)";
-    private static final String DROP_TABLE_DEFAULT_DDL = "drop table if exists %s CASCADE";
-    public static final String INSERT_DEFAULT_DML = "insert into %s (%s) values (%s)";
-    public static final String SELECT_FIND_ALL_DEFAULT_DML = "select %s from %s";
-    public static final String SELECT_FIND_ID_DEFAULT_DML = "%s where %s";
-    public static final String DELETE_DEFAULT_DML = "delete from %s where %s";
-    public static final String UPDATE_DEFAULT_DML = "update %s set %s where %s";
 
     public H2Dialect() {
         registerColumnType(Types.BIGINT, "bigint");
@@ -36,40 +29,5 @@ public class H2Dialect extends Dialect {
         }
 
         return "not null";
-    }
-
-    @Override
-    public String getCreateDefaultDdlQuery() {
-        return CREATE_DEFAULT_DDL;
-    }
-
-    @Override
-    public String getDropDefaultDdlQuery() {
-        return DROP_TABLE_DEFAULT_DDL;
-    }
-
-    @Override
-    public String getInsertDefaultDmlQuery() {
-        return INSERT_DEFAULT_DML;
-    }
-
-    @Override
-    public String getFindAllDefaultDmlQuery() {
-        return SELECT_FIND_ALL_DEFAULT_DML;
-    }
-
-    @Override
-    public String getFindByIdDefaultDmlQuery() {
-        return SELECT_FIND_ID_DEFAULT_DML;
-    }
-
-    @Override
-    public String getDeleteDefaultDmlQuery() {
-        return DELETE_DEFAULT_DML;
-    }
-
-    @Override
-    public String getUpdateDefaultDmlQuery() {
-        return UPDATE_DEFAULT_DML;
     }
 }

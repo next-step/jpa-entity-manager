@@ -49,7 +49,7 @@ class QueryBuilderTest {
     @DisplayName("요구사항4, Person객체의 drop ddl문을 생성한다.")
     @Test
     void persion_ddl_drop() {
-        final DdlDropQueryBuilder queryBuilder = new DdlDropQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
+        final DdlDropQueryBuilder queryBuilder = new DdlDropQueryBuilder(SimpleEntityMetaCreator.of(Person.class));
         String expectedDDL = "drop table if exists users CASCADE";
 
         String actualDDL = queryBuilder.dropDdl();

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 public class DdlCreateQueryBuilder {
 
+    private static final String CREATE_DEFAULT_DDL = "create table %s (%s)";
     public static final String COMMA = ", ";
     private final TableName tableMeta;
     private final PrimaryKey primaryKey;
@@ -21,7 +22,7 @@ public class DdlCreateQueryBuilder {
     }
 
     public String createDdl() {
-        return String.format(dialect.getCreateDefaultDdlQuery(), this.tableMeta.name(), createColumns());
+        return String.format(CREATE_DEFAULT_DDL, this.tableMeta.name(), createColumns());
     }
 
     private String createColumns() {
@@ -35,7 +36,7 @@ public class DdlCreateQueryBuilder {
     private String columns() {
         return this.columns.getColumns()
                 .stream()
-                .map(c-> createColumnsClause(c))
+                .map(this::createColumnsClause)
                 .collect(Collectors.joining(", "));
     }
 

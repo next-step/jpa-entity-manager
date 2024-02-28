@@ -14,7 +14,7 @@ class UpdateQueryBuilderTest {
     @Test
     void dml_findAll_create() {
         Person person = new Person(1L, "simpson", 31, "qwe5507@gmail.com");
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(SimpleEntityMetaCreator.of(Person.class));
 
         String findAllQuery = updateQueryBuilder.createUpdateQuery(person);
 

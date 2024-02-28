@@ -28,7 +28,7 @@ class EntityManagerImplTest {
         final Connection connection = databaseServer.getConnection();
         jdbcTemplate = new JdbcTemplate(connection);
 
-        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
+        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(SimpleEntityMetaCreator.of(Person.class));
         final String dropSql = ddlDropQueryBuilder.dropDdl();
         jdbcTemplate.execute(dropSql);
 
@@ -41,7 +41,7 @@ class EntityManagerImplTest {
     @Test
     void findTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate, new H2Dialect());
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
         entityManager.persist(person);
 
@@ -54,7 +54,7 @@ class EntityManagerImplTest {
     @Test
     void persistTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate, new H2Dialect());
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
 
         entityManager.persist(person);
@@ -67,7 +67,7 @@ class EntityManagerImplTest {
     @Test
     void removeTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate, new H2Dialect());
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(SimpleEntityMetaCreator.of(Person.class), jdbcTemplate);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
         entityManager.persist(person);
 

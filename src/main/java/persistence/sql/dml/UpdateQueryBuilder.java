@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import persistence.sql.dialect.Dialect;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
@@ -10,21 +9,20 @@ import java.util.stream.Collectors;
 
 public class UpdateQueryBuilder {
 
+    public static final String UPDATE_DEFAULT_DML = "update %s set %s where %s";
     private static final String KEY_VALUE_FORMAT = "%s=%s";
     private final TableName tableName;
     private final PrimaryKey primaryKey;
     private final Columns columns;
-    private final Dialect dialect;
 
-    public UpdateQueryBuilder(EntityMetaCreator entityMetaCreator, Dialect dialect) {
+    public UpdateQueryBuilder(EntityMetaCreator entityMetaCreator) {
         this.tableName = entityMetaCreator.createTableName();
         this.primaryKey = entityMetaCreator.createPrimaryKey();
         this.columns = entityMetaCreator.createColumns();
-        this.dialect = dialect;
     }
 
     public String createUpdateQuery(Object object) {
-        return String.format(dialect.getUpdateDefaultDmlQuery(), tableName.name(), setClause(object), whereClause(object));
+        return String.format(UPDATE_DEFAULT_DML, tableName.name(), setClause(object), whereClause(object));
     }
 
     private String setClause(Object object) {

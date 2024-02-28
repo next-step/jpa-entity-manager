@@ -2,7 +2,6 @@ package persistence.sql.dml;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
@@ -14,7 +13,7 @@ public class DeleteQueryBuilderTest {
     @Test
     void dml_delete_create() {
         Person person = new Person(1L, "simpson", 31, "qwe5507@gmail.com");
-        final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(SimpleEntityMetaCreator.of(Person.class), new H2Dialect());
+        final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(SimpleEntityMetaCreator.of(Person.class));
 
         String deleteQuery = deleteQueryBuilder.createDeleteQuery(person);
 

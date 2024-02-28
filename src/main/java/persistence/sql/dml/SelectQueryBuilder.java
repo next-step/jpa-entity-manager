@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import persistence.sql.dialect.Dialect;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
@@ -8,24 +7,24 @@ import persistence.sql.meta.TableName;
 
 public class SelectQueryBuilder {
 
+    public static final String SELECT_FIND_ALL_DEFAULT_DML = "select %s from %s";
+    public static final String SELECT_FIND_ID_DEFAULT_DML = "%s where %s";
     private final TableName tableName;
     private final PrimaryKey primaryKey;
     private final Columns columns;
-    private final Dialect dialect;
 
-    public SelectQueryBuilder(EntityMetaCreator entityMetaCreator, final Dialect dialect) {
+    public SelectQueryBuilder(EntityMetaCreator entityMetaCreator) {
         this.tableName = entityMetaCreator.createTableName();
         this.primaryKey = entityMetaCreator.createPrimaryKey();
         this.columns = entityMetaCreator.createColumns();
-        this.dialect = dialect;
     }
 
     public String createFindAllQuery() {
-        return String.format(dialect.getFindAllDefaultDmlQuery(), select(), this.tableName.name());
+        return String.format(SELECT_FIND_ALL_DEFAULT_DML, select(), this.tableName.name());
     }
 
     public String createFindByIdQuery(Long id) {
-        return String.format(dialect.getFindByIdDefaultDmlQuery(), createFindAllQuery(), selectWhere(id));
+        return String.format(SELECT_FIND_ID_DEFAULT_DML, createFindAllQuery(), selectWhere(id));
     }
 
     private String select() {
