@@ -7,10 +7,14 @@ import persistence.exception.NotEntityException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Table {
+    private final static Map<Class<?>, Table> CACHE = new ConcurrentHashMap<>();
+
     private final Class<?> clazz;
     private final List<Column> columns;
 
@@ -21,6 +25,9 @@ public class Table {
 
     public static Table from(Class<?> target) {
         checkIsEntity(target);
+        if (CACHE.containsKey(target)) {
+            return CACHE.get(target);
+        }
         List<Column> columns = getColumns(target);
         return new Table(target, columns);
     }
