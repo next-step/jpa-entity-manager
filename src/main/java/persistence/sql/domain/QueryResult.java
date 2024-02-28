@@ -38,7 +38,7 @@ public class QueryResult<T> implements RowMapper<T> {
             table.getAllColumns().forEach(column -> setEntityFieldValue(entity, column, resultSet));
             return entity;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("fail to map row", e);
         }
     }
 }
