@@ -66,4 +66,11 @@ public class EntityInfoExtractor {
                 .filter(EntityFieldInspector::isPersistable)
                     .collect(Collectors.toList());
     }
+
+    public static Field getFieldByColumnName(Class<?> clazz, String columName) {
+        return Arrays.stream(clazz.getDeclaredFields())
+            .filter(field -> EntityInfoExtractor.getColumnName(field).equals(columName))
+            .findFirst()
+            .get();
+    }
 }

@@ -40,7 +40,7 @@ public class DMLQueryBuilderTest {
     public void selectAllQueryTest() {
         String query = dmlQueryBuilder.selectAllSql(Person.class);
 
-        assertEquals("SELECT * FROM users", query);
+        assertEquals("SELECT id, nick_name, old, email FROM users", query);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class DMLQueryBuilderTest {
     void selectByIdSqlTest() {
         String query = dmlQueryBuilder.selectByIdQuery(Person.class, 1L);
 
-        assertEquals("SELECT * FROM users WHERE id = 1", query);
+        assertEquals("SELECT id, nick_name, old, email FROM users WHERE id = 1", query);
     }
 
     @Test

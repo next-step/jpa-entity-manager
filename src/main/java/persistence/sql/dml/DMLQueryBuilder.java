@@ -2,9 +2,13 @@ package persistence.sql.dml;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.stream.Collectors;
+import persistence.core.EntityContextManager;
+import persistence.entity.metadata.EntityColumn;
+import persistence.entity.metadata.EntityMetadata;
 import persistence.inspector.EntityInfoExtractor;
 
-public class DMLQueryBuilder {
+public class DMLQueryBuilder extends EntityContextManager {
 
     private DMLQueryBuilder() {
     }
@@ -16,79 +20,74 @@ public class DMLQueryBuilder {
     private final static String COLUMN_SEPARATOR = ", ";
 
     public String insertSql(Object entity) {
-        String tableName = EntityInfoExtractor.getTableName(entity.getClass());
-        String columns = getInsertColumnsClause(entity);
-        String values = insertValueClause(entity);
+        EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
 
-        return DMLQueryFormatter.createInsertQuery(tableName, columns, values);
+        String tableName = entityMetadata.getTableName();
+        String columns = getColumnNamesClause(entityMetadata.getInsertTargetColumns());
+        String columnValues = getColumnValueClause(entity, entityMetadata.getInsertTargetColumns());
+
+        return DMLQueryFormatter.createInsertQuery(tableName, columns, columnValues);
+    }
+
+    private String getColumnValueClause(Object entity, List<EntityColumn> insertTargetColumns) {
+
+        return insertTargetColumns.stream()
+            .map(column -> getColumnValueWithSqlFormat(entity, column.getName()))
+            .collect(Collectors.joining(COLUMN_SEPARATOR));
     }
 
     public String selectAllSql(Class<?> clazz) {
-        String tableName = EntityInfoExtractor.getTableName(clazz);
+        EntityMetadata entityMetadata = getEntityMetadata(clazz);
+        String columnsClause = entityMetadata.getColumns().stream()
+            .map(EntityColumn::getName)
+            .collect(Collectors.joining(COLUMN_SEPARATOR));
 
-        return DMLQueryFormatter.createSelectQuery(tableName);
+        return DMLQueryFormatter.createSelectQuery(columnsClause, entityMetadata.getTableName());
     }
 
     public String selectByIdQuery(Class<?> clazz, Object id) {
+        EntityMetadata entityMetadata = getEntityMetadata(clazz);
 
-        return DMLQueryFormatter.createSelectByConditionQuery(selectAllSql(clazz), wherePrimaryKeyClause(clazz, id));
+        String sql = selectAllSql(clazz);
+        String condition = createCondition(entityMetadata.getIdColumn().getName(), id, "=");
+        return DMLQueryFormatter.createSelectByConditionQuery(sql, condition);
     }
 
     public String deleteSql(Object entity) {
-        String tableName = EntityInfoExtractor.getTableName(entity.getClass());
-        String deleteConditionClause = wherePrimaryKeyClause(entity);
+        EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
+
+        String tableName = entityMetadata.getTableName();
+        String deleteConditionClause = wherePrimaryKeyClause(entityMetadata, entity);
 
         return DMLQueryFormatter.createDeleteQuery(tableName, deleteConditionClause);
     }
 
-    private String wherePrimaryKeyClause(Object object) {
-        Field idField = EntityInfoExtractor.getIdField(object.getClass());
+    private String wherePrimaryKeyClause(EntityMetadata entityMetadata, Object object) {
+        String idColumnName = entityMetadata.getIdColumn().getName();
+        Object value = getColumnValue(object, entityMetadata.getIdColumn().getName());
 
-        return createCondition(EntityInfoExtractor.getColumnName(idField), EntityInfoExtractor.getFieldValue(object, idField));
+        return createCondition(idColumnName, value, "=");
     }
 
-    private String wherePrimaryKeyClause(Class<?> clazz, Object id) {
-        String columnName = EntityInfoExtractor.getIdColumnName(clazz);
+    private String createCondition(String columnName, Object value, String operator) {
 
-        return createCondition(columnName, id);
+        return String.format("%s %s %s", columnName, operator, formatValue(value));
     }
 
-    private String createCondition(String columnName, Object value) {
-
-        return String.format("%s = %s", columnName, formatValue(value));
+    private String getColumnNamesClause(List<EntityColumn> insertTargetColumns) {
+        return insertTargetColumns.stream()
+            .map(EntityColumn::getName)
+            .collect(Collectors.joining(COLUMN_SEPARATOR));
     }
 
-    private String getInsertColumnsClause(Object entity) {
-
-        return getColumnsClause(EntityInfoExtractor.getEntityFieldsForInsert(entity.getClass()));
+    private String getColumnValueWithSqlFormat(Object entity, String columnName) {
+        return formatValue(getColumnValue(entity, columnName));
     }
 
-    public String insertValueClause(Object entity) {
-        StringBuilder sql = new StringBuilder();
-        for (Field targetField : EntityInfoExtractor.getEntityFieldsForInsert(entity.getClass())) {
-            sql.append(getFieldValueWithSqlFormat(entity, targetField))
-                .append(COLUMN_SEPARATOR);
-        }
+    private Object getColumnValue(Object entity, String columnName) {
+        Field field = EntityInfoExtractor.getFieldByColumnName(entity.getClass(), columnName);
 
-        return sql.toString().replaceAll(", $", "");
-    }
-
-    private Object getFieldValueWithSqlFormat(Object entity, Field field) {
-        return formatValue(EntityInfoExtractor.getFieldValue(entity, field));
-    }
-
-    private String getColumnsClause(List<Field> fields) {
-        StringBuilder sql = new StringBuilder();
-        final String columnFormat = "%s%s";
-
-        for (Field field : fields) {
-            sql.append(String.format(columnFormat,
-                    EntityInfoExtractor.getColumnName(field),
-                    COLUMN_SEPARATOR
-            ));
-        }
-
-        return sql.toString().replaceAll(", $", "");
+        return EntityInfoExtractor.getFieldValue(entity, field);
     }
 
     private String formatValue(Object value) {
@@ -96,7 +95,7 @@ public class DMLQueryBuilder {
             return "'" + value + "'";
         }
 
-        return value.toString();
+        return value == null ? "" : value.toString();
     }
 
 }

@@ -2,7 +2,6 @@ package persistence.sql.ddl.h2;
 
 import jakarta.persistence.GenerationType;
 import persistence.entity.metadata.EntityColumn;
-import persistence.sql.Dialect;
 import persistence.sql.ddl.DDLSqlGenerator;
 import persistence.sql.h2.H2Dialect;
 
@@ -15,24 +14,29 @@ public class H2DDLSqlGenerator extends DDLSqlGenerator {
     @Override
     protected String getColumnClause(EntityColumn entityColumn) {
         StringBuilder columnClause = new StringBuilder();
+        String columnDefinition = String.format("%s %s ", entityColumn.getName(), getColumnDataType(entityColumn));
 
+        columnClause.append(columnDefinition);
+        columnClause.append(getColumnConstraint(entityColumn));
+
+        return columnClause.toString();
+    }
+
+    private String getColumnConstraint(EntityColumn entityColumn) {
+        StringBuilder columnClause = new StringBuilder();
         String nullable = getNullable(entityColumn);
         String columnProperty = getColumnGenerator(entityColumn);
         String PK = getPrimaryKey(entityColumn);
 
-        columnClause.append(entityColumn.getName());
-        columnClause.append(" ");
-        columnClause.append(getColumnDataType(entityColumn));
-        columnClause.append(" ");
-        if (columnProperty != null && !columnProperty.isEmpty()) {
+        if (!columnProperty.isEmpty()) {
             columnClause.append(columnProperty);
             columnClause.append(" ");
         }
-        if (PK != null && !PK.isEmpty()) {
+        if (!PK.isEmpty()) {
             columnClause.append(PK);
             columnClause.append(" ");
         }
-        if (nullable != null && !nullable.isEmpty()) {
+        if (!nullable.isEmpty()) {
             columnClause.append(nullable);
             columnClause.append(" ");
         }

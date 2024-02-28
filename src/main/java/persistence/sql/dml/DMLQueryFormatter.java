@@ -16,6 +16,11 @@ public class DMLQueryFormatter {
         return java.lang.String.format("SELECT * FROM %s", tableName);
     }
 
+    public static String createSelectQuery(String columnClause, String tableName) {
+
+        return java.lang.String.format("SELECT %s FROM %s", columnClause, tableName);
+    }
+
     public static String createSelectByConditionQuery(String sql, String conditionClause) {
         String selectByConditionQueryFormat = "%s WHERE %s";
 
