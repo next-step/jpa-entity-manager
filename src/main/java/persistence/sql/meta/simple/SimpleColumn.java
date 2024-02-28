@@ -6,8 +6,6 @@ import persistence.sql.meta.Column;
 
 import java.lang.reflect.Field;
 
-import static persistence.sql.meta.parser.ValueParser.valueParse;
-
 public class SimpleColumn implements Column {
 
     private final Field field;
@@ -27,7 +25,23 @@ public class SimpleColumn implements Column {
 
     @Override
     public String value(Object object) {
-        return valueParse(this.field, object);
+        this.field.setAccessible(true);
+        Object value;
+        try {
+            value = field.get(object);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (field.getType().equals(String.class)) {
+            return String.format("'%s'", value);
+        }
+
+        if (field.getType().equals(Long.class)) {
+            return String.format("%dL", value);
+        }
+
+        return String.valueOf(value);
     }
 
     @Override
