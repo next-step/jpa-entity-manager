@@ -26,7 +26,7 @@ public class EntityPersist {
         this.deleteQueryBuilder = new DeleteQueryBuilder();
     }
 
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> T findOneOrFail(Class<T> clazz, Long id) {
         return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new RowMapperImpl<>(clazz));
     }
 
@@ -36,16 +36,12 @@ public class EntityPersist {
             insert(entity);
             return;
         }
-        T findEntity = find(entity, pkValue);
+        T findEntity = findOne(entity, pkValue);
         if (findEntity == null) {
             insert(entity);
             return;
         }
         update(pkValue, findEntity, entity);
-    }
-
-    public <T> void delete(T entity) {
-        jdbcTemplate.execute(deleteQueryBuilder.generateSQL(entity));
     }
 
     private <T> void insert(T entity) {
@@ -75,7 +71,7 @@ public class EntityPersist {
         jdbcTemplate.execute(sql);
     }
 
-    private <T> T find(T entity, Long id) {
+    private <T> T findOne(T entity, Long id) {
         List<T> entities = (List<T>) jdbcTemplate.query(
                 selectQueryBuilder.findById(entity.getClass(), id),
                 new RowMapperImpl<>(entity.getClass())
@@ -96,5 +92,9 @@ public class EntityPersist {
             throw new IllegalArgumentException(e);
         }
         return value;
+    }
+
+    public <T> void delete(T entity) {
+        jdbcTemplate.execute(deleteQueryBuilder.generateSQL(entity));
     }
 }
