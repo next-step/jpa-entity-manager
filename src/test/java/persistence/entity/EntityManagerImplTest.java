@@ -175,23 +175,23 @@ class EntityManagerImplTest {
         assertThat(findPerson).isEmpty();
     }
 
-    @DisplayName("update 메서드를 통해 Person 객체를 수정한다.")
+    @DisplayName("merge 메서드를 통해 Person 객체를 수정한다.")
     @Test
-    void update() {
+    void merge() {
         // given
         Person person = new Person(1L, "John", 99, "john@test.com", 1);
         entityManager.persist(person);
 
         // when
         person.setName("John2");
-        entityManager.update(person);
+        entityManager.merge(person);
 
         // then
         Person findPerson = entityManager.find(Person.class, person.getId());
         assertThat(findPerson.getName()).isEqualTo("John2");
     }
 
-    @DisplayName("update 메서드를 통해 Person 객체를 수정한다. - persistContext에서 id는 그대로고 엔티티만 수정된다.")
+    @DisplayName("merge 메서드를 통해 Person 객체를 수정한다. - persistContext에서 id는 그대로고 엔티티만 수정된다.")
     @Test
     void updateContext() {
         // given
@@ -200,7 +200,7 @@ class EntityManagerImplTest {
 
         // when
         person.setName("John2");
-        entityManager.update(person);
+        entityManager.merge(person);
 
         // then
         PersistenceContext persistContext = entityManager.getPersistContext();

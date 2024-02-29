@@ -26,9 +26,10 @@ public class EntityManagerImpl implements EntityManager {
         Object entity = persistContext.getEntity(id)
                 .orElseGet(() -> {
                     T findEntity = entityLoader.find(clazz, id);
-                    persistContext.addEntity(id, findEntity);
+                    savePersistence(findEntity, id);
                     return findEntity;
                 });
+        persistContext.getDatabaseSnapshot(id, entity);
         return clazz.cast(entity);
 
     }
@@ -39,7 +40,7 @@ public class EntityManagerImpl implements EntityManager {
 
         GenerationType generationType = idColumn.getIdGeneratedStrategy().getGenerationType();
         if (!dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
-            persistContext.addEntity(idColumn.getValue(), entity);
+            savePersistence(entity, idColumn.getValue());
             entityPersister.insert(entity);
             return entity;
         }
@@ -48,7 +49,7 @@ public class EntityManagerImpl implements EntityManager {
             setIdValue(entity, getIdField(entity, idColumn), 1L);
         }
 
-        persistContext.addEntity(idColumn.getValue(), entity);
+        savePersistence(entity, idColumn.getValue());
         entityPersister.insert(entity);
 
         return entity;
@@ -81,10 +82,21 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public boolean update(Object entity) {
+    public <T> T merge(T entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-        persistContext.addEntity(idColumn.getValue(), entity);
-        return entityPersister.update(entity, idColumn.getValue());
+
+        Object cachedDatabaseSnapshot = persistContext.getCachedDatabaseSnapshot(idColumn.getValue());
+        if (!cachedDatabaseSnapshot.equals(entity)) {
+            entityPersister.update(entity, idColumn.getValue());
+            return entity;
+        }
+        savePersistence(entity, idColumn.getValue());
+        return entity;
+    }
+
+    private <T> void savePersistence(T entity, Long id) {
+        persistContext.getDatabaseSnapshot(id, entity);
+        persistContext.addEntity(id, entity);
     }
 
     @Override

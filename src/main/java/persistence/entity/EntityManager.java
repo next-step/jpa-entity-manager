@@ -8,7 +8,7 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    boolean update(Object entity);
+    <T> T merge(T entity);
 
     PersistenceContext getPersistContext();
 }

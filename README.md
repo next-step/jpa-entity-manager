@@ -18,7 +18,7 @@
 ### step3 - First Level Cache, Dirty Check
 
 - [x] 요구 사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱 적용
-- [ ] 요구 사항 2 - snapshot 만들기
+- [x] 요구 사항 2 - snapshot 만들기
   - Snapshot은 영속성 컨텍스트 내부의 데이터를 복사한 것
     1. 영속 컨텍스트 내에서 Entity 를 조회
     2. 조회된 상태의 Entity 를 스냅샷 생성
