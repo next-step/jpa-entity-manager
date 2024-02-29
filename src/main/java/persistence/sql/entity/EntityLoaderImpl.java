@@ -1,11 +1,10 @@
 package persistence.sql.entity;
 
 import jdbc.JdbcTemplate;
+import jdbc.RowMapper;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-
-import static persistence.sql.entity.RowMapperFactory.createRowMapper;
 
 public class EntityLoaderImpl implements EntityLoader {
 
@@ -25,7 +24,7 @@ public class EntityLoaderImpl implements EntityLoader {
     public <T> T findById(final Class<T> clazz, final Long id) {
         final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(tableName, primaryKey, columns);
         final String findByIdQuery = queryBuilder.createFindByIdQuery(id);
-
-        return jdbcTemplate.queryForObject(findByIdQuery, createRowMapper(clazz));
+        final RowMapper<T> simpleRowMapper = new SimpleRowMapper<>(clazz);
+        return jdbcTemplate.queryForObject(findByIdQuery, simpleRowMapper);
     }
 }
