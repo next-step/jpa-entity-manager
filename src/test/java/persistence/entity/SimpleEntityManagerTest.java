@@ -114,6 +114,14 @@ class SimpleEntityManagerTest {
         final String email = "email@domain.com";
         final PersonV3 person = new PersonV3(0L, name, age, email, 1);
 
+        final String insertQuery = "insert\n" +
+                "into\n" +
+                "    users\n" +
+                "    (nick_name, old, email, id)\n" +
+                "values\n" +
+                "    ('" + name + "', " + age + ", '" + email + "', default)";
+        jdbcTemplate.execute(insertQuery);
+
         // when
         entityManager.remove(person);
 
