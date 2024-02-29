@@ -5,24 +5,24 @@ import jdbc.RowMapperImpl;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
-import persistence.sql.meta.column.ColumnName;
+import persistence.sql.dml.builder.UpdateQueryBuilder;
 import persistence.sql.meta.pk.PKField;
-import persistence.sql.meta.table.TableName;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 public class EntityPersist {
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryBuilder selectQueryBuilder;
     private final InsertQueryBuilder insertQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
     private final DeleteQueryBuilder deleteQueryBuilder;
 
     public EntityPersist(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.selectQueryBuilder = new SelectQueryBuilder();
         this.insertQueryBuilder = new InsertQueryBuilder();
+        this.updateQueryBuilder = new UpdateQueryBuilder();
         this.deleteQueryBuilder = new DeleteQueryBuilder();
     }
 
@@ -49,25 +49,7 @@ public class EntityPersist {
     }
 
     private <T> void update(Long pk, T findEntity, T entity) {
-        Class<?> clazz = findEntity.getClass();
-        Field[] fields = clazz.getDeclaredFields();
-        StringBuilder sb = new StringBuilder();
-        Arrays.stream(fields)
-                .forEach(field -> {
-                    field.setAccessible(true);
-                    try {
-                        Object findValue = field.get(findEntity);
-                        Object newValue = field.get(entity);
-                        if (findValue != newValue) {
-                            sb.append(new ColumnName(field).getName() + "=" + "'" + newValue.toString() + "'");
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        TableName tableName = new TableName(findEntity.getClass());
-        String sql = String.format("UPDATE %s SET %s WHERE id = %s",
-                tableName.getName(), sb, pk.toString());
+        String sql = updateQueryBuilder.generateSQL(pk, findEntity, entity);
         jdbcTemplate.execute(sql);
     }
 
