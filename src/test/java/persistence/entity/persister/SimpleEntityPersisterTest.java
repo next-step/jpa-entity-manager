@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 import database.DatabaseServer;
 import database.H2;
@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.entity.persister.EntityPersister;
+import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.DmlGenerator;
