@@ -5,7 +5,7 @@
 - [x] 1주차 마지막 미션 리뷰 반영
 
 ## Step1 요구사항
-- [ ] EntityPersister 
-  - [ ] insert
-  - [ ] update
+- [x] EntityPersister 
+  - [x] insert
+  - [x] update
   - [x] delete
