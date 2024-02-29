@@ -36,7 +36,8 @@ class EntityManagerImplTest {
         Connection connection = server.getConnection();
         JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         jdbcTemplate.execute(ddlQueryBuilder.createQuery(Person.class));
-        entityManager = new EntityManagerImpl(jdbcTemplate, new UpdateQueryBuilder(), new InsertQueryBuilder(), new DeleteQueryBuilder(), new SelectQueryBuilder());
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(), new DeleteQueryBuilder());
+        entityManager = new EntityManagerImpl(jdbcTemplate, entityPersister, new SelectQueryBuilder());
     }
 
     @AfterAll

@@ -18,11 +18,9 @@ public class EntityManagerImpl implements EntityManager {
 
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate,
-                             UpdateQueryBuild updateQueryBuilder,
-                             InsertQueryBuild insertQueryBuilder,
-                             DeleteQueryBuild deleteQueryBuilder,
+                             EntityPersister entityPersister,
                              SelectQueryBuild selectQueryBuilder) {
-        this.entityPersister = new EntityPersister(jdbcTemplate, insertQueryBuilder, updateQueryBuilder, deleteQueryBuilder);
+        this.entityPersister = entityPersister;
         this.selectQueryBuilder = selectQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
     }
