@@ -35,6 +35,7 @@ public class InsertQueryBuilder {
     private String valueClause(List<Column> columns, Object object) {
         return columns.stream()
             .map(column -> column.getFieldValue(object))
+            .map(String::valueOf)
             .collect(Collectors.joining(COMMA.getValue()));
     }
 }

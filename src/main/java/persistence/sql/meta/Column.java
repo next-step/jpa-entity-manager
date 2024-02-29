@@ -49,7 +49,7 @@ public class Column {
         return column == null || column.nullable();
     }
 
-    public String getFieldValue(Object object) {
+    public Object getFieldValue(Object object) {
         try {
             field.setAccessible(true);
             return valueOf(field.get(object));
@@ -67,12 +67,12 @@ public class Column {
         }
     }
 
-    private String valueOf(Object object) {
+    private Object valueOf(Object object) {
 
         if (object instanceof String) {
             return String.format("'%s'", object);
         }
-        return String.valueOf(object);
+        return object;
     }
 
     private String convertCamelToSnakeString(String str) {

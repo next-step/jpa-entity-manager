@@ -156,7 +156,7 @@ class ColumnTest {
             Column column = Column.from(Entity.class.getDeclaredField("id"));
             Entity entity = new Entity(1);
 
-            assertEquals(column.getFieldValue(entity), String.valueOf(entity.id));
+            assertEquals(column.getFieldValue(entity), entity.id);
         }
     }
 
