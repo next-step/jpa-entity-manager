@@ -21,7 +21,7 @@ class SelectQueryBuilderTest {
             SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.getInstance();
 
             // when
-            String query = selectQueryBuilder.generateQuery(Table.from(Person.class));
+            String query = selectQueryBuilder.generateQuery(Table.getInstance(Person.class));
 
             // then
             assertEquals("SELECT id,nick_name,old,email FROM users", query);

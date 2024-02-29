@@ -4,20 +4,22 @@ import jakarta.persistence.Entity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import org.h2.util.StringUtils;
 
 public class Table {
 
     private final Class<?> clazz;
     private final Columns columns;
-    private static final Map<Class<?>, Table> cashTable = new HashMap<>();
+    private static final Map<Class<?>, Table> cashTable = new ConcurrentHashMap<>();
 
     private Table(Class<?> clazz, Columns columns) {
         this.clazz = clazz;
         this.columns = columns;
     }
 
-    public static Table from(Class<?> clazz) {
+    public static Table getInstance(Class<?> clazz) {
         if (cashTable.containsKey(clazz)) {
             return cashTable.get(clazz);
         }
@@ -56,6 +58,10 @@ public class Table {
         return columns.getIdValue(entity);
     }
 
+    public void setIdValue(Object entity, Object id) {
+        columns.getIdColumn().setFieldValue(entity, id);
+    }
+
     private static void validate(Class<?> clazz, Columns columns) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("엔티티 객체가 아닙니다.");
@@ -66,5 +72,18 @@ public class Table {
         if (idFieldCount != 1) {
             throw new IllegalArgumentException("Id 필드는 필수로 1개를 가져야 합니다.");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Table table = (Table) o;
+        return Objects.equals(clazz, table.clazz);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz);
     }
 }

@@ -27,7 +27,7 @@ class CreateQueryBuilderTest {
         @Test
         void testGenerateQuery_WhenPersonEntity_ThenGenerateDdl() {
             // given
-            Table table = Table.from(Person.class);
+            Table table = Table.getInstance(Person.class);
 
             //when
             String ddl = builder.generateQuery(table);

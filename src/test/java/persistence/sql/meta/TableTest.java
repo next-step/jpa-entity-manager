@@ -18,7 +18,7 @@ class TableTest {
         @DisplayName("Entity 클래스로부터 Table 객체를 생성한다.")
         @Test
         void testTableOf() {
-            Table table = Table.from(Person.class);
+            Table table = Table.getInstance(Person.class);
             assertNotNull(table);
         }
 
@@ -30,7 +30,7 @@ class TableTest {
                 private String name;
             }
 
-            assertThrows(IllegalArgumentException.class, () -> Table.from(NonEntity.class));
+            assertThrows(IllegalArgumentException.class, () -> Table.getInstance(NonEntity.class));
         }
 
         @DisplayName("Id 필드가 없을 경우 예외를 던진다.")
@@ -41,7 +41,7 @@ class TableTest {
                 private String name;
             }
 
-            assertThrows(IllegalArgumentException.class, () -> Table.from(EntityWithNoId.class));
+            assertThrows(IllegalArgumentException.class, () -> Table.getInstance(EntityWithNoId.class));
         }
 
         @DisplayName("Id 필드가 2개 이상일 경우 예외를 던진다.")
@@ -55,7 +55,7 @@ class TableTest {
                 private String name;
             }
 
-            assertThrows(IllegalArgumentException.class, () -> Table.from(EntityWithMultipleId.class));
+            assertThrows(IllegalArgumentException.class, () -> Table.getInstance(EntityWithMultipleId.class));
         }
     }
 
@@ -65,7 +65,7 @@ class TableTest {
         @DisplayName("Entity 클래스의 필드에 대한 Column 객체 목록을 반환한다.")
         @Test
         void testGetColumns() {
-            Table table = Table.from(Person.class);
+            Table table = Table.getInstance(Person.class);
             List<Column> columns = table.getColumns();
             assertEquals(4, columns.size());
         }
@@ -77,7 +77,7 @@ class TableTest {
         @DisplayName("Entity 클래스의 테이블 이름을 반환한다.")
         @Test
         void testGetTableName() {
-            Table table = Table.from(Person.class);
+            Table table = Table.getInstance(Person.class);
             assertEquals("users", table.getTableName());
         }
 
@@ -91,7 +91,7 @@ class TableTest {
                 private String name;
             }
 
-            Table table = Table.from(EntityWithoutTableAnnotation.class);
+            Table table = Table.getInstance(EntityWithoutTableAnnotation.class);
             assertEquals("EntityWithoutTableAnnotation", table.getTableName());
         }
     }
@@ -103,7 +103,7 @@ class TableTest {
         @DisplayName("Entity 클래스의 Id 필드에 대한 Column 객체를 반환한다.")
         @Test
         void testGetIdColumn() {
-            Table table = Table.from(Person.class);
+            Table table = Table.getInstance(Person.class);
             Column idColumn = table.getIdColumn();
             assertEquals("id", idColumn.getColumnName());
         }
@@ -115,10 +115,10 @@ class TableTest {
         @DisplayName("Entity 클래스의 Id 필드의 값을 반환한다.")
         @Test
         void testGetIdValue() {
-            Table table = Table.from(Person.class);
+            Table table = Table.getInstance(Person.class);
             Person person = Person.of(1L, "name", 20, "email");
             Object idValue = table.getIdValue(person);
-            assertEquals(String.valueOf(1L), idValue);
+            assertEquals(1L, idValue);
         }
     }
 }

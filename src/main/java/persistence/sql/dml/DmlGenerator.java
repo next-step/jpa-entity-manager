@@ -32,7 +32,7 @@ public class DmlGenerator {
     }
 
     public String generateInsertQuery(Object object) {
-        Table table = Table.from(object.getClass());
+        Table table = getTable(object.getClass());
         return insertQueryBuilder.generateQuery(table, object);
     }
 
@@ -54,7 +54,7 @@ public class DmlGenerator {
     }
 
     public String generateDeleteQuery(Object object) {
-        Table table = Table.from(object.getClass());
+        Table table = Table.getInstance(object.getClass());
         return deleteQueryBuilder.generateQuery(table) +
             whereClause(Map.of(table.getIdColumn(), table.getIdValue(object)));
     }
@@ -83,6 +83,6 @@ public class DmlGenerator {
     }
 
     private Table getTable(Class<?> clazz) {
-        return Table.from(clazz);
+        return Table.getInstance(clazz);
     }
 }
