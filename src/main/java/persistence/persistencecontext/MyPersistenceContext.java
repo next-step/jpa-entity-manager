@@ -1,42 +1,42 @@
 package persistence.persistencecontext;
 
-import persistence.sql.domain.Table;
-import utils.ValueExtractor;
+import persistence.entity.EntityMeta;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class MyPersistenceContext implements PersistenceContext {
-    private final Map<EntityKey, Object> entities = new HashMap<>();
+    private final Map<EntityKey, EntityMeta> entities = new HashMap<>();
     private final Map<EntityKey, EntitySnapshot> snapshots = new HashMap<>();
 
     @Override
-    public <T> T getEntity(Class<T> clazz, Object id) {
-        return (T) entities.get(new EntityKey(id, clazz));
+    public <T> Optional<T> getEntity(Class<T> clazz, Object id) {
+        EntityKey entityKey = new EntityKey(id, clazz);
+        return Optional.ofNullable(entities.get(entityKey))
+                .map(EntityMeta::getEntity)
+                .map(clazz::cast);
     }
 
     @Override
-    public void addEntity(Object id, Object entity) {
-        entities.put(new EntityKey(id, entity.getClass()), entity);
+    public void addEntity(EntityMeta entityMeta) {
+        entities.put(entityMeta.getEntityKey(), entityMeta);
     }
 
     @Override
-    public void removeEntity(Object entity) {
-        Table table = Table.from(entity.getClass());
-        Object id = ValueExtractor.extract(entity, table.getIdColumn());
-        EntityKey entityKey = new EntityKey(id, entity.getClass());
-        entities.remove(entityKey);
+    public void removeEntity(EntityMeta entityMeta) {
+        entities.remove(entityMeta.getEntityKey());
     }
 
     @Override
-    public EntitySnapshot getDatabaseSnapshot(Object id, Object entity) {
-        EntityKey entityKey = new EntityKey(id, entity.getClass());
-        return snapshots.put(entityKey, EntitySnapshot.from(entity));
+    public EntitySnapshot getDatabaseSnapshot(EntityMeta entityMeta) {
+        EntityKey entityKey = new EntityKey(entityMeta.getId(), entityMeta.getEntity().getClass());
+        return snapshots.put(entityKey, EntitySnapshot.from(entityMeta.getEntity()));
     }
 
     @Override
-    public EntitySnapshot getCachedDatabaseSnapshot(Object id, Object entity) {
-        EntityKey entityKey = new EntityKey(id, entity.getClass());
+    public EntitySnapshot getCachedDatabaseSnapshot(EntityMeta entityMeta) {
+        EntityKey entityKey = new EntityKey(entityMeta.getId(), entityMeta.getEntity().getClass());
         return snapshots.get(entityKey);
     }
 }
