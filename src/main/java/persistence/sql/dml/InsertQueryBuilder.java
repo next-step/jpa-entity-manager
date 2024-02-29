@@ -3,8 +3,8 @@ package persistence.sql.dml;
 import persistence.sql.domain.Column;
 import persistence.sql.domain.DataType;
 import persistence.sql.domain.Table;
+import utils.ValueExtractor;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,23 +41,13 @@ public class InsertQueryBuilder {
     }
 
     private void checkNullableValue(Object object, Column column) {
-        if (!column.isNullable() && (getObject(object, column) == null)) {
+        if (!column.isNullable() && (ValueExtractor.extract(object, column) == null)) {
             throw new IllegalArgumentException("Not nullable column value is null");
         }
     }
 
-    private Object getObject(Object object, Column column) {
-        try {
-            Field field = column.getField();
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed to access field: " + column.getName(), e);
-        }
-    }
-
     private String getDmlValue(Object object, Column column) {
-        Object value = getObject(object, column);
+        Object value = ValueExtractor.extract(object, column);
         DataType columnType = column.getType();
         if (columnType.isVarchar()) {
             return String.format("'%s'", value);

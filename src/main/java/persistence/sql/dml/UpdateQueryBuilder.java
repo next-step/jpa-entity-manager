@@ -4,8 +4,8 @@ import persistence.sql.domain.Column;
 import persistence.sql.domain.DataType;
 import persistence.sql.domain.IdColumn;
 import persistence.sql.domain.Table;
+import utils.ValueExtractor;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class UpdateQueryBuilder {
         Table table = Table.from(object.getClass());
         IdColumn idColumn = table.getIdColumn();
         String updateClause = getUpdateClause(object, table.getColumns());
-        Object keyValue = getValue(object, idColumn);
+        Object keyValue = ValueExtractor.extract(object, idColumn);
         return String.format(UPDATE_QUERY_TEMPLATE, table.getName(), updateClause, idColumn.getName(), keyValue);
     }
 
@@ -46,21 +46,11 @@ public class UpdateQueryBuilder {
     }
 
     private String getDmlValue(Object object, Column column) {
-        Object value = getValue(object, column);
+        Object value = ValueExtractor.extract(object, column);
         DataType columnType = column.getType();
         if (columnType.isVarchar()) {
             return String.format("'%s'", value);
         }
         return value.toString();
-    }
-
-    private Object getValue(Object object, Column column) {
-        try {
-            Field field = column.getField();
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed to access field: " + column.getName(), e);
-        }
     }
 }
