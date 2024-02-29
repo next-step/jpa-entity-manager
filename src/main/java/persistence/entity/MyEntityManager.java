@@ -22,7 +22,8 @@ public class MyEntityManager implements EntityManager {
         return persistenceContext.getEntity(clazz, id)
                 .orElseGet(() -> {
                     T foundEntity = entityLoader.find(clazz, id);
-                    addToCache(EntityMeta.from(foundEntity));
+                    EntityMeta entityMeta = EntityMeta.from(foundEntity);
+                    addToCache(entityMeta);
                     return foundEntity;
                 });
     }
@@ -30,6 +31,7 @@ public class MyEntityManager implements EntityManager {
     @Override
     public <T> T persist(T entity) {
         EntityMeta entityMeta = EntityMeta.from(entity);
+        entityMeta.updateStatus(EntityStatus.SAVING);
         Object generatedId = entityPersister.insert(entityMeta);
         entityMeta.injectId(generatedId);
         addToCache(entityMeta);
@@ -39,7 +41,9 @@ public class MyEntityManager implements EntityManager {
     @Override
     public void remove(Object entity) {
         EntityMeta entityMeta = EntityMeta.from(entity);
+        entityMeta.updateStatus(EntityStatus.DELETED);
         persistenceContext.removeEntity(entityMeta);
+        entityMeta.updateStatus(EntityStatus.GONE);
         entityPersister.delete(entityMeta);
     }
 
@@ -55,7 +59,12 @@ public class MyEntityManager implements EntityManager {
     }
 
     private void addToCache(EntityMeta entityMeta) {
+        entityMeta.updateStatus(EntityStatus.MANAGED);
         persistenceContext.addEntity(entityMeta);
         persistenceContext.getDatabaseSnapshot(entityMeta);
+    }
+
+    public PersistenceContext getPersistenceContext() {
+        return persistenceContext;
     }
 }

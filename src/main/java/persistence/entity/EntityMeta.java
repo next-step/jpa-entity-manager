@@ -10,11 +10,13 @@ public class EntityMeta {
     private final Table table;
     private final IdColumn id;
     private final Object entity;
+    private final EntityEntry entityEntry;
 
     public EntityMeta(Table table, IdColumn id, Object entity) {
         this.table = table;
         this.id = id;
         this.entity = entity;
+        this.entityEntry = new EntityEntry();
     }
 
     public static <T> EntityMeta from(T entity) {
@@ -41,5 +43,9 @@ public class EntityMeta {
 
     public Object getEntity() {
         return entity;
+    }
+
+    public void updateStatus(EntityStatus status) {
+        this.entityEntry.updateStatus(status);
     }
 }

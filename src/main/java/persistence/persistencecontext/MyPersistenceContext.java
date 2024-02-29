@@ -39,4 +39,8 @@ public class MyPersistenceContext implements PersistenceContext {
         EntityKey entityKey = new EntityKey(entityMeta.getId(), entityMeta.getEntity().getClass());
         return snapshots.get(entityKey);
     }
+
+    public Map<EntityKey, EntityMeta> getEntities() {
+        return entities;
+    }
 }
