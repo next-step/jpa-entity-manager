@@ -18,7 +18,7 @@ public class QueryResult<T> implements RowMapper<T> {
         this.clazz = clazz;
     }
 
-    private <T> void setEntityFieldValue(T entity, ColumnOperation column, ResultSet resultSet) {
+    private void setEntityFieldValue(T entity, ColumnOperation column, ResultSet resultSet) {
         String jdbcColumnName = column.getJdbcColumnName();
         String javaFieldName = column.getJavaFieldName();
         try {
