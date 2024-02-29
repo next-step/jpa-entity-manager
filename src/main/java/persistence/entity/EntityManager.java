@@ -1,14 +1,20 @@
 package persistence.entity;
 
+import persistence.sql.dialect.Dialect;
+
 public interface EntityManager {
 
     <T> T find(Class<T> clazz, Long id);
 
-    Object persist(Object entity);
+    <T> T persist(Object entity);
 
     void remove(Object entity);
 
     <T> T merge(T entity);
 
     PersistenceContext getPersistContext();
+
+    <T> T getSnapshot(T id);
+
+    Dialect getDialect();
 }

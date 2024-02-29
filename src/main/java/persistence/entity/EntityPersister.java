@@ -4,7 +4,7 @@ public interface EntityPersister {
 
     boolean update(Object entity, Object id);
 
-    void insert(Object entity);
+    <T> void insert(T entity);
 
     void delete(Object entity, Object id);
 }

@@ -103,4 +103,13 @@ public class EntityManagerImpl implements EntityManager {
     public PersistenceContext getPersistContext() {
         return persistContext;
     }
+
+    @Override
+    public <T> T getSnapshot(T id) {
+        return persistContext.getCachedDatabaseSnapshot(id);
+    }
+
+    public Dialect getDialect() {
+        return dialect;
+    }
 }

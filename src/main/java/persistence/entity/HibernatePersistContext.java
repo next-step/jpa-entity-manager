@@ -35,7 +35,7 @@ public class HibernatePersistContext implements PersistenceContext {
     }
 
     @Override
-    public <T> T getCachedDatabaseSnapshot(Long id) {
+    public <T> T getCachedDatabaseSnapshot(T id) {
         return (T) snapshot.get(id);
     }
 }
