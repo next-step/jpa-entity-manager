@@ -13,4 +13,8 @@ step3 : 🚀 3단계 - First Level Cache, Dirty Check
 - [x] : 요구사항2 - snapshot 만들기
 - [x] : 요구사항3 - 더티체킹 구현
 
+step4 : 🚀 4단계 - EntityEntry
+- [ ] : 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자
+
+
 
