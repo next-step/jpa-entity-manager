@@ -94,22 +94,18 @@ class DefaultDmlQueryBuilderTest {
     @Test
     public void buildUpdateQuery() throws Exception {
         // given
-        final Class<PersonV3> clazz = PersonV3.class;
-        final Table table = tableBinder.createTable(clazz);
-        table.changeColumnValue("nick_name", "name2", "'name2'");
-        table.changeColumnValue("old", 24, "24");
-        final Column column = columnBinder.createColumn(clazz.getDeclaredField("id"));
-        final Value value = column.getValue();
-        value.setValue(1L);
-        column.setPk(true);
-        column.setStrategy(GenerationType.IDENTITY);
-        final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
-        final Update update = new Update(table, wheres);
+        final long id = 1L;
+        final String name = "name";
+        final int age = 1;
+        final String mail = "email@domain.com";
+        final PersonV3 person = new PersonV3(id, name, age, mail, 0);
+        final Table table = tableBinder.createTable(person);
+        final Update update = new Update(table);
 
         final String dml = "update\n" +
                 "    users\n" +
                 "set\n" +
-                "    nick_name = 'name2', old = 24\n" +
+                "    nick_name = 'name', old = 1, email = 'email@domain.com'\n" +
                 "where\n" +
                 "    id = 1";
 
