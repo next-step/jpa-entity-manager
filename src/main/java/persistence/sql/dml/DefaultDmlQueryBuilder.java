@@ -89,6 +89,26 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
         return statement.toString();
     }
 
+    @Override
+    public String buildUpdateQuery(final Update update) {
+        final Table table = update.getTable();
+
+        final StringBuilder statement = new StringBuilder()
+                .append("update")
+                .append(ENTER)
+                .append(SPACE)
+                .append(table.getName())
+                .append(ENTER)
+                .append("set")
+                .append(ENTER)
+                .append(SPACE)
+                .append(update.columnSetClause());
+
+        appendWhereClause(statement, update.getWhereClause());
+
+        return statement.toString();
+    }
+
     private void appendWhereClause(final StringBuilder statement, final List<Where> wheres) {
         final String whereClause = wheresClause(wheres);
 
@@ -123,5 +143,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
 
         return statement.toString();
     }
+
+
 
 }

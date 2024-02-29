@@ -1,14 +1,12 @@
 package persistence.sql.dml;
 
+import jakarta.persistence.GenerationType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
-import persistence.sql.mapping.Column;
-import persistence.sql.mapping.Table;
-import persistence.sql.mapping.TableBinder;
-import persistence.sql.mapping.Value;
+import persistence.sql.mapping.*;
 
 import java.sql.Types;
 import java.util.List;
@@ -18,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultDmlQueryBuilderTest {
 
     private final TableBinder tableBinder = new TableBinder();
+    private final ColumnBinder columnBinder = new ColumnBinder(ColumnTypeMapper.getInstance());
 
     private final Dialect dialect = new H2Dialect();
 
@@ -86,6 +85,36 @@ class DefaultDmlQueryBuilderTest {
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
+
+        // then
+        assertThat(result).isEqualTo(dml);
+    }
+
+    @DisplayName("엔티티 클래스로 updateById 쿼리를 생성한다")
+    @Test
+    public void buildUpdateQuery() throws Exception {
+        // given
+        final Class<PersonV3> clazz = PersonV3.class;
+        final Table table = tableBinder.createTable(clazz);
+        table.changeColumnValue("nick_name", "name2", "'name2'");
+        table.changeColumnValue("old", 24, "24");
+        final Column column = columnBinder.createColumn(clazz.getDeclaredField("id"));
+        final Value value = column.getValue();
+        value.setValue(1L);
+        column.setPk(true);
+        column.setStrategy(GenerationType.IDENTITY);
+        final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
+        final Update update = new Update(table, wheres);
+
+        final String dml = "update\n" +
+                "    users\n" +
+                "set\n" +
+                "    nick_name = 'name2', old = 24\n" +
+                "where\n" +
+                "    id = 1";
+
+        // when
+        final String result = queryBuilder.buildUpdateQuery(update);
 
         // then
         assertThat(result).isEqualTo(dml);
