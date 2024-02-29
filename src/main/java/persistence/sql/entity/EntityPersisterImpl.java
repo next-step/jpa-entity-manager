@@ -4,34 +4,40 @@ import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
-import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.Columns;
+import persistence.sql.meta.PrimaryKey;
+import persistence.sql.meta.TableName;
 
 public class EntityPersisterImpl implements EntityPersister {
 
+    private final TableName tableName;
+    private final PrimaryKey primaryKey;
+    private final Columns columns;
     private final JdbcTemplate jdbcTemplate;
-    private final EntityMetaCreator entityMetaCreator;
 
-    public EntityPersisterImpl(EntityMetaCreator entityMetaCreator, JdbcTemplate jdbcTemplate) {
+    public EntityPersisterImpl(TableName tableName, PrimaryKey primaryKey, Columns columns, JdbcTemplate jdbcTemplate) {
+        this.tableName = tableName;
+        this.primaryKey = primaryKey;
+        this.columns = columns;
         this.jdbcTemplate = jdbcTemplate;
-        this.entityMetaCreator = entityMetaCreator;
     }
 
     @Override
     public boolean update(final Object object) {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMetaCreator);
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(tableName, primaryKey, columns);
         final int result = jdbcTemplate.executeUpdate(updateQueryBuilder.createUpdateQuery(object));
         return result > 0;
     }
 
     @Override
     public void insert(final Object object) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityMetaCreator);
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(tableName, columns);
         jdbcTemplate.execute(insertQueryBuilder.createInsertQuery(object));
     }
 
     @Override
     public void delete(final Object object) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entityMetaCreator);
+        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(tableName, primaryKey);
         jdbcTemplate.execute(deleteQueryBuilder.createDeleteQuery(object));
     }
 }

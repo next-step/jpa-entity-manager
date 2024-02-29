@@ -1,7 +1,6 @@
 package persistence.sql.dml;
 
 import persistence.sql.meta.Columns;
-import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.TableName;
 
 public class InsertQueryBuilder {
@@ -11,12 +10,11 @@ public class InsertQueryBuilder {
     private final TableName tableName;
     private final Columns columns;
 
-    public InsertQueryBuilder(EntityMetaCreator entityMetaCreator) {
-        this.tableName = entityMetaCreator.createTableName();
-        this.columns = entityMetaCreator.createColumns();
+    public InsertQueryBuilder(TableName tableName, Columns columns) {
+        this.tableName = tableName;
+        this.columns = columns;
     }
 
-    // insert into %s (%s) values (%s)
     public String createInsertQuery(Object object) {
         return String.format(INSERT_DEFAULT_DML, tableName(), insertColumns(), insertValues(object));
     }

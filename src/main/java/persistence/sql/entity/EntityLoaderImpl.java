@@ -2,24 +2,30 @@ package persistence.sql.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.Columns;
+import persistence.sql.meta.PrimaryKey;
+import persistence.sql.meta.TableName;
 
 import static persistence.sql.entity.RowMapperFactory.createRowMapper;
 
 public class EntityLoaderImpl implements EntityLoader {
 
-    private final EntityMetaCreator entityMetaCreator;
+    private final TableName tableName;
+    private final PrimaryKey primaryKey;
+    private final Columns columns;
     private final JdbcTemplate jdbcTemplate;
 
 
-    public EntityLoaderImpl(EntityMetaCreator entityMetaCreator, JdbcTemplate jdbcTemplate) {
-        this.entityMetaCreator = entityMetaCreator;
+    public EntityLoaderImpl(TableName tableName, PrimaryKey primaryKey, Columns columns, JdbcTemplate jdbcTemplate) {
+        this.tableName = tableName;
+        this.primaryKey = primaryKey;
+        this.columns = columns;
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public <T> T findById(final Class<T> clazz, final Long id) {
-        final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(entityMetaCreator);
+        final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(tableName, primaryKey, columns);
         final String findByIdQuery = queryBuilder.createFindByIdQuery(id);
 
         return jdbcTemplate.queryForObject(findByIdQuery, createRowMapper(clazz));

@@ -1,7 +1,6 @@
 package persistence.sql.dml;
 
 import persistence.sql.meta.Columns;
-import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
 import persistence.sql.meta.TableName;
 
@@ -15,10 +14,10 @@ public class UpdateQueryBuilder {
     private final PrimaryKey primaryKey;
     private final Columns columns;
 
-    public UpdateQueryBuilder(EntityMetaCreator entityMetaCreator) {
-        this.tableName = entityMetaCreator.createTableName();
-        this.primaryKey = entityMetaCreator.createPrimaryKey();
-        this.columns = entityMetaCreator.createColumns();
+    public UpdateQueryBuilder(TableName tableName, PrimaryKey primaryKey, Columns columns) {
+        this.tableName = tableName;
+        this.primaryKey = primaryKey;
+        this.columns = columns;
     }
 
     public String createUpdateQuery(Object object) {

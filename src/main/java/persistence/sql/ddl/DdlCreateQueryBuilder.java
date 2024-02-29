@@ -3,7 +3,6 @@ package persistence.sql.ddl;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Columns;
-import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
 import persistence.sql.meta.TableName;
 
@@ -20,10 +19,10 @@ public class DdlCreateQueryBuilder {
     private final Columns columns;
     private final Dialect dialect;
 
-    public DdlCreateQueryBuilder(final EntityMetaCreator entityMetaCreator, final Dialect dialect) {
-        this.tableName = entityMetaCreator.createTableName();
-        this.primaryKey = entityMetaCreator.createPrimaryKey();
-        this.columns = entityMetaCreator.createColumns();
+    public DdlCreateQueryBuilder(TableName tableName, PrimaryKey primaryKey, Columns columns, Dialect dialect) {
+        this.tableName = tableName;
+        this.primaryKey = primaryKey;
+        this.columns = columns;
         this.dialect = dialect;
     }
 

@@ -1,6 +1,5 @@
 package persistence.sql.ddl;
 
-import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.TableName;
 
 public class DdlDropQueryBuilder {
@@ -8,8 +7,8 @@ public class DdlDropQueryBuilder {
     private static final String DROP_TABLE_DEFAULT_DDL = "drop table if exists %s CASCADE";
     private final TableName tableName;
 
-    public DdlDropQueryBuilder(final EntityMetaCreator entityMetaCreator) {
-        this.tableName = entityMetaCreator.createTableName();
+    public DdlDropQueryBuilder(final TableName tableName) {
+        this.tableName = tableName;
     }
 
     public String dropDdl() {
