@@ -37,7 +37,9 @@ class EntityManagerImplTest {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         jdbcTemplate.execute(ddlQueryBuilder.createQuery(Person.class));
         EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(), new DeleteQueryBuilder());
-        entityManager = new EntityManagerImpl(jdbcTemplate, entityPersister, new SelectQueryBuilder());
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new SelectQueryBuilder());
+
+        entityManager = new EntityManagerImpl(entityPersister, entityLoader);
     }
 
     @AfterAll
@@ -54,7 +56,7 @@ class EntityManagerImplTest {
         Person foundPerson = entityManager.find(Person.class, id);
         entityManager.remove(foundPerson);
 
-        assertThatThrownBy(()->entityManager.find(Person.class, id))
+        assertThatThrownBy(() -> entityManager.find(Person.class, id))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Expected 1 result, got 0");
     }
