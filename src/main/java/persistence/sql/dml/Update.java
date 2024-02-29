@@ -12,16 +12,16 @@ public class Update {
 
     private final List<Column> columns;
 
-    private List<Where> whereClause = List.of();
+    private List<Where> whereClause;
 
     public Update(final Table table) {
         this.table = table;
-        columns = table.getColumns();
-    }
-
-    public Update(final Table table, final List<Where> whereClause) {
-        this(table);
-        this.whereClause = whereClause;
+        this.columns = table.getColumns();
+        this.whereClause = this.columns.stream()
+                .filter(Column::isPk)
+                .map(column -> new Where(column, column.getValue(), LogicalOperator.AND, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)))
+                .collect(Collectors.toList());
+        this.whereClause.stream().findFirst().ifPresent(where -> where.changeLogicalOperator(LogicalOperator.NONE));
     }
 
     public Table getTable() {
@@ -34,7 +34,7 @@ public class Update {
 
     public String columnSetClause() {
         return columns.stream()
-                .filter(column -> column.getValue().isNotNull())
+                .filter(Column::isNotPk)
                 .map(column -> column.getName() + " = " + column.getValue().getValueClause())
                 .collect(Collectors.joining(", "));
     }
