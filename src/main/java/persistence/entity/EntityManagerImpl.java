@@ -109,6 +109,7 @@ public class EntityManagerImpl implements EntityManager {
         return persistContext.getCachedDatabaseSnapshot(id);
     }
 
+    @Override
     public Dialect getDialect() {
         return dialect;
     }
