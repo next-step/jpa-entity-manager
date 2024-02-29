@@ -23,6 +23,10 @@ public class Value implements Serializable {
         this.valueClause = valueClause;
     }
 
+    public boolean isNotNull() {
+        return this.value != null;
+    }
+
     public Class<?> getOriginalType() {
         return this.originalType;
     }
