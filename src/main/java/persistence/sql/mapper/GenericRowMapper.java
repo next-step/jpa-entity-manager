@@ -1,9 +1,11 @@
 package persistence.sql.mapper;
 
 import jdbc.RowMapper;
+import persistence.exception.CanNotCreateInstance;
+import persistence.exception.CanNotFindDeclaredConstructorException;
+import persistence.exception.CanNotGetObjectException;
 import persistence.sql.column.Column;
 import persistence.sql.column.Columns;
-import persistence.sql.column.GeneralColumn;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
 
@@ -28,9 +30,10 @@ public class GenericRowMapper<T> implements RowMapper<T> {
             mapIdColumn(resultSet, instance);
             mapGeneralColumns(resultSet, instance);
             return instance;
-        } catch (InvocationTargetException | InstantiationException |
-                 IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        } catch (InvocationTargetException | IllegalAccessException| InstantiationException e) {
+            throw new CanNotCreateInstance("[ERROR] 리플렉션으로 인스턴스를 만들 수 없습니다.", e);
+        } catch (NoSuchMethodException e) {
+            throw new CanNotFindDeclaredConstructorException("[ERROR] 리플렉션으로 생성자를 찾을 수 없습니다", e);
         }
     }
 
@@ -45,21 +48,21 @@ public class GenericRowMapper<T> implements RowMapper<T> {
                 .forEach(column -> setColumnValue(resultSet, instance, column));
     }
 
-    private void setColumnValue(ResultSet resultSet, T instance, Column idColumn) {
-        String fieldName = idColumn.getFieldName();
-        String idColumnName = idColumn.getName();
+    private void setColumnValue(ResultSet resultSet, T instance, Column column) {
+        String fieldName = column.getFieldName();
+        String idColumnName = column.getName();
 
-        Field idField = null;
+        Field field = null;
         try {
-            idField = clazz.getDeclaredField(fieldName);
+            field = clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw new CanNotFindDeclaredConstructorException("[ERROR] 리플렉션으로 생성자를 찾을 수 없습니다", e);
         }
-        idField.setAccessible(true);
+        field.setAccessible(true);
         try {
-            idField.set(instance, resultSet.getObject(idColumnName));
+            field.set(instance, resultSet.getObject(idColumnName));
         } catch (IllegalAccessException | SQLException e) {
-            throw new RuntimeException(e);
+            throw new CanNotGetObjectException("[ERROR] field의 값을 불러오는데 실패했습니다.", e);
         }
     }
 }
