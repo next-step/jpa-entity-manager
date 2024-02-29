@@ -5,11 +5,7 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.entity.Person;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,10 +16,10 @@ class QueryResultTest {
     private final Class<Person> clazz = Person.class;
 
     @Test
-    void should_return_single_entity() throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    void should_return_single_entity() {
         DatabaseTable table = new DatabaseTable(Person.class);
-        QueryResult queryResult = new QueryResult(new MockResultSet(), table);
-        Person person = queryResult.getSingleEntity(Person.class);
+        QueryResult<Person> queryResult = new QueryResult<>(table, Person.class);
+        Person person = queryResult.mapRow(new MockResultSet());
 
 
         assertAll(
@@ -42,24 +38,17 @@ class QueryResultTest {
 
     private static class MockResultSet extends SimpleResultSet implements ResultSet {
 
-        private final List<Map<String, Object>> rows = Collections.singletonList(Map.of(
+        private final Map<String, Object> rows = Map.of(
                 "id", 1l,
                 "nick_name", "cs",
                 "old", 29,
                 "email", "katd216@gmail.com"
-        ));
-        private int pointer = -1;
+        );
 
         @Override
         public Object getObject(String columnLabel) {
-            return rows.get(pointer).get(columnLabel);
+            return rows.get(columnLabel);
         }
 
-        @Override
-        public boolean next() {
-            boolean hasNext = pointer < rows.size() - 1;
-            pointer++;
-            return hasNext;
-        }
     }
 }

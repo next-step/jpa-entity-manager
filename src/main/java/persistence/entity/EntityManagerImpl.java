@@ -1,59 +1,53 @@
 package persistence.entity;
 
-import persistence.sql.dml.DmlQueryBuilder;
+import jdbc.JdbcTemplate;
+import persistence.sql.dml.DeleteQueryBuild;
+import persistence.sql.dml.InsertQueryBuild;
+import persistence.sql.dml.SelectQueryBuild;
+import persistence.sql.dml.UpdateQueryBuild;
 import persistence.sql.domain.Query;
 import persistence.sql.domain.QueryResult;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 public class EntityManagerImpl implements EntityManager {
 
-    private final Connection connection;
+    private final EntityPersister entityPersister;
 
-    private final DmlQueryBuilder dmlQueryBuilder;
+    private final SelectQueryBuild selectQueryBuilder;
 
-    public EntityManagerImpl(Connection connection, DmlQueryBuilder dmlQueryBuilder) {
-        this.connection = connection;
-        this.dmlQueryBuilder = dmlQueryBuilder;
+    private final JdbcTemplate jdbcTemplate;
+
+
+    public EntityManagerImpl(JdbcTemplate jdbcTemplate,
+                             UpdateQueryBuild updateQueryBuilder,
+                             InsertQueryBuild insertQueryBuilder,
+                             DeleteQueryBuild deleteQueryBuilder,
+                             SelectQueryBuild selectQueryBuilder) {
+        this.entityPersister = new EntityPersister(jdbcTemplate, insertQueryBuilder, updateQueryBuilder, deleteQueryBuilder);
+        this.selectQueryBuilder = selectQueryBuilder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
-    public <T> T find(Class<T> clazz, Long id) {
-        Query query = dmlQueryBuilder.findById(clazz, id);
-
-        return executeQueryForEntity(clazz, query);
-    }
-
-    private <T> T executeQueryForEntity(Class<T> clazz, Query query) {
-        try (final ResultSet resultSet = connection.prepareStatement(query.getSql()).executeQuery()) {
-            QueryResult queryResult = new QueryResult(resultSet, query.getTable());
-            return queryResult.getSingleEntity(clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void persist(Object entity) {
-        Query query = dmlQueryBuilder.insert(entity);
+        entityPersister.insert(entity);
+    }
 
-        executeQuery(query);
+    @Override
+    public boolean update(Object entity, Object id) {
+        return entityPersister.update(entity, id);
     }
 
     @Override
     public void remove(Object entity) {
-        Query query = dmlQueryBuilder.delete(entity);
-
-        executeQuery(query);
+        entityPersister.delete(entity);
     }
 
-    private void executeQuery(Query query) {
-        try (final Statement statement = connection.createStatement()) {
-            statement.execute(query.getSql());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public <T> T find(Class<T> clazz, Object id) {
+        Query query = selectQueryBuilder.findById(clazz, id);
+
+        return jdbcTemplate.queryForObject(query.getSql(), new QueryResult<>(query.getTable(), clazz));
     }
+
 }
