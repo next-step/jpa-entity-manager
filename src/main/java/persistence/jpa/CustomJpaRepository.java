@@ -24,6 +24,6 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 
     private boolean isNew(T entity) {
         IdColumn idColumn = new IdColumn(entity, entityManager.getDialect());
-        return null == entityManager.getSnapshot(idColumn.getValue());
+        return idColumn.isNull();
     }
 }
