@@ -124,4 +124,42 @@ class SimpleEntityManagerTest {
                 .isInstanceOf(RuntimeException.class);
         }
     }
+
+    @DisplayName("merge 메서드는")
+    @Nested
+    class Merge {
+
+        @DisplayName("Person entity를 수정 할 수 있다.")
+        @Test
+        void mergeTest() {
+            //given
+            Person person = PersonFixture.createPerson();
+            entityManager.persist(person);
+            person = entityManager.find(Person.class, 1L);
+            person.updateName("user2");
+
+            //when
+            entityManager.merge(person);
+
+            //then
+            person = entityManager.find(Person.class, 1L);
+            assertEquals(person.getName(), "user2");
+        }
+
+        @DisplayName("Person entity를 수정하지 않으면 수정하지 않는다.")
+        @Test
+        void mergeTest_whenNotUpdate() {
+            //given
+            Person person = PersonFixture.createPerson();
+            entityManager.persist(person);
+            person = entityManager.find(Person.class, 1L);
+            Person person1 = entityManager.find(Person.class, 1L);
+
+            //when
+            entityManager.merge(person);
+
+            //then
+            assertEquals(person, person1);
+        }
+    }
 }

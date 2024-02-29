@@ -13,8 +13,9 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public Object getEntity(Class<?> clazz, Object id) {
-        if (entities.containsKey(EntityKey.of(clazz, id))) {
-            return entities.get(EntityKey.of(clazz, id)).getKey();
+        EntityKey key = EntityKey.of(clazz, id);
+        if (entities.containsKey(key)) {
+            return entities.get(key).getKey();
         }
         return null;
     }
@@ -27,5 +28,10 @@ public class SimplePersistenceContext implements PersistenceContext {
     @Override
     public void removeEntity(Object entity) {
         entities.remove(EntityKey.from(entity));
+    }
+
+    @Override
+    public EntitySnapshot getCachedDatabaseSnapshot(Object entity) {
+        return entities.get(EntityKey.from(entity)).getValue();
     }
 }

@@ -7,4 +7,6 @@ public interface PersistenceContext {
     void addEntity(Object entity);
 
     void removeEntity(Object entity);
+
+    EntitySnapshot getCachedDatabaseSnapshot(Object entity);
 }
