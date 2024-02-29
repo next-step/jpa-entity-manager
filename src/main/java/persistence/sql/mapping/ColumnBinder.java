@@ -47,7 +47,7 @@ public class ColumnBinder {
                 .collect(Collectors.toList());
     }
 
-    private Column createColumn(final Field field) {
+    public Column createColumn(final Field field) {
         if (field.isAnnotationPresent(Transient.class)) {
             return null;
         }
