@@ -86,6 +86,21 @@ class SimpleEntityManagerTest {
                 () -> assertEquals(person.getEmail(), foundPerson.getEmail())
             );
         }
+
+        @DisplayName("같은 Person entity를 두 번 검색하면 캐싱된 entity를 반환한다.")
+        @Test
+        void findTest_whenFindTwice() {
+            // given
+            Person person = createPerson();
+            entityManager.persist(person);
+
+            // when
+            Person foundPerson1 = entityManager.find(Person.class, 1L);
+            Person foundPerson2 = entityManager.find(Person.class, 1L);
+
+            // then
+            assertEquals(foundPerson1, foundPerson2);
+        }
     }
 
     @DisplayName("remove 메서드는")
@@ -98,9 +113,10 @@ class SimpleEntityManagerTest {
             //given
             Person person = createPerson();
             entityManager.persist(person);
-            person = entityManager.find(Person.class, 1L);
+            Person person1 = entityManager.find(Person.class, 1L);
+
             //when
-            entityManager.remove(person);
+            entityManager.remove(person1);
 
             //then
             assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
@@ -109,6 +125,6 @@ class SimpleEntityManagerTest {
     }
 
     private Person createPerson() {
-        return Person.of("user1", 1, "abc@gtest.com", 1);
+        return Person.of("user1", 1, "abc@gtest.com", 0);
     }
 }

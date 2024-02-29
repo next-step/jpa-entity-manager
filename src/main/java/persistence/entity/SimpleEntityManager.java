@@ -1,15 +1,23 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.loader.EntityLoader;
+import persistence.entity.loader.SimpleEntityLoader;
+import persistence.entity.persistencecontext.SimplePersistenceContext;
+import persistence.entity.persister.EntityPersister;
+import persistence.entity.persister.SimpleEntityPersister;
 
 public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
+    private final SimplePersistenceContext persistenceContext;
+
     private final EntityLoader entityLoader;
 
     private SimpleEntityManager(JdbcTemplate jdbcTemplate) {
         entityPersister = SimpleEntityPersister.from(jdbcTemplate);
         entityLoader = SimpleEntityLoader.from(jdbcTemplate);
+        persistenceContext = new SimplePersistenceContext();
     }
 
     public static SimpleEntityManager from(JdbcTemplate jdbcTemplate) {
@@ -18,16 +26,23 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityLoader.find(clazz, id);
+        T entity = (T) persistenceContext.getEntity(clazz, id);
+        if (entity == null) {
+            entity = entityLoader.find(clazz, id);
+            persistenceContext.addEntity(entity);
+        }
+        return entity;
     }
 
     @Override
     public void persist(Object entity) {
         entityPersister.insert(entity);
+        persistenceContext.addEntity(entity);
     }
 
     @Override
     public void remove(Object entity) {
+        persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
     }
 }
