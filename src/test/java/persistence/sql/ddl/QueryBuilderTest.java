@@ -10,7 +10,6 @@ import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +20,7 @@ class QueryBuilderTest {
     @Test
     void persion_ddl_create1() {
         final EntityMetaCreator entityMetaCreator = SimpleEntityMetaCreator.of(Person1.class);
-        final TableName tableName = entityMetaCreator.createTableName();
+        final String tableName = entityMetaCreator.createTableName();
         final PrimaryKey primaryKey = entityMetaCreator.createPrimaryKey();
         final Columns columns = entityMetaCreator.createColumns();
         final DdlCreateQueryBuilder queryBuilder = new DdlCreateQueryBuilder(tableName, primaryKey, columns, new H2Dialect());
@@ -36,7 +35,7 @@ class QueryBuilderTest {
     @Test
     void persion_ddl_create2() {
         final EntityMetaCreator entityMetaCreator = SimpleEntityMetaCreator.of(Person2.class);
-        final TableName tableName = entityMetaCreator.createTableName();
+        final String tableName = entityMetaCreator.createTableName();
         final PrimaryKey primaryKey = entityMetaCreator.createPrimaryKey();
         final Columns columns = entityMetaCreator.createColumns();
         final DdlCreateQueryBuilder queryBuilder = new DdlCreateQueryBuilder(tableName, primaryKey, columns, new H2Dialect());
@@ -51,7 +50,7 @@ class QueryBuilderTest {
     @Test
     void persion_ddl_create3() {
         final EntityMetaCreator entityMetaCreator = SimpleEntityMetaCreator.of(Person3.class);
-        final TableName tableName = entityMetaCreator.createTableName();
+        final String tableName = entityMetaCreator.createTableName();
         final PrimaryKey primaryKey = entityMetaCreator.createPrimaryKey();
         final Columns columns = entityMetaCreator.createColumns();
         final DdlCreateQueryBuilder queryBuilder = new DdlCreateQueryBuilder(tableName, primaryKey, columns, new H2Dialect());
@@ -66,7 +65,7 @@ class QueryBuilderTest {
     @Test
     void persion_ddl_drop() {
         final EntityMetaCreator entityMetaCreator = SimpleEntityMetaCreator.of(Person.class);
-        final TableName tableName = entityMetaCreator.createTableName();
+        final String tableName = entityMetaCreator.createTableName();
         final DdlDropQueryBuilder queryBuilder = new DdlDropQueryBuilder(tableName);
         String expectedDDL = "drop table if exists users CASCADE";
 

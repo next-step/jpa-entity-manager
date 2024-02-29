@@ -5,14 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DeleteQueryBuilderTest {
 
-    private TableName tableName;
+    private String tableName;
     private PrimaryKey primaryKey;
 
     @BeforeEach

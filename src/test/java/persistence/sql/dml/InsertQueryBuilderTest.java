@@ -5,14 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.Columns;
-import persistence.sql.meta.TableName;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InsertQueryBuilderTest {
 
-    private TableName tableName;
+    private String tableName;
     private Columns columns;
 
     @BeforeEach

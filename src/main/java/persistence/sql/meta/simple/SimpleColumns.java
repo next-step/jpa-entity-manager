@@ -1,30 +1,18 @@
 package persistence.sql.meta.simple;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Columns;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 public class SimpleColumns implements Columns {
 
-    private final List<Column> columns;
+    private final List<SimpleColumn> columns;
 
-    private SimpleColumns(final Class<?> clazz) {
-        this.columns = Arrays.stream(clazz.getDeclaredFields())
-                .filter(this::isNotTransientField)
-                .filter(this::isNotIdField)
-                .map(SimpleColumn::new)
-                .collect(Collectors.toList());
-    }
-
-    public static SimpleColumns of(Class<?> clazz) {
-        return new SimpleColumns(clazz);
+    public SimpleColumns(final List<SimpleColumn> columns) {
+        this.columns = columns;
     }
 
     @Override
@@ -42,15 +30,7 @@ public class SimpleColumns implements Columns {
     }
 
     @Override
-    public List<Column> getColumns() {
+    public List<SimpleColumn> getColumns() {
         return columns;
-    }
-
-    private boolean isNotIdField(Field field) {
-        return !field.isAnnotationPresent(Id.class);
-    }
-
-    private boolean isNotTransientField(final Field field) {
-        return !field.isAnnotationPresent(Transient.class);
     }
 }

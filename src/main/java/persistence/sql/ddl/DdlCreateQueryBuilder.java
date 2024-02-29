@@ -4,7 +4,6 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 
 import java.util.stream.Collectors;
 
@@ -14,12 +13,12 @@ public class DdlCreateQueryBuilder {
 
     private static final String CREATE_DEFAULT_DDL = "create table %s (%s)";
     public static final String COMMA = ", ";
-    private final TableName tableName;
+    private final String tableName;
     private final PrimaryKey primaryKey;
     private final Columns columns;
     private final Dialect dialect;
 
-    public DdlCreateQueryBuilder(TableName tableName, PrimaryKey primaryKey, Columns columns, Dialect dialect) {
+    public DdlCreateQueryBuilder(String tableName, PrimaryKey primaryKey, Columns columns, Dialect dialect) {
         this.tableName = tableName;
         this.primaryKey = primaryKey;
         this.columns = columns;
@@ -27,7 +26,7 @@ public class DdlCreateQueryBuilder {
     }
 
     public String createDdl() {
-        return String.format(CREATE_DEFAULT_DDL, this.tableName.name(), createColumns());
+        return String.format(CREATE_DEFAULT_DDL, this.tableName, createColumns());
     }
 
     private String createColumns() {

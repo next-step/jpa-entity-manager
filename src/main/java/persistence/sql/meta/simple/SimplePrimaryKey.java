@@ -1,26 +1,14 @@
 package persistence.sql.meta.simple;
 
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import persistence.sql.meta.PrimaryKey;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class SimplePrimaryKey implements PrimaryKey {
 
     private SimpleColumn primaryKey;
 
-    private SimplePrimaryKey(final Class<?> clazz) {
-        this.primaryKey = Arrays.stream(clazz.getDeclaredFields())
-                .filter(this::isIdField)
-                .findFirst()
-                .map(SimpleColumn::new)
-                .orElseThrow(IllegalArgumentException::new);
-    }
-
-    public static SimplePrimaryKey of(Class<?> clazz) {
-        return new SimplePrimaryKey(clazz);
+    public SimplePrimaryKey(final SimpleColumn primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     @Override
@@ -43,7 +31,4 @@ public class SimplePrimaryKey implements PrimaryKey {
         return this.primaryKey.generateType();
     }
 
-    private boolean isIdField(Field field) {
-        return field.isAnnotationPresent(Id.class);
-    }
 }

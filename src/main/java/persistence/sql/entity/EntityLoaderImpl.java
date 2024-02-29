@@ -4,19 +4,17 @@ import jdbc.JdbcTemplate;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 
 import static persistence.sql.entity.RowMapperFactory.createRowMapper;
 
 public class EntityLoaderImpl implements EntityLoader {
 
-    private final TableName tableName;
+    private final String tableName;
     private final PrimaryKey primaryKey;
     private final Columns columns;
     private final JdbcTemplate jdbcTemplate;
 
-
-    public EntityLoaderImpl(TableName tableName, PrimaryKey primaryKey, Columns columns, JdbcTemplate jdbcTemplate) {
+    public EntityLoaderImpl(String tableName, PrimaryKey primaryKey, Columns columns, JdbcTemplate jdbcTemplate) {
         this.tableName = tableName;
         this.primaryKey = primaryKey;
         this.columns = columns;

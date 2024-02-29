@@ -12,7 +12,6 @@ import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import java.sql.Connection;
@@ -23,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityManagerImplTest {
     private JdbcTemplate jdbcTemplate;
-    private TableName tableName;
+    private String tableName;
     private PrimaryKey primaryKey;
     private Columns columns;
 

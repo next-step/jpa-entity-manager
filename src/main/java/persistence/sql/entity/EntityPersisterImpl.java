@@ -6,16 +6,15 @@ import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 
 public class EntityPersisterImpl implements EntityPersister {
 
-    private final TableName tableName;
+    private final String tableName;
     private final PrimaryKey primaryKey;
     private final Columns columns;
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityPersisterImpl(TableName tableName, PrimaryKey primaryKey, Columns columns, JdbcTemplate jdbcTemplate) {
+    public EntityPersisterImpl(String tableName, PrimaryKey primaryKey, Columns columns, JdbcTemplate jdbcTemplate) {
         this.tableName = tableName;
         this.primaryKey = primaryKey;
         this.columns = columns;

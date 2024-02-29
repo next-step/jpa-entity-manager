@@ -8,5 +8,5 @@ public interface Columns {
 
     List<String> values(Object object);
 
-    List<Column> getColumns();
+    List<? extends Column> getColumns();
 }

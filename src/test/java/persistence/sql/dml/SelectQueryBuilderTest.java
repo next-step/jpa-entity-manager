@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.TableName;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SelectQueryBuilderTest {
 
-    private TableName tableName;
+    private String tableName;
     private PrimaryKey primaryKey;
     private Columns columns;
 

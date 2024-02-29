@@ -1,16 +1,15 @@
 package persistence.sql.dml;
 
 import persistence.sql.meta.Columns;
-import persistence.sql.meta.TableName;
 
 public class InsertQueryBuilder {
 
     public static final String INSERT_DEFAULT_DML = "insert into %s (%s) values (%s)";
     public static final String COMMA = ", ";
-    private final TableName tableName;
+    private final String tableName;
     private final Columns columns;
 
-    public InsertQueryBuilder(TableName tableName, Columns columns) {
+    public InsertQueryBuilder(String tableName, Columns columns) {
         this.tableName = tableName;
         this.columns = columns;
     }
@@ -20,7 +19,7 @@ public class InsertQueryBuilder {
     }
 
     private String tableName() {
-        return tableName.name();
+        return tableName;
     }
 
     private String insertColumns() {
