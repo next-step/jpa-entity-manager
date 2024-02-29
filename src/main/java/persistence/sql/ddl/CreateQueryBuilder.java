@@ -47,14 +47,8 @@ public class CreateQueryBuilder implements QueryBuilder {
     private String generateColumn(Column column) {
         return Stream.of(column.getName(),
                         DIALECT.getTypeString(column.getType(), column.getLength()),
-                        generateConstraints(column))
+                        DIALECT.getConstraintString(column.getConstraint()))
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.joining(SPACE));
-    }
-
-    private String generateConstraints(Column column) {
-        return column.getConstraints().stream()
-                .map(DIALECT::getConstraintString)
                 .collect(Collectors.joining(SPACE));
     }
 

@@ -22,7 +22,7 @@ public enum Type {
 
     public static Type of(Class<?> type) {
         return Arrays.stream(values())
-                .filter(h2DataType -> h2DataType.supportedClasses.contains(type))
+                .filter(t -> t.supportedClasses.contains(type))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported type: " + type));
     }
