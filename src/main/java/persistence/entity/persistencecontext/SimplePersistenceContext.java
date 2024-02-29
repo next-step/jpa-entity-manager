@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class SimplePersistenceContext implements PersistenceContext {
 
-    private final Map<EntityKey, Object> entities;
+    private final Map<EntityKey, Map.Entry<Object, EntitySnapshot>> entities;
 
     public SimplePersistenceContext() {
         this.entities = new HashMap<>();
@@ -13,12 +13,15 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public Object getEntity(Class<?> clazz, Object id) {
-        return entities.get(EntityKey.of(clazz, id));
+        if (entities.containsKey(EntityKey.of(clazz, id))) {
+            return entities.get(EntityKey.of(clazz, id)).getKey();
+        }
+        return null;
     }
 
     @Override
     public void addEntity(Object entity) {
-        entities.put(EntityKey.from(entity), entity);
+        entities.put(EntityKey.from(entity), Map.entry(entity, EntitySnapshot.from(entity)));
     }
 
     @Override

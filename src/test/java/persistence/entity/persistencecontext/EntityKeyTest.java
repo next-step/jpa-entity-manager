@@ -13,7 +13,7 @@ class EntityKeyTest {
 
     @DisplayName("equals 메서드는")
     @Nested
-    class Describe_equals {
+    class Equals {
         @DisplayName("두 EntityKey가 같은 테이블과 같은 id를 가지고 있으면 true를 반환한다.")
         @Test
         void it_returns_true_if_two_entity_keys_have_same_table_and_same_id() {

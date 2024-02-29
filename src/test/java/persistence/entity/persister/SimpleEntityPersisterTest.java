@@ -14,8 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.entity.persister.EntityPersister;
-import persistence.entity.persister.SimpleEntityPersister;
+import persistence.fixture.PersonFixture;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.DmlGenerator;
@@ -55,7 +54,7 @@ class SimpleEntityPersisterTest {
         @Test
         void insertTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
 
             //when
             entityPersister.insert(person);
@@ -78,7 +77,7 @@ class SimpleEntityPersisterTest {
         @Test
         void updateTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
             entityPersister.insert(person);
             person = findPerson(1L);
             person.updateName("user2");
@@ -99,7 +98,7 @@ class SimpleEntityPersisterTest {
         @Test
         void deleteTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
             entityPersister.insert(person);
             person = findPerson(1L);
 
@@ -110,9 +109,6 @@ class SimpleEntityPersisterTest {
             assertThatThrownBy(() -> findPerson(1L))
                 .isInstanceOf(RuntimeException.class);
         }
-    }
-    private Person createPerson() {
-        return Person.of("user1", 1, "abc@gtest.com", 1);
     }
 
     private Person findPerson(long id) {
