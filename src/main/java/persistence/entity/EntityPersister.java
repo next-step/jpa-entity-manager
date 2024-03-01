@@ -2,9 +2,9 @@ package persistence.entity;
 
 public interface EntityPersister {
 
-    boolean update(EntityMeta entity);
+    boolean update(Object entity);
 
-    Object insert(EntityMeta entity);
+    Object insert(Object entity);
 
-    void delete(EntityMeta entity);
+    void delete(Object entity);
 }

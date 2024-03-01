@@ -19,52 +19,42 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return persistenceContext.getEntity(clazz, id)
+        return (T) persistenceContext.getEntity(clazz, id)
                 .orElseGet(() -> {
                     T foundEntity = entityLoader.find(clazz, id);
-                    EntityMeta entityMeta = EntityMeta.from(foundEntity);
-                    addToCache(entityMeta);
+                    addToCache(foundEntity);
                     return foundEntity;
                 });
     }
 
     @Override
     public <T> T persist(T entity) {
+        persistenceContext.addEntityEntry(entity, EntityStatus.SAVING);
+        Object generatedId = entityPersister.insert(entity);
         EntityMeta entityMeta = EntityMeta.from(entity);
-        entityMeta.updateStatus(EntityStatus.SAVING);
-        Object generatedId = entityPersister.insert(entityMeta);
-        entityMeta.injectId(generatedId);
-        addToCache(entityMeta);
+        entityMeta.injectId(entity, generatedId);
+        addToCache(entity);
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        EntityMeta entityMeta = EntityMeta.from(entity);
-        entityMeta.updateStatus(EntityStatus.DELETED);
-        persistenceContext.removeEntity(entityMeta);
-        entityMeta.updateStatus(EntityStatus.GONE);
-        entityPersister.delete(entityMeta);
+        persistenceContext.removeEntity(entity);
+        entityPersister.delete(entity);
     }
 
     @Override
     public <T> T merge(T entity) {
-        EntityMeta entityMeta = EntityMeta.from(entity);
-        EntitySnapshot snapshot = (EntitySnapshot) persistenceContext.getCachedDatabaseSnapshot(entityMeta);
+        EntitySnapshot snapshot = (EntitySnapshot) persistenceContext.getCachedDatabaseSnapshot(entity);
         if (snapshot.isChanged(entity)) {
-            entityPersister.update(entityMeta);
+            entityPersister.update(entity);
         }
-        addToCache(entityMeta);
+        addToCache(entity);
         return entity;
     }
 
-    private void addToCache(EntityMeta entityMeta) {
-        entityMeta.updateStatus(EntityStatus.MANAGED);
-        persistenceContext.addEntity(entityMeta);
-        persistenceContext.getDatabaseSnapshot(entityMeta);
-    }
-
-    public PersistenceContext getPersistenceContext() {
-        return persistenceContext;
+    private void addToCache(Object entity) {
+        persistenceContext.addEntity(entity);
+        persistenceContext.getDatabaseSnapshot(entity);
     }
 }

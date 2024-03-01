@@ -12,7 +12,7 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 
     public T save(T entity) {
         EntityMeta entityMeta = EntityMeta.from(entity);
-        if (entityMeta.isNew()) {
+        if (entityMeta.isNew(entity)) {
             return entityManager.persist(entity);
         }
         return entityManager.merge(entity);

@@ -20,20 +20,20 @@ public class MyEntityPersister implements EntityPersister {
     }
 
     @Override
-    public boolean update(EntityMeta entityMeta) {
-        String query = updateQueryBuilder.build(entityMeta.getEntity());
+    public boolean update(Object entity) {
+        String query = updateQueryBuilder.build(entity);
         return jdbcTemplate.executeForUpdate(query);
     }
 
     @Override
-    public Object insert(EntityMeta entity) {
-        String query = insertQueryBuilder.build(entity.getEntity());
+    public Object insert(Object entity) {
+        String query = insertQueryBuilder.build(entity);
         return jdbcTemplate.executeForInsert(query);
     }
 
     @Override
-    public void delete(EntityMeta entity) {
-        String query = deleteQueryBuilder.build(entity.getEntity());
+    public void delete(Object entity) {
+        String query = deleteQueryBuilder.build(entity);
         jdbcTemplate.execute(query);
     }
 }

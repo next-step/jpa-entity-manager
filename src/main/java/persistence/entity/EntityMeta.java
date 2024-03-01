@@ -9,43 +9,31 @@ import utils.ValueInjector;
 public class EntityMeta {
     private final Table table;
     private final IdColumn id;
-    private final Object entity;
-    private final EntityEntry entityEntry;
 
-    public EntityMeta(Table table, IdColumn id, Object entity) {
+    public EntityMeta(Table table, IdColumn id) {
         this.table = table;
         this.id = id;
-        this.entity = entity;
-        this.entityEntry = new EntityEntry();
     }
 
     public static <T> EntityMeta from(T entity) {
         Table table = Table.from(entity.getClass());
         IdColumn id = table.getIdColumn();
-        return new EntityMeta(table, id, entity);
+        return new EntityMeta(table, id);
     }
 
-    public EntityKey getEntityKey() {
-        return new EntityKey(getId(), entity.getClass());
+    public EntityKey getEntityKey(Object entity) {
+        return new EntityKey(getId(entity), table.getClazz());
     }
 
-    public boolean isNew() {
-        return getId() == null;
+    public boolean isNew(Object entity) {
+        return getId(entity) == null;
     }
 
-    public Object getId() {
+    private Object getId(Object entity) {
         return ValueExtractor.extract(entity, id);
     }
 
-    public void injectId(Object generatedId) {
+    public void injectId(Object entity, Object generatedId) {
         ValueInjector.inject(entity, id, generatedId);
-    }
-
-    public Object getEntity() {
-        return entity;
-    }
-
-    public void updateStatus(EntityStatus status) {
-        this.entityEntry.updateStatus(status);
     }
 }

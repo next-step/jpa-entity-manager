@@ -42,9 +42,9 @@ class MyEntityPersisterTest {
 
         //when
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);
-        entityPersister.insert(EntityMeta.from(person));
+        entityPersister.insert(person);
         Person anotherPerson = new Person(2L, "DEF", 20, "DEF@email.com", 20);
-        entityPersister.insert(EntityMeta.from(anotherPerson));
+        entityPersister.insert(anotherPerson);
 
         //then
         String selectAllQuery = new SelectAllQueryBuilder().build(Person.class);
@@ -59,12 +59,12 @@ class MyEntityPersisterTest {
 
         //when
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);
-        entityPersister.insert(EntityMeta.from(person));
+        entityPersister.insert(person);
         String updateName = "DEF";
         int updateAge = 20;
         String updateEmail = "DEF@email.com";
         Person updatePerson = new Person(1L, updateName, updateAge, updateEmail, 20);
-        entityPersister.update(EntityMeta.from(updatePerson));
+        entityPersister.update(updatePerson);
 
         //then
         EntityManager entityManager = new MyEntityManager(jdbcTemplate);
@@ -83,8 +83,8 @@ class MyEntityPersisterTest {
 
         //when
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);
-        entityPersister.insert(EntityMeta.from(person));
-        entityPersister.delete(EntityMeta.from(person));
+        entityPersister.insert(person);
+        entityPersister.delete(person);
 
         //then
         String selectAllQuery = new SelectAllQueryBuilder().build(Person.class);

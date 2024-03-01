@@ -76,8 +76,7 @@ class MyEntityManagerTest {
         //given
         MyEntityManager entityManager = new MyEntityManager(jdbcTemplate);
         Person expected = new Person(1L, "name", 25, "qwer@asdf.com", 1);
-        String insertQuery = new InsertQueryBuilder().build(expected);
-        jdbcTemplate.execute(insertQuery);
+        entityManager.persist(expected);
 
         //when
         entityManager.remove(expected);

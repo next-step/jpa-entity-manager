@@ -1,46 +1,56 @@
 package persistence.persistencecontext;
 
+import persistence.entity.EntityEntry;
 import persistence.entity.EntityMeta;
+import persistence.entity.EntityStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class MyPersistenceContext implements PersistenceContext {
-    private final Map<EntityKey, EntityMeta> entities = new HashMap<>();
+    private final Map<EntityKey, Object> entities = new HashMap<>();
     private final Map<EntityKey, EntitySnapshot> snapshots = new HashMap<>();
+    private final Map<Object, EntityEntry> entries = new HashMap<>();
 
     @Override
-    public <T> Optional<T> getEntity(Class<T> clazz, Object id) {
+    public Optional<Object> getEntity(Class<?> clazz, Object id) {
         EntityKey entityKey = new EntityKey(id, clazz);
-        return Optional.ofNullable(entities.get(entityKey))
-                .map(EntityMeta::getEntity)
-                .map(clazz::cast);
+        return Optional.ofNullable(entities.get(entityKey));
     }
 
     @Override
-    public void addEntity(EntityMeta entityMeta) {
-        entities.put(entityMeta.getEntityKey(), entityMeta);
+    public void addEntity(Object entity) {
+        EntityMeta entityMeta = EntityMeta.from(entity);
+        entries.put(entity, new EntityEntry(EntityStatus.MANAGED));
+        entities.put(entityMeta.getEntityKey(entity), entity);
     }
 
     @Override
-    public void removeEntity(EntityMeta entityMeta) {
-        entities.remove(entityMeta.getEntityKey());
+    public void removeEntity(Object entity) {
+        EntityMeta entityMeta = EntityMeta.from(entity);
+        EntityEntry entityEntry = entries.get(entity);
+        entityEntry.updateStatus(EntityStatus.DELETED);
+        entities.remove(entityMeta.getEntityKey(entity));
+        entityEntry.updateStatus(EntityStatus.GONE);
     }
 
     @Override
-    public EntitySnapshot getDatabaseSnapshot(EntityMeta entityMeta) {
-        EntityKey entityKey = new EntityKey(entityMeta.getId(), entityMeta.getEntity().getClass());
-        return snapshots.put(entityKey, EntitySnapshot.from(entityMeta.getEntity()));
+    public EntitySnapshot getDatabaseSnapshot(Object entity) {
+        EntityMeta entityMeta = EntityMeta.from(entity);
+        EntityKey entityKey = entityMeta.getEntityKey(entity);
+        return snapshots.put(entityKey, EntitySnapshot.from(entity));
     }
 
     @Override
-    public EntitySnapshot getCachedDatabaseSnapshot(EntityMeta entityMeta) {
-        EntityKey entityKey = new EntityKey(entityMeta.getId(), entityMeta.getEntity().getClass());
+    public EntitySnapshot getCachedDatabaseSnapshot(Object entity) {
+        EntityMeta entityMeta = EntityMeta.from(entity);
+        EntityKey entityKey = entityMeta.getEntityKey(entity);
         return snapshots.get(entityKey);
     }
 
-    public Map<EntityKey, EntityMeta> getEntities() {
-        return entities;
+    @Override
+    public void addEntityEntry(Object entity, EntityStatus entityStatus) {
+        entries.put(entity, new EntityEntry(entityStatus));
     }
 }

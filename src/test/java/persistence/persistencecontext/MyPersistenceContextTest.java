@@ -15,7 +15,7 @@ class MyPersistenceContextTest {
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);
 
         //when
-        persistenceContext.addEntity(EntityMeta.from(person));
+        persistenceContext.addEntity(person);
 
         //then
         assertThat(persistenceContext.getEntity(Person.class, 1L)).isNotNull();
@@ -27,10 +27,10 @@ class MyPersistenceContextTest {
         MyPersistenceContext persistenceContext = new MyPersistenceContext();
         String expectedName = "ABC";
         Person person = new Person(1L, expectedName, 10, "ABC@email.com", 10);
-        persistenceContext.addEntity(EntityMeta.from(person));
+        persistenceContext.addEntity(person);
 
         //when
-        Person actual = persistenceContext.getEntity(Person.class, 1L).get();
+        Object actual = persistenceContext.getEntity(Person.class, 1L).get();
 
         //then
         assertThat(actual).extracting("name").isEqualTo(expectedName);
@@ -41,10 +41,10 @@ class MyPersistenceContextTest {
         //given
         MyPersistenceContext persistenceContext = new MyPersistenceContext();
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);
-        persistenceContext.addEntity(EntityMeta.from(person));
+        persistenceContext.addEntity(person);
 
         //when
-        persistenceContext.removeEntity(EntityMeta.from(person));
+        persistenceContext.removeEntity(person);
 
         //then
         assertThat(persistenceContext.getEntity(Person.class, 1L).isEmpty()).isTrue();
@@ -55,10 +55,10 @@ class MyPersistenceContextTest {
         //given
         MyPersistenceContext persistenceContext = new MyPersistenceContext();
         Person person = new Person(1L, "ABC", 10, "ABC@email.com", 10);
-        persistenceContext.getDatabaseSnapshot(EntityMeta.from(person));
+        persistenceContext.getDatabaseSnapshot(person);
 
         //when
-        EntitySnapshot actual = persistenceContext.getDatabaseSnapshot(EntityMeta.from(person));
+        EntitySnapshot actual = persistenceContext.getDatabaseSnapshot(person);
 
         //then
         assertThat(actual.getSnapshot()).isNotEmpty();

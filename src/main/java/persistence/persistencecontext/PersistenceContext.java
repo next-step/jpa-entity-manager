@@ -1,17 +1,19 @@
 package persistence.persistencecontext;
 
-import persistence.entity.EntityMeta;
+import persistence.entity.EntityStatus;
 
 import java.util.Optional;
 
 public interface PersistenceContext {
-    <T> Optional<T> getEntity(Class<T> clazz, Object id);
+    Optional<Object> getEntity(Class<?> clazz, Object id);
 
-    void addEntity(EntityMeta entityMeta);
+    void addEntity(Object entity);
 
-    void removeEntity(EntityMeta entity);
+    void removeEntity(Object entity);
 
-    Object getDatabaseSnapshot(EntityMeta entityMeta);
+    Object getDatabaseSnapshot(Object entity);
 
-    Object getCachedDatabaseSnapshot(EntityMeta entityMeta);
+    Object getCachedDatabaseSnapshot(Object entity);
+
+    void addEntityEntry(Object entity, EntityStatus entityStatus);
 }
