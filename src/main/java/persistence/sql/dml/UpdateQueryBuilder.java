@@ -14,7 +14,7 @@ public class UpdateQueryBuilder {
         this.columns = columns;
     }
 
-    public String toQuery(Object entity, WhereBuilder whereBuilder) {
+    public String build(Object entity, WhereBuilder whereBuilder) {
         Columns columns = Columns.createColumnsWithValue(entity.getClass(), entity);
         StringBuilder stringBuilder = new StringBuilder();
 

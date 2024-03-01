@@ -35,7 +35,7 @@ public class EntityPersister {
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(eq(keyColumn.getName(), keyColumn.getValue()));
 
-        jdbcTemplate.execute(updateQueryBuilder.toQuery(entity, whereBuilder));
+        jdbcTemplate.execute(updateQueryBuilder.build(entity, whereBuilder));
 
         return true;
     }
@@ -44,7 +44,7 @@ public class EntityPersister {
         Class<?> clazz = entity.getClass();
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(clazz);
 
-        jdbcTemplate.execute(insertQueryBuilder.toQuery(entity));
+        jdbcTemplate.execute(insertQueryBuilder.build(entity));
 
         setIdToEntity(entity, clazz);
     }
@@ -73,6 +73,6 @@ public class EntityPersister {
         WhereBuilder builder = new WhereBuilder();
         builder.and(eq(idColumn.getName(), idColumn.getValue()));
 
-        jdbcTemplate.execute(deleteQueryBuilder.toQuery(builder));
+        jdbcTemplate.execute(deleteQueryBuilder.build(builder));
     }
 }

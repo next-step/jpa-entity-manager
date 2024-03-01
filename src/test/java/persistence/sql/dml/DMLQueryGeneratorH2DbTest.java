@@ -35,13 +35,13 @@ class DMLQueryGeneratorH2DbTest {
 
     @BeforeEach
     public void setUp() {
-        String sql = createQueryBuilder.toQuery();
+        String sql = createQueryBuilder.build();
         jdbcTemplate.execute(sql);
     }
 
     @AfterEach
     public void cleanUp() {
-        jdbcTemplate.execute(dropQueryBuilder.toQuery());
+        jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
     @Test
@@ -54,11 +54,11 @@ class DMLQueryGeneratorH2DbTest {
         Person person1 = new Person(null, nickName1, age, email, null);
         Person person2 = new Person(null, nickName2, age, email, null);
 
-        jdbcTemplate.execute(insertQueryBuilder.toQuery(person1));
-        jdbcTemplate.execute(insertQueryBuilder.toQuery(person2));
+        jdbcTemplate.execute(insertQueryBuilder.build(person1));
+        jdbcTemplate.execute(insertQueryBuilder.build(person2));
 
         List<Person> persons = jdbcTemplate.query(
-                selectQueryBuilder.toQuery(new WhereBuilder()),
+                selectQueryBuilder.build(new WhereBuilder()),
                 rs -> new Person(
                         rs.getLong("id"),
                         rs.getString("nick_name"),

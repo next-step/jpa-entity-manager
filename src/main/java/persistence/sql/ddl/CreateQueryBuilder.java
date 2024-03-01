@@ -19,7 +19,7 @@ public class CreateQueryBuilder {
         this.columns = Columns.createColumns(clazz);
     }
 
-    public String toQuery() {
+    public String build() {
         final String tableNameClause = tableData.getName();
         final String columnClause = getColumnClause();
         final String keyClause = getKeyClause();

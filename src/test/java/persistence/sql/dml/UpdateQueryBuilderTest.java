@@ -6,7 +6,6 @@ import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class UpdateQueryBuilderTest {
     @Test
@@ -24,7 +23,7 @@ class UpdateQueryBuilderTest {
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq("id", 1L));
 
-        String query = updateQueryBuilder.toQuery(person, whereBuilder);
+        String query = updateQueryBuilder.build(person, whereBuilder);
 
         assertThat(query).isEqualTo(expected);
     }

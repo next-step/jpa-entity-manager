@@ -9,7 +9,7 @@ public class DeleteQueryBuilder {
         this.table = TableData.from(clazz);
     }
 
-    public String toQuery(WhereBuilder whereBuilder) {
+    public String build(WhereBuilder whereBuilder) {
         StringBuilder query = new StringBuilder();
         query.append("delete from ");
         query.append(table.getName());

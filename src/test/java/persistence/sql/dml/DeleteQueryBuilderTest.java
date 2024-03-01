@@ -17,7 +17,7 @@ class DeleteQueryBuilderTest {
         String expected = String.format("delete from users where id = %s", id);
         WhereBuilder booleanBuilder = new WhereBuilder();
         booleanBuilder.and(eq("id", id));
-        String selectQuery = deleteQueryBuilder.toQuery(booleanBuilder);
+        String selectQuery = deleteQueryBuilder.build(booleanBuilder);
 
         assertThat(selectQuery).isEqualTo(expected);
     }

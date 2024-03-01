@@ -24,12 +24,12 @@ class EntityPersisterTest extends H2DBTestSupport {
     private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
     @BeforeEach
     public void setUp() {
-        jdbcTemplate.execute(createQueryBuilder.toQuery());
+        jdbcTemplate.execute(createQueryBuilder.build());
     }
 
     @AfterEach
     public void cleanUp() {
-        jdbcTemplate.execute(dropQueryBuilder.toQuery());
+        jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
     @DisplayName("insert 테스트")
@@ -50,7 +50,7 @@ class EntityPersisterTest extends H2DBTestSupport {
     void testUpdate() {
         final String newName = "new_nick_name";
         Person person = new Person(null, "nick_name", 10, "email", null);
-        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).toQuery(person));
+        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).build(person));
         person.setId(1L);
 
         person.changeName(newName);
@@ -69,7 +69,7 @@ class EntityPersisterTest extends H2DBTestSupport {
     void testDelete() {
         final String newName = "new_nick_name";
         Person person = new Person(null, "nick_name", 10, "email", null);
-        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).toQuery(person));
+        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).build(person));
         person.setId(1L);
 
         entityPersister.delete(person);

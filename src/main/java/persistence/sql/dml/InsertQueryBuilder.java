@@ -12,7 +12,7 @@ public class InsertQueryBuilder {
         this.table = TableData.from(clazz);
     }
 
-    public String toQuery(Object entity) {
+    public String build(Object entity) {
         Columns columns = Columns.createColumnsWithValue(entity.getClass(), entity);
 
         return String.format(

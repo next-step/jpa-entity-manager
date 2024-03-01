@@ -21,7 +21,7 @@ public class EntityMangerImpl implements EntityManger {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
         WhereBuilder builder = new WhereBuilder();
         builder.and(BooleanExpression.eq("id", id));
-        String query = selectQueryBuilder.toQuery(builder);
+        String query = selectQueryBuilder.build(builder);
 
         return jdbcTemplate.queryForObject(query, getRowMapper());
     }

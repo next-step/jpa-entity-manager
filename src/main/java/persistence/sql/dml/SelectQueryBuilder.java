@@ -14,7 +14,7 @@ public class SelectQueryBuilder {
         this.columns = Columns.createColumns(clazz);
     }
 
-    public String toQuery(WhereBuilder whereBuilder) {
+    public String build(WhereBuilder whereBuilder) {
         StringBuilder query = new StringBuilder();
         query.append("select ");
         query.append(selectClause());
