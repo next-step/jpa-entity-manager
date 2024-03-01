@@ -5,9 +5,9 @@
 
 # 1단계 요구사항
 
-- [ ] EntityPersister 만들기
-  - [ ] update 메소드 만들기
-  - [ ] insert 메소드 만들기
-  - [ ] delte 메소드 만들기
+- [x] EntityPersister 만들기
+  - [x] update 메소드 만들기
+  - [x] insert 메소드 만들기
+  - [x] delte 메소드 만들기
 
 - [ ] EntityManager의 책임 줄이기
