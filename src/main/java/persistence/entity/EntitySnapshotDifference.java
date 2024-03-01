@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+// XXX: Difference -> Changes 네이밍 변경
 public class EntitySnapshotDifference {
     private final Map<String, Object> difference = new HashMap<>();
 

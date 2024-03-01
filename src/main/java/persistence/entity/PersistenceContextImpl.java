@@ -6,8 +6,11 @@ import jdbc.JdbcTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static persistence.entity.Status.*;
+
 public class PersistenceContextImpl implements PersistenceContext {
-    private final HashMap<String, Object> firstLevelCacheMap;
+    private final Map<String, Object> firstLevelCacheMap;
+    private final EntityEntries entityEntries;
 
     private final JdbcTemplate jdbcTemplate;
     private final Map<Class<?>, EntityPersister> entityPersisters;
@@ -15,100 +18,130 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     public PersistenceContextImpl(JdbcTemplate jdbcTemplate) {
         firstLevelCacheMap = new HashMap<>();
+        entityEntries = new EntityEntries();
 
         this.jdbcTemplate = jdbcTemplate;
         this.entityPersisters = new HashMap<>();
         this.entityLoaders = new HashMap<>();
     }
 
+
     @Override
     public Object getEntity(Class<?> entityClass, Long id) {
-        String cacheKey = getCacheKey(entityClass, id);
-        if (firstLevelCacheMap.containsKey(cacheKey)) {
-            return firstLevelCacheMap.get(cacheKey);
-        }
+        return syncEntity(entityClass, id);
+    }
 
-        EntityLoader entityLoader = getEntityLoader(entityClass);
-        Object entity = entityLoader.load(id);
-        if (entity != null) {
-            doAddEntity(entity);
+    private Object syncEntity(Class<?> entityClass, Long id) {
+        String cacheKey = getCacheKey(entityClass, id);
+
+        Status status = entityEntries.getStatus(cacheKey);
+        if (status == null) {
+            return loadObjectFromEntityLoader(entityClass, id);
         }
+        switch (status) {
+            case MANAGED:
+            case READ_ONLY:
+                return firstLevelCacheMap.get(cacheKey);
+            case DELETED:
+            case GONE:
+                throw new ObjectNotFoundException(entityClass, id);
+            case LOADING:
+            case SAVING:
+            default:
+                throw new UnsupportedOperationException(
+                        String.format("status: %s, entityClass: %s, id: %d", status, entityClass, id));
+        }
+    }
+
+    private Object loadObjectFromEntityLoader(Class<?> entityClass, Long id) {
+        String cacheKey = getCacheKey(entityClass, id);
+        entityEntries.setStatus(cacheKey, LOADING);
+
+        EntityLoader entityLoader = entityLoaderOf(entityClass);
+        Object entity = entityLoader.load(id);
+        if (entity == null) {
+            entityEntries.removeStatus(cacheKey);
+            return null;
+        }
+        firstLevelCacheMap.put(cacheKey, entity);
+        entityEntries.setStatus(cacheKey, MANAGED);
         return entity;
     }
 
     @Override
     public void addEntity(Object entity) {
-        Long id = getRowId(entity);
-        if (id == null) {
-            insertEntity(entity);
-        } else {
-            updateEntity(id, entity);
-        }
-    }
-
-    private void insertEntity(Object entity) {
         Class<?> entityClass = entity.getClass();
-        EntityPersister entityPersister = getEntityPersister(entityClass);
-        EntityLoader entityLoader = getEntityLoader(entityClass);
+        Long id = getRowId(entity);
 
-        entityPersister.insert(entity);
+        if (id == null) {
+            // insert
+//            Object createdEntity = insertEntityAndLoadFromDatabase(entity);
+            entityPersisterOf(entityClass).insert(entity);
 
-        Long savedEntityId = entityLoader.getLastId();
-        doAddEntity(entityLoader.load(savedEntityId));
-    }
+            Long savedEntityId = entityLoaderOf(entityClass).getLastId();
+            Object createdEntity = entityLoaderOf(entityClass).load(savedEntityId);
 
-    private void updateEntity(Long id, Object entity) {
-        EntitySnapshotDifference difference = buildEntitySnapshotDifference(id, entity);
-        if (difference.isDirty()) {
-            Class<?> entityClass = entity.getClass();
-            EntityPersister entityPersister = getEntityPersister(entityClass);
+            // set to 1st level cache
+            String cacheKey = getCacheKey(createdEntity.getClass(), getRowId(createdEntity));
+            firstLevelCacheMap.put(cacheKey, createdEntity);
+            entityEntries.setStatus(cacheKey, MANAGED);
+        } else {
+            String cacheKey = getCacheKey(entityClass, id);
 
-            entityPersister.update(id, difference);
+            // 미리 DB와 persistence context 를 싱크
+            syncEntity(entityClass, id);
+            if (entityEntries.getStatus(cacheKey) != MANAGED) {
+                throw new UnsupportedOperationException("updating unmanaged entity");
+            }
 
-            doAddEntity(entity);
+            entityEntries.setStatus(cacheKey, SAVING);
+            Object currentEntity = firstLevelCacheMap.get(cacheKey);
+            EntitySnapshotDifference difference = getEntitySnapshotDifference(currentEntity, entity);
+            if (difference.isDirty()) {
+                entityPersisterOf(entityClass).update(id, difference);
+            }
+            firstLevelCacheMap.put(cacheKey, entity);
+            entityEntries.setStatus(cacheKey, MANAGED);
         }
     }
 
-    private EntitySnapshotDifference buildEntitySnapshotDifference(Long id, Object entity) {
-        Object oldEntity = firstLevelCacheMap.get(getCacheKey(entity.getClass(), id));
+    private static EntitySnapshotDifference getEntitySnapshotDifference(Object oldEntity, Object newEntity) {
         EntitySnapshot oldEntitySnapshot = new EntitySnapshot(oldEntity);
-        EntitySnapshot newEntitySnapshot = new EntitySnapshot(entity);
+        EntitySnapshot newEntitySnapshot = new EntitySnapshot(newEntity);
 
         return new EntitySnapshotDifference(oldEntitySnapshot, newEntitySnapshot);
     }
 
     @Override
     public void removeEntity(Object entity) {
-        EntityPersister entityPersister = getEntityPersister(entity.getClass());
-
+        Class<?> entityClass = entity.getClass();
         Long id = getRowId(entity);
-        entityPersister.delete(id);
+        String cacheKey = getCacheKey(entityClass, id);
 
-        String cacheKey = getCacheKey(entity.getClass(), id);
+        // 미리 DB와 persistence context 를 싱크
+        syncEntity(entityClass, id);
+
+        entityEntries.setStatus(cacheKey, DELETED);
+        entityPersisterOf(entityClass).delete(id);
         firstLevelCacheMap.remove(cacheKey);
+        entityEntries.setStatus(cacheKey, GONE);
     }
 
-    private void doAddEntity(Object entity) {
-        String cacheKey = getCacheKey(entity.getClass(), getRowId(entity));
-
-        firstLevelCacheMap.put(cacheKey, entity);
-    }
-
-    private String getCacheKey(Class<?> entityClass, Long id) {
+    private static String getCacheKey(Class<?> entityClass, Long id) {
         if (id == null) {
             throw new RuntimeException("id is null");
         }
         return String.format("%s:%d", entityClass.getName(), id);
     }
 
-    private EntityPersister getEntityPersister(Class<?> entityClass) {
+    private EntityPersister entityPersisterOf(Class<?> entityClass) {
         if (!entityPersisters.containsKey(entityClass)) {
             entityPersisters.put(entityClass, new EntityPersister(jdbcTemplate, entityClass));
         }
         return entityPersisters.get(entityClass);
     }
 
-    private EntityLoader getEntityLoader(Class<?> entityClass) {
+    private EntityLoader entityLoaderOf(Class<?> entityClass) {
         if (!entityLoaders.containsKey(entityClass)) {
             entityLoaders.put(entityClass, new EntityLoader(jdbcTemplate, entityClass));
         }
