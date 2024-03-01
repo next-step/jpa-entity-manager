@@ -27,7 +27,6 @@ public class UpdateQueryBuilder {
             return stringBuilder.toString();
         }
 
-        stringBuilder.append(" where ");
         stringBuilder.append(whereBuilder.toClause());
 
         return stringBuilder.toString();

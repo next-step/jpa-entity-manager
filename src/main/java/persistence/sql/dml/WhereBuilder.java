@@ -16,6 +16,7 @@ public class WhereBuilder {
         StringBuilder stringBuilder = new StringBuilder();
         boolean isFirstLine = true;
 
+        stringBuilder.append(" where ");
         for (BooleanExpressionLine line : expressionLines) {
             stringBuilder.append(line.toQuery(isFirstLine));
             isFirstLine = false;

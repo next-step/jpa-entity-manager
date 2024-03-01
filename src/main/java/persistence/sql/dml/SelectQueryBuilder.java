@@ -25,7 +25,6 @@ public class SelectQueryBuilder {
             return query.toString();
         }
 
-        query.append(" where ");
         query.append(whereBuilder.toClause());
 
         return query.toString();
