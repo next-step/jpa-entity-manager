@@ -5,6 +5,8 @@ import persistence.persistencecontext.EntitySnapshot;
 import persistence.persistencecontext.MyPersistenceContext;
 import persistence.persistencecontext.PersistenceContext;
 
+import java.util.List;
+
 public class MyEntityManager implements EntityManager {
 
     private final PersistenceContext persistenceContext;
@@ -47,10 +49,18 @@ public class MyEntityManager implements EntityManager {
     public <T> T merge(T entity) {
         EntitySnapshot snapshot = (EntitySnapshot) persistenceContext.getCachedDatabaseSnapshot(entity);
         if (snapshot.isChanged(entity)) {
-            entityPersister.update(entity);
+            persistenceContext.addEntity(entity);
         }
-        addToCache(entity);
         return entity;
+    }
+
+    @Override
+    public void flush() {
+        List<Object> entities = persistenceContext.getDirtyEntities();
+        for (Object entity : entities) {
+            entityPersister.update(entity);
+            persistenceContext.addEntityEntry(entity, EntityStatus.GONE);
+        }
     }
 
     private void addToCache(Object entity) {

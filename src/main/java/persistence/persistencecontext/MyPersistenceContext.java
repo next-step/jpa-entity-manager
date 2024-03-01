@@ -5,8 +5,10 @@ import persistence.entity.EntityMeta;
 import persistence.entity.EntityStatus;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MyPersistenceContext implements PersistenceContext {
     private final Map<EntityKey, Object> entities = new HashMap<>();
@@ -52,5 +54,13 @@ public class MyPersistenceContext implements PersistenceContext {
     @Override
     public void addEntityEntry(Object entity, EntityStatus entityStatus) {
         entries.put(entity, new EntityEntry(entityStatus));
+    }
+
+    @Override
+    public List<Object> getDirtyEntities() {
+        return snapshots.keySet().stream()
+                .filter(key -> snapshots.get(key).isChanged(entities.get(key)))
+                .map(entities::get)
+                .collect(Collectors.toList());
     }
 }

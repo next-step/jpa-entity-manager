@@ -90,6 +90,5 @@ class MyEntityPersisterTest {
         String selectAllQuery = new SelectAllQueryBuilder().build(Person.class);
         List<Person> result = jdbcTemplate.query(selectAllQuery, RowMapperFactory.create(Person.class));
         assertThat(result.size()).isEqualTo(0);
-
     }
 }

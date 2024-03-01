@@ -85,4 +85,21 @@ class MyEntityManagerTest {
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
                 .isInstanceOf(RuntimeException.class);
     }
+
+    @Test
+    @DisplayName("flush 메서드는 변경된 객체를 업데이트 한다.")
+    void flush() {
+        //given
+        MyEntityManager entityManager = new MyEntityManager(jdbcTemplate);
+        Person person = new Person(1L, "name", 25, "qwer@asdf.com", 1);
+        entityManager.persist(person);
+        String updatedName = "ABC";
+        Person updated = new Person(1L, updatedName, 30, "asdf@asdf.com", 1);
+        entityManager.merge(updated);
+
+        //when & then
+        entityManager.flush();
+        Person result = entityManager.find(Person.class, 1L);
+        assertThat(result).extracting("name").isEqualTo(updatedName);
+    }
 }

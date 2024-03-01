@@ -2,6 +2,7 @@ package persistence.persistencecontext;
 
 import persistence.entity.EntityStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PersistenceContext {
@@ -16,4 +17,6 @@ public interface PersistenceContext {
     Object getCachedDatabaseSnapshot(Object entity);
 
     void addEntityEntry(Object entity, EntityStatus entityStatus);
+
+    List<Object> getDirtyEntities();
 }
