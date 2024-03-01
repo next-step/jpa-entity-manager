@@ -3,6 +3,7 @@ package persistence.sql.dml;
 import persistence.entity.EntityBinder;
 import persistence.sql.model.Column;
 import persistence.sql.model.Columns;
+import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 
 import java.util.List;
@@ -36,10 +37,14 @@ public class UpdateQueryBuilder {
     }
 
     private String buildColumnsValueClause() {
+        PKColumn pkColumn = table.getPKColumn();
+        Object id = entityBinder.getValue(pkColumn);
+        String pkValueClause = String.format("%s,", id);
+
         Columns columns = table.getColumns();
         return columns.stream()
                 .map(this::buildColumnValueClause)
-                .collect(Collectors.joining(",", "null,", ""));
+                .collect(Collectors.joining(",", pkValueClause, ""));
     }
 
     private String buildColumnValueClause(Column column) {
