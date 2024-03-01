@@ -59,4 +59,13 @@ public class DMLQueryBuilderTest {
 
         assertEquals("DELETE FROM users WHERE id = 1", query);
     }
+
+    @Test
+    @DisplayName("update 쿼리 생성")
+    void updateSqlTest() {
+        person.setId(1L);
+        String query = dmlQueryBuilder.updateSql(person);
+
+        assertEquals("UPDATE users SET nick_name = '"+name+"', old = "+age+", email = '"+email+"' WHERE id = 1", query);
+    }
 }

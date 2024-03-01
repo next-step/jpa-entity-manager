@@ -28,4 +28,10 @@ public class DMLQueryFormatter {
 
         return String.format(deleteQueryFormat, tableName, conditionClause);
     }
+
+    public static String createUpdateQuery(String tableName, String columnValueSetClause, String conditionClause) {
+        final String queryFormat = "UPDATE %s SET %s WHERE %s";
+
+        return String.format(queryFormat, tableName, columnValueSetClause, conditionClause);
+    }
 }

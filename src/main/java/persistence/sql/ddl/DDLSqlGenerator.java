@@ -21,7 +21,7 @@ public abstract class DDLSqlGenerator extends EntityContextManager {
 
     public String genCreateTableQuery(Class<?> clazz) {
         EntityMetadata entityMetadata = getEntityMetadata(clazz);
-        String tableName = entityMetadata.getTableName();
+        String tableName = entityMetadata.getEntityTable().getTableName();
         String columnClause = createColumnClause(entityMetadata);
 
         return String.format(CREATE_TABLE_QUERY_FORMAT, tableName, columnClause);
@@ -30,11 +30,11 @@ public abstract class DDLSqlGenerator extends EntityContextManager {
     public String genDropTableQuery(Class<?> clazz) {
         EntityMetadata entityMetadata = getEntityMetadata(clazz);
 
-        return String.format(DROP_TABLE_QUERY_FORMAT, entityMetadata.getTableName());
+        return String.format(DROP_TABLE_QUERY_FORMAT, entityMetadata.getEntityTable().getTableName());
     }
 
     protected String createColumnClause(EntityMetadata entityMetadata) {
-        List<String> collect = entityMetadata.getColumns().stream()
+        List<String> collect = entityMetadata.getColumns().getColumns().stream()
                 .map(this::getColumnClause)
                 .collect(Collectors.toList());
 

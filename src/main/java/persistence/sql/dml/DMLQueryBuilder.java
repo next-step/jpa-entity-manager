@@ -21,47 +21,62 @@ public class DMLQueryBuilder extends EntityContextManager {
 
     public String insertSql(Object entity) {
         EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
-        String tableName = entityMetadata.getTableName();
-        String columns = getColumnNamesClause(entityMetadata.getInsertTargetColumns());
-        String columnValues = getColumnValueClause(entity, entityMetadata.getInsertTargetColumns());
+        String tableName = entityMetadata.getEntityTable().getTableName();
+        String columns = getColumnNamesClause(entityMetadata.getColumns().getInsertTargetColumns());
+        String columnValues = getColumnValueClause(entity, entityMetadata.getColumns().getInsertTargetColumns());
 
         return DMLQueryFormatter.createInsertQuery(tableName, columns, columnValues);
     }
 
     private String getColumnValueClause(Object entity, List<EntityColumn> insertTargetColumns) {
         return insertTargetColumns.stream()
-            .map(column -> getColumnValueWithSqlFormat(entity, column.getName()))
+            .map(column -> getColumnValueWithSqlFormat(entity, column.getColumnName()))
             .collect(Collectors.joining(COLUMN_SEPARATOR));
     }
 
     public String selectAllSql(Class<?> clazz) {
         EntityMetadata entityMetadata = getEntityMetadata(clazz);
-        String columnsClause = entityMetadata.getColumns().stream()
-            .map(EntityColumn::getName)
+        String columnsClause = entityMetadata.getColumns().getColumns().stream()
+            .map(EntityColumn::getColumnName)
             .collect(Collectors.joining(COLUMN_SEPARATOR));
 
-        return DMLQueryFormatter.createSelectQuery(columnsClause, entityMetadata.getTableName());
+        return DMLQueryFormatter.createSelectQuery(columnsClause, entityMetadata.getEntityTable().getTableName());
     }
 
     public String selectByIdQuery(Class<?> clazz, Object id) {
         EntityMetadata entityMetadata = getEntityMetadata(clazz);
         String sql = selectAllSql(clazz);
-        String condition = createCondition(entityMetadata.getIdColumn().getName(), id, "=");
+        String condition = createCondition(entityMetadata.getColumns().getIdColumn().getColumnName(), id, "=");
 
         return DMLQueryFormatter.createSelectByConditionQuery(sql, condition);
     }
 
     public String deleteSql(Object entity) {
         EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
-        String tableName = entityMetadata.getTableName();
+        String tableName = entityMetadata.getEntityTable().getTableName();
         String deleteConditionClause = wherePrimaryKeyClause(entityMetadata, entity);
 
         return DMLQueryFormatter.createDeleteQuery(tableName, deleteConditionClause);
     }
 
+    public String updateSql(Object entity) {
+        EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
+        String tableName = entityMetadata.getEntityTable().getTableName();
+        String columnValueSetClause = columnValueSetClause(entity, entityMetadata.getColumns().getInsertTargetColumns());
+        String conditionClause = wherePrimaryKeyClause(entityMetadata, entity);
+
+        return DMLQueryFormatter.createUpdateQuery(tableName, columnValueSetClause, conditionClause);
+    }
+
+    private String columnValueSetClause(Object entity, List<EntityColumn> insertTargetColumns) {
+        return insertTargetColumns.stream()
+            .map(column -> column.getColumnName() + " = " + getColumnValueWithSqlFormat(entity, column.getColumnName()))
+            .collect(Collectors.joining(COLUMN_SEPARATOR));
+    }
+
     private String wherePrimaryKeyClause(EntityMetadata entityMetadata, Object object) {
-        String idColumnName = entityMetadata.getIdColumn().getName();
-        Object value = getColumnValue(object, entityMetadata.getIdColumn().getName());
+        String idColumnName = entityMetadata.getColumns().getIdColumn().getColumnName();
+        Object value = getColumnValue(object, entityMetadata.getColumns().getIdColumn().getColumnName());
 
         return createCondition(idColumnName, value, "=");
     }
@@ -73,7 +88,7 @@ public class DMLQueryBuilder extends EntityContextManager {
 
     private String getColumnNamesClause(List<EntityColumn> insertTargetColumns) {
         return insertTargetColumns.stream()
-            .map(EntityColumn::getName)
+            .map(EntityColumn::getColumnName)
             .collect(Collectors.joining(COLUMN_SEPARATOR));
     }
 

@@ -68,6 +68,7 @@ public class EntityInfoExtractor {
     }
 
     public static Field getFieldByColumnName(Class<?> clazz, String columName) {
+        System.out.println(clazz + " >> " + columName);
         return Arrays.stream(clazz.getDeclaredFields())
             .filter(field -> EntityInfoExtractor.getColumnName(field).equals(columName))
             .findFirst()

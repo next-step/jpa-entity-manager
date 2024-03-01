@@ -14,7 +14,7 @@ public class H2DDLSqlGenerator extends DDLSqlGenerator {
     @Override
     protected String getColumnClause(EntityColumn entityColumn) {
         StringBuilder columnClause = new StringBuilder();
-        String columnDefinition = String.format("%s %s ", entityColumn.getName(), getColumnDataType(entityColumn));
+        String columnDefinition = String.format("%s %s ", entityColumn.getColumnName(), getColumnDataType(entityColumn));
 
         columnClause.append(columnDefinition);
         columnClause.append(getColumnConstraint(entityColumn));
