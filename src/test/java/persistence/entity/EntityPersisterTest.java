@@ -3,6 +3,7 @@ package persistence.entity;
 import database.sql.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.database.EntityPersister;
 import testsupport.H2DatabaseTest;
 
 import java.util.List;

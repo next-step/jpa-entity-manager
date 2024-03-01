@@ -4,6 +4,8 @@ import database.sql.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.context.ObjectNotFoundException;
+import persistence.entity.context.PersistenceContextImpl;
 import testsupport.H2DatabaseTest;
 
 import static org.assertj.core.api.Assertions.assertThat;

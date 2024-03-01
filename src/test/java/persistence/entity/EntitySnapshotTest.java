@@ -2,6 +2,7 @@ package persistence.entity;
 
 import database.sql.Person;
 import org.junit.jupiter.api.Test;
+import persistence.entity.data.EntitySnapshot;
 
 import java.util.List;
 

@@ -1,14 +1,16 @@
-package persistence.entity;
+package persistence.entity.database;
 
 import database.sql.dml.SelectByPrimaryKeyQueryBuilder;
 import database.sql.dml.SelectQueryBuilder;
 import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
+import persistence.entity.RowMapperFactory;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class EntityLoader {
     private final JdbcTemplate jdbcTemplate;
@@ -31,14 +33,11 @@ public class EntityLoader {
         return jdbcTemplate.query(query, rowMapper);
     }
 
-    public Object load(Long id) {
+    public Optional<Object> load(Long id) {
         String query = selectByPrimaryKeyQueryBuilder.buildQuery(id);
         List<Object> result = jdbcTemplate.query(query, rowMapper);
 
-        if (result.isEmpty()) {
-            return null;
-        }
-        return result.get(0);
+        return result.stream().findFirst();
     }
 
     // TODO: 데이터베이스에서 지원하는 방식으로 변경하기

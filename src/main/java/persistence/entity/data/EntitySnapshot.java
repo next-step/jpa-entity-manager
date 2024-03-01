@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.data;
 
 import database.sql.util.EntityMetadata;
 import database.sql.util.column.EntityColumn;

@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.data;
 
 import java.util.Collections;
 import java.util.HashMap;

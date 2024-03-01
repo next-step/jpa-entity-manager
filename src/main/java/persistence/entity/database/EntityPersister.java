@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.database;
 
 import database.sql.dml.ColumnValueMap;
 import database.sql.dml.DeleteQueryBuilder;
@@ -6,6 +6,7 @@ import database.sql.dml.InsertQueryBuilder;
 import database.sql.dml.UpdateQueryBuilder;
 import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
+import persistence.entity.data.EntitySnapshotDifference;
 
 import java.util.Map;
 

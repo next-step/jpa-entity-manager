@@ -3,6 +3,7 @@ package persistence.entity;
 import database.sql.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.database.EntityLoader;
 import testsupport.H2DatabaseTest;
 
 import java.util.List;
@@ -22,7 +23,7 @@ class EntityLoaderTest extends H2DatabaseTest {
 
     @Test
     void loadMissingRecord() {
-        assertThat(entityLoader.load(1L)).isNull();
+        assertThat(entityLoader.load(1L)).isEmpty();
     }
 
     @Test
@@ -30,7 +31,7 @@ class EntityLoaderTest extends H2DatabaseTest {
         Person person = new Person(null, "abc123", 14, "c123@d.com");
         entityManager.persist(person);
 
-        Person found = (Person) entityLoader.load(1L);
+        Person found = (Person) entityLoader.load(1L).get();
 
         assertSamePerson(found, person, false);
     }
