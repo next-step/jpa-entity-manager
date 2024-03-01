@@ -23,13 +23,10 @@ public class JdbcTemplate {
 
     public Long executeAndReturnGeneratedKey(final String sql) {
         try (final Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql,
-                    new String[] { "id" });
+            statement.executeUpdate(sql, new String[] {"id"});
             ResultSet keys = statement.getGeneratedKeys();
-            while (keys.next()){
-                return keys.getLong(1);
-            }
-            return 1l;
+            keys.next();
+            return keys.getLong(1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

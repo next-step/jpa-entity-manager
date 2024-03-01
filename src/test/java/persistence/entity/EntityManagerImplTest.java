@@ -103,6 +103,7 @@ class EntityManagerImplTest {
     void should_remove_cache() {
         Long id = 4L;
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+        entityManager.merge(person);
         entityManager.remove(person);
 
         assertThat(persistenceContext.getEntity(person.getClass(), id)).isNull();
