@@ -11,6 +11,6 @@
   - [x] delete
 
 ## Step2 요구사항
-- [ ] RowMapper
+- [x] RowMapper
 - [x] EntityLoader
 - [ ] PK 관련 리팩토링

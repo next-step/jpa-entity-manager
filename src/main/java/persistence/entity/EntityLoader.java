@@ -5,6 +5,7 @@ import jdbc.RowMapperImpl;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EntityLoader {
 
@@ -16,19 +17,24 @@ public class EntityLoader {
         this.selectQueryBuilder = new SelectQueryBuilder();
     }
 
-    public <T> T findOne(T entity, Long id) {
-        List<T> entities = (List<T>) jdbcTemplate.query(
-                selectQueryBuilder.findById(entity.getClass(), id),
-                new RowMapperImpl<>(entity.getClass())
+    public <T> Optional<T> findOne(Class<T> clazz, Long id) {
+        List<T> entities = jdbcTemplate.query(
+                selectQueryBuilder.findById(clazz, id),
+                new RowMapperImpl<>(clazz)
         );
         if (entities.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return entities.get(0);
+        return Optional.ofNullable(entities.get(0));
     }
 
-    public <T> T findOneOrFail(Class<T> clazz, Long id) {
-        return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new RowMapperImpl<>(clazz));
+    public <T> Optional<T> findOne(T entity, Long id) {
+        List<?> entities = jdbcTemplate.query(
+                selectQueryBuilder.findById(entity.getClass(), id),
+                new RowMapperImpl<>(entity.getClass()));
+        if (entities.isEmpty()) {
+            return Optional.empty();
+        }
+        return (Optional<T>) Optional.ofNullable(entities.get(0));
     }
-
 }

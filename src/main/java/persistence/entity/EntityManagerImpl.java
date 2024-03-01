@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
+import java.util.Optional;
+
 public class EntityManagerImpl<T> implements EntityManager<T> {
     private final EntityLoader entityLoader;
     private final EntityPersist entityPersist;
@@ -13,7 +15,8 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
 
     @Override
     public T find(Class<T> clazz, Long id) {
-        return entityLoader.findOneOrFail(clazz, id);
+        return entityLoader.findOne(clazz, id)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("entity id: %s not found", id)));
     }
 
     @Override
@@ -23,8 +26,8 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
             entityPersist.insert(entity);
             return;
         }
-        T findEntity = entityLoader.findOne(entity, pkValue);
-        if (findEntity == null) {
+        Optional<T> findEntity = entityLoader.findOne(entity, pkValue);
+        if (findEntity.isEmpty()) {
             entityPersist.insert(entity);
             return;
         }
