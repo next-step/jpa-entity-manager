@@ -1,12 +1,10 @@
 package persistence.sql.entity.manager;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
-import persistence.sql.dml.query.builder.SelectQueryBuilder;
-import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.Operators;
 import persistence.sql.entity.persister.EntityPersister;
@@ -17,12 +15,14 @@ import java.util.List;
 
 public class EntityManagerImpl<T, K> implements EntityManger<T, K> {
 
+    private final Class<T> clazz;
     private final JdbcTemplate jdbcTemplate;
     private final EntityManagerMapper<T> entityManagerMapper;
     private final EntityPersister<T, K> entityPersister;
 
     public EntityManagerImpl(final JdbcTemplate jdbcTemplate,
                              Class<T> clazz) {
+        this.clazz = clazz;
         this.jdbcTemplate = jdbcTemplate;
         this.entityManagerMapper = new EntityManagerMapper<>(clazz);
         this.entityPersister = new EntityPersisterImpl<>(jdbcTemplate, clazz);
@@ -51,23 +51,29 @@ public class EntityManagerImpl<T, K> implements EntityManger<T, K> {
 
     @Override
     public void persist(final T entity) {
-        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.from(entity);
-        jdbcTemplate.execute(insertQueryBuilder.toSql());
+        final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
+        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
+        K key = (K) pkDomainType.getValue();
+
+        T object = find(clazz, key);
+
+        if (object == null) {
+            entityPersister.insert(entity);
+        }
+        entityPersister.update(entity);
     }
 
     @Override
     public void remove(final T entity) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
         final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
+        K key = (K) pkDomainType.getValue();
 
-        entityPersister.delete((K) pkDomainType.getValue());
+        entityPersister.delete(key);
     }
 
     @Override
     public void removeAll(final Class<T> clazz) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.from(entityMappingTable.getTableName());
-
-        jdbcTemplate.execute(deleteQueryBuilder.toSql());
+        entityPersister.deleteAll();
     }
 }

@@ -8,4 +8,6 @@ public interface EntityPersister<T, K> {
 
     void delete(K key);
 
+    void deleteAll();
+
 }
