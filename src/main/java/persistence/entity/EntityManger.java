@@ -3,8 +3,7 @@ package persistence.entity;
 import persistence.Person;
 
 public interface EntityManger {
-    // TODO: RowMapper 하고 제너릭으로
-    Person find(Class<Person> clazz, Long id);
+    <T> T find(Class<T> clazz, Long id);
 
     Object persist(Object entity);
 
