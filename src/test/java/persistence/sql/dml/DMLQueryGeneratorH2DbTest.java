@@ -5,9 +5,12 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
 import persistence.Person;
+import persistence.PersonRowMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.H2Dialect;
+import persistence.sql.mapping.Columns;
+import persistence.sql.mapping.TableData;
 
 import java.util.List;
 
@@ -16,9 +19,12 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 class DMLQueryGeneratorH2DbTest {
     private static JdbcTemplate jdbcTemplate;
     private static DatabaseServer server;
+
+    private final TableData tableData = TableData.from(Person.class);
+    private final Columns columns = Columns.createColumns(Person.class);
     private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
     private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(Person.class);
+    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(tableData, columns);
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
     @BeforeAll

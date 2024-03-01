@@ -9,9 +9,9 @@ public class SelectQueryBuilder {
     private final TableData table;
     private final Columns columns;
 
-    public SelectQueryBuilder(Class<?> clazz) {
-        this.table = TableData.from(clazz);
-        this.columns = Columns.createColumns(clazz);
+    public SelectQueryBuilder(TableData table, Columns columns) {
+        this.table = table;
+        this.columns = columns;
     }
 
     public String build(WhereBuilder whereBuilder) {
