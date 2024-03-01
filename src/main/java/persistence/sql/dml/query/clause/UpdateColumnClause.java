@@ -1,5 +1,6 @@
 package persistence.sql.dml.query.clause;
 
+import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.DomainTypes;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class UpdateColumnClause {
     public static UpdateColumnClause from(final DomainTypes domainTypes) {
         return new UpdateColumnClause(domainTypes.getDomainTypes()
                 .stream()
+                .filter(DomainType::isNotExistsId)
                 .map(domainType -> String.format(FORMAT, domainType.getColumnName(), domainType.getValue()))
                 .collect(Collectors.toList()));
     }

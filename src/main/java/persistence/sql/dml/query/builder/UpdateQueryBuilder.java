@@ -7,7 +7,7 @@ import persistence.sql.entity.EntityMappingTable;
 
 public class UpdateQueryBuilder {
 
-    private static final String FORMAT = "UPDATE %s SET %s WHERE %s";
+    private static final String FORMAT = "UPDATE %s SET %s %s";
 
     private final String tableName;
     private final WhereClause whereClause;

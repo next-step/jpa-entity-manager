@@ -24,7 +24,7 @@ class UpdateColumnClauseTest {
         DomainTypes domainTypes = entityMappingTable.getDomainTypes();
         UpdateColumnClause updateColumnClause = UpdateColumnClause.from(domainTypes);
 
-        assertThat(updateColumnClause.toSql()).isEqualTo("id=1,nick_name='박재성',old=20,email='jason@nextstep.com'");
+        assertThat(updateColumnClause.toSql()).isEqualTo("nick_name='박재성',old=20,email='jason@nextstep.com'");
     }
 
 }
