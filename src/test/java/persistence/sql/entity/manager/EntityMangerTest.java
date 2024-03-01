@@ -44,6 +44,16 @@ class EntityMangerTest extends H2Database {
         assertThat(findPerson).isEqualTo(newPerson);
     }
 
+    @DisplayName("디비 데이터가 업데이트가 된다.")
+    @Test
+    void updateTest() {
+        Person updatePerson = new Person(person.getId(), "이동규", 20, "cu");
+        entityManger.persist(updatePerson);
+
+        Person findPerson = entityManger.find(Person.class, person.getId());
+        assertThat(findPerson).isEqualTo(updatePerson);
+    }
+
     @DisplayName("디비에 데이터가 삭제가 된다.")
     @Test
     void deleteTest() {

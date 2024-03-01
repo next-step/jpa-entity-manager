@@ -59,6 +59,7 @@ public class EntityManagerImpl<T, K> implements EntityManger<T, K> {
 
         if (object == null) {
             entityPersister.insert(entity);
+            return;
         }
         entityPersister.update(entity);
     }
