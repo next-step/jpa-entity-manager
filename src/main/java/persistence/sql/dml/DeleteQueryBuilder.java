@@ -25,7 +25,7 @@ public class DeleteQueryBuilder {
         return this;
     }
 
-    public String deleteById(Long id) {
+    public String deleteById(Object id) {
         return query + String.format(WHERE_CLAUSE_FORMAT, idColumn.getName(), id);
     }
 }

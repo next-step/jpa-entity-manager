@@ -72,7 +72,7 @@ class EntityPersisterImplTest {
 
         //when
         savedPerson.setName("김길동");
-        entityPersister.update(savedPerson, new IdColumn(savedPerson, dialect));
+        entityPersister.update(savedPerson, new IdColumn(savedPerson, dialect).getValue());
 
         //then
         Person foundPerson = entityManager.find(Person.class, savedPerson.getId());
@@ -109,7 +109,7 @@ class EntityPersisterImplTest {
         entityPersister.insert(person);
         IdColumn idColumn = new IdColumn(person, dialect);
         //when
-        entityPersister.delete(person, idColumn);
+        entityPersister.delete(person, idColumn.getValue());
 
         //then
         assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))

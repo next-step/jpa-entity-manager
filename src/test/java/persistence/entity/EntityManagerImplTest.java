@@ -18,6 +18,7 @@ import persistence.sql.dialect.MysqlDialect;
 import persistence.sql.dml.InsertQueryBuilder;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,17 +29,22 @@ class EntityManagerImplTest {
     private JdbcTemplate jdbcTemplate;
     private TableColumn table;
     private Dialect dialect;
-
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() throws SQLException {
         DatabaseServer server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-
+        entityManager = new EntityManagerImpl(jdbcTemplate, new MysqlDialect());
         Class<Person> personEntity = Person.class;
         table = new TableColumn(personEntity);
         dialect = new MysqlDialect();
+
+        createTable(personEntity);
+    }
+
+    private void createTable(Class<Person> personEntity) {
         Columns columns = new Columns(personEntity.getDeclaredFields(), dialect);
         IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
 
@@ -59,7 +65,6 @@ class EntityManagerImplTest {
     @Test
     void find() {
         // given
-        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate, new MysqlDialect());
         Long id = 1L;
         Person person = new Person(id, "John", 25, "qwer@asdf.com", 1);
 
@@ -83,7 +88,6 @@ class EntityManagerImplTest {
     @Test
     void persist() {
         // given
-        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate, new MysqlDialect());
         Person person = new Person("John", 99, "john@test.com", 1);
 
         // when
@@ -100,11 +104,30 @@ class EntityManagerImplTest {
         );
     }
 
+    @DisplayName("entityManager.persist() 메서드를 통해 Person 객체를 저장한다. - persistContext에 저장된다.")
+    @Test
+    void persistContext() {
+        // given
+        Person person = new Person(1L, "John", 99, "john@test.com", 1);
+
+        // when
+        entityManager.persist(person);
+
+        // then
+        PersistenceContext persistContext = entityManager.getPersistContext();
+        Optional<Object> findPerson = persistContext.getEntity(person.getId());
+
+        assertAll(
+                () -> assertThat(findPerson).isPresent(),
+                () -> assertThat(findPerson.get()).isEqualTo(person)
+        );
+
+    }
+
     @DisplayName("persist 메서드를 통해 Person 객체를 저장한다. - id가 있다면 증가하지 않는다.")
     @Test
     void persistWhenHasId() {
         // given
-        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate, new MysqlDialect());
         Person person = new Person(1L, "John", 99, "john@test.com", 1);
 
         // when
@@ -125,7 +148,6 @@ class EntityManagerImplTest {
     @Test
     void remove() {
         // given
-        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate, new MysqlDialect());
         Person person = new Person(1L, "John", 99, "john@test.com", 1);
         entityManager.persist(person);
 
@@ -135,5 +157,58 @@ class EntityManagerImplTest {
         // then
         assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))
                 .isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName("remove 메서드를 통해 Person 객체를 삭제한다. - persistContext에서도 삭제된다.")
+    @Test
+    void removeContext() {
+        // given
+        Person person = new Person(1L, "John", 99, "john@test.com", 1);
+        entityManager.persist(person);
+
+        // when
+        entityManager.remove(person);
+
+        // then
+        PersistenceContext persistContext = entityManager.getPersistContext();
+        Optional<Object> findPerson = persistContext.getEntity(person.getId());
+        assertThat(findPerson).isEmpty();
+    }
+
+    @DisplayName("merge 메서드를 통해 Person 객체를 수정한다.")
+    @Test
+    void merge() {
+        // given
+        Person person = new Person(1L, "John", 99, "john@test.com", 1);
+        entityManager.persist(person);
+
+        // when
+        person.setName("John2");
+        entityManager.merge(person);
+
+        // then
+        Person findPerson = entityManager.find(Person.class, person.getId());
+        assertThat(findPerson.getName()).isEqualTo("John2");
+    }
+
+    @DisplayName("merge 메서드를 통해 Person 객체를 수정한다. - persistContext에서 id는 그대로고 엔티티만 수정된다.")
+    @Test
+    void updateContext() {
+        // given
+        Person person = new Person(1L, "John", 99, "john@test.com", 1);
+        entityManager.persist(person);
+
+        // when
+        person.setName("John2");
+        entityManager.merge(person);
+
+        // then
+        PersistenceContext persistContext = entityManager.getPersistContext();
+        Optional<Object> findPerson = persistContext.getEntity(person.getId());
+        assertAll(
+                () -> assertThat(findPerson).isPresent(),
+                () -> assertThat(((Person) findPerson.get()).getId()).isEqualTo(1L),
+                () -> assertThat(((Person) findPerson.get()).getName()).isEqualTo("John2")
+        );
     }
 }

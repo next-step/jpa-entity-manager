@@ -14,7 +14,7 @@ public class GeneralColumn implements Column {
     private final NameType name;
     private Object value;
     private final ColumnType columnType;
-    private final NullableType nullable;
+    private NullableType nullable;
 
     public GeneralColumn(Field field, Dialect dialect) {
         this.columnType = dialect.getColumn(field.getType());
@@ -39,10 +39,9 @@ public class GeneralColumn implements Column {
 
     private String getColumnNameWithColumn(Field field) {
         String columnName = field.getName();
-
         if (field.isAnnotationPresent(jakarta.persistence.Column.class)) {
             boolean isNullable = field.getAnnotation(jakarta.persistence.Column.class).nullable();
-            this.nullable.update(isNullable);
+            this.nullable = new NullableType(isNullable);
             columnName = field.getAnnotation(jakarta.persistence.Column.class).name();
         }
         return columnName;
@@ -63,7 +62,6 @@ public class GeneralColumn implements Column {
     public String getFieldName() {
         return name.getFieldName();
     }
-
 
     public Object getValue() {
         if (value instanceof String) {
