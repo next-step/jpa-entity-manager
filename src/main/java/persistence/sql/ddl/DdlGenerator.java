@@ -31,6 +31,6 @@ public class DdlGenerator {
     }
 
     private Table getTable(Class<?> clazz) {
-        return Table.from(clazz);
+        return Table.getInstance(clazz);
     }
 }

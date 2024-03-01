@@ -22,7 +22,7 @@ public class UpdateQueryBuilderTest {
                 Person person = Person.of(1L, "user1", 1, "abc@test.com");
 
                 // when
-                String query = updateQueryBuilder.generateQuery(Table.from(person.getClass()), person);
+                String query = updateQueryBuilder.generateQuery(Table.getInstance(person.getClass()), person);
 
                 // then
                 assertEquals("UPDATE users SET nick_name='user1',old=1,email='abc@test.com'", query);

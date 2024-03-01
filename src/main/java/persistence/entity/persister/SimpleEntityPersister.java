@@ -1,7 +1,8 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
+import persistence.sql.meta.Table;
 
 public class SimpleEntityPersister implements EntityPersister {
 
@@ -24,11 +25,13 @@ public class SimpleEntityPersister implements EntityPersister {
 
     @Override
     public void insert(Object entity) {
-        jdbcTemplate.execute(dmlGenerator.generateInsertQuery(entity));
+        Object id = jdbcTemplate.executeInsert(dmlGenerator.generateInsertQuery(entity));
+        Table table = Table.getInstance(entity.getClass());
+        table.setIdValue(entity, id);
     }
 
     @Override
     public void delete(Object entity) {
-        jdbcTemplate.execute(dmlGenerator.generateDeleteQuery(entity));
+        jdbcTemplate.executeUpdate(dmlGenerator.generateDeleteQuery(entity));
     }
 }

@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 import database.DatabaseServer;
 import database.H2;
@@ -14,12 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.fixture.PersonFixture;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.DmlGenerator;
 
-@DisplayName("EntityPersister class 의")
-class EntityPersisterTest {
+@DisplayName("SimpleEntityPersister class 의")
+class SimpleEntityPersisterTest {
 
     private DatabaseServer server;
 
@@ -36,7 +37,7 @@ class EntityPersisterTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
         dmlGenerator = DmlGenerator.getInstance();
-        entityPersister = EntityPersister.from(jdbcTemplate);
+        entityPersister = SimpleEntityPersister.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
     }
 
@@ -53,7 +54,7 @@ class EntityPersisterTest {
         @Test
         void insertTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
 
             //when
             entityPersister.insert(person);
@@ -76,14 +77,15 @@ class EntityPersisterTest {
         @Test
         void updateTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
             entityPersister.insert(person);
             person = findPerson(1L);
-
             person.updateName("user2");
 
-            //when & then
+            //when
             assertThat(entityPersister.update(person)).isTrue();
+
+            //then
             person = findPerson(1L);
             assertThat(person.getName()).isEqualTo("user2");
         }
@@ -96,7 +98,7 @@ class EntityPersisterTest {
         @Test
         void deleteTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
             entityPersister.insert(person);
             person = findPerson(1L);
 
@@ -107,9 +109,6 @@ class EntityPersisterTest {
             assertThatThrownBy(() -> findPerson(1L))
                 .isInstanceOf(RuntimeException.class);
         }
-    }
-    private Person createPerson() {
-        return Person.of("user1", 1, "abc@gtest.com", 1);
     }
 
     private Person findPerson(long id) {

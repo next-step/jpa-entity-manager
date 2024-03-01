@@ -49,7 +49,7 @@ public class Column {
         return column == null || column.nullable();
     }
 
-    public String getFieldValue(Object object) {
+    public Object getFieldValue(Object object) {
         try {
             field.setAccessible(true);
             return valueOf(field.get(object));
@@ -67,36 +67,12 @@ public class Column {
         }
     }
 
-    private String valueOf(Object object) {
+    private Object valueOf(Object object) {
 
         if (object instanceof String) {
             return String.format("'%s'", object);
         }
-        return String.valueOf(object);
-    }
-
-    private String convertCamelToSnakeString(String str) {
-        Matcher matcher = CAMEL_CASE_FIELD_NAME_PATTERN.matcher(str);
-        return matcher.replaceAll(matchResult -> String.format(
-            SNAKE_CASE_FORMAT,
-            matchResult.group(1).toLowerCase(),
-            matchResult.group(2).toUpperCase()
-        )).toLowerCase();
-    }
-
-    public boolean isUpdatable() {
-        return !isIdAnnotation();
-    }
-
-    private String valueOf(Object object) {
-        if (object == null) {
-            return null;
-        }
-
-        if (object instanceof String) {
-            return String.format("'%s'", object);
-        }
-        return String.valueOf(object);
+        return object;
     }
 
     private String convertCamelToSnakeString(String str) {

@@ -21,7 +21,7 @@ class DeleteQueryBuilderTest {
             DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.getInstance();
 
             // when
-            String query = deleteQueryBuilder.generateQuery(Table.from(Person.class));
+            String query = deleteQueryBuilder.generateQuery(Table.getInstance(Person.class));
 
             // then
             assertEquals("DELETE FROM users", query);

@@ -22,7 +22,7 @@ class InsertQueryBuilderTest {
             InsertQueryBuilder builder = InsertQueryBuilder.getInstance();
 
             // when
-            String query = builder.generateQuery(Table.from(Person.class), person);
+            String query = builder.generateQuery(Table.getInstance(Person.class), person);
 
             // then
             assertEquals("INSERT INTO users (nick_name,old,email) VALUES ('user1',1,'abc@test.com')", query);

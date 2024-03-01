@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 public interface EntityPersister {
 

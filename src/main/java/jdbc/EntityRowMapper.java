@@ -3,7 +3,6 @@ package jdbc;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import persistence.sql.meta.Column;
-import persistence.sql.meta.Columns;
 import persistence.sql.meta.Table;
 
 public class EntityRowMapper<T> implements RowMapper {
@@ -18,7 +17,7 @@ public class EntityRowMapper<T> implements RowMapper {
     public T mapRow(ResultSet resultSet) {
         try {
             T t = clazz.getDeclaredConstructor().newInstance();
-            Table table = Table.from(clazz);
+            Table table = Table.getInstance(clazz);
             for (Column column : table.getColumns()) {
                 column.setFieldValue(t, ResultSetColumnReader.map(resultSet, column.getColumnName(), column.getType()));
             }

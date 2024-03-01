@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.fixture.PersonFixture;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
 
@@ -50,7 +51,7 @@ class SimpleEntityManagerTest {
         @Test
         void persistTest_whenInsert() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
 
             //when
             entityManager.persist(person);
@@ -73,7 +74,7 @@ class SimpleEntityManagerTest {
         @Test
         void findTest() {
             // given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
             entityManager.persist(person);
 
             // when
@@ -86,6 +87,21 @@ class SimpleEntityManagerTest {
                 () -> assertEquals(person.getEmail(), foundPerson.getEmail())
             );
         }
+
+        @DisplayName("같은 Person entity를 두 번 검색하면 캐싱된 entity를 반환한다.")
+        @Test
+        void findTest_whenFindTwice() {
+            // given
+            Person person = PersonFixture.createPerson();
+            entityManager.persist(person);
+
+            // when
+            Person foundPerson1 = entityManager.find(Person.class, 1L);
+            Person foundPerson2 = entityManager.find(Person.class, 1L);
+
+            // then
+            assertEquals(foundPerson1, foundPerson2);
+        }
     }
 
     @DisplayName("remove 메서드는")
@@ -96,11 +112,12 @@ class SimpleEntityManagerTest {
         @Test
         void deleteTest() {
             //given
-            Person person = createPerson();
+            Person person = PersonFixture.createPerson();
             entityManager.persist(person);
-            person = entityManager.find(Person.class, 1L);
+            Person person1 = entityManager.find(Person.class, 1L);
+
             //when
-            entityManager.remove(person);
+            entityManager.remove(person1);
 
             //then
             assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
@@ -108,7 +125,41 @@ class SimpleEntityManagerTest {
         }
     }
 
-    private Person createPerson() {
-        return Person.of("user1", 1, "abc@gtest.com", 1);
+    @DisplayName("merge 메서드는")
+    @Nested
+    class Merge {
+
+        @DisplayName("Person entity를 수정 할 수 있다.")
+        @Test
+        void mergeTest() {
+            //given
+            Person person = PersonFixture.createPerson();
+            entityManager.persist(person);
+            person = entityManager.find(Person.class, 1L);
+            person.updateName("user2");
+
+            //when
+            entityManager.merge(person);
+
+            //then
+            person = entityManager.find(Person.class, 1L);
+            assertEquals(person.getName(), "user2");
+        }
+
+        @DisplayName("Person entity를 수정하지 않으면 수정하지 않는다.")
+        @Test
+        void mergeTest_whenNotUpdate() {
+            //given
+            Person person = PersonFixture.createPerson();
+            entityManager.persist(person);
+            person = entityManager.find(Person.class, 1L);
+            Person person1 = entityManager.find(Person.class, 1L);
+
+            //when
+            entityManager.merge(person);
+
+            //then
+            assertEquals(person, person1);
+        }
     }
 }
