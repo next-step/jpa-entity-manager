@@ -1,32 +1,32 @@
 package persistence.sql.dml;
 
-import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityColumns;
-import persistence.sql.meta.EntityTableMeta;
+import persistence.sql.meta.Columns;
 
 public class InsertQueryBuilder {
+
+    public static final String INSERT_DEFAULT_DML = "insert into %s (%s) values (%s)";
     public static final String COMMA = ", ";
-    private final EntityTableMeta entityTableMeta;
-    private final EntityColumns entityColumns;
-    private final Dialect dialect;
+    private final String tableName;
+    private final Columns columns;
 
-    public InsertQueryBuilder(Class<?> clazz, Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
-        this.entityColumns = EntityColumns.of(clazz);
-        this.dialect = dialect;
+    public InsertQueryBuilder(String tableName, Columns columns) {
+        this.tableName = tableName;
+        this.columns = columns;
     }
 
-    // insert into %s (%s) values (%s)
     public String createInsertQuery(Object object) {
-        return String.format(dialect.getInsertDefaultDmlQuery(), tableName(), insertColumns(), insertValues(object));
+        return String.format(INSERT_DEFAULT_DML, tableName(), insertColumns(), insertValues(object));
     }
+
     private String tableName() {
-        return entityTableMeta.name();
+        return tableName;
     }
+
     private String insertColumns() {
-        return String.join(COMMA, this.entityColumns.names());
+        return String.join(COMMA, this.columns.names());
     }
+
     private String insertValues(Object object) {
-        return String.join(COMMA, this.entityColumns.values(object));
+        return String.join(COMMA, this.columns.values(object));
     }
 }

@@ -1,19 +1,15 @@
 package persistence.sql.ddl;
 
-import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityTableMeta;
-
 public class DdlDropQueryBuilder {
 
-    private final EntityTableMeta entityTableMeta;
-    private final Dialect dialect;
+    private static final String DROP_TABLE_DEFAULT_DDL = "drop table if exists %s CASCADE";
+    private final String tableName;
 
-    public DdlDropQueryBuilder(final Class<?> clazz, final Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
-        this.dialect = dialect;
+    public DdlDropQueryBuilder(final String tableName) {
+        this.tableName = tableName;
     }
 
     public String dropDdl() {
-        return String.format(dialect.getDropDefaultDdlQuery(), this.entityTableMeta.name());
+        return String.format(DROP_TABLE_DEFAULT_DDL, this.tableName);
     }
 }

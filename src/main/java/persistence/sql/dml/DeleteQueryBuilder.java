@@ -1,27 +1,24 @@
 package persistence.sql.dml;
 
-import persistence.sql.dialect.Dialect;
-import persistence.sql.meta.EntityPrimaryKey;
-import persistence.sql.meta.EntityTableMeta;
+import persistence.sql.meta.PrimaryKey;
 
 public class DeleteQueryBuilder {
-    private final EntityTableMeta entityTableMeta;
-    private final EntityPrimaryKey entityPrimaryKey;
-    private final Dialect dialect;
 
-    public DeleteQueryBuilder(Class<?> clazz, Dialect dialect) {
-        this.entityTableMeta = EntityTableMeta.of(clazz);
-        this.entityPrimaryKey = EntityPrimaryKey.of(clazz);
-        this.dialect = dialect;
+    public static final String DELETE_DEFAULT_DML = "delete from %s where %s";
+    private final String tableName;
+    private final PrimaryKey primaryKey;
+
+    public DeleteQueryBuilder(String tableName, PrimaryKey primaryKey) {
+        this.tableName = tableName;
+        this.primaryKey = primaryKey;
     }
 
-    // delete from %s where %s
     public String createDeleteQuery(Object object) {
-        return String.format(dialect.getDeleteDefaultDmlQuery(), this.entityTableMeta.name(), deleteWhere(object));
+        return String.format(DELETE_DEFAULT_DML, this.tableName, deleteWhere(object));
     }
 
     private String deleteWhere(Object object) {
-        return String.format("%s = %s", this.entityPrimaryKey.name(), this.entityPrimaryKey.value(object));
+        return String.format("%s = %s", this.primaryKey.name(), this.primaryKey.value(object));
     }
 
 }
