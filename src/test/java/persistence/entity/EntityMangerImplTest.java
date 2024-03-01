@@ -15,11 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityMangerImplTest extends H2DBTestSupport {
-    private EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
-    private EntityManger entityManger = new EntityMangerImpl(jdbcTemplate, entityPersister);
-    private CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
-    private DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
-    private InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
+    private final DynamicRowMapperFactory dynamicRowMapperFactory = new DynamicRowMapperFactory();
+    private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
+    private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dynamicRowMapperFactory);
+    private final EntityManger entityManger = new EntityMangerImpl(entityPersister, entityLoader);
+    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
+    private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
+    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
 
     @BeforeEach
