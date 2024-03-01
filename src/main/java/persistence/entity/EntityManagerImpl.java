@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import persistence.sql.domain.DatabaseTable;
-
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityPersister entityPersister;
@@ -20,9 +18,10 @@ public class EntityManagerImpl implements EntityManager {
 
 
     @Override
-    public void persist(Object entity) {
+    public <T> T persist(T entity) {
         entityPersister.insert(entity);
         persistenceContext.addEntity(entity);
+        return entity;
     }
 
 

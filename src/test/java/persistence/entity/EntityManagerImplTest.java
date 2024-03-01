@@ -28,6 +28,7 @@ class EntityManagerImplTest {
     private static DatabaseServer server;
     private static EntityManager entityManager;
     private static PersistenceContext persistenceContext;
+    private static CustomJpaRepository<Person, Long> repository;
 
     @BeforeAll
     static void initDatabase() throws SQLException {
@@ -41,6 +42,7 @@ class EntityManagerImplTest {
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new SelectQueryBuilder());
         persistenceContext = new PersistenceContextImpl(new SimpleSnapshotStorage());
         entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
+        repository = new CustomJpaRepository<>(entityManager, new EntityInformation());
     }
 
     @AfterAll
@@ -114,6 +116,14 @@ class EntityManagerImplTest {
         entityManager.persist(person);
         entityManager.merge(newPerson);
         assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(newPerson);
+    }
+
+    @Test
+    void should_save_entity() {
+        Long id = 5L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+
+        repository.save(person);
     }
 
 }
