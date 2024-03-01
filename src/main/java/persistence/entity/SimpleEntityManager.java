@@ -54,14 +54,15 @@ public class SimpleEntityManager implements EntityManager {
         EntitySnapshot before = persistenceContext.getCachedDatabaseSnapshot(entity);
         EntitySnapshot after = EntitySnapshot.from(entity);
 
-        if (before != after) {
+        if (before.equals(after)) {
             entityPersister.update(entity);
             cacheEntity(entity);
         }
         return entity;
     }
 
-    private void cacheEntity( Object entity) {
+    private void cacheEntity(Object entity) {
         persistenceContext.addEntity(entity);
+        persistenceContext.getDatabaseSnapshot(entity);
     }
 }
