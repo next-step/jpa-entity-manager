@@ -6,7 +6,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 public class DomainType {
-    private static final String FORMAT = "'%s'";
 
     private final Field field;
     private final boolean isTransient;
