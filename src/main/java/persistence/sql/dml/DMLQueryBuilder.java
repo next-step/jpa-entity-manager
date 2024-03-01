@@ -10,8 +10,8 @@ public class DMLQueryBuilder {
         this.table = table;
     }
 
-    public String buildInsertQuery(Object instance) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(table, instance);
+    public String buildInsertQuery(Object entity) {
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(table, entity);
         return insertQueryBuilder.build();
     }
 
@@ -23,6 +23,11 @@ public class DMLQueryBuilder {
     public String buildFindByIdQuery(Object id) {
         FindQueryBuilder findQueryBuilder = new FindQueryBuilder(table);
         return findQueryBuilder.buildById(id);
+    }
+
+    public String buildUpdateByIdQuery(Object entity, Object id) {
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(table, entity);
+        return updateQueryBuilder.buildById(id);
     }
 
     public String buildDeleteAllQuery() {
