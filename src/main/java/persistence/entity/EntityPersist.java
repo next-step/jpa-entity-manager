@@ -34,8 +34,8 @@ public class EntityPersist {
         jdbcTemplate.execute(insertQueryBuilder.generateSQL(entity));
     }
 
-    public <T> void update(Long pk, T findEntity, T entity) {
-        String sql = updateQueryBuilder.generateSQL(pk, findEntity, entity);
+    public <T> void update(Long pk, T entity) {
+        String sql = updateQueryBuilder.generateSQL(pk, entity);
         jdbcTemplate.execute(sql);
     }
 

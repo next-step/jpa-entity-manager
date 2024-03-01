@@ -13,3 +13,4 @@ class InsertQueryBuilderTest {
                 .isEqualTo("insert into users (id, nick_name, old, email) values (DEFAULT, 'hoon25', 20, 'hoon25@gmail.com')");
     }
 }
+

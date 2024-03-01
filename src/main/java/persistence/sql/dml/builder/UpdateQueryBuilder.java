@@ -8,29 +8,30 @@ import java.util.Arrays;
 
 public class UpdateQueryBuilder {
 
-    public String generateSQL(Long pk, Object oldEntity, Object newEntity) {
-        Class<?> clazz = oldEntity.getClass();
+    public String generateSQL(Long pk, Object entity) {
+        Class<?> clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
         StringBuilder sb = new StringBuilder();
         Arrays.stream(fields)
-                .forEach(field -> generateSetSQL(oldEntity, newEntity, field, sb));
-        TableName tableName = new TableName(oldEntity.getClass());
+                .forEach(field -> generateSetSQL(entity, field, sb));
+        sb.deleteCharAt(sb.length() - 1);
+        sb.deleteCharAt(sb.length() - 1);
+        TableName tableName = new TableName(entity.getClass());
         return String.format("UPDATE %s SET %s WHERE id = %s",
                 tableName.getName(),
                 sb,
                 pk.toString());
     }
 
-    private void generateSetSQL(Object oldEntity, Object newEntity, Field field, StringBuilder sb) {
+    private void generateSetSQL(Object entity, Field field, StringBuilder sb) {
         try {
             field.setAccessible(true);
-            Object findValue = field.get(oldEntity);
-            Object newValue = field.get(newEntity);
-            if (findValue != newValue) {
+            Object value = field.get(entity);
+            if (value != null) {
                 sb.append(new ColumnName(field).getName())
-                        .append("='")
-                        .append(newValue.toString())
-                        .append("'");
+                        .append(" = '")
+                        .append(value)
+                        .append("', ");
             }
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);

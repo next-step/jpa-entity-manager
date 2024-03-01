@@ -26,7 +26,7 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
             entityPersist.insert(entity);
             return;
         }
-        entityPersist.update(pkValue, findEntity, entity);
+        entityPersist.update(pkValue, entity);
     }
 
     @Override
