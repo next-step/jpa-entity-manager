@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 
 public class UpdateQueryBuilder {
     private final TableData table;
+    private final Columns columns;
 
-    public UpdateQueryBuilder(Class<?> clazz) {
-        this.table = TableData.from(clazz);
+    public UpdateQueryBuilder(TableData table, Columns columns) {
+        this.table = table;
+        this.columns = columns;
     }
 
     public String toQuery(Object entity, WhereBuilder whereBuilder) {
