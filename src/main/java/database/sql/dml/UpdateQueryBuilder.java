@@ -4,6 +4,7 @@ import database.sql.util.EntityMetadata;
 import database.sql.util.column.EntityColumn;
 
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import static database.sql.Util.quote;
@@ -21,20 +22,20 @@ public class UpdateQueryBuilder {
         this(new EntityMetadata(entityClass));
     }
 
-    public String buildQuery(long id, Object entity) {
+    public String buildQuery(long id, Map<String, Object> changes) {
         return String.format("UPDATE %s SET %s WHERE %s",
                              tableName,
-                             setClauses(entity),
+                             setClauses(changes),
                              whereClauses(id));
     }
 
-    private String setClauses(Object entity) {
+    private String setClauses(Map<String, Object> changes) {
         StringJoiner joiner = new StringJoiner(", ");
         for (EntityColumn generalColumn : generalColumns) {
             String key = generalColumn.getColumnName();
-            Object value = generalColumn.getValue(entity);
-
-            joiner.add(String.format("%s = %s", key, quote(value)));
+            if (changes.containsKey(key)) {
+                joiner.add(String.format("%s = %s", key, quote(changes.get(key))));
+            }
         }
         return joiner.toString();
     }

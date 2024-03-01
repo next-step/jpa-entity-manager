@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import database.sql.dml.ColumnValueMap;
 import database.sql.dml.DeleteQueryBuilder;
 import database.sql.dml.InsertQueryBuilder;
 import database.sql.dml.UpdateQueryBuilder;
@@ -32,17 +33,21 @@ public class EntityPersister {
         jdbcTemplate.execute(query);
     }
 
-    public void update(Object entity) {
-        String query = updateQueryBuilder.buildQuery(getId(entity), entity);
+    public void update(Long id, EntitySnapshotDifference difference) {
+        doUpdate(id, difference.toMap());
+    }
+
+    public void update(Long id, Object entity) {
+        doUpdate(id, new ColumnValueMap(entity).getColumnValueMap());
+    }
+
+    private void doUpdate(Long id, Map<String, Object> map) {
+        String query = updateQueryBuilder.buildQuery(id, map);
         jdbcTemplate.execute(query);
     }
 
-    public void delete(Object entity) {
-        String query = deleteQueryBuilder.buildQuery(Map.of("id", getId(entity)));
+    public void delete(Long id) {
+        String query = deleteQueryBuilder.buildQuery(Map.of("id", id));
         jdbcTemplate.execute(query);
-    }
-
-    private Long getId(Object entity) {
-        return entityMetadata.getPrimaryKeyValue(entity);
     }
 }

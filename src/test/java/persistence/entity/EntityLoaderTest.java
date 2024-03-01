@@ -3,12 +3,12 @@ package persistence.entity;
 import database.sql.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testsupport.H2DatabaseTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static persistence.entity.EntityTestUtils.assertSamePerson;
+import static testsupport.EntityTestUtils.assertSamePerson;
 
 class EntityLoaderTest extends H2DatabaseTest {
     private EntityManagerImpl entityManager;
@@ -16,16 +16,13 @@ class EntityLoaderTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = new EntityManagerImpl(jdbcTemplate);
-        entityLoader = new EntityLoader(jdbcTemplate, Person.class);
+        entityManager = new EntityManagerImpl(loggingJdbcTemplate);
+        entityLoader = new EntityLoader(loggingJdbcTemplate, Person.class);
     }
 
     @Test
     void loadMissingRecord() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                entityLoader.load(1L)
-        );
-        assertThat(exception.getMessage()).isEqualTo("Expected 1 result, got 0");
+        assertThat(entityLoader.load(1L)).isNull();
     }
 
     @Test
