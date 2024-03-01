@@ -6,5 +6,5 @@ public interface SnapshotStorage {
 
     void remove(EntityCacheKey entityCacheKey);
 
-    boolean isDirty(EntityCacheKey entityCacheKey, Object entity);
+    boolean isDirty(Object entity);
 }

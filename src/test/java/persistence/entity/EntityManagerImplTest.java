@@ -70,7 +70,7 @@ class EntityManagerImplTest {
         String updateEmail = "katd6@naver.com";
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
         entityManager.persist(person);
-        entityManager.update(new Person(updateName, updateAge, updateEmail, 2), id);
+        entityManager.merge(new Person(id,updateName, updateAge, updateEmail, 2));
 
         Person updatePerson = entityManager.find(Person.class, id);
 
@@ -112,7 +112,7 @@ class EntityManagerImplTest {
         Person newPerson = new Person(id, "newPerson", 32, "katd6@naver.com", 1);
 
         entityManager.persist(person);
-        entityManager.update(newPerson, id);
+        entityManager.merge(newPerson);
         assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(newPerson);
     }
 

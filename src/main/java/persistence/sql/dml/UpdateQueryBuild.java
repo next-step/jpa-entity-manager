@@ -4,5 +4,5 @@ import persistence.sql.domain.Query;
 
 public interface UpdateQueryBuild {
 
-    Query update(Object entity, Object id);
+    Query update(Object entity);
 }

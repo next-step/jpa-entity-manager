@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.sql.domain.DatabaseTable;
+
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityPersister entityPersister;
@@ -23,23 +25,29 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.addEntity(entity);
     }
 
+
     @Override
-    public boolean update(Object entity, Object id) {
-        if (persistenceContext.isNotDirty(entity, id)){
-            return false;
-        }
-        if (entityPersister.update(entity, id)) {
-            persistenceContext.updateCache(entity);
-            return true;
-        }
-        return false;
+    public <T> T merge(T entity) {
+        saveOrUpdate(entity);
+        persistenceContext.addEntity(entity);
+        return entity;
     }
+
+    private void saveOrUpdate(Object entity) {
+        if (persistenceContext.isDirty(entity)){
+            entityPersister.update(entity);
+            return;
+        }
+        entityPersister.insert(entity);
+    }
+
 
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
     }
+
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {

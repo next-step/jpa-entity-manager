@@ -8,5 +8,5 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    boolean update(Object entity, Object id);
+    <T> T merge(T entity);
 }

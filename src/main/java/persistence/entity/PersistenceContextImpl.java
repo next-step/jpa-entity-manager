@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import persistence.sql.domain.DatabaseTable;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +16,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T getEntity(Class<T> clazz, Object id) {
         EntityCacheKey entityCacheKey = new EntityCacheKey(clazz, id);
-        return (T) firstLevelCache.get(entityCacheKey);
+        Object cachedEntity = firstLevelCache.get(entityCacheKey);
+        return clazz.cast(cachedEntity);
     }
 
     @Override
@@ -30,23 +29,13 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void removeEntity(Object entity) {
-        String id = new DatabaseTable(entity).getPrimaryColumn().getColumnValue();
-        EntityCacheKey entityCacheKey = new EntityCacheKey(entity.getClass(), id);
+        EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
         firstLevelCache.remove(entityCacheKey);
         snapshotStorage.remove(entityCacheKey);
     }
 
     @Override
-    public void updateCache(Object entity) {
-        EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
-        if (firstLevelCache.containsKey(entityCacheKey)){
-            firstLevelCache.put(entityCacheKey, entity);
-        }
-    }
-
-    @Override
-    public boolean isNotDirty(Object entity, Object id) {
-        EntityCacheKey entityCacheKey = new EntityCacheKey(entity.getClass(), id);
-        return !snapshotStorage.isDirty(entityCacheKey, entity);
+    public boolean isDirty(Object entity) {
+        return snapshotStorage.isDirty(entity);
     }
 }

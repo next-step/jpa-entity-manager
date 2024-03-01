@@ -22,7 +22,8 @@ public class SimpleSnapshotStorage implements SnapshotStorage{
     }
 
     @Override
-    public boolean isDirty(EntityCacheKey entityCacheKey,Object entity) {
+    public boolean isDirty(Object entity) {
+        EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
         DatabaseTable snapshot = snapshotStorage.get(entityCacheKey);
 
         return !snapshot.equals(new DatabaseTable(entity));

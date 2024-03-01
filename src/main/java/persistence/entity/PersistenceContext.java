@@ -8,8 +8,6 @@ public interface PersistenceContext {
 
     void removeEntity(Object entity);
 
-    void updateCache(Object entity);
-
-    boolean isNotDirty(Object entity, Object id);
+    boolean isDirty(Object entity);
 }
 

@@ -27,11 +27,10 @@ public class EntityPersister {
         this.deleteQueryBuilder = deleteQueryBuilder;
     }
 
-    public boolean update(Object entity, Object id) {
-        Query query = updateQueryBuilder.update(entity, id);
+    public boolean update(Object entity) {
+        Query query = updateQueryBuilder.update(entity);
         try {
             executeQuery(query);
-            setEntityId(entity, id);
             return true;
         } catch (RuntimeException ex) {
             return false;
