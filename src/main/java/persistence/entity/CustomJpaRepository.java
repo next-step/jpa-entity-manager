@@ -1,6 +1,6 @@
 package persistence.entity;
 
-public class CustomJpaRepository<T,ID>{
+public class CustomJpaRepository<T, ID> {
 
     private final EntityManager entityManager;
 
@@ -12,7 +12,7 @@ public class CustomJpaRepository<T,ID>{
     }
 
     public T save(T entity) {
-        if(entityInformation.isNew(entity)){
+        if (entityInformation.isNew(entity)) {
             return entityManager.persist(entity);
         }
         return entityManager.merge(entity);

@@ -40,7 +40,7 @@ public class EntityPersister {
     public void insert(Object entity) {
         DatabasePrimaryColumn primaryColumn = new DatabaseTable(entity).getPrimaryColumn();
         Query query = insertQueryBuilder.insert(entity);
-        if (primaryColumn.hasColumnValue()){
+        if (primaryColumn.hasColumnValue()) {
             jdbcTemplate.execute(query.getSql());
             return;
         }

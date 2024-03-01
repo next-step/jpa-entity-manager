@@ -33,7 +33,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private void saveOrUpdate(Object entity) {
-        if (persistenceContext.isDirty(entity)){
+        if (persistenceContext.isDirty(entity)) {
             entityPersister.update(entity);
             return;
         }

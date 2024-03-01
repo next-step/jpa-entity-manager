@@ -5,7 +5,7 @@ import persistence.sql.domain.DatabaseTable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SimpleSnapshotStorage implements SnapshotStorage{
+public class SimpleSnapshotStorage implements SnapshotStorage {
 
     private final Map<EntityCacheKey, DatabaseTable> snapshotStorage = new ConcurrentHashMap<>();
 
@@ -26,7 +26,7 @@ public class SimpleSnapshotStorage implements SnapshotStorage{
         EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
 
         DatabaseTable before = snapshotStorage.get(entityCacheKey);
-        if (before == null){
+        if (before == null) {
             return false;
         }
         DatabaseTable after = new DatabaseTable(entity);

@@ -16,7 +16,7 @@ public class EntityCacheKey {
         this.id = String.valueOf(id);
     }
 
-    public EntityCacheKey(Object entity){
+    public EntityCacheKey(Object entity) {
         DatabasePrimaryColumn primaryColumn = new DatabaseTable(entity).getPrimaryColumn();
         this.entityClazz = entity.getClass();
         this.id = primaryColumn.getColumnValue();

@@ -72,7 +72,7 @@ class EntityManagerImplTest {
         String updateEmail = "katd6@naver.com";
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
         entityManager.persist(person);
-        entityManager.merge(new Person(id,updateName, updateAge, updateEmail, 2));
+        entityManager.merge(new Person(id, updateName, updateAge, updateEmail, 2));
 
         Person updatePerson = entityManager.find(Person.class, id);
 
