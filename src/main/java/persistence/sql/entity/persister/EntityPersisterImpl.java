@@ -49,5 +49,9 @@ public class EntityPersisterImpl<T, K> implements EntityPersister<T, K> {
 
     @Override
     public void delete(K key) {
+        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.from(entityMappingTable.getTableName());
+
+        jdbcTemplate.execute(deleteQueryBuilder.toSql());
     }
 }
