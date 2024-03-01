@@ -8,6 +8,7 @@ import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.Operators;
 
 import java.util.Collections;
 
@@ -50,8 +51,12 @@ public class EntityPersisterImpl<T, K> implements EntityPersister<T, K> {
     @Override
     public void delete(K key) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.from(entityMappingTable.getTableName());
+        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
 
+        Criterion criterion = Criterion.of(pkDomainType.getColumnName(), key.toString());
+        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.of(entityMappingTable.getTableName(), criteria);
         jdbcTemplate.execute(deleteQueryBuilder.toSql());
     }
 }
