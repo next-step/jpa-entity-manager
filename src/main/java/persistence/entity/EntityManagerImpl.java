@@ -1,7 +1,9 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.sql.meta.pk.PKField;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 public class EntityManagerImpl<T> implements EntityManager<T> {
@@ -21,7 +23,7 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
 
     @Override
     public void persist(T entity) {
-        Long pkValue = entityPersist.getPKValue(entity);
+        Long pkValue = getPKValue(entity);
         if (pkValue == null) {
             entityPersist.insert(entity);
             return;
@@ -37,5 +39,17 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
     @Override
     public void remove(T entity) {
         entityPersist.delete(entity);
+    }
+
+    private Long getPKValue(T entity) {
+        Field pkField = new PKField(entity.getClass()).getField();
+        pkField.setAccessible(true);
+        Long value;
+        try {
+            value = (Long) pkField.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return value;
     }
 }
