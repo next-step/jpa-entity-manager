@@ -7,6 +7,7 @@ import persistence.sql.ddl.exception.AnnotationMissingException;
 import persistence.sql.ddl.exception.IdAnnotationMissingException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,5 +86,17 @@ class ColumnsTest {
         Columns columns = Columns.createColumns(Person.class);
 
         assertThat(columns.getKeyColumnName()).isEqualTo("id");
+    }
+
+    @Test
+    public void testGetValuesMap() {
+        Columns columns = Columns.createColumnsWithValue(Person.class, person);
+
+        assertSoftly(softly -> {
+            Map<String, Object> valuesMap = columns.getValuesMap();
+            softly.assertThat(valuesMap.get("nick_name")).isEqualTo(person.getName());
+            softly.assertThat(valuesMap.get("old")).isEqualTo(person.getAge());
+            softly.assertThat(valuesMap.get("email")).isEqualTo(person.getEmail());
+        });
     }
 }
