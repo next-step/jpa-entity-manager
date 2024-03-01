@@ -2,6 +2,6 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
-public interface GetGeneratedIdStrategy {
+public interface GeneratedIdObtainStrategy {
     Long getGeneratedId(JdbcTemplate jdbcTemplate);
 }
