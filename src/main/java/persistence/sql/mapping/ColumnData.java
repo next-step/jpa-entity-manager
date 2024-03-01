@@ -11,13 +11,13 @@ import java.lang.reflect.Field;
 
 public class ColumnData {
     private final String name;
-    private final DataType type;
+    private final int type;
     private Object value;
     private final KeyType keyType;
     private final GenerationType generationType;
     private final boolean isNullable;
 
-    private ColumnData(String name, DataType type, KeyType keyType, GenerationType generationType, boolean isNullable) {
+    private ColumnData(String name, int type, KeyType keyType, GenerationType generationType, boolean isNullable) {
         this.name = name;
         this.type = type;
         this.keyType = keyType;
@@ -71,8 +71,8 @@ public class ColumnData {
         }
     }
 
-    private static DataType extractDataType(Field field) {
-        return new DataTypeMapper().map(field.getType());
+    private static int extractDataType(Field field) {
+        return new DataTypeMapper().mapToSqlType(field.getType());
     }
 
     private static boolean extractIsNullable(Column column) {
@@ -110,7 +110,7 @@ public class ColumnData {
         return value;
     }
 
-    public DataType getType() {
+    public int getType() {
         return type;
     }
 

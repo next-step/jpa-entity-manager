@@ -2,15 +2,15 @@ package persistence.sql.dialect;
 
 import jakarta.persistence.GenerationType;
 import persistence.sql.ddl.KeyType;
-import persistence.sql.mapping.DataType;
 
+import java.sql.Types;
 import java.util.Map;
 
 public class H2Dialect implements Dialect {
-    private final Map<DataType, String> mappingTable = Map.of(
-            DataType.LONG, "BIGINT",
-            DataType.STRING, "VARCHAR",
-            DataType.INT, "INTEGER"
+    private final Map<Integer, String> mappingTable = Map.of(
+            Types.BIGINT, "BIGINT",
+            Types.VARCHAR, "VARCHAR",
+            Types.INTEGER, "INTEGER"
     );
 
     private final Map<GenerationType, String> generationTypeMappingTable = Map.of(
@@ -23,9 +23,9 @@ public class H2Dialect implements Dialect {
     );
 
     @Override
-    public String mapDataType(DataType type) {
+    public String mapDataType(int type) {
         String str = mappingTable.get(type);
-        if(str == null) {
+        if (str == null) {
             throw new IllegalArgumentException("지원하지 않는 타입입니다.");
         }
         return str;
