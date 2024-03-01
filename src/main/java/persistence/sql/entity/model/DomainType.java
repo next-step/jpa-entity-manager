@@ -8,55 +8,29 @@ import java.lang.reflect.Field;
 public class DomainType {
     private static final String FORMAT = "'%s'";
 
-    private final String name;
-    private final Class<?> classType;
     private final Field field;
     private final boolean isTransient;
-    private final Object value;
+    private final EntityColumn entityColumn;
 
 
-    public DomainType(final String name,
-                      final Class<?> classType,
+    public DomainType(final EntityColumn entityColumn,
                       final Field field,
                       final boolean isTransient) {
-        this.name = name;
-        this.classType = classType;
-        this.field = field;
-        this.isTransient = isTransient;
-        this.value = null;
-    }
-
-    public DomainType(final String name,
-                      final Class<?> classType,
-                      final Object value,
-                      final Field field,
-                      final boolean isTransient) {
-        this.name = name;
-        this.classType = classType;
-        this.value = value;
+        this.entityColumn = entityColumn;
         this.field = field;
         this.isTransient = isTransient;
     }
-
 
     public String getName() {
-        return name;
+        return entityColumn.getName();
     }
 
     public Class<?> getClassType() {
-        return classType;
+        return entityColumn.getClassType();
     }
 
     public String getValue() {
-        if (classType == String.class) {
-            return String.format(FORMAT, value);
-        }
-
-        if(value == null) {
-            return null;
-        }
-
-        return value.toString();
+        return entityColumn.getStringValue();
     }
 
     public boolean isNotTransient() {
@@ -74,9 +48,7 @@ public class DomainType {
 
     public static DomainType from(Field field) {
         return new DomainType(
-                field.getName(),
-                field.getType(),
-                null,
+                new EntityColumn(field.getName(), field.getType(), null),
                 field,
                 field.isAnnotationPresent(Transient.class)
         );
@@ -84,9 +56,7 @@ public class DomainType {
 
     public static DomainType of(final Field field, final Object domain) {
         return new DomainType(
-                field.getName(),
-                field.getType(),
-                getValue(field, domain),
+                new EntityColumn(field.getName(), field.getType(), getValue(field, domain)),
                 field,
                 field.isAnnotationPresent(Transient.class)
         );
@@ -107,7 +77,7 @@ public class DomainType {
         if (columnAnnotation != null && !columnAnnotation.name().isEmpty()) {
             return columnAnnotation.name();
         }
-        return name;
+        return entityColumn.getName();
     }
 
     public boolean isExistsId() {
