@@ -21,6 +21,20 @@ public class JdbcTemplate {
         }
     }
 
+    public Long executeAndReturnGeneratedKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql,
+                    new String[] { "id" });
+            ResultSet keys = statement.getGeneratedKeys();
+            while (keys.next()){
+                return keys.getLong(1);
+            }
+            return 1l;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         final List<T> results = query(sql, rowMapper);
         if (results.size() != 1) {

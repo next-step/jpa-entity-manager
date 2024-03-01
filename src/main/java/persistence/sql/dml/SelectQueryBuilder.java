@@ -9,6 +9,7 @@ public class SelectQueryBuilder implements SelectQueryBuild {
 
     private static final String FIND_ALL_TEMPLATE = "select * from %s;";
     private static final String FIND_WITH_CONDITION_TEMPLATE = "select * from %s where %s;";
+    public static final String FIND_LAST_ID = "select LAST_INSERT_ID();";
 
     @Override
     public Query findAll(Class<?> entity) {

@@ -6,32 +6,47 @@ public class EntityManagerImpl implements EntityManager {
 
     private final EntityLoader entityLoader;
 
+    private final PersistenceContext persistenceContext;
+
 
     public EntityManagerImpl(EntityPersister entityPersister,
-                             EntityLoader entityLoader) {
+                             EntityLoader entityLoader, PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
+        this.persistenceContext = persistenceContext;
     }
 
 
     @Override
     public void persist(Object entity) {
         entityPersister.insert(entity);
+        persistenceContext.addEntity(entity);
     }
 
     @Override
     public boolean update(Object entity, Object id) {
-        return entityPersister.update(entity, id);
+        if (entityPersister.update(entity, id)) {
+            persistenceContext.addEntity(entity);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        return entityLoader.find(clazz, id);
+        T cachedEntity = persistenceContext.getEntity(clazz, id);
+        if (cachedEntity != null) {
+            return cachedEntity;
+        }
+        T foundEntity = entityLoader.find(clazz, id);
+        persistenceContext.addEntity(foundEntity);
+        return foundEntity;
     }
 
 }

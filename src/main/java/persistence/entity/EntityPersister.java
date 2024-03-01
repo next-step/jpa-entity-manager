@@ -4,7 +4,11 @@ import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuild;
 import persistence.sql.dml.InsertQueryBuild;
 import persistence.sql.dml.UpdateQueryBuild;
+import persistence.sql.domain.DatabasePrimaryColumn;
+import persistence.sql.domain.DatabaseTable;
 import persistence.sql.domain.Query;
+
+import java.lang.reflect.Field;
 
 public class EntityPersister {
 
@@ -23,22 +27,41 @@ public class EntityPersister {
         this.deleteQueryBuilder = deleteQueryBuilder;
     }
 
-    public <T> boolean update(T entity, Object id) {
+    public boolean update(Object entity, Object id) {
         Query query = updateQueryBuilder.update(entity, id);
         try {
             executeQuery(query);
+            setEntityId(entity, id);
             return true;
         } catch (RuntimeException ex) {
             return false;
         }
     }
 
-    public <T> void insert(T entity) {
+    public void insert(Object entity) {
+        DatabasePrimaryColumn primaryColumn = new DatabaseTable(entity).getPrimaryColumn();
         Query query = insertQueryBuilder.insert(entity);
-        executeQuery(query);
+        if (primaryColumn.hasColumnValue()){
+            jdbcTemplate.execute(query.getSql());
+            return;
+        }
+        Long id = jdbcTemplate.executeAndReturnGeneratedKey(query.getSql());
+        setEntityId(entity, id);
     }
 
-    public <T> void delete(T entity) {
+    private void setEntityId(Object entity, Object id) {
+        DatabasePrimaryColumn primaryColumn = new DatabaseTable(entity).getPrimaryColumn();
+        try {
+            Field declaredField = entity.getClass().getDeclaredField(primaryColumn.getJavaFieldName());
+            declaredField.setAccessible(true);
+            declaredField.set(entity, id);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void delete(Object entity) {
         Query query = deleteQueryBuilder.delete(entity);
         executeQuery(query);
     }
@@ -46,4 +69,6 @@ public class EntityPersister {
     private void executeQuery(Query query) {
         jdbcTemplate.execute(query.getSql());
     }
+
+
 }
