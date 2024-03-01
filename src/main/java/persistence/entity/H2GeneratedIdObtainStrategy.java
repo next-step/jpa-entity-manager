@@ -3,7 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 
-public class H2GetGeneratedIdStrategy implements GetGeneratedIdStrategy {
+public class H2GeneratedIdObtainStrategy implements GeneratedIdObtainStrategy {
     @Override
     public Long getGeneratedId(JdbcTemplate jdbcTemplate) {
         Long nextId = jdbcTemplate.queryForObject("CALL IDENTITY()", getNextId());
