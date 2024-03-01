@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class EntityContextManager {
     private static final Logger LOG = LoggerFactory.getLogger(EntityContextManager.class);
-    protected static final Map<Class<?>, EntityMetadata> entities = new HashMap<>();
+    protected static final Map<Class<?>, EntityMetadata> ENTITIES = new HashMap<>();
 
     public static void loadEntities() {
         LOG.info("=============== Load EntityMetadata ===============");
@@ -25,14 +25,14 @@ public class EntityContextManager {
 
     protected static EntityMetadata putEntityMetadata(Class<?> clazz) {
         EntityMetadata entityMetadata = EntityMetadataBuilder.build(clazz);
-        entities.put(clazz, entityMetadata);
+        ENTITIES.put(clazz, entityMetadata);
 
         return entityMetadata;
     }
 
     public static EntityMetadata getEntityMetadata(Class<?> clazz) {
 
-        return entities.putIfAbsent(clazz, EntityContextManager.putEntityMetadata(clazz));
+        return ENTITIES.putIfAbsent(clazz, EntityContextManager.putEntityMetadata(clazz));
     }
 
 }

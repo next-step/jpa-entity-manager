@@ -2,6 +2,7 @@ package persistence.core;
 
 import database.DatabaseServer;
 import database.H2;
+import jdbc.JdbcTemplate;
 import org.h2.jdbc.JdbcSQLSyntaxErrorException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ class EntityPersisterTest {
         server = new H2();
         server.start();
 
-        entityPersister = new EntityPersister(server, Person.class, DMLQueryBuilder.getInstance());
+        entityPersister = new EntityPersister(new JdbcTemplate(server.getConnection()), Person.class);
     }
 
     @AfterEach

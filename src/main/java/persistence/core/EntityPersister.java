@@ -17,12 +17,11 @@ public class EntityPersister extends EntityContextManager {
     DMLQueryBuilder dmlQueryBuilder;
     JdbcTemplate jdbcTemplate;
 
-    public EntityPersister(DatabaseServer server, Class<?> clazz, DMLQueryBuilder dmlQueryBuilder) throws SQLException {
-        this.jdbcTemplate = new JdbcTemplate(server.getConnection());
+    public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> clazz) throws SQLException {
+        this.jdbcTemplate = jdbcTemplate;
         this.entityMetadata = getEntityMetadata(clazz);
-        this.dmlQueryBuilder = dmlQueryBuilder;
+        this.dmlQueryBuilder = DMLQueryBuilder.getInstance();
     }
-
 
     public void insert(Object entity) {
         String sql = dmlQueryBuilder.insertSql(entity);

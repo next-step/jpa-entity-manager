@@ -44,7 +44,7 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("find 실행")
-    public void findTest() {
+    public void findTest() throws Exception {
         final Person person = new Person();
         person.setName("jinny");
         person.setAge(30);

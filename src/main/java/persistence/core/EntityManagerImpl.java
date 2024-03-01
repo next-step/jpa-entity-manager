@@ -2,39 +2,43 @@ package persistence.core;
 
 import database.DatabaseServer;
 import jdbc.JdbcTemplate;
-import jdbc.PersonRowMapper;
-import persistence.entity.Person;
-import persistence.sql.ddl.DDLQueryBuilder;
-import persistence.sql.ddl.DDLQueryBuilderFactory;
-import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
 public class EntityManagerImpl implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
-    private final DDLQueryBuilder ddlQueryBuilder;
-    private DMLQueryBuilder dmlQueryBuilder;
+
     public EntityManagerImpl(DatabaseServer server) throws SQLException {
         this.jdbcTemplate = new JdbcTemplate(server.getConnection());
-        this.ddlQueryBuilder = DDLQueryBuilderFactory.getDDLQueryBuilder(server);
-        this.dmlQueryBuilder = DMLQueryBuilder.getInstance();
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) {
+    public <T> T find(Class<T> clazz, Long Id) throws Exception {
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, clazz);
 
-        return (T) jdbcTemplate.queryForObject(dmlQueryBuilder.selectByIdQuery(clazz, Id), new PersonRowMapper());
+        return entityPersister.select(clazz, Id);
     }
 
     @Override
-    public <T> T persist(T entity) {
-        jdbcTemplate.execute(dmlQueryBuilder.insertSql(entity));
+    public <T> T persist(T entity) throws SQLException {
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entity.getClass());
+
+        entityPersister.insert(entity);
 
         return entity;
     }
 
     @Override
-    public void remove(Object entity) {
-        jdbcTemplate.execute(dmlQueryBuilder.deleteSql(entity));
+    public void remove(Object entity) throws Exception {
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entity.getClass());
+
+        entityPersister.delete(entity);
+    }
+
+    @Override
+    public void update(Object entity) throws Exception {
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entity.getClass());
+
+        entityPersister.update(entity);
     }
 }
