@@ -5,6 +5,7 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.core.EntityContextManager;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -12,6 +13,9 @@ public class Application {
     public static void main(String[] args) {
         logger.info("Starting application...");
         try {
+
+            EntityContextManager.loadEntities();
+
             final DatabaseServer server = new H2();
             server.start();
 
@@ -24,4 +28,6 @@ public class Application {
             logger.info("Application finished");
         }
     }
+
+
 }
