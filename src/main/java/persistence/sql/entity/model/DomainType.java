@@ -6,10 +6,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 public class DomainType {
+    private static final String FORMAT = "'%s'";
+
     private final String name;
     private final Class<?> classType;
     private final Field field;
     private final boolean isTransient;
+    private final Object value;
+
 
     public DomainType(final String name,
                       final Class<?> classType,
@@ -17,6 +21,19 @@ public class DomainType {
                       final boolean isTransient) {
         this.name = name;
         this.classType = classType;
+        this.field = field;
+        this.isTransient = isTransient;
+        this.value = null;
+    }
+
+    public DomainType(final String name,
+                      final Class<?> classType,
+                      final Object value,
+                      final Field field,
+                      final boolean isTransient) {
+        this.name = name;
+        this.classType = classType;
+        this.value = value;
         this.field = field;
         this.isTransient = isTransient;
     }
@@ -28,6 +45,13 @@ public class DomainType {
 
     public Class<?> getClassType() {
         return classType;
+    }
+
+    public String getValue() {
+        if (classType == String.class) {
+            return String.format(FORMAT, value);
+        }
+        return value.toString();
     }
 
     public boolean isNotTransient() {
@@ -47,9 +71,30 @@ public class DomainType {
         return new DomainType(
                 field.getName(),
                 field.getType(),
+                null,
                 field,
                 field.isAnnotationPresent(Transient.class)
         );
+    }
+
+    public static DomainType of(final Field field, final Object domain) {
+        return new DomainType(
+                field.getName(),
+                field.getType(),
+                getValue(field, domain),
+                field,
+                field.isAnnotationPresent(Transient.class)
+        );
+    }
+
+    private static Object getValue(final Field field,
+                                   final Object domain) {
+        try {
+            field.setAccessible(true);
+            return field.get(domain);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String getColumnName() {

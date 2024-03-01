@@ -30,6 +30,14 @@ public class EntityMappingTable {
         );
     }
 
+    public static EntityMappingTable of(final Class<?> clazz, final Object object) {
+        return new EntityMappingTable(
+                clazz.getSimpleName(),
+                DomainTypes.of(clazz.getDeclaredFields(), object),
+                clazz
+        );
+    }
+
     public String getTableName() {
         if (clazz.isAnnotationPresent(Table.class)) {
             return clazz.getAnnotation(Table.class).name();

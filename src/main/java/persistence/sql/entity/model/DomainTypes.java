@@ -14,9 +14,16 @@ public class DomainTypes implements Iterable<DomainType> {
         this.domainTypes = domainTypes;
     }
 
-    public static DomainTypes from(Field[] fields) {
+    public static DomainTypes from(final Field[] fields) {
         return new DomainTypes(Arrays.stream(fields)
                 .map(DomainType::from)
+                .collect(Collectors.toList()));
+    }
+
+    public static DomainTypes of(final Field[] fields,
+                                 final Object entity) {
+        return new DomainTypes(Arrays.stream(fields)
+                .map(field -> DomainType.of(field, entity))
                 .collect(Collectors.toList()));
     }
 

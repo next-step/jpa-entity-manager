@@ -17,6 +17,15 @@ public class Criterion {
         this.operators = operators;
     }
 
+    public static Criterion of(final String key,
+                               final String value) {
+        return new Criterion(
+                key,
+                value,
+                Operators.EQUALS
+        );
+    }
+
     public String toSql() {
         return new StringBuilder(key)
                 .append(operators.getValue())
