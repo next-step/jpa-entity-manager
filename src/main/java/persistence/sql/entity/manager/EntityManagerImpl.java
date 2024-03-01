@@ -9,6 +9,8 @@ import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.Operators;
+import persistence.sql.entity.persister.EntityPersister;
+import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,11 +19,13 @@ public class EntityManagerImpl<T, K> implements EntityManger<T, K> {
 
     private final JdbcTemplate jdbcTemplate;
     private final EntityManagerMapper<T> entityManagerMapper;
+    private final EntityPersister<T, K> entityPersister;
 
     public EntityManagerImpl(final JdbcTemplate jdbcTemplate,
                              Class<T> clazz) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityManagerMapper = new EntityManagerMapper<>(clazz);
+        this.entityPersister = new EntityPersisterImpl<>(jdbcTemplate, clazz);
     }
 
 
@@ -53,14 +57,10 @@ public class EntityManagerImpl<T, K> implements EntityManger<T, K> {
 
     @Override
     public void remove(final T entity) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(entity.getClass());
+        final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
         final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
 
-        Criterion criterion = new Criterion(pkDomainType.getColumnName(), entityManagerMapper.getFieldValue(entity, pkDomainType.getColumnName()), Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
-
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.of(entityMappingTable.getTableName(), criteria);
-        jdbcTemplate.execute(deleteQueryBuilder.toSql());
+        entityPersister.delete((K) pkDomainType.getValue());
     }
 
     @Override

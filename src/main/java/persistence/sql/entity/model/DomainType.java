@@ -51,6 +51,11 @@ public class DomainType {
         if (classType == String.class) {
             return String.format(FORMAT, value);
         }
+
+        if(value == null) {
+            return null;
+        }
+
         return value.toString();
     }
 

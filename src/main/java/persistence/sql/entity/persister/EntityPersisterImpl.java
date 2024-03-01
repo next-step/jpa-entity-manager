@@ -8,7 +8,6 @@ import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
-import persistence.sql.entity.model.Operators;
 
 import java.util.Collections;
 
