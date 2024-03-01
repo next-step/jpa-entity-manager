@@ -65,7 +65,7 @@ class EntityManagerImplTest {
 
     @DisplayName("persist/entity 저장/저장 성공")
     @Test
-    void persist() {
+    void persistInsert() {
         Person person = new Person("hoon25", 20, "hoon25@gmail.com");
 
         entityManager.persist(person);
@@ -73,6 +73,21 @@ class EntityManagerImplTest {
         Person findPerson = entityManager.find(Person.class, 1L);
         assertThat(person.getName()).isEqualTo(findPerson.getName());
     }
+
+    @DisplayName("persist/entity 수정/수정 성공")
+    @Test
+    void persistUpdate() {
+        Person person = new Person("hoon25", 20, "hoon25@gmail.com");
+        entityManager.persist(person);
+        Person findPerson = entityManager.find(Person.class, 1L);
+        findPerson.changeName("hoon");
+
+        entityManager.persist(findPerson);
+
+        Person updatePerson = entityManager.find(Person.class, 1L);
+        assertThat(updatePerson.getName()).isEqualTo("hoon");
+    }
+
 
     @DisplayName("remove/entity 삭제/삭제 성공")
     @Test

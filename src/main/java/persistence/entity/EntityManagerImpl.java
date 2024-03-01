@@ -1,37 +1,36 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import jdbc.RowMapperImpl;
-import persistence.sql.dml.builder.DeleteQueryBuilder;
-import persistence.sql.dml.builder.InsertQueryBuilder;
-import persistence.sql.dml.builder.SelectQueryBuilder;
 
 public class EntityManagerImpl<T> implements EntityManager<T> {
-
-    private final JdbcTemplate jdbcTemplate;
-    private final SelectQueryBuilder selectQueryBuilder;
-    private final InsertQueryBuilder insertQueryBuilder;
-    private final DeleteQueryBuilder deleteQueryBuilder;
+    private final EntityPersist entityPersist;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.selectQueryBuilder = new SelectQueryBuilder();
-        this.insertQueryBuilder = new InsertQueryBuilder();
-        this.deleteQueryBuilder = new DeleteQueryBuilder();
+        this.entityPersist = new EntityPersist(jdbcTemplate);
     }
 
     @Override
     public T find(Class<T> clazz, Long id) {
-        return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new RowMapperImpl<>(clazz));
+        return entityPersist.findOneOrFail(clazz, id);
     }
 
     @Override
     public void persist(T entity) {
-        jdbcTemplate.execute(insertQueryBuilder.generateSQL(entity));
+        Long pkValue = entityPersist.getPKValue(entity);
+        if (pkValue == null) {
+            entityPersist.insert(entity);
+            return;
+        }
+        T findEntity = entityPersist.findOne(entity, pkValue);
+        if (findEntity == null) {
+            entityPersist.insert(entity);
+            return;
+        }
+        entityPersist.update(pkValue, entity);
     }
 
     @Override
     public void remove(T entity) {
-        jdbcTemplate.execute(deleteQueryBuilder.generateSQL(entity));
+        entityPersist.delete(entity);
     }
 }

@@ -30,6 +30,13 @@ public class Person {
     public Person() {
     }
 
+    public Person(Long id, String name, Integer age, String email) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+
     public Person(String name, Integer age, String email) {
         this.name = name;
         this.age = age;
@@ -53,5 +60,9 @@ public class Person {
 
     public String getName() {
         return name;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
     }
 }
