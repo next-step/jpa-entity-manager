@@ -1,12 +1,10 @@
 package persistence.entity;
 
+import persistence.sql.domain.DatabasePrimaryColumn;
+import persistence.sql.domain.DatabaseTable;
+
 import java.util.Objects;
 
-/***
- * Entity Caching 을 위한 Key
- * Entity Clazz : Entity 타입
- * Id : 해당 Entity의 식별자
- */
 public class EntityCacheKey {
 
     private final Class<?> entityClazz;
@@ -16,6 +14,12 @@ public class EntityCacheKey {
     public EntityCacheKey(Class<?> entityClazz, Object id) {
         this.entityClazz = entityClazz;
         this.id = String.valueOf(id);
+    }
+
+    public EntityCacheKey(Object entity){
+        DatabasePrimaryColumn primaryColumn = new DatabaseTable(entity).getPrimaryColumn();
+        this.entityClazz = entity.getClass();
+        this.id = primaryColumn.getColumnValue();
     }
 
     @Override

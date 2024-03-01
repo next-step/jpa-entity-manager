@@ -3,6 +3,7 @@ package persistence.sql.domain;
 import jakarta.persistence.Column;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class ColumnLength {
 
@@ -19,5 +20,18 @@ public class ColumnLength {
 
     public Integer getSize() {
         return length;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ColumnLength)) return false;
+        ColumnLength that = (ColumnLength) o;
+        return Objects.equals(length, that.length);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(length);
     }
 }

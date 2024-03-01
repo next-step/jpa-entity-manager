@@ -39,7 +39,7 @@ class EntityManagerImplTest {
         jdbcTemplate.execute(ddlQueryBuilder.createQuery(Person.class));
         EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(), new DeleteQueryBuilder());
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new SelectQueryBuilder());
-        persistenceContext = new PersistenceContextImpl();
+        persistenceContext = new PersistenceContextImpl(new SimpleSnapshotStorage());
         entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
     }
 

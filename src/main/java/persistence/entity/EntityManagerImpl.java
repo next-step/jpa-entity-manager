@@ -25,8 +25,11 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public boolean update(Object entity, Object id) {
+        if (persistenceContext.isNotDirty(entity, id)){
+            return false;
+        }
         if (entityPersister.update(entity, id)) {
-            persistenceContext.addEntity(entity);
+            persistenceContext.updateCache(entity);
             return true;
         }
         return false;
