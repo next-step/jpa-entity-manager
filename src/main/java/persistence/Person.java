@@ -32,6 +32,10 @@ public class Person {
     @Transient
     private Integer index;
 
+    public void changeName(String name){
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }
