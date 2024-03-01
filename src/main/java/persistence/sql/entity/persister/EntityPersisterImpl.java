@@ -3,6 +3,8 @@ package persistence.sql.entity.persister;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.builder.DeleteQueryBuilder;
+import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
@@ -41,11 +43,11 @@ public class EntityPersisterImpl<T, K> implements EntityPersister<T, K> {
 
     @Override
     public void insert(T entity) {
-
+        final InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.from(entity);
+        jdbcTemplate.execute(insertQueryBuilder.toSql());
     }
 
     @Override
     public void delete(K key) {
-
     }
 }
