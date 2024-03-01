@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Entity
 class TestClass {
     @Id
-    private int id;
+    private Integer id;
 
     @Transient
     private String ignore;

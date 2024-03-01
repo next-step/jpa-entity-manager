@@ -10,9 +10,7 @@ public class DataTypeMapper {
 
     public DataTypeMapper() {
         addMapping(Long.class, Types.BIGINT);
-        addMapping(long.class, Types.BIGINT);
         addMapping(Integer.class, Types.INTEGER);
-        addMapping(int.class, Types.INTEGER);
         addMapping(String.class, Types.VARCHAR);
     }
 
