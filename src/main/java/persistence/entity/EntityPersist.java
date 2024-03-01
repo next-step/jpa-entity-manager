@@ -30,30 +30,16 @@ public class EntityPersist {
         return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new RowMapperImpl<>(clazz));
     }
 
-    public <T> void persist(T entity) {
-        Long pkValue = getPKValue(entity);
-        if (pkValue == null) {
-            insert(entity);
-            return;
-        }
-        T findEntity = findOne(entity, pkValue);
-        if (findEntity == null) {
-            insert(entity);
-            return;
-        }
-        update(pkValue, findEntity, entity);
-    }
-
-    private <T> void insert(T entity) {
+    public <T> void insert(T entity) {
         jdbcTemplate.execute(insertQueryBuilder.generateSQL(entity));
     }
 
-    private <T> void update(Long pk, T findEntity, T entity) {
+    public <T> void update(Long pk, T findEntity, T entity) {
         String sql = updateQueryBuilder.generateSQL(pk, findEntity, entity);
         jdbcTemplate.execute(sql);
     }
 
-    private <T> T findOne(T entity, Long id) {
+    public <T> T findOne(T entity, Long id) {
         List<T> entities = (List<T>) jdbcTemplate.query(
                 selectQueryBuilder.findById(entity.getClass(), id),
                 new RowMapperImpl<>(entity.getClass())
@@ -64,7 +50,7 @@ public class EntityPersist {
         return entities.get(0);
     }
 
-    private <T> Long getPKValue(T entity) {
+    public <T> Long getPKValue(T entity) {
         Field pkField = new PKField(entity.getClass()).getField();
         pkField.setAccessible(true);
         Long value;

@@ -16,7 +16,17 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
 
     @Override
     public void persist(T entity) {
-        entityPersist.persist(entity);
+        Long pkValue = entityPersist.getPKValue(entity);
+        if (pkValue == null) {
+            entityPersist.insert(entity);
+            return;
+        }
+        T findEntity = entityPersist.findOne(entity, pkValue);
+        if (findEntity == null) {
+            entityPersist.insert(entity);
+            return;
+        }
+        entityPersist.update(pkValue, findEntity, entity);
     }
 
     @Override
