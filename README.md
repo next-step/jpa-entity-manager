@@ -72,3 +72,7 @@
    - insert 구현
    - update 구현
    - delete 구현
+### step2
+1. EntityLoader 에서 동적 RowMapper 생성하기
+2. find 구현
+3. EntityManger의 find 책임 entityLoader 로 덜어내기
