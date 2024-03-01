@@ -3,7 +3,6 @@ package persistence.entity;
 import persistence.sql.domain.DatabaseTable;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceContextImpl implements PersistenceContext {

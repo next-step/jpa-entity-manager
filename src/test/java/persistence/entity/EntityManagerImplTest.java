@@ -27,6 +27,7 @@ class EntityManagerImplTest {
 
     private static DatabaseServer server;
     private static EntityManager entityManager;
+    private static PersistenceContext persistenceContext;
 
     @BeforeAll
     static void initDatabase() throws SQLException {
@@ -38,8 +39,8 @@ class EntityManagerImplTest {
         jdbcTemplate.execute(ddlQueryBuilder.createQuery(Person.class));
         EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(), new DeleteQueryBuilder());
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new SelectQueryBuilder());
-
-        entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        persistenceContext = new PersistenceContextImpl();
+        entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
     }
 
     @AfterAll
@@ -84,6 +85,35 @@ class EntityManagerImplTest {
         Field field = clazz.getDeclaredField(fieldName);
         field.setAccessible(true);
         assertThat(field.get(instance)).isEqualTo(fieldValue);
+    }
+
+    @Test
+    void should_cache_entity() {
+        Long id = 3L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+
+        entityManager.persist(person);
+        assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(person);
+    }
+
+    @Test
+    void should_remove_cache() {
+        Long id = 4L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+
+        entityManager.remove(person);
+        assertThat(persistenceContext.getEntity(person.getClass(), id)).isNull();
+    }
+
+    @Test
+    void should_update_cache() {
+        Long id = 5L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+        Person newPerson = new Person(id, "newPerson", 32, "katd6@naver.com", 1);
+
+        entityManager.persist(person);
+        entityManager.update(newPerson, id);
+        assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(newPerson);
     }
 
 }
