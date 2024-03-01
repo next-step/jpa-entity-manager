@@ -7,4 +7,5 @@ public interface Dialect {
     String mapDataType(int type);
     String mapGenerationType(GenerationType strategy);
     String mapKeyType(KeyType keyType);
+    String getGeneratedIdSelectQuery();
 }

@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import persistence.sql.ddl.exception.IdAnnotationMissingException;
+import persistence.sql.dialect.Dialect;
+import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.*;
 import persistence.sql.mapping.ColumnData;
 import persistence.sql.mapping.Columns;
@@ -50,7 +52,10 @@ public class EntityPersister {
     }
 
     private void setIdToEntity(Object entity, Class<?> clazz) {
-        Long id = generatedIdObtainStrategy.getGeneratedId(jdbcTemplate);
+        Long generatedId = jdbcTemplate.queryForObject(
+                generatedIdObtainStrategy.getQueryString(),
+                generatedIdObtainStrategy.getRowMapper()
+        );
 
         Field idField = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
@@ -59,7 +64,7 @@ public class EntityPersister {
         idField.setAccessible(true);
 
         try {
-            idField.set(entity, id);
+            idField.set(entity, generatedId);
         } catch (IllegalAccessException e) {
             throw new IdAnnotationMissingException();
         }
