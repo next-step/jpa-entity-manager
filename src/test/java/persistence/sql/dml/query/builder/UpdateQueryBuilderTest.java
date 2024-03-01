@@ -31,7 +31,7 @@ class UpdateQueryBuilderTest {
 
         UpdateQueryBuilder queryBuilder = UpdateQueryBuilder.of(entityMappingTable, criteria);
 
-        assertThat(queryBuilder.toSql()).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' where id='1'");
+        assertThat(queryBuilder.toSql()).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
     }
 
 }

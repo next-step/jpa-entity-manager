@@ -32,7 +32,7 @@ class DeleteQueryBuilderTest {
 
         DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.of("person", criteria);
 
-        assertThat(deleteQueryBuilder.toSql()).isEqualTo("DELETE FROM person where id='1'");
+        assertThat(deleteQueryBuilder.toSql()).isEqualTo("DELETE FROM person WHERE id='1'");
     }
 
 }

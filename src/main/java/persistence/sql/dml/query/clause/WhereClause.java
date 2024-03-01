@@ -4,7 +4,7 @@ import persistence.sql.dml.conditional.Criteria;
 
 public class WhereClause {
 
-    private static final String FORMAT = "where %s";
+    private static final String FORMAT = "WHERE %s";
     private static final String EMPTY = "";
 
     private Criteria criteria;
