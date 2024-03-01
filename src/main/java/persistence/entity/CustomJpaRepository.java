@@ -20,6 +20,14 @@ public class CustomJpaRepository<T, ID> implements Repository<T, ID> {
 
     private boolean isNew(T entity) {
         Table table = Table.getInstance(entity.getClass());
-        return table.getIdValue(entity) == null;
+        Object id = table.getIdValue(entity);
+        if (id == null) {
+            return true;
+        }
+        else if (id instanceof Number) {
+            return ((Number) id).longValue() == 0L;
+        } else {
+            throw new IllegalArgumentException(String.format("Unsupported id type %s", id.getClass()));
+        }
     }
 }
