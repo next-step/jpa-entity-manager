@@ -12,5 +12,5 @@
 
 ## Step2 요구사항
 - [ ] RowMapper
-- [ ] EntityLoader
+- [x] EntityLoader
 - [ ] PK 관련 리팩토링

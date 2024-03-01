@@ -3,15 +3,17 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 public class EntityManagerImpl<T> implements EntityManager<T> {
+    private final EntityLoader entityLoader;
     private final EntityPersist entityPersist;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
+        this.entityLoader = new EntityLoader(jdbcTemplate);
         this.entityPersist = new EntityPersist(jdbcTemplate);
     }
 
     @Override
     public T find(Class<T> clazz, Long id) {
-        return entityPersist.findOneOrFail(clazz, id);
+        return entityLoader.findOneOrFail(clazz, id);
     }
 
     @Override
@@ -21,7 +23,7 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
             entityPersist.insert(entity);
             return;
         }
-        T findEntity = entityPersist.findOne(entity, pkValue);
+        T findEntity = entityLoader.findOne(entity, pkValue);
         if (findEntity == null) {
             entityPersist.insert(entity);
             return;
