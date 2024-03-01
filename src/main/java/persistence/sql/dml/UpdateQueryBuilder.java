@@ -16,7 +16,6 @@ public class UpdateQueryBuilder {
     }
 
     public String build(Object entity, WhereBuilder whereBuilder) {
-        Columns columns = Columns.createColumnsWithValue(entity.getClass(), entity);
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("update ");
