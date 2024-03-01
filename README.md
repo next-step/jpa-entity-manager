@@ -10,4 +10,4 @@
   - [x] insert 메소드 만들기
   - [x] delte 메소드 만들기
 
-- [ ] EntityManager의 책임 줄이기
+- [x] EntityManager의 책임 줄이기
