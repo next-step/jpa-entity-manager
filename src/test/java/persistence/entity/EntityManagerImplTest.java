@@ -93,37 +93,31 @@ class EntityManagerImplTest {
     void should_cache_entity() {
         Long id = 3L;
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+        entityManager.merge(person);
+        Person cacheEntity = entityManager.find(Person.class, id);
 
-        entityManager.persist(person);
-        assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(person);
+        assertThat(cacheEntity).isEqualTo(person);
     }
 
     @Test
     void should_remove_cache() {
         Long id = 4L;
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
-
         entityManager.remove(person);
+
         assertThat(persistenceContext.getEntity(person.getClass(), id)).isNull();
     }
 
     @Test
-    void should_update_cache() {
+    void should_dirty_check_entity() {
         Long id = 5L;
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
         Person newPerson = new Person(id, "newPerson", 32, "katd6@naver.com", 1);
+        entityManager.merge(person);
 
-        entityManager.persist(person);
+
+        assertThat(persistenceContext.isDirty(newPerson)).isTrue();
         entityManager.merge(newPerson);
         assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(newPerson);
     }
-
-    @Test
-    void should_save_entity() {
-        Long id = 5L;
-        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
-
-        repository.save(person);
-    }
-
 }
