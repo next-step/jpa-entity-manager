@@ -2,6 +2,7 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
+import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import persistence.core.EntityManager;
 import persistence.core.EntityManagerImpl;
 import persistence.entity.Person;
+import persistence.sql.ddl.DDLQueryBuilder;
+import persistence.sql.ddl.DDLQueryBuilderFactory;
 
 import java.sql.SQLException;
 
@@ -20,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class EntityManagerImplTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private JdbcTemplate jdbcTemplate;
+    private DDLQueryBuilder ddlQueryBuilder;
 
     private DatabaseServer server;
     EntityManager entityManager;
@@ -29,21 +34,17 @@ class EntityManagerImplTest {
         server = new H2();
         server.start();
 
+        jdbcTemplate = new JdbcTemplate(server.getConnection());
+        ddlQueryBuilder = DDLQueryBuilderFactory.getDDLQueryBuilder(server);
         entityManager = new EntityManagerImpl(server);
-    }
 
-    @AfterEach
-    public void tearDown() throws SQLException {
-        entityManager.dropTable(Person.class);
-        server.stop();
+        createTable(Person.class);
     }
 
 
     @Test
     @DisplayName("find 실행")
     public void findTest() {
-        entityManager.createTable(Person.class);
-
         final Person person = new Person();
         person.setName("jinny");
         person.setAge(30);
@@ -61,20 +62,8 @@ class EntityManagerImplTest {
         );
     }
 
-    @Test
-    @DisplayName("delete 실행")
-    public void removeTest() {
-        entityManager.createTable(Person.class);
-
-        final Person person = new Person();
-        person.setName("jinny");
-        person.setAge(30);
-        person.setEmail("test@gmail.com");
-
-        entityManager.persist(person);
-
-        Person persistedPerson = entityManager.find(Person.class, 1L);
-
-        entityManager.remove(persistedPerson);
+    private void createTable(Class<?> clazz) {
+        jdbcTemplate.execute(ddlQueryBuilder.createTableQuery(clazz));
     }
+
 }

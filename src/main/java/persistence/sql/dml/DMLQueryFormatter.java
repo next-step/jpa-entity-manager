@@ -11,14 +11,10 @@ public class DMLQueryFormatter {
         return java.lang.String.format(insertQueryFormat, tableName, columnClause, valueClause);
     }
 
-    public static String createSelectQuery(String tableName) {
-
-        return java.lang.String.format("SELECT * FROM %s", tableName);
-    }
-
     public static String createSelectQuery(String columnClause, String tableName) {
+        final String selectQueryFormat = "SELECT %s FROM %s";
 
-        return java.lang.String.format("SELECT %s FROM %s", columnClause, tableName);
+        return java.lang.String.format(selectQueryFormat, columnClause, tableName);
     }
 
     public static String createSelectByConditionQuery(String sql, String conditionClause) {

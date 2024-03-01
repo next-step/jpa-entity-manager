@@ -21,7 +21,6 @@ public class DMLQueryBuilder extends EntityContextManager {
 
     public String insertSql(Object entity) {
         EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
-
         String tableName = entityMetadata.getTableName();
         String columns = getColumnNamesClause(entityMetadata.getInsertTargetColumns());
         String columnValues = getColumnValueClause(entity, entityMetadata.getInsertTargetColumns());
@@ -30,7 +29,6 @@ public class DMLQueryBuilder extends EntityContextManager {
     }
 
     private String getColumnValueClause(Object entity, List<EntityColumn> insertTargetColumns) {
-
         return insertTargetColumns.stream()
             .map(column -> getColumnValueWithSqlFormat(entity, column.getName()))
             .collect(Collectors.joining(COLUMN_SEPARATOR));
@@ -47,15 +45,14 @@ public class DMLQueryBuilder extends EntityContextManager {
 
     public String selectByIdQuery(Class<?> clazz, Object id) {
         EntityMetadata entityMetadata = getEntityMetadata(clazz);
-
         String sql = selectAllSql(clazz);
         String condition = createCondition(entityMetadata.getIdColumn().getName(), id, "=");
+
         return DMLQueryFormatter.createSelectByConditionQuery(sql, condition);
     }
 
     public String deleteSql(Object entity) {
         EntityMetadata entityMetadata = getEntityMetadata(entity.getClass());
-
         String tableName = entityMetadata.getTableName();
         String deleteConditionClause = wherePrimaryKeyClause(entityMetadata, entity);
 
@@ -92,6 +89,7 @@ public class DMLQueryBuilder extends EntityContextManager {
 
     private String formatValue(Object value) {
         if (value instanceof String) {
+
             return "'" + value + "'";
         }
 

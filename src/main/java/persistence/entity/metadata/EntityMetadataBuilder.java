@@ -33,6 +33,7 @@ public class EntityMetadataBuilder {
         column.setNullable(EntityFieldInspector.isNullable(field));
         column.setGenerationType(EntityFieldInspector.getGenerationType(field));
         column.setLength(EntityFieldInspector.getLength(field));
+
         return column;
     }
 

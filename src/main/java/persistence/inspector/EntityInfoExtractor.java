@@ -12,7 +12,6 @@ public class EntityInfoExtractor {
 
     public static List<Field> getEntityFieldsForInsert(Class<?> clazz) {
         try {
-
             return ClsssMetadataInspector.getFields(clazz).stream()
                     .filter(EntityInfoExtractor::isInsertTargetField)
                     .collect(Collectors.toList());
@@ -37,11 +36,11 @@ public class EntityInfoExtractor {
 
                 return clazz.getAnnotation(Table.class).name();
         }
+
         return clazz.getSimpleName().toLowerCase();
     }
 
     public static Field getIdField(Class<?> clazz) {
-
         return ClsssMetadataInspector.getFields(clazz).stream()
                 .filter(EntityInfoExtractor::isPrimaryKey)
                 .findFirst().orElse(null);
@@ -54,6 +53,7 @@ public class EntityInfoExtractor {
     public static Object getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
+
             return field.get(object);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -71,6 +71,6 @@ public class EntityInfoExtractor {
         return Arrays.stream(clazz.getDeclaredFields())
             .filter(field -> EntityInfoExtractor.getColumnName(field).equals(columName))
             .findFirst()
-            .get();
+            .orElseThrow();
     }
 }

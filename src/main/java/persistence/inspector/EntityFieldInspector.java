@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 public class EntityFieldInspector {
 
     public static boolean isPersistable(Field field) {
+
         return !field.isAnnotationPresent(Transient.class);
     }
 
@@ -42,15 +43,19 @@ public class EntityFieldInspector {
 
     public static GenerationType getGenerationType(Field field) {
         if (field.isAnnotationPresent(GeneratedValue.class)) {
+
             return field.getAnnotation(GeneratedValue.class).strategy();
         }
+
         return null;
     }
 
     public static int getLength(Field field) {
         if (field.isAnnotationPresent(Column.class)) {
+
             return field.getAnnotation(Column.class).length();
         }
+
         return 0;
     }
 }
