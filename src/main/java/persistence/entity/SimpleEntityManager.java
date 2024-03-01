@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.util.Objects;
 import jdbc.JdbcTemplate;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.SimpleEntityLoader;
@@ -54,7 +55,7 @@ public class SimpleEntityManager implements EntityManager {
         EntitySnapshot before = persistenceContext.getCachedDatabaseSnapshot(entity);
         EntitySnapshot after = EntitySnapshot.from(entity);
 
-        if (before.equals(after)) {
+        if (!Objects.equals(before, after)) {
             entityPersister.update(entity);
             cacheEntity(entity);
         }
