@@ -9,12 +9,12 @@ public class SelectQueryBuilder {
     private final TableData table;
     private final Columns columns;
 
-    public SelectQueryBuilder(Class<?> clazz) {
-        this.table = TableData.from(clazz);
-        this.columns = Columns.createColumns(clazz);
+    public SelectQueryBuilder(TableData table, Columns columns) {
+        this.table = table;
+        this.columns = columns;
     }
 
-    public String toQuery(WhereBuilder whereBuilder) {
+    public String build(WhereBuilder whereBuilder) {
         StringBuilder query = new StringBuilder();
         query.append("select ");
         query.append(selectClause());
@@ -25,7 +25,6 @@ public class SelectQueryBuilder {
             return query.toString();
         }
 
-        query.append(" where ");
         query.append(whereBuilder.toClause());
 
         return query.toString();

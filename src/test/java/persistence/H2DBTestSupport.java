@@ -3,17 +3,8 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
-import org.junit.jupiter.api.*;
-import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dialect.H2Dialect;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.WhereBuilder;
-
-import java.util.List;
-
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 public class H2DBTestSupport {
     protected static JdbcTemplate jdbcTemplate;

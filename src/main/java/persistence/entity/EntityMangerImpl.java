@@ -1,40 +1,20 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import persistence.Person;
-import persistence.sql.dml.BooleanExpression;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.WhereBuilder;
 
 public class EntityMangerImpl implements EntityManger {
-    private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
-    public EntityMangerImpl(JdbcTemplate jdbcTemplate, EntityPersister entityPersister) {
-        this.jdbcTemplate = jdbcTemplate;
+    public EntityMangerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
         this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
 
     @Override
-    public Person find(Class<Person> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        WhereBuilder builder = new WhereBuilder();
-        builder.and(BooleanExpression.eq("id", id));
-        String query = selectQueryBuilder.toQuery(builder);
-
-        return jdbcTemplate.queryForObject(query, getRowMapper());
-    }
-
-    public static RowMapper<Person> getRowMapper() {
-        return rs ->
-                new Person(
-                        rs.getLong("id"),
-                        rs.getString("nick_name"),
-                        rs.getInt("old"),
-                        rs.getString("email"),
-                        null
-                );
+    public <T> T find(Class<T> clazz, Long id) {
+        return entityLoader.find(clazz, id);
     }
 
     @Override

@@ -23,7 +23,7 @@ class InsertQueryBuilderTest {
                 email
         );
 
-        String insertQuery = insertQueryBuilder.toQuery(person);
+        String insertQuery = insertQueryBuilder.build(person);
 
         assertThat(insertQuery).isEqualTo(expected);
     }

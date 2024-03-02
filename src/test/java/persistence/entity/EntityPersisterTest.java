@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.H2DBTestSupport;
 import persistence.Person;
+import persistence.PersonRowMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.H2Dialect;
@@ -15,21 +16,21 @@ import persistence.sql.dml.WhereBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static persistence.entity.EntityMangerImpl.getRowMapper;
 import static persistence.sql.dml.BooleanExpression.eq;
 
 class EntityPersisterTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
     private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
-    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
+    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);
+
     @BeforeEach
     public void setUp() {
-        jdbcTemplate.execute(createQueryBuilder.toQuery());
+        jdbcTemplate.execute(createQueryBuilder.build());
     }
 
     @AfterEach
     public void cleanUp() {
-        jdbcTemplate.execute(dropQueryBuilder.toQuery());
+        jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
     @DisplayName("insert 테스트")
@@ -41,7 +42,7 @@ class EntityPersisterTest extends H2DBTestSupport {
 
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(eq("id", 1L));
-        Person findPerson = jdbcTemplate.queryForObject("select * from users where id = 1", getRowMapper());
+        Person findPerson = jdbcTemplate.queryForObject("select * from users where id = 1", new PersonRowMapper());
         assertThat(findPerson).isNotNull();
     }
 
@@ -50,14 +51,14 @@ class EntityPersisterTest extends H2DBTestSupport {
     void testUpdate() {
         final String newName = "new_nick_name";
         Person person = new Person(null, "nick_name", 10, "email", null);
-        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).toQuery(person));
+        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).build(person));
         person.setId(1L);
 
         person.changeName(newName);
         boolean ret = entityPersister.update(person);
 
 
-        Person findPerson = jdbcTemplate.queryForObject("select * from users where id = 1", getRowMapper());
+        Person findPerson = jdbcTemplate.queryForObject("select * from users where id = 1", new PersonRowMapper());
         assertSoftly(softly -> {
             softly.assertThat(ret).isTrue();
             softly.assertThat(findPerson.getName()).isEqualTo(newName);
@@ -69,7 +70,7 @@ class EntityPersisterTest extends H2DBTestSupport {
     void testDelete() {
         final String newName = "new_nick_name";
         Person person = new Person(null, "nick_name", 10, "email", null);
-        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).toQuery(person));
+        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).build(person));
         person.setId(1L);
 
         entityPersister.delete(person);

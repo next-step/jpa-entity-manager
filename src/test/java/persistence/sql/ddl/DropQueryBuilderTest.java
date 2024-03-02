@@ -12,7 +12,7 @@ class DropQueryBuilderTest {
         DropQueryBuilder sut = new DropQueryBuilder(Requirement4.class);
         String expect = "drop table users";
 
-        String query = sut.toQuery();
+        String query = sut.build();
 
         assertThat(query.toLowerCase()).isEqualTo(expect.toLowerCase());
     }

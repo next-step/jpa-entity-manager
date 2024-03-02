@@ -15,22 +15,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityMangerImplTest extends H2DBTestSupport {
-    private EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
-    private EntityManger entityManger = new EntityMangerImpl(jdbcTemplate, entityPersister);
-    private CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
-    private DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
-    private InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
+    private final DynamicRowMapperFactory dynamicRowMapperFactory = new DynamicRowMapperFactory();
+    private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
+    private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dynamicRowMapperFactory);
+    private final EntityManger entityManger = new EntityMangerImpl(entityPersister, entityLoader);
+    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
+    private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
+    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
 
     @BeforeEach
     public void setUp() {
-        String sql = createQueryBuilder.toQuery();
+        String sql = createQueryBuilder.build();
         jdbcTemplate.execute(sql);
     }
 
     @AfterEach
     public void cleanUp() {
-        jdbcTemplate.execute(dropQueryBuilder.toQuery());
+        jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
     @Test
@@ -38,7 +40,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
     void testFind() {
         Long id = 1L;
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
-        jdbcTemplate.execute(insertQueryBuilder.toQuery(person));
+        jdbcTemplate.execute(insertQueryBuilder.build(person));
 
         Person findPerson = entityManger.find(Person.class, id);
 
@@ -61,7 +63,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
     void testPersistUpdate() {
         String newName = "new_nick_name";
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
-        jdbcTemplate.execute(insertQueryBuilder.toQuery(person));
+        jdbcTemplate.execute(insertQueryBuilder.build(person));
         person.changeName(newName);
 
         Object saved = entityManger.persist(person);

@@ -9,7 +9,7 @@ public class DropQueryBuilder {
         this.tableData = TableData.from(clazz);
     }
 
-    public String toQuery() {
+    public String build() {
         return String.format("DROP TABLE %s", tableData.getName());
     }
 }

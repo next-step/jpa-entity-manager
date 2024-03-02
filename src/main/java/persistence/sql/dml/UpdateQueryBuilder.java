@@ -6,6 +6,7 @@ import persistence.sql.mapping.TableData;
 import java.util.stream.Collectors;
 
 public class UpdateQueryBuilder {
+    public static final String SET_COLUMN_FORMAT = "%s = %s";
     private final TableData table;
     private final Columns columns;
 
@@ -14,8 +15,7 @@ public class UpdateQueryBuilder {
         this.columns = columns;
     }
 
-    public String toQuery(Object entity, WhereBuilder whereBuilder) {
-        Columns columns = Columns.createColumnsWithValue(entity.getClass(), entity);
+    public String build(Object entity, WhereBuilder whereBuilder) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("update ");
@@ -27,7 +27,6 @@ public class UpdateQueryBuilder {
             return stringBuilder.toString();
         }
 
-        stringBuilder.append(" where ");
         stringBuilder.append(whereBuilder.toClause());
 
         return stringBuilder.toString();
@@ -37,7 +36,7 @@ public class UpdateQueryBuilder {
         return columns.getValuesMap()
                 .entrySet()
                 .stream()
-                .map(entry -> String.format("%s = %s", entry.getKey(), ValueUtil.getValueString(entry.getValue())))
+                .map(entry -> String.format(SET_COLUMN_FORMAT, entry.getKey(), ValueUtil.getValueString(entry.getValue())))
                 .collect(Collectors.joining(", "));
     }
 }

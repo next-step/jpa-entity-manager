@@ -10,7 +10,7 @@ class WhereBuilderTest {
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq("id", 1));
         whereBuilder.and(BooleanExpression.eq("name", "testname"));
-        assertThat(whereBuilder.toClause().toLowerCase()).isEqualTo("id = 1 and name = 'testname'");
+        assertThat(whereBuilder.toClause().toLowerCase()).isEqualTo(" where id = 1 and name = 'testname'");
     }
 
 }

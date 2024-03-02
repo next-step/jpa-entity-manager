@@ -1,7 +1,8 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
+import jdbc.RowMapper;
 
 public interface GeneratedIdObtainStrategy {
-    Long getGeneratedId(JdbcTemplate jdbcTemplate);
+    String getQueryString();
+    RowMapper<Long> getRowMapper();
 }

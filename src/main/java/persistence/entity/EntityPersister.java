@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import persistence.sql.ddl.exception.IdAnnotationMissingException;
+import persistence.sql.dialect.Dialect;
+import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.*;
 import persistence.sql.mapping.ColumnData;
 import persistence.sql.mapping.Columns;
@@ -35,7 +37,7 @@ public class EntityPersister {
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(eq(keyColumn.getName(), keyColumn.getValue()));
 
-        jdbcTemplate.execute(updateQueryBuilder.toQuery(entity, whereBuilder));
+        jdbcTemplate.execute(updateQueryBuilder.build(entity, whereBuilder));
 
         return true;
     }
@@ -44,13 +46,16 @@ public class EntityPersister {
         Class<?> clazz = entity.getClass();
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(clazz);
 
-        jdbcTemplate.execute(insertQueryBuilder.toQuery(entity));
+        jdbcTemplate.execute(insertQueryBuilder.build(entity));
 
         setIdToEntity(entity, clazz);
     }
 
     private void setIdToEntity(Object entity, Class<?> clazz) {
-        Long id = generatedIdObtainStrategy.getGeneratedId(jdbcTemplate);
+        Long generatedId = jdbcTemplate.queryForObject(
+                generatedIdObtainStrategy.getQueryString(),
+                generatedIdObtainStrategy.getRowMapper()
+        );
 
         Field idField = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
@@ -59,7 +64,7 @@ public class EntityPersister {
         idField.setAccessible(true);
 
         try {
-            idField.set(entity, id);
+            idField.set(entity, generatedId);
         } catch (IllegalAccessException e) {
             throw new IdAnnotationMissingException();
         }
@@ -73,6 +78,6 @@ public class EntityPersister {
         WhereBuilder builder = new WhereBuilder();
         builder.and(eq(idColumn.getName(), idColumn.getValue()));
 
-        jdbcTemplate.execute(deleteQueryBuilder.toQuery(builder));
+        jdbcTemplate.execute(deleteQueryBuilder.build(builder));
     }
 }
