@@ -1,15 +1,16 @@
 package persistence.sql.ddl.query.builder;
 
-import jakarta.persistence.Column;
 import persistence.sql.dialect.database.ConstraintsMapper;
 import persistence.sql.dialect.database.TypeMapper;
 import persistence.sql.entity.model.Constraints;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.NormalDomainType;
+import persistence.sql.entity.model.PrimaryDomainType;
+
+import static persistence.sql.constant.SqlConstant.BLANK;
+import static persistence.sql.constant.SqlConstant.EMPTY;
 
 public class ColumnBuilder {
-
-    private static final String BLANK = " ";
-    private static final String EMPTY = "";
 
     private final DomainType domainType;
     private final TypeMapper typeMapper;
@@ -24,7 +25,7 @@ public class ColumnBuilder {
     }
 
     public String build() {
-        return String.join(BLANK,
+        return String.join(BLANK.getValue(),
                 getColumnName(),
                 getColumnType(),
                 getPkConstantType(),
@@ -41,28 +42,27 @@ public class ColumnBuilder {
     }
 
     private String getPkConstantType() {
-        if (domainType.isNotExistsId()) {
-            return EMPTY;
+        if (!domainType.isPrimaryDomain()) {
+            return EMPTY.getValue();
         }
 
-        if (domainType.isNotExistGenerateValue()) {
-            return constantTypeMapper.getConstantType(Constraints.PRIMARY_KEY);
-        }
+        final PrimaryDomainType primaryDomainType = (PrimaryDomainType) domainType;
 
-        if (domainType.isExistsIdentity()) {
-            return constantTypeMapper.getConstantType(Constraints.PRIMARY_KEY);
-        }
-
-        return constantTypeMapper.getConstantType(Constraints.PK);
+        return primaryDomainType.isIdentityGenerationType() ?
+                constantTypeMapper.getConstantType(Constraints.PK) :
+                constantTypeMapper.getConstantType(Constraints.PRIMARY_KEY);
     }
 
     private String getConstantType() {
-        if (domainType.isColumnAnnotation()) {
-            Column column = domainType.getAnnotation(Column.class);
-            return column.nullable() ? EMPTY : constantTypeMapper.getConstantType(Constraints.NOT_NULL);
+        if (domainType.isPrimaryDomain()) {
+            return EMPTY.getValue();
         }
 
-        return EMPTY;
+        final NormalDomainType normalDomainType = (NormalDomainType) domainType;
+
+        return normalDomainType.isNotNull() ?
+                constantTypeMapper.getConstantType(Constraints.NOT_NULL) :
+                EMPTY.getValue();
     }
 
 }
