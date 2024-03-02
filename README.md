@@ -12,4 +12,4 @@
 
 ### step2
 
-- [ ] EntityPersister의 find에 대한 책임을 EntityLoader로 옮겨주기
+- [x] EntityPersister의 find에 대한 책임을 EntityLoader로 옮겨주기
