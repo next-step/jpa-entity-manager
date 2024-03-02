@@ -4,43 +4,52 @@ import jakarta.persistence.Table;
 import persistence.sql.dml.exception.NotFoundIdException;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.DomainTypes;
+import persistence.sql.entity.model.PrimaryDomainType;
+import persistence.sql.entity.model.TableName;
 
 import java.util.Spliterator;
 import java.util.stream.StreamSupport;
 
 public class EntityMappingTable {
 
-    private final String tableName;
+    private final TableName tableName;
     private final DomainTypes domainTypes;
-    private final Class<?> clazz;
+    private final Table table;
 
-    public EntityMappingTable(final String tableName,
-                              final DomainTypes domainTypes,
-                              final Class<?> clazz) {
+    private EntityMappingTable(final TableName tableName,
+                               final DomainTypes domainTypes,
+                               final Table table) {
         this.tableName = tableName;
         this.domainTypes = domainTypes;
-        this.clazz = clazz;
+        this.table = table;
     }
 
     public static EntityMappingTable from(final Class<?> clazz) {
         return new EntityMappingTable(
-                clazz.getSimpleName(),
+                new TableName(clazz.getSimpleName()),
                 DomainTypes.from(clazz.getDeclaredFields()),
-                clazz
+                getTable(clazz)
         );
     }
 
-    public static EntityMappingTable of(final Class<?> clazz, final Object object) {
+    private static Table getTable(final Class<?> clazz) {
+        return clazz.isAnnotationPresent(Table.class) ?
+                clazz.getAnnotation(Table.class) :
+                null;
+    }
+
+    public static EntityMappingTable of(final Class<?> clazz,
+                                        final Object object) {
         return new EntityMappingTable(
-                clazz.getSimpleName(),
+                new TableName(clazz.getSimpleName()),
                 DomainTypes.of(clazz.getDeclaredFields(), object),
-                clazz
+                getTable(clazz)
         );
     }
 
-    public String getTableName() {
-        if (clazz.isAnnotationPresent(Table.class)) {
-            return clazz.getAnnotation(Table.class).name();
+    public TableName getTableName() {
+        if(table != null) {
+            return new TableName(table.name());
         }
 
         return tableName;
@@ -50,10 +59,10 @@ public class EntityMappingTable {
         return domainTypes;
     }
 
-    public DomainType getPkDomainTypes() {
+    public PrimaryDomainType getPkDomainTypes() {
         Spliterator<DomainType> spliterator = domainTypes.spliterator();
-        return StreamSupport.stream(spliterator, false)
-                .filter(DomainType::isExistsId)
+        return (PrimaryDomainType) StreamSupport.stream(spliterator, false)
+                .filter(DomainType::isPrimaryDomain)
                 .findFirst()
                 .orElseThrow(NotFoundIdException::new);
     }
