@@ -25,13 +25,6 @@ public class EntityPersister {
         database.execute(insertQuery);
     }
 
-    public <T> T read(Class<T> clazz, Object id) {
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
-        String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
-        return database.executeQueryForObject(clazz, findByIdQuery);
-    }
-
     public void update(Object entity) {
         Class<?> clazz = entity.getClass();
         Table table = entityMetaCache.getTable(clazz);
