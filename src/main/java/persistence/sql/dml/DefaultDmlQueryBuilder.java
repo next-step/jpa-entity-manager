@@ -70,48 +70,49 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
     public String buildSelectQuery(final Select select) {
         final Table table = select.getTable();
 
-        final StringBuilder statement = new StringBuilder()
-                .append("select")
-                .append(ENTER)
-                .append(SPACE);
-
-        final String columnsClause = insertColumnsClause(table.getColumns());
-
-        statement.append(columnsClause)
-                .append(ENTER)
-                .append("from")
-                .append(ENTER)
-                .append(SPACE)
-                .append(table.getName());
-
-        appendWhereClause(statement, select.getWhereClause());
-
-        return statement.toString();
+        return "select" +
+                ENTER +
+                SPACE +
+                insertColumnsClause(table.getColumns()) +
+                ENTER +
+                "from" +
+                ENTER +
+                SPACE +
+                table.getName() +
+                buildWhereClause(select.getWhereClause());
     }
 
     @Override
     public String buildUpdateQuery(final Update update) {
         final Table table = update.getTable();
 
-        final StringBuilder statement = new StringBuilder()
-                .append("update")
-                .append(ENTER)
-                .append(SPACE)
-                .append(table.getName())
-                .append(ENTER)
-                .append("set")
-                .append(ENTER)
-                .append(SPACE)
-                .append(update.columnSetClause());
-
-        appendWhereClause(statement, update.getWhereClause());
-
-        return statement.toString();
+        return "update" +
+                ENTER +
+                SPACE +
+                table.getName() +
+                ENTER +
+                "set" +
+                ENTER +
+                SPACE +
+                update.columnSetClause() +
+                buildWhereClause(update.getWhereClause());
     }
 
-    private void appendWhereClause(final StringBuilder statement, final List<Where> wheres) {
-        final String whereClause = wheresClause(wheres);
+    @Override
+    public String buildDeleteQuery(final Delete delete) {
+        final Table table = delete.getTable();
 
+        return "delete" +
+                ENTER +
+                "from" +
+                ENTER +
+                SPACE +
+                table.getName() +
+                buildWhereClause(delete.getWhereClause());
+    }
+
+    private String buildWhereClause(final String whereClause) {
+        final StringBuilder statement = new StringBuilder();
         if (StringUtils.isNotBlank(whereClause)) {
             statement.append(ENTER)
                     .append("where")
@@ -119,31 +120,8 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                     .append(SPACE)
                     .append(whereClause);
         }
-    }
-
-    private String wheresClause(final List<Where> wheres) {
-        return wheres.stream()
-                .map(Where::getWhereClause)
-                .collect(Collectors.joining(ENTER + SPACE));
-    }
-
-    @Override
-    public String buildDeleteQuery(final Delete delete) {
-        final Table table = delete.getTable();
-
-        final StringBuilder statement = new StringBuilder()
-                .append("delete")
-                .append(ENTER)
-                .append("from")
-                .append(ENTER)
-                .append(SPACE)
-                .append(table.getName());
-
-        appendWhereClause(statement, delete.getWhereClause());
 
         return statement.toString();
     }
-
-
 
 }
