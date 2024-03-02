@@ -1,15 +1,14 @@
 package persistence.sql.dml.query.clause;
 
-import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.DomainTypes;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdateColumnClause {
+import static persistence.sql.constant.SqlConstant.COMMA;
+import static persistence.sql.constant.SqlFormat.UPDATE_COLUMN;
 
-    private static final String FORMAT = "%s=%s";
-    private static final String DELIMITER = ",";
+public class UpdateColumnClause {
 
     private final List<String> column;
 
@@ -20,13 +19,13 @@ public class UpdateColumnClause {
     public static UpdateColumnClause from(final DomainTypes domainTypes) {
         return new UpdateColumnClause(domainTypes.getDomainTypes()
                 .stream()
-                .filter(DomainType::isNotExistsId)
-                .map(domainType -> String.format(FORMAT, domainType.getColumnName(), domainType.getValue()))
+                .filter(domainType -> !domainType.isPrimaryDomain())
+                .map(domainType -> String.format(UPDATE_COLUMN.getFormat(), domainType.getColumnName(), domainType.getValue()))
                 .collect(Collectors.toList()));
     }
 
     public String toSql() {
-        return String.join(DELIMITER, column);
+        return String.join(COMMA.getValue(), column);
     }
 
 }
