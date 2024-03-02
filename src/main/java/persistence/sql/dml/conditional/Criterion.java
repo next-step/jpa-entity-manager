@@ -2,16 +2,17 @@ package persistence.sql.dml.conditional;
 
 import persistence.sql.entity.model.Operators;
 
+import static persistence.sql.constant.SqlFormat.STRING_FORMAT;
+
 public class Criterion {
-    private static final String FORMAT = "'%s'";
 
     private final String key;
     private final String value;
     private final Operators operators;
 
-    public Criterion(String key,
-                     String value,
-                     Operators operators) {
+    public Criterion(final String key,
+                     final String value,
+                     final Operators operators) {
         this.key = key;
         this.value = value;
         this.operators = operators;
@@ -29,7 +30,7 @@ public class Criterion {
     public String toSql() {
         return new StringBuilder(key)
                 .append(operators.getValue())
-                .append(String.format(FORMAT, value))
+                .append(String.format(STRING_FORMAT.getFormat(), value))
                 .toString();
     }
 }
