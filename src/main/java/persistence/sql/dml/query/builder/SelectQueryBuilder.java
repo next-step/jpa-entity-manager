@@ -2,43 +2,25 @@ package persistence.sql.dml.query.builder;
 
 import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
-import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.dml.conditional.Criteria;
+import persistence.sql.entity.model.TableName;
+
+import static persistence.sql.constant.SqlFormat.SELECT;
 
 public class SelectQueryBuilder {
-    private static final String FORMAT = "SELECT %s FROM %s %s";
-
-    private final String tableName;
+    private final TableName tableName;
     private final ColumnClause columnClause;
-    private final WhereClause whereClause;
 
-    private SelectQueryBuilder(final String tableName,
-                               final ColumnClause columnClause,
-                               final WhereClause whereClause) {
+    public SelectQueryBuilder(final TableName tableName,
+                              final ColumnClause columnClause) {
         this.tableName = tableName;
         this.columnClause = columnClause;
-        this.whereClause = whereClause;
     }
 
-    public static SelectQueryBuilder of(final EntityMappingTable entityMappingTable,
-                                        final Criteria criterias) {
-        return new SelectQueryBuilder(
-                entityMappingTable.getTableName(),
-                ColumnClause.from(entityMappingTable.getDomainTypes()),
-                new WhereClause(criterias)
-        );
-    }
-
-    public static SelectQueryBuilder from(final EntityMappingTable entityMappingTable) {
-        return new SelectQueryBuilder(
-                entityMappingTable.getTableName(),
-                ColumnClause.from(entityMappingTable.getDomainTypes()),
-                new WhereClause(Criteria.emptyInstance())
-        );
-    }
-
-    public String toSql() {
-        return String.format(FORMAT, columnClause.toSql(), tableName, whereClause.toSql());
+    public String toSql(final WhereClause whereClause) {
+        return String.format(SELECT.getFormat(),
+                columnClause.toSql(),
+                tableName.getName(),
+                whereClause.toSql());
     }
 
 
