@@ -3,8 +3,8 @@ package persistence.sql.ddl.query.builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.LegacyPerson;
-import persistence.entity.User;
+import domain.LegacyPerson;
+import domain.User;
 import persistence.sql.entity.EntityMappingTable;
 
 import static org.assertj.core.api.Assertions.assertThat;
