@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityEntry;
+import persistence.fixture.PersonFixture;
 
 @DisplayName("SimplePersistenceContext class 의")
 class SimplePersistenceContextTest {
@@ -14,7 +16,7 @@ class SimplePersistenceContextTest {
     @BeforeEach
     void setUp() {
         context = new SimplePersistenceContext();
-        person = Person.of(1L, "user1", 1, "abc@gtest.com");
+        person = PersonFixture.createPerson();
     }
 
     @DisplayName("addEntity 메서드는")

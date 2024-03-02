@@ -24,10 +24,9 @@ public class CustomJpaRepository<T, ID> implements Repository<T, ID> {
         if (id == null) {
             return true;
         }
-        else if (id instanceof Number) {
+        if (id instanceof Number) {
             return ((Number) id).longValue() == 0L;
-        } else {
-            throw new IllegalArgumentException(String.format("Unsupported id type %s", id.getClass()));
         }
+        throw new IllegalArgumentException(String.format("Unsupported id type %s", id.getClass()));
     }
 }

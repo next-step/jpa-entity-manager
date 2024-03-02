@@ -31,23 +31,31 @@ public class SimpleEntityManager implements EntityManager {
         T entity = (T) persistenceContext.getEntity(clazz, id);
         if (entity == null) {
             entity = entityLoader.find(clazz, id);
+            EntityEntry entityEntry = EntityEntry.loading();
             cacheEntity(entity);
+            persistenceContext.setEntityEntry(entity, entityEntry);
+            entityEntry.managed();
         }
         return entity;
     }
 
     @Override
     public <T> T persist(T entity) {
+        EntityEntry entityEntry = EntityEntry.saving();
         entityPersister.insert(entity);
         cacheEntity(entity);
-
+        persistenceContext.setEntityEntry(entity, entityEntry);
+        entityEntry.managed();
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        entityEntry.deleted();
         persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
+        entityEntry.gone();
     }
 
     @Override
