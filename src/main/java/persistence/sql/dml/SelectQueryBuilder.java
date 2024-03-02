@@ -25,12 +25,12 @@ public class SelectQueryBuilder {
         return this;
     }
 
-    public String findById(Long id) {
+    public String toStatementById(Long id) {
         return String.format(SELECT_QUERY_FORMAT, idColumn.getName(), columns.getColumnNames(),
                 tableColumn.getName()) + whereClause(id);
     }
 
-    public String findAll() {
+    public String toStatement() {
         return String.format(SELECT_QUERY_FORMAT, idColumn.getName(), columns.getColumnNames(),
                 tableColumn.getName());
     }

@@ -18,8 +18,4 @@ public class NullableType {
         }
         return " not null";
     }
-
-    public void update(boolean isNullable) {
-        this.isNullable = isNullable;
-    }
 }

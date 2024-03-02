@@ -28,7 +28,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
 
         //when
-        String selectOneQuery = queryBuilder.build(Person.class).findById(1L);
+        String selectOneQuery = queryBuilder.build(Person.class).toStatementById(1L);
 
         //then
         assertThat(selectOneQuery).isEqualTo("select id, nick_name, old, email from users where id = 1");
@@ -42,7 +42,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
 
         //when
-        String selectAll = queryBuilder.build(Person.class).findAll();
+        String selectAll = queryBuilder.build(Person.class).toStatement();
 
         //then
         assertThat(selectAll).isEqualTo("select id, nick_name, old, email from users");

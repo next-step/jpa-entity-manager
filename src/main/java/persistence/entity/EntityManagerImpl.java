@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 public class EntityManagerImpl implements EntityManager {
 
     private final Dialect dialect;
-    private final HibernatePersistContext persistContext;
+    private final PersistenceContext persistContext;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
@@ -87,6 +87,7 @@ public class EntityManagerImpl implements EntityManager {
 
         Object cachedDatabaseSnapshot = persistContext.getCachedDatabaseSnapshot(idColumn.getValue());
         if (!cachedDatabaseSnapshot.equals(entity)) {
+            savePersistence(entity, idColumn.getValue());
             entityPersister.update(entity, idColumn.getValue());
             return entity;
         }
