@@ -9,3 +9,8 @@
   - [x] insert
   - [x] update
   - [x] delete
+
+## Step2 요구사항
+- [x] RowMapper
+- [x] EntityLoader
+- [ ] PK 관련 리팩토링

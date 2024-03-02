@@ -54,13 +54,20 @@ class EntityManagerImplTest {
 
     @DisplayName("find/id로 조회/성공")
     @Test
-    void find() {
+    void findOne() {
         Person person = new Person("hoon25", 20, "hoon25@gmail.com");
         entityManager.persist(person);
 
         Person findPerson = entityManager.find(Person.class, 1L);
 
         assertThat(person.getName()).isEqualTo(findPerson.getName());
+    }
+
+    @DisplayName("find/id로 조회/실패")
+    @Test
+    void findOneFail() {
+        assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("persist/entity 저장/저장 성공")

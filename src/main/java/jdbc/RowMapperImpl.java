@@ -39,15 +39,7 @@ public class RowMapperImpl<T> implements RowMapper<T> {
     private void setValue(T object, Field field, ResultSet resultSet) throws SQLException {
         try {
             String columnName = new ColumnName(field).getName();
-            if (field.getType().equals(Long.class)) {
-                field.set(object, resultSet.getLong(columnName));
-            }
-            if (field.getType().equals(Integer.class)) {
-                field.set(object, resultSet.getInt(columnName));
-            }
-            if (field.getType().equals(String.class)) {
-                field.set(object, resultSet.getString(columnName));
-            }
+            field.set(object, resultSet.getObject(columnName));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
