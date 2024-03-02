@@ -3,67 +3,84 @@ package persistence.sql.entity.persister;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.exception.InvalidUpdateSqlException;
 import persistence.sql.dml.query.builder.DeleteQueryBuilder;
 import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
+import persistence.sql.dml.query.clause.ColumnClause;
+import persistence.sql.dml.query.clause.UpdateColumnClause;
+import persistence.sql.dml.query.clause.ValueClause;
+import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.NormalDomainType;
+import persistence.sql.entity.model.PrimaryDomainType;
+import persistence.sql.entity.model.TableName;
 
 import java.util.Collections;
 
-public class EntityPersisterImpl<T, K> implements EntityPersister<T, K> {
+public class EntityPersisterImpl<T> implements EntityPersister<T> {
 
     private final JdbcTemplate jdbcTemplate;
-    private final Class<T> clazz;
+
+    private final InsertQueryBuilder insertQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
+
 
     public EntityPersisterImpl(final JdbcTemplate jdbcTemplate,
-                               final Class<T> clazz) {
+                               final InsertQueryBuilder insertQueryBuilder,
+                               final UpdateQueryBuilder updateQueryBuilder,
+                               final DeleteQueryBuilder deleteQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
-        this.clazz = clazz;
+        this.insertQueryBuilder = insertQueryBuilder;
+        this.updateQueryBuilder = updateQueryBuilder;
+        this.deleteQueryBuilder = deleteQueryBuilder;
     }
 
     @Override
     public boolean update(T entity) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
-        DomainType pkDomainTypes = entityMappingTable.getPkDomainTypes();
-        Criterion criterion = Criterion.of(pkDomainTypes.getColumnName(), pkDomainTypes.getValue().toString());
-        UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.of(entityMappingTable, new Criteria(Collections.singletonList(criterion)));
+        PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
+        WhereClause whereClause = new WhereClause(Criteria.fromPkCriterion(primaryDomainType));
 
-        return updateExecute(updateQueryBuilder.toSql());
-    }
+        UpdateColumnClause updateColumnClause = UpdateColumnClause.from(entityMappingTable.getDomainTypes());
 
-    private boolean updateExecute(final String sql) {
-        try {
-            jdbcTemplate.execute(sql);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return jdbcTemplate.execute(updateQueryBuilder.toSql(updateColumnClause, whereClause));
     }
 
     @Override
     public void insert(T entity) {
-        final InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.from(entity);
-        jdbcTemplate.execute(insertQueryBuilder.toSql());
+        final EntityMappingTable entityMappingTable = EntityMappingTable.from(entity.getClass());
+
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final ValueClause valueClause = ValueClause.from(entity, entityMappingTable.getDomainTypes());
+
+        jdbcTemplate.executeUpdate(insertQueryBuilder.toSql(columnClause, valueClause));
     }
 
     @Override
-    public void delete(K key) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
+    public Object insertWithPk(T entity) {
+        final EntityMappingTable entityMappingTable = EntityMappingTable.from(entity.getClass());
 
-        Criterion criterion = Criterion.of(pkDomainType.getColumnName(), key.toString());
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final ValueClause valueClause = ValueClause.from(entity, entityMappingTable.getDomainTypes());
 
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.of(entityMappingTable.getTableName(), criteria);
-        jdbcTemplate.execute(deleteQueryBuilder.toSql());
+        return jdbcTemplate.executeAndReturnKey(insertQueryBuilder.toSql(columnClause, valueClause));
+    }
+
+    @Override
+    public void delete(T entity) {
+        final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
+        final PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
+        final WhereClause whereClause = new WhereClause(Criteria.fromPkCriterion(primaryDomainType));
+
+        jdbcTemplate.executeUpdate(deleteQueryBuilder.toSql(whereClause));
     }
 
     @Override
     public void deleteAll() {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.from(entityMappingTable.getTableName());
+        final WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
-        jdbcTemplate.execute(deleteQueryBuilder.toSql());
+        jdbcTemplate.execute(deleteQueryBuilder.toSql(whereClause));
     }
 }
