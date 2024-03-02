@@ -2,9 +2,9 @@ package persistence.sql.ddl.query.builder;
 
 import persistence.sql.entity.EntityMappingTable;
 
-public class DropQueryBuilder {
+import static persistence.sql.constant.SqlFormat.DROP;
 
-    private static final String DROP_SQL = "DROP TABLE IF EXISTS %s;";
+public class DropQueryBuilder {
 
     private final EntityMappingTable entityMappingTable;
 
@@ -13,7 +13,7 @@ public class DropQueryBuilder {
     }
 
     public String toSql() {
-        return String.format(DROP_SQL, entityMappingTable.getTableName());
+        return String.format(DROP.getFormat(), entityMappingTable.getTableName().getName());
     }
 
 }
