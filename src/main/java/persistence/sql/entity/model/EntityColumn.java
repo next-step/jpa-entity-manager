@@ -1,7 +1,8 @@
 package persistence.sql.entity.model;
 
+import static persistence.sql.constant.SqlFormat.STRING_FORMAT;
+
 public class EntityColumn {
-    private static final String FORMAT = "'%s'";
 
     private final String name;
     private final Class<?> classType;
@@ -29,7 +30,7 @@ public class EntityColumn {
 
     public String getStringValue() {
         if (classType == String.class) {
-            return String.format(FORMAT, value);
+            return String.format(STRING_FORMAT.getFormat(), value);
         }
 
         if (value == null) {
