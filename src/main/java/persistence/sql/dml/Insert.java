@@ -12,16 +12,11 @@ public class Insert {
 
     private final Table table;
 
-    private final List<Column> columns;
-
-    private final List<Column> pkColumns;
+    private final Columns columns;
 
     public Insert(final Table table) {
         this.table = table;
-        final List<Column> tempColumns = table.getColumns();
-
-        this.columns = tempColumns.stream().filter(Column::isNotPk).collect(Collectors.toList());
-        this.pkColumns = tempColumns.stream().filter(Column::isPk).collect(Collectors.toList());
+        columns = new Columns(table.getColumns());
     }
 
     public Table getTable() {
@@ -29,15 +24,15 @@ public class Insert {
     }
 
     public List<Column> getColumns() {
-        return this.columns;
+        return this.columns.getColumns();
     }
 
     public List<Column> getPkColumns() {
-        return this.pkColumns;
+        return this.columns.getPkColumns();
     }
 
     public String columnNameClause(final Dialect dialect) {
-        final String columnNameClause = columns.stream()
+        final String columnNameClause = getColumns().stream()
                 .map(Column::getName)
                 .collect(Collectors.joining(", "));
 
@@ -48,7 +43,7 @@ public class Insert {
             clause.append(", ");
         }
 
-        final String pkColumnNameClause = pkColumns.stream()
+        final String pkColumnNameClause = getPkColumns().stream()
                 .filter(column -> isPkWithValueClause(column, dialect))
                 .map(Column::getName)
                 .collect(Collectors.joining(", "));
@@ -59,7 +54,7 @@ public class Insert {
     }
 
     public String columnValueClause(final Dialect dialect) {
-        final String columnNameClause = columns.stream()
+        final String columnNameClause = getColumns().stream()
                 .map(Column::getValue)
                 .map(Value::getValueClause)
                 .collect(Collectors.joining(", "));
@@ -71,7 +66,7 @@ public class Insert {
             clause.append(", ");
         }
 
-        final String pkColumnNameClause = pkColumns.stream()
+        final String pkColumnNameClause = getPkColumns().stream()
                 .filter(column -> isPkWithValueClause(column, dialect))
                 .map(column -> getPkValueClause(column, dialect))
                 .collect(Collectors.joining(", "));

@@ -9,11 +9,11 @@ public class Where {
 
     private final Value value;
 
-    private final LogicalOperator logicalOperator;
+    private LogicalOperator logicalOperator;
 
     private final WhereOperator whereOperator;
 
-    public Where(Column column, Value value, LogicalOperator logicalOperator, WhereOperator whereOperator) {
+    public Where(final Column column, final Value value, final LogicalOperator logicalOperator, final WhereOperator whereOperator) {
         this.column = column;
         this.value = value;
         this.logicalOperator = logicalOperator;
@@ -22,5 +22,9 @@ public class Where {
 
     public String getWhereClause() {
         return (this.logicalOperator.getOperator() + " " + this.column.getName() + " " + this.whereOperator.operatorClause(this.value.getValueClause())).trim();
+    }
+
+    public void changeLogicalOperator(final LogicalOperator logicalOperator) {
+        this.logicalOperator = logicalOperator;
     }
 }

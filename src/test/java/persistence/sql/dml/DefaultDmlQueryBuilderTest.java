@@ -1,14 +1,12 @@
 package persistence.sql.dml;
 
+import jakarta.persistence.GenerationType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
-import persistence.sql.mapping.Column;
-import persistence.sql.mapping.Table;
-import persistence.sql.mapping.TableBinder;
-import persistence.sql.mapping.Value;
+import persistence.sql.mapping.*;
 
 import java.sql.Types;
 import java.util.List;
@@ -18,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultDmlQueryBuilderTest {
 
     private final TableBinder tableBinder = new TableBinder();
+    private final ColumnBinder columnBinder = new ColumnBinder(ColumnTypeMapper.getInstance());
 
     private final Dialect dialect = new H2Dialect();
 
@@ -86,6 +85,32 @@ class DefaultDmlQueryBuilderTest {
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
+
+        // then
+        assertThat(result).isEqualTo(dml);
+    }
+
+    @DisplayName("엔티티 클래스로 updateById 쿼리를 생성한다")
+    @Test
+    public void buildUpdateQuery() throws Exception {
+        // given
+        final long id = 1L;
+        final String name = "name";
+        final int age = 1;
+        final String mail = "email@domain.com";
+        final PersonV3 person = new PersonV3(id, name, age, mail, 0);
+        final Table table = tableBinder.createTable(person);
+        final Update update = new Update(table);
+
+        final String dml = "update\n" +
+                "    users\n" +
+                "set\n" +
+                "    nick_name = 'name', old = 1, email = 'email@domain.com'\n" +
+                "where\n" +
+                "    id = 1";
+
+        // when
+        final String result = queryBuilder.buildUpdateQuery(update);
 
         // then
         assertThat(result).isEqualTo(dml);

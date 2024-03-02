@@ -16,9 +16,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
-@JdbcServerTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class SimpleEntityManagerTest {
+@JdbcServerTest
+class SingleTableEntityPersisterTest {
 
     private static JdbcTemplate jdbcTemplate;
 
@@ -26,8 +26,6 @@ class SimpleEntityManagerTest {
     private final Dialect dialect = new H2Dialect();
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
     private final EntityPersister entityPersister = new SingleTableEntityPersister(tableBinder, dmlQueryBuilder, jdbcTemplate);
-    private final EntityManager entityManager = new SimpleEntityManager(entityPersister);
-
     private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersonV3.class);
 
     @BeforeAll
@@ -59,47 +57,47 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute("delete from users");
     }
 
-    @DisplayName("엔티티 클래스 타입과 id 값으로 엔티티를 조회 후 반환한다")
+    @DisplayName("엔티티 객체로 엔티티를 update 한다")
     @Test
     @Order(0)
-    @Disabled
-    public void find() throws Exception {
+    public void update() throws Exception {
         // given
-        final Class<PersonV3> clazz = PersonV3.class;
-        final long id = 1L;
-        final String name = "name";
+        final String name = "name1";
         final int age = 20;
-        final String email = "email@domain.com";
+        final String email = "email1@domain.com";
+        final PersonV3 person = new PersonV3(1L, name, age, email, 1);
 
-        final String insertQuery = "insert\n" +
+        final String dml = "insert\n" +
                 "into\n" +
                 "    users\n" +
                 "    (nick_name, old, email, id)\n" +
                 "values\n" +
-                "    ('" + name + "', " + age + ", '" + email + "', default)";
-        jdbcTemplate.execute(insertQuery);
+                "    ('name', 1, 'email@domain.com', default)";
+
+        jdbcTemplate.execute(dml);
 
         // when
-        final PersonV3 entity = entityManager.find(clazz, id);
+        entityPersister.update(person);
 
         // then
-        assertThat(entity).isNotNull()
-                .extracting("id", "name", "age", "email", "index")
-                .contains(id, name, age, email, null);
+        final String select = "select * from users";
+        final List<PersonV3> result = jdbcTemplate.query(select, rowMapper);
+        assertThat(result).hasSize(1)
+                .extracting("name", "age", "email", "index")
+                .contains(tuple(name, age, email, null));
     }
 
     @DisplayName("엔티티 객체로 엔티티를 insert 한다")
     @Test
-    public void persist() throws Exception {
+    public void insert() throws Exception {
         // given
         final String name = "name";
         final int age = 20;
         final String email = "email@domain.com";
         final PersonV3 person = new PersonV3(0L, name, age, email, 1);
-        final Class<?> clazz = person.getClass();
 
         // when
-        entityManager.persist(person);
+        entityPersister.insert(person);
 
         // then
         final String select = "select * from users";
@@ -111,7 +109,7 @@ class SimpleEntityManagerTest {
 
     @DisplayName("엔티티 객체로 엔티티를 db 에서 삭제한다")
     @Test
-    public void remove() throws Exception {
+    public void delete() throws Exception {
         // given
         final String name = "name";
         final int age = 20;
@@ -127,7 +125,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute(insertQuery);
 
         // when
-        entityManager.remove(person);
+        entityPersister.delete(person);
 
         // then
         final String select = "select * from users";

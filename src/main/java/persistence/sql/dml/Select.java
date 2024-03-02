@@ -2,28 +2,29 @@ package persistence.sql.dml;
 
 import persistence.sql.mapping.Table;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Select {
 
     private final Table table;
 
-    private List<Where> whereClause = List.of();
+    private final Wheres whereClause;
 
-    public Select(Table table) {
-        this.table = table;
+    public Select(final Table table) {
+        this(table, Collections.emptyList());
     }
 
-    public Select(Table table, List<Where> whereClause) {
-        this(table);
-        this.whereClause = whereClause;
+    public Select(final Table table, final List<Where> wheres) {
+        this.table = table;
+        this.whereClause = new Wheres(wheres);
     }
 
     public Table getTable() {
         return table;
     }
 
-    public List<Where> getWhereClause() {
-        return whereClause;
+    public String getWhereClause() {
+        return this.whereClause.wheresClause();
     }
 }

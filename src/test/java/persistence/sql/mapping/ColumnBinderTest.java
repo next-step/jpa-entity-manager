@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.PersonV3;
 
 import java.lang.reflect.Field;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,6 +61,22 @@ class ColumnBinderTest {
                         Tuple.tuple(age, Integer.class),
                         Tuple.tuple(mail, mail.getClass())
                 );
+    }
+
+    @DisplayName("Field 로 컬럼을 생성한다.")
+    @Test
+    public void createColumnByField() throws Exception {
+        // given
+        final Class<PersonV3> clazz = PersonV3.class;
+        final Field nameField = clazz.getDeclaredField("name");
+
+        // when
+        final Column column = columnBinder.createColumn(nameField);
+
+        // then
+        assertThat(column)
+                .extracting("name", "type")
+                .contains("nick_name", Types.VARCHAR);
     }
 
     @DisplayName("필드와 컬럼 애너테이션을 이용해 컬럼 이름을 추출한다")

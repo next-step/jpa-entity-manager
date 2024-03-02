@@ -6,6 +6,8 @@ public interface DmlQueryBuilder {
 
     String buildSelectQuery(final Select select);
 
+    String buildUpdateQuery(final Update update);
+
     String buildDeleteQuery(final Delete delete);
 
 }
