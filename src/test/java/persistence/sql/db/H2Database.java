@@ -4,12 +4,12 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeAll;
-import persistence.entity.Person;
-import persistence.sql.StandardDialectResolver;
+import domain.Person;
 import persistence.sql.ddl.query.builder.CreateQueryBuilder;
 import persistence.sql.ddl.query.builder.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectResolutionInfo;
+import persistence.sql.dialect.database.Database;
 import persistence.sql.entity.EntityMappingTable;
 
 import java.sql.SQLException;
@@ -32,7 +32,7 @@ public abstract class H2Database {
 
     private static void createTable() throws SQLException {
         DialectResolutionInfo dialectResolutionInfo = new DialectResolutionInfo(server.getConnection().getMetaData());
-        Dialect dialect = StandardDialectResolver.resolveDialect(dialectResolutionInfo);
+        Dialect dialect = Database.from(dialectResolutionInfo).getDialectSupplier().get();
         entityMappingTable = EntityMappingTable.from(Person.class);
         CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.of(entityMappingTable, dialect.getTypeMapper(), dialect.getConstantTypeMapper());
         DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entityMappingTable);
