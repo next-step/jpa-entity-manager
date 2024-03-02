@@ -107,11 +107,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void flush() {
         persistContext.getActionQueue()
-                .forEach(event -> {
-                    event.excetute(entityPersister);
-//                    entityPersister.update(event.getEntity(), event.getId())
-                });
-
+                .forEach(event -> event.excetute(entityPersister));
     }
 
     @Override
