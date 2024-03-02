@@ -2,28 +2,29 @@ package persistence.sql.dml;
 
 import persistence.sql.mapping.Table;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Delete {
 
     private final Table table;
 
-    private List<Where> whereClause = List.of();
+    private final Wheres whereClause;
 
     public Delete(final Table table) {
-        this.table = table;
+        this(table, Collections.emptyList());
     }
 
-    public Delete(final Table table, final List<Where> whereClause) {
+    public Delete(final Table table, final List<Where> wheres) {
         this.table = table;
-        this.whereClause = whereClause;
+        this.whereClause = new Wheres(wheres);
     }
 
     public Table getTable() {
         return table;
     }
 
-    public List<Where> getWhereClause() {
-        return whereClause;
+    public String getWhereClause() {
+        return this.whereClause.wheresClause();
     }
 }
