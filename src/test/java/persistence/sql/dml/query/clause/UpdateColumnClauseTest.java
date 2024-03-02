@@ -2,7 +2,7 @@ package persistence.sql.dml.query.clause;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainTypes;
 

@@ -3,7 +3,7 @@ package persistence.sql.dml.query.clause;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainTypes;
 
@@ -21,7 +21,7 @@ class ColumnClauseTest {
     @DisplayName("컬럼 쿼리를 반환한다.")
     @Test
     void columnSql() {
-        ColumnClause columnClause = ColumnClause.from(domainTypes);
+        ColumnClause columnClause = new ColumnClause(domainTypes.getColumnName());
 
         assertThat(columnClause.toSql()).isEqualTo("id,nick_name,old,email");
     }
