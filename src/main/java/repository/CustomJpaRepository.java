@@ -1,9 +1,7 @@
 package repository;
 
 import persistence.entity.EntityManager;
-import persistence.sql.domain.IdColumn;
-import persistence.sql.domain.Table;
-import utils.ValueExtractor;
+import persistence.entity.EntityMeta;
 
 public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
     private final EntityManager entityManager;
@@ -13,16 +11,10 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
     }
 
     public T save(T entity) {
-        if (isNew(entity)) {
+        EntityMeta entityMeta = EntityMeta.from(entity);
+        if (entityMeta.isNew(entity)) {
             return entityManager.persist(entity);
         }
         return entityManager.merge(entity);
-    }
-
-    private boolean isNew(T entity) {
-        Table table = Table.from(entity.getClass());
-        IdColumn idColumn = table.getIdColumn();
-        Object id = ValueExtractor.extract(entity, idColumn);
-        return id == null;
     }
 }

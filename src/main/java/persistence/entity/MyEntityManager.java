@@ -4,10 +4,8 @@ import jdbc.JdbcTemplate;
 import persistence.persistencecontext.EntitySnapshot;
 import persistence.persistencecontext.MyPersistenceContext;
 import persistence.persistencecontext.PersistenceContext;
-import persistence.sql.domain.IdColumn;
-import persistence.sql.domain.Table;
-import utils.ValueExtractor;
-import utils.ValueInjector;
+
+import java.util.List;
 
 public class MyEntityManager implements EntityManager {
 
@@ -23,23 +21,21 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        T entity = persistenceContext.getEntity(clazz, id);
-        if (entity == null) {
-            T foundEntity = entityLoader.find(clazz, id);
-            addToCache(id, foundEntity);
-            return foundEntity;
-        }
-        return entity;
+        return (T) persistenceContext.getEntity(clazz, id)
+                .orElseGet(() -> {
+                    T foundEntity = entityLoader.find(clazz, id);
+                    addToCache(foundEntity);
+                    return foundEntity;
+                });
     }
 
     @Override
     public <T> T persist(T entity) {
-        Table table = Table.from(entity.getClass());
-        IdColumn idColumn = table.getIdColumn();
+        persistenceContext.addEntityEntry(entity, EntityStatus.SAVING);
         Object generatedId = entityPersister.insert(entity);
-
-        ValueInjector.inject(entity, idColumn, generatedId);
-        addToCache(generatedId, entity);
+        EntityMeta entityMeta = EntityMeta.from(entity);
+        entityMeta.injectId(entity, generatedId);
+        addToCache(entity);
         return entity;
     }
 
@@ -51,18 +47,24 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        Table table = Table.from(entity.getClass());
-        Object id = ValueExtractor.extract(entity, table.getIdColumn());
-        EntitySnapshot snapshot = (EntitySnapshot) persistenceContext.getCachedDatabaseSnapshot(id, entity);
+        EntitySnapshot snapshot = (EntitySnapshot) persistenceContext.getCachedDatabaseSnapshot(entity);
         if (snapshot.isChanged(entity)) {
-            entityPersister.update(entity);
+            persistenceContext.addEntity(entity);
         }
-        addToCache(id, entity);
         return entity;
     }
 
-    private void addToCache(Object id, Object entity) {
-        persistenceContext.addEntity(id, entity);
-        persistenceContext.getDatabaseSnapshot(id, entity);
+    @Override
+    public void flush() {
+        List<Object> entities = persistenceContext.getDirtyEntities();
+        for (Object entity : entities) {
+            entityPersister.update(entity);
+            persistenceContext.addEntityEntry(entity, EntityStatus.GONE);
+        }
+    }
+
+    private void addToCache(Object entity) {
+        persistenceContext.addEntity(entity);
+        persistenceContext.getDatabaseSnapshot(entity);
     }
 }

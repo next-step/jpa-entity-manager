@@ -19,16 +19,19 @@ public class MyEntityPersister implements EntityPersister {
         this.deleteQueryBuilder = DeleteQueryBuilder.getInstance();
     }
 
+    @Override
     public boolean update(Object entity) {
         String query = updateQueryBuilder.build(entity);
         return jdbcTemplate.executeForUpdate(query);
     }
 
+    @Override
     public Object insert(Object entity) {
         String query = insertQueryBuilder.build(entity);
         return jdbcTemplate.executeForInsert(query);
     }
 
+    @Override
     public void delete(Object entity) {
         String query = deleteQueryBuilder.build(entity);
         jdbcTemplate.execute(query);

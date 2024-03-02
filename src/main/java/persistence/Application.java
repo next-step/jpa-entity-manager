@@ -5,12 +5,12 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.EntityPersister;
-import persistence.entity.MyEntityPersister;
+import persistence.entity.MyEntityManager;
 import persistence.sql.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.domain.dialect.H2Dialect;
+import repository.CustomJpaRepository;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -25,14 +25,12 @@ public class Application {
             CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect());
             jdbcTemplate.execute(createQueryBuilder.build(Person.class));
 
-            Person person = new Person(1L, "John", 25, "email", 1);
-            Person person2 = new Person(2L, "James", 45, "james@asdf.com", 10);
-            EntityPersister entityPersister = new MyEntityPersister(jdbcTemplate);
-            entityPersister.insert(person);
-            entityPersister.insert(person2);
-            Person updatedPerson = new Person(2L, "Tom", 20, "james@asdf.com", 1);
-            entityPersister.update(updatedPerson);
-            entityPersister.delete(person);
+            Person person = new Person(null, "John", 25, "email", 1);
+            Person person2 = new Person(1L, "James", 45, "james@asdf.com", 10);
+            MyEntityManager entityManager = new MyEntityManager(jdbcTemplate);
+            CustomJpaRepository<Person, Long> personLongCustomJpaRepository = new CustomJpaRepository<Person, Long>(entityManager);
+            personLongCustomJpaRepository.save(person);
+            personLongCustomJpaRepository.save(person2);
 
             DropQueryBuilder dropQuery = new DropQueryBuilder(new H2Dialect());
             jdbcTemplate.execute(dropQuery.build(Person.class));

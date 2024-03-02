@@ -67,4 +67,8 @@ public class Table {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Id not found"));
     }
+
+    public Class<?> getClazz() {
+        return clazz;
+    }
 }
