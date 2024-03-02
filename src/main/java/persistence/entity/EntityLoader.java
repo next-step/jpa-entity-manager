@@ -7,44 +7,33 @@ import persistence.sql.model.Table;
 
 import java.util.List;
 
-public class EntityPersister {
+public class EntityLoader {
 
     private final Database database;
     private final EntityMetaCache entityMetaCache;
 
-    public EntityPersister(Database database, EntityMetaCache entityMetaCache) {
+    public EntityLoader(Database database, EntityMetaCache entityMetaCache) {
         this.database = database;
         this.entityMetaCache = entityMetaCache;
     }
 
-    public void create(Object entity) {
-        Class<?> clazz = entity.getClass();
+    public <T> T read(Class<T> clazz, Object id) {
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
-        String insertQuery = queryBuilder.buildInsertQuery(entity);
-        database.execute(insertQuery);
+        String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
+        return database.executeQueryForObject(clazz, findByIdQuery);
     }
 
-    public void update(Object entity) {
+    public boolean isExist(Object entity) {
         Class<?> clazz = entity.getClass();
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
 
         Object id = getEntityId(entity);
-        String updateByIdQuery = queryBuilder.buildUpdateByIdQuery(entity, id);
+        String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
 
-        database.execute(updateByIdQuery);
-    }
-
-    public void delete(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
-
-        Object id = getEntityId(entity);
-        String deleteByIdQuery = queryBuilder.buildDeleteByIdQuery(id);
-
-        database.execute(deleteByIdQuery);
+        List<?> results = database.executeQuery(clazz, findByIdQuery);
+        return !results.isEmpty();
     }
 
     private Object getEntityId(Object entity) {

@@ -42,10 +42,12 @@ class SimpleEntityMangerTest {
 
         Connection jdbcConnection = server.getConnection();
         jdbcTemplate = new JdbcTemplate(jdbcConnection);
-
         Database database = new SimpleDatabase(jdbcTemplate);
-        EntityPersister persister = new EntityPersister(database);;
-        entityManager = new SimpleEntityManger(persister);
+
+        EntityMetaCache entityMetaCache = new EntityMetaCache();
+        EntityPersister persister = new EntityPersister(database, entityMetaCache);
+        EntityLoader loader = new EntityLoader(database, entityMetaCache);
+        entityManager = new SimpleEntityManger(persister, loader);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);

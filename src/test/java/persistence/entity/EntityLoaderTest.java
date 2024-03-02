@@ -1,6 +1,9 @@
 package persistence.entity;
 
-import database.*;
+import database.Database;
+import database.DatabaseServer;
+import database.H2;
+import database.SimpleDatabase;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,13 +21,12 @@ import java.sql.SQLException;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class EntityPersisterTest {
+public class EntityLoaderTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private static EntityPersister persister;
+    private static EntityLoader loader;
 
     private static DDLQueryBuilder ddlQueryBuilder;
     private static DMLQueryBuilder dmlQueryBuilder;
@@ -39,7 +41,7 @@ class EntityPersisterTest {
 
         Database database = new SimpleDatabase(jdbcTemplate);
         EntityMetaCache entityMetaCache = new EntityMetaCache();
-        persister = new EntityPersister(database, entityMetaCache);
+        loader = new EntityLoader(database, entityMetaCache);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -79,36 +81,27 @@ class EntityPersisterTest {
     }
 
     @Test
-    @DisplayName("person을 이용하여 create 메서드 테스트")
-    void create() {
-        Person3 person3 = new Person3("qwer", 12, "qwe@ema.com");
+    @DisplayName("person을 이용하여 read 메서드 테스트")
+    void read() {
+        Person3 result = loader.read(Person3.class, 3L);
 
-        persister.create(person3);
-        Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=4L", new EntityRowMapper<>(Person3.class));
-
-        Person3 expect = new Person3(4L, "qwer", 12, "qwe@ema.com");
+        Person3 expect = new Person3(3L, "qwer3", 3, "email3@email.com");
         assertThat(result).isEqualTo(expect);
     }
 
-    @Test
-    void update() {
-        Person3 person = new Person3(2L, "qwer", 12, "qwe@ema.com");
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("person을 이용하여 isExist 메서드 테스트")
+    void isExist(Person3 person, boolean expect) {
+        boolean result = loader.isExist(person);
 
-        persister.update(person);
-        Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=2L", new EntityRowMapper<>(Person3.class));
-
-        Person3 expect = new Person3(2L, "qwer", 12, "qwe@ema.com");
         assertThat(result).isEqualTo(expect);
     }
 
-    @Test
-    void deleteById() {
-        Person3 person = new Person3(2L, "aa", 123, "qeqwewq");
-
-        persister.delete(person);
-
-        assertThatThrownBy(() -> jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=2L", new EntityRowMapper<>(Person3.class)))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Expected 1 result, got 0");
+    private static Stream<Arguments> isExist() {
+        return Stream.of(
+                Arguments.arguments(new Person3(1L, "qwer3", 3, "email3@email.com"), true),
+                Arguments.arguments(new Person3(5L, "qwer3", 3, "email3@email.com"), false)
+        );
     }
 }
