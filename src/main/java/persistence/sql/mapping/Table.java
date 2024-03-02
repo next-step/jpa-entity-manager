@@ -30,16 +30,6 @@ public class Table {
         return this.columns.get(columnName).clone();
     }
 
-    public void changeColumnValue(final String columnName, Object value) {
-        this.changeColumnValue(columnName, value, value.toString());
-    }
-
-    public void changeColumnValue(final String columnName, Object value, String valueClause) {
-        final Value currentValue = this.columns.get(columnName).getValue();
-        currentValue.setValue(value);
-        currentValue.setValueClause(valueClause);
-    }
-
     public void setPrimaryKey(final PrimaryKey primaryKey) {
         this.primaryKey = primaryKey;
     }
