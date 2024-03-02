@@ -13,4 +13,6 @@ public interface EntityManager {
     <T> T merge(T entity);
 
     Dialect getDialect();
+
+    void flush();
 }

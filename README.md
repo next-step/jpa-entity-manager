@@ -29,3 +29,17 @@
   - 엔티티의 상태를 스냅샷으로 저장하여, 변경된 값이 있는지를 비교하는 방식
   1. 엔티티를 조회할 때 스냅샷을 만들어 둔 후,
   2. 엔티티의 상태를 변경할 때마다 스냅샷과 비교하여 변경 내용을 감지합니다.
+
+### step4 - EntityEntry
+
+- [x] 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자
+  - EntityEntry 클래스는 엔터티의 영속성 상태와 상태 변화, 생명주기와 변경감지에 중요한 역할
+  - EntityEntry의 상태는 다음과 같이 구분
+  - ```angular2html
+    MANAGED,
+    READ_ONLY,
+    DELETED,
+    GONE,
+    LOADING,
+    SAVING; `
+    ```

@@ -2,7 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.GenerationType;
 import jdbc.JdbcTemplate;
-import org.h2.mvstore.tx.Transaction;
+import persistence.entity.event.DeleteEvent;
+import persistence.entity.event.UpdateEvent;
 import persistence.sql.column.Columns;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
@@ -81,24 +82,36 @@ public class EntityManagerImpl implements EntityManager {
         IdColumn idColumn = new IdColumn(entity, dialect);
         persistContext.removeEntity(entity.getClass(), idColumn.getValue());
         entityPersister.delete(entity, idColumn.getValue());
+        persistContext.addActionQueue(new DeleteEvent<>(idColumn.getValue(), entity));
     }
 
     @Override
     public <T> T merge(T entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-        EntityMetaData entityMetaData = persistContext.getCachedDatabaseSnapshot(entity.getClass(), idColumn.getValue());
-        if (entityMetaData.isDirty(new EntityMetaData(entity, dialect))) {
+        EntityMetaData entityMetaData = new EntityMetaData(entity, dialect);
+        EntityMetaData previousEntity = persistContext.getCachedDatabaseSnapshot(entity.getClass(), idColumn.getValue());
+         if (entityMetaData.isDirty(previousEntity)) {
+            persistContext.addActionQueue(new UpdateEvent<>(idColumn.getValue(), entity));
             savePersistence(entity, idColumn.getValue());
-            entityPersister.update(entity, idColumn.getValue());
             return entity;
         }
-        savePersistence(entity, idColumn.getValue());
         return entity;
     }
 
-    private void savePersistence(Object entity, Long id) {
+    private void savePersistence(Object entity, Object id) {
         persistContext.getDatabaseSnapshot(new EntityMetaData(entity, dialect), id);
         persistContext.addEntity(entity, id);
+    }
+
+
+    @Override
+    public void flush() {
+        persistContext.getActionQueue()
+                .forEach(event -> {
+                    event.excetute(entityPersister);
+//                    entityPersister.update(event.getEntity(), event.getId())
+                });
+
     }
 
     @Override

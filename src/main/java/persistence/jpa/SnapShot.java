@@ -5,6 +5,7 @@ import persistence.entity.EntityMetaData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SnapShot {
     private final Map<EntityKey, EntityMetaData> snapshot;

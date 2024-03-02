@@ -31,6 +31,7 @@ class EntityManagerImplTest {
     private Dialect dialect;
     private EntityManager entityManager;
     private PersistenceContext persistContext;
+    private EntityLoader entityLoader;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -41,11 +42,12 @@ class EntityManagerImplTest {
         table = new TableColumn(personEntity);
         dialect = new MysqlDialect();
         persistContext = new HibernatePersistContext();
+        entityLoader = new EntityLoaderImpl(jdbcTemplate, new MysqlDialect());
         entityManager = new EntityManagerImpl(
                 new MysqlDialect(),
                 persistContext,
                 new EntityPersisterImpl(jdbcTemplate, new MysqlDialect()),
-                new EntityLoaderImpl(jdbcTemplate, new MysqlDialect())
+                entityLoader
         );
 
         createTable(personEntity);
@@ -213,6 +215,30 @@ class EntityManagerImplTest {
                 () -> assertThat(findPerson).isPresent(),
                 () -> assertThat((findPerson.get()).getId()).isEqualTo(1L),
                 () -> assertThat((findPerson.get()).getName()).isEqualTo("John2")
+        );
+    }
+
+    @DisplayName("flush 메서드를 통해 persistContext에 저장된 이벤트를 실행한다.")
+    @Test
+    void flush() {
+        // given
+        Person person = new Person( "John", 99, "john@test.com", 1);
+        entityManager.persist(person);
+        person.setName("John2");
+        entityManager.merge(person);
+
+        Person person1 = entityLoader.find(Person.class, 1L);
+
+        assertThat(person1.getName()).isEqualTo("John");
+
+        // when
+        entityManager.flush();
+        Person findPerson = entityLoader.find(Person.class, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(findPerson.getId()).isEqualTo(1L),
+                () -> assertThat(findPerson.getName()).isEqualTo("John2")
         );
     }
 }

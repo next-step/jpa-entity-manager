@@ -1,6 +1,9 @@
 package persistence.entity;
 
+import persistence.entity.event.Event;
+
 import java.util.Optional;
+import java.util.Queue;
 
 public interface PersistenceContext {
 
@@ -14,4 +17,7 @@ public interface PersistenceContext {
 
     EntityMetaData getCachedDatabaseSnapshot(Class<?> clazz, Object id);
 
+    Queue<Event> getActionQueue();
+
+    void addActionQueue(Event event);
 }
