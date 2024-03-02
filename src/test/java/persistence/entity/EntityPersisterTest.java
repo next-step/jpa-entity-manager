@@ -90,22 +90,6 @@ class EntityPersisterTest {
         assertThat(result).isEqualTo(expect);
     }
 
-    @ParameterizedTest
-    @MethodSource
-    @DisplayName("person을 이용하여 isExist 메서드 테스트")
-    void isExist(Person3 person, boolean expect) {
-        boolean result = persister.isExist(person);
-
-        assertThat(result).isEqualTo(expect);
-    }
-
-    private static Stream<Arguments> isExist() {
-        return Stream.of(
-          Arguments.arguments(new Person3(1L, "qwer3", 3, "email3@email.com"), true),
-          Arguments.arguments(new Person3(5L, "qwer3", 3, "email3@email.com"), false)
-        );
-    }
-
     @Test
     void update() {
         Person3 person = new Person3(2L, "qwer", 12, "qwe@ema.com");

@@ -2,7 +2,10 @@ package persistence.entity;
 
 import database.Database;
 import persistence.sql.dml.DMLQueryBuilder;
+import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
+
+import java.util.List;
 
 public class EntityLoader {
 
@@ -19,5 +22,27 @@ public class EntityLoader {
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
         String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
         return database.executeQueryForObject(clazz, findByIdQuery);
+    }
+
+    public boolean isExist(Object entity) {
+        Class<?> clazz = entity.getClass();
+        Table table = entityMetaCache.getTable(clazz);
+        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+
+        Object id = getEntityId(entity);
+        String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
+
+        List<?> results = database.executeQuery(clazz, findByIdQuery);
+        return !results.isEmpty();
+    }
+
+    private Object getEntityId(Object entity) {
+        Class<?> clazz = entity.getClass();
+        Table table = entityMetaCache.getTable(clazz);
+
+        EntityBinder entityBinder = new EntityBinder(entity);
+
+        PKColumn pkColumn = table.getPKColumn();
+        return entityBinder.getValue(pkColumn);
     }
 }

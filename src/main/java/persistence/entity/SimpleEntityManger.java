@@ -17,7 +17,7 @@ public class SimpleEntityManger implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        if (persister.isExist(entity)) {
+        if (loader.isExist(entity)) {
             persister.update(entity);
         }
         persister.create(entity);

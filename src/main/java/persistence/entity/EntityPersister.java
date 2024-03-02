@@ -32,18 +32,6 @@ public class EntityPersister {
         return database.executeQueryForObject(clazz, findByIdQuery);
     }
 
-    public boolean isExist(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
-
-        Object id = getEntityId(entity);
-        String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
-
-        List<?> results = database.executeQuery(clazz, findByIdQuery);
-        return !results.isEmpty();
-    }
-
     public void update(Object entity) {
         Class<?> clazz = entity.getClass();
         Table table = entityMetaCache.getTable(clazz);

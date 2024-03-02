@@ -6,6 +6,9 @@ import database.H2;
 import database.SimpleDatabase;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import persistence.sql.ddl.DDLQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -23,7 +26,7 @@ public class EntityLoaderTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private static EntityPersister persister;
+    private static EntityLoader loader;
 
     private static DDLQueryBuilder ddlQueryBuilder;
     private static DMLQueryBuilder dmlQueryBuilder;
@@ -38,7 +41,7 @@ public class EntityLoaderTest {
 
         Database database = new SimpleDatabase(jdbcTemplate);
         EntityMetaCache entityMetaCache = new EntityMetaCache();
-        persister = new EntityPersister(database, entityMetaCache);
+        loader = new EntityLoader(database, entityMetaCache);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -80,9 +83,25 @@ public class EntityLoaderTest {
     @Test
     @DisplayName("person을 이용하여 read 메서드 테스트")
     void read() {
-        Person3 result = persister.read(Person3.class, 3L);
+        Person3 result = loader.read(Person3.class, 3L);
 
         Person3 expect = new Person3(3L, "qwer3", 3, "email3@email.com");
         assertThat(result).isEqualTo(expect);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("person을 이용하여 isExist 메서드 테스트")
+    void isExist(Person3 person, boolean expect) {
+        boolean result = loader.isExist(person);
+
+        assertThat(result).isEqualTo(expect);
+    }
+
+    private static Stream<Arguments> isExist() {
+        return Stream.of(
+                Arguments.arguments(new Person3(1L, "qwer3", 3, "email3@email.com"), true),
+                Arguments.arguments(new Person3(5L, "qwer3", 3, "email3@email.com"), false)
+        );
     }
 }
