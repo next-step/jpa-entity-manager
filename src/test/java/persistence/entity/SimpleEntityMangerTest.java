@@ -42,8 +42,10 @@ class SimpleEntityMangerTest {
 
         Connection jdbcConnection = server.getConnection();
         jdbcTemplate = new JdbcTemplate(jdbcConnection);
+
         Database database = new SimpleDatabase(jdbcTemplate);
-        entityManager = new SimpleEntityManger(database);
+        EntityPersister persister = new EntityPersister(database);;
+        entityManager = new SimpleEntityManger(persister);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -111,13 +113,24 @@ class SimpleEntityMangerTest {
 
         entityManager.persist(person);
 
-        Person3 findPerson = findByIdPerson();
+        Person3 findPerson = findByIdPerson(4L);
         Person3 expectPerson = new Person3(4L, "qwer", 1, "email@email.com");
         assertThat(findPerson).isEqualTo(expectPerson);
     }
 
-    private Person3 findByIdPerson() {
-        String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(4L);
+    @DisplayName("person이 이미 있는 경우 값을 update 한다.")
+    @Test
+    void persistWithUpdate() {
+        Person3 person = new Person3(1L, "qwerqwrwr", 1231231, "email@email,com");
+
+        entityManager.persist(person);
+
+        Person3 result = findByIdPerson(1L);
+        assertThat(result).isEqualTo(person);
+    }
+
+    private Person3 findByIdPerson(Long id) {
+        String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(id);
         return jdbcTemplate.queryForObject(findByIdQuery, new Person3RowMapper());
     }
 

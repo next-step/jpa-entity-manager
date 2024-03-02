@@ -3,28 +3,32 @@ package persistence.sql.dml;
 import persistence.entity.EntityBinder;
 import persistence.sql.model.Column;
 import persistence.sql.model.Columns;
+import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InsertQueryBuilder {
+public class UpdateQueryBuilder {
 
-    private final static String INSERT_QUERY_FORMAT = "INSERT INTO %s (%s) values (%s);";
+    private final static String UPDATE_BY_ID_QUERY_BUILDER = "UPDATE %s SET (%s) = (%s) WHERE %s;";
 
     private final Table table;
     private final EntityBinder entityBinder;
 
-    public InsertQueryBuilder(Table table, Object instance) {
+    public UpdateQueryBuilder(Table table, Object entity) {
         this.table = table;
-        this.entityBinder = new EntityBinder(instance);
+        this.entityBinder = new EntityBinder(entity);
     }
 
-    public String build() {
+    public String buildById(Object id) {
+        ByIdQueryBuilder byIdQueryBuilder = new ByIdQueryBuilder(table, id);
+
         String tableName = table.getName();
         String columnsClause = buildColumnsClause();
-        String valueClause = buildColumnsValueClause();
-        return String.format(INSERT_QUERY_FORMAT, tableName, columnsClause, valueClause);
+        String columnsValueClause = buildColumnsValueClause();
+        String whereClause = byIdQueryBuilder.build();
+        return String.format(UPDATE_BY_ID_QUERY_BUILDER, tableName, columnsClause, columnsValueClause, whereClause);
     }
 
     private String buildColumnsClause() {
@@ -33,10 +37,14 @@ public class InsertQueryBuilder {
     }
 
     private String buildColumnsValueClause() {
+        PKColumn pkColumn = table.getPKColumn();
+        Object id = entityBinder.getValue(pkColumn);
+        String pkValueClause = String.format("%s,", id);
+
         Columns columns = table.getColumns();
         return columns.stream()
                 .map(this::buildColumnValueClause)
-                .collect(Collectors.joining(",", "null,", ""));
+                .collect(Collectors.joining(",", pkValueClause, ""));
     }
 
     private String buildColumnValueClause(Column column) {
