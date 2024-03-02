@@ -26,6 +26,13 @@ public class LoggingJdbcTemplate extends JdbcTemplate {
         super.execute(sql);
     }
 
+//    @Override
+//    public void execute2(String sql) {
+//        executedQueries.add(sql);
+//
+//        super.execute2(sql);
+//    }
+
     @Override
     public <T> List<T> query(String sql, RowMapper<T> rowMapper) {
         executedQueries.add(sql);

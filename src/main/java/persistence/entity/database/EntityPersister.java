@@ -6,7 +6,6 @@ import database.sql.dml.InsertQueryBuilder;
 import database.sql.dml.UpdateQueryBuilder;
 import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
-import persistence.entity.data.EntitySnapshotDifference;
 
 import java.util.Map;
 
@@ -30,13 +29,16 @@ public class EntityPersister {
     }
 
     public void insert(Object entity) {
+        // XXX: id 없는거 예외 처리는 여기서
         Long id = getRowId(entity);
         String query = insertQueryBuilder.buildQuery(id, columnValues(entity));
         jdbcTemplate.execute(query);
+        // TODO: getlastid
+//        jdbcTemplate.execute2(query);
     }
 
-    public void update(Long id, EntitySnapshotDifference difference) {
-        doUpdate(id, difference.toMap());
+    public void update(Long id, Map<String, Object> changes) {
+        doUpdate(id, changes);
     }
 
     public void update(Long id, Object entity) {

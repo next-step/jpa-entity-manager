@@ -3,7 +3,6 @@ package persistence.entity.context;
 import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
 import persistence.entity.data.EntitySnapshot;
-import persistence.entity.data.EntitySnapshotDifference;
 import persistence.entity.database.EntityLoader;
 import persistence.entity.database.EntityPersister;
 
@@ -37,20 +36,15 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     private Object syncEntity(Class<?> entityClass, Long id) {
         Status status = entityEntries.getStatus(entityClass, id);
+        // XXX: 코드정리
         if (status == null) {
-            entityEntries.setStatus(entityClass, id, LOADING);
-
-            Optional<Object> fetched = entityLoaderOf(entityClass).load(id);
-            if (fetched.isEmpty()) {
-                entityEntries.removeStatus(entityClass, id);
-                return null;
-            }
-            Object entity = fetched.get();
-            firstLevelCache.store(entityClass, id, entity);
-            entityEntries.setStatus(entityClass, id, MANAGED);
-            return entity;
+            return getObject(entityClass, id);
         }
 
+        return getObject(entityClass, id, status);
+    }
+
+    private Object getObject(Class<?> entityClass, Long id, Status status) {
         switch (status) {
             case MANAGED:
             case READ_ONLY:
@@ -64,6 +58,20 @@ public class PersistenceContextImpl implements PersistenceContext {
                 throw new UnsupportedOperationException(
                         String.format("status: %s, entityClass: %s, id: %d", status, entityClass, id));
         }
+    }
+
+    private Object getObject(Class<?> entityClass, Long id) {
+        entityEntries.setStatus(entityClass, id, LOADING);
+
+        Optional<Object> fetched = entityLoaderOf(entityClass).load(id);
+        if (fetched.isEmpty()) {
+            entityEntries.removeStatus(entityClass, id);
+            return null;
+        }
+        Object entity = fetched.get();
+        firstLevelCache.store(entityClass, id, entity);
+        entityEntries.setStatus(entityClass, id, MANAGED);
+        return entity;
     }
 
     @Override
@@ -112,19 +120,19 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         entityEntries.setStatus(entityClass, id, SAVING);
         Object currentEntity = firstLevelCache.get(entityClass, id);
-        EntitySnapshotDifference difference = getEntitySnapshotDifference(currentEntity, entity);
-        if (difference.isDirty()) {
-            entityPersisterOf(entityClass).update(id, difference);
+        Map<String, Object> changes = getEntitySnapshotChanges(currentEntity, entity);
+        if (!changes.isEmpty()) {
+            entityPersisterOf(entityClass).update(id, changes);
         }
         firstLevelCache.store(entityClass, id, entity);
         entityEntries.setStatus(entityClass, id, MANAGED);
     }
 
-    private static EntitySnapshotDifference getEntitySnapshotDifference(Object oldEntity, Object newEntity) {
-        EntitySnapshot oldEntitySnapshot = new EntitySnapshot(oldEntity);
-        EntitySnapshot newEntitySnapshot = new EntitySnapshot(newEntity);
+    private static Map<String, Object> getEntitySnapshotChanges(Object oldEntity, Object newEntity) {
+        EntitySnapshot oldEntitySnapshot = EntitySnapshot.of(oldEntity);
+        EntitySnapshot newEntitySnapshot = EntitySnapshot.of(newEntity);
 
-        return new EntitySnapshotDifference(oldEntitySnapshot, newEntitySnapshot);
+        return oldEntitySnapshot.changes(newEntitySnapshot);
     }
 
     @Override

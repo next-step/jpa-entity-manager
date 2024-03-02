@@ -6,7 +6,7 @@ class EntityKey {
     private final String entityClass;
     private final Long id;
 
-    public EntityKey(String entityClass, Long id) {
+    private EntityKey(String entityClass, Long id) {
         this.entityClass = entityClass;
         this.id = id;
     }
@@ -15,12 +15,16 @@ class EntityKey {
         return new EntityKey(entityClass.getName(), id);
     }
 
+//    public static EntityKey of(String name, Long id) {
+//        return new EntityKey(name, id);
+//    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         EntityKey entityKey = (EntityKey) object;
-        return Objects.equals(entityClass, entityKey.entityClass) && Objects.equals(id, entityKey.id);
+        return Objects.equals(entityClass, entityKey.entityClass) && Objects.equals(id, entityKey.id) ;
     }
 
     @Override

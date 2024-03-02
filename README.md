@@ -25,5 +25,5 @@
 ### 4단계 - EntityEntry
 
 - [x] 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자
-- [ ] // XXX: Difference -> Changes 네이밍 변경
+- [x] // XXX: Difference -> Changes 네이밍 변경
 - [x] // FirstLevelCache 를 별도 클래스로 분리

@@ -46,6 +46,7 @@ public class InsertQueryBuilder {
         return buildQuery(columnClauses(primaryKeyColumnName, valueMap), valueClauses(id, valueMap));
     }
 
+    // XXX Persister insert() 로 옮기기
     private void checkGenerationStrategy(Long id) {
         if (!hasAutoIncrementPrimaryKey && id == null) {
             throw new PrimaryKeyMissingException();

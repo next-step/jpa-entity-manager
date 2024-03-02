@@ -20,7 +20,10 @@ public class EntityEntries {
     }
 
     public void setStatus(Class<?> entityClass, Long id, Status status) {
+//    public void setStatus(EntityKey entityKey, Status status) {
         EntityKey cacheKey = getCacheKey(entityClass, id);
+//        EntityKey cacheKey = EntityKey.of(entityClass, id);
+
 
         if (!entityEntriesMap.containsKey(cacheKey)) {
             entityEntriesMap.put(cacheKey, new EntityEntry(status));
@@ -34,6 +37,10 @@ public class EntityEntries {
 
         entityEntriesMap.remove(cacheKey);
     }
+
+//    public void changeLoadingBy(EntityKey of) {
+//        setStatus(Loading)
+//    }
 
     private static EntityKey getCacheKey(Class<?> entityClass, Long id) {
         if (id == null) {
