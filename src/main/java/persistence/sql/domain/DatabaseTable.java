@@ -8,7 +8,6 @@ import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,18 +83,5 @@ public class DatabaseTable {
     public List<ColumnOperation> getAllColumns() {
         return Stream.concat(Stream.of(getPrimaryColumn()), columns.stream().map(DatabaseColumn::copy))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DatabaseTable)) return false;
-        DatabaseTable that = (DatabaseTable) o;
-        return name.equals(that.name) && columns.equals(that.columns);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, columns);
     }
 }

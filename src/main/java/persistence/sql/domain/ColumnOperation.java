@@ -17,4 +17,13 @@ public interface ColumnOperation {
     boolean isNullable();
 
     String getJavaFieldName();
+
+    default Object getColumnValueByJavaType(){
+        String value = getColumnValue();
+        Class<?> type = getColumnObjectType();
+        if (type.equals(Long.class)){
+            return Long.valueOf(value);
+        }
+        return value;
+    }
 }

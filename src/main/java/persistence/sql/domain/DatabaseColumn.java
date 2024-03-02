@@ -1,7 +1,6 @@
 package persistence.sql.domain;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 public class DatabaseColumn implements ColumnOperation {
 
@@ -72,16 +71,4 @@ public class DatabaseColumn implements ColumnOperation {
         return this.nullable.isNullable();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DatabaseColumn)) return false;
-        DatabaseColumn that = (DatabaseColumn) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(size, that.size) && Objects.equals(nullable, that.nullable);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, value, size, nullable);
-    }
 }

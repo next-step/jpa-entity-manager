@@ -1,17 +1,15 @@
 package persistence.entity;
 
-import persistence.sql.domain.DatabaseTable;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleSnapshotStorage implements SnapshotStorage {
 
-    private final Map<EntityCacheKey, DatabaseTable> snapshotStorage = new ConcurrentHashMap<>();
+    private final Map<EntityCacheKey, Snapshot> snapshotStorage = new ConcurrentHashMap<>();
 
     @Override
     public void add(Object entity) {
-        DatabaseTable snapshot = new DatabaseTable(entity);
+        Snapshot snapshot = new Snapshot(entity);
         EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
         snapshotStorage.put(entityCacheKey, snapshot);
     }
@@ -25,11 +23,11 @@ public class SimpleSnapshotStorage implements SnapshotStorage {
     public boolean isDirty(Object entity) {
         EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
 
-        DatabaseTable before = snapshotStorage.get(entityCacheKey);
+        Snapshot before = snapshotStorage.get(entityCacheKey);
         if (before == null) {
             return false;
         }
-        DatabaseTable after = new DatabaseTable(entity);
+        Snapshot after = new Snapshot(entity);
 
         return !before.equals(after);
     }

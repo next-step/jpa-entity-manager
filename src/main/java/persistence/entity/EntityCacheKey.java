@@ -9,17 +9,17 @@ public class EntityCacheKey {
 
     private final Class<?> entityClazz;
 
-    private final String id;
+    private final Object id;
 
     public EntityCacheKey(Class<?> entityClazz, Object id) {
         this.entityClazz = entityClazz;
-        this.id = String.valueOf(id);
+        this.id = id;
     }
 
     public EntityCacheKey(Object entity) {
         DatabasePrimaryColumn primaryColumn = new DatabaseTable(entity).getPrimaryColumn();
         this.entityClazz = entity.getClass();
-        this.id = primaryColumn.getColumnValue();
+        this.id = primaryColumn.getColumnValueByJavaType();
     }
 
     @Override
