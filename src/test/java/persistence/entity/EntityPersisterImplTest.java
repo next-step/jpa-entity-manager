@@ -68,7 +68,7 @@ class EntityPersisterImplTest {
     void update() {
         //given
         Person person = new Person(1L, "홍길동", 20, "Jon@test.com", 20);
-        Person savedPerson = (Person) entityManager.persist(person);
+        Person savedPerson =  entityManager.persist(person);
 
         //when
         savedPerson.setName("김길동");

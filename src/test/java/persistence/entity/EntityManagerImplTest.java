@@ -121,7 +121,7 @@ class EntityManagerImplTest {
         entityManager.persist(person);
 
         // then
-        Optional<Object> findPerson = persistContext.getEntity(person.getId());
+        Optional<Person> findPerson = persistContext.getEntity(Person.class, person.getId());
 
         assertAll(
                 () -> assertThat(findPerson).isPresent(),
@@ -176,7 +176,7 @@ class EntityManagerImplTest {
         entityManager.remove(person);
 
         // then
-        Optional<Object> findPerson = persistContext.getEntity(person.getId());
+        Optional<Person> findPerson = persistContext.getEntity(Person.class, person.getId());
         assertThat(findPerson).isEmpty();
     }
 
@@ -208,11 +208,11 @@ class EntityManagerImplTest {
         entityManager.merge(person);
 
         // then
-        Optional<Object> findPerson = persistContext.getEntity(person.getId());
+        Optional<Person> findPerson = persistContext.getEntity(Person.class, person.getId());
         assertAll(
                 () -> assertThat(findPerson).isPresent(),
-                () -> assertThat(((Person) findPerson.get()).getId()).isEqualTo(1L),
-                () -> assertThat(((Person) findPerson.get()).getName()).isEqualTo("John2")
+                () -> assertThat((findPerson.get()).getId()).isEqualTo(1L),
+                () -> assertThat((findPerson.get()).getName()).isEqualTo("John2")
         );
     }
 }

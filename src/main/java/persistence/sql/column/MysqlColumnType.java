@@ -22,7 +22,7 @@ public enum MysqlColumnType implements ColumnType {
         return Arrays.stream(values())
                 .filter(columnType -> columnType.javaType.equals(javaType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("[INFO] No supported javaType"));
+                .orElseThrow(() -> new IllegalArgumentException("[INFO] No supported javaType: " + javaType.getName() + " found"));
     }
 
     @Override

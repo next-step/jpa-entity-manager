@@ -1,41 +1,42 @@
 package persistence.entity;
 
-import java.util.HashMap;
-import java.util.Map;
+import persistence.jpa.Cache;
+import persistence.jpa.SnapShot;
+
 import java.util.Optional;
 
 public class HibernatePersistContext implements PersistenceContext {
 
-    private final Map<Long, Object> cache;
-    private final Map<Long, Object> snapshot;
+    private final Cache cache;
+    private final SnapShot snapshot;
 
     public HibernatePersistContext() {
-        this.cache = new HashMap<>();
-        this.snapshot = new HashMap<>();
+        this.cache = new Cache();
+        this.snapshot = new SnapShot();
     }
 
     @Override
-    public Optional<Object> getEntity(Long id) {
-        return Optional.ofNullable(cache.get(id));
+    public <T> Optional<T> getEntity(Class<T> clazz, Object id) {
+        return (Optional<T>) cache.get(new EntityKey(clazz, id));
     }
 
     @Override
-    public void addEntity(Long id, Object entity) {
-        cache.put(id, entity);
+    public void addEntity(Object entity, Object id) {
+        cache.save(new EntityKey(entity.getClass(), id), entity);
     }
 
     @Override
-    public void removeEntity(Long id) {
-        cache.remove(id);
+    public void removeEntity(Class<?> clazz, Object id) {
+        cache.remove(new EntityKey(clazz, id));
     }
 
     @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
-        return snapshot.put(id, entity);
+    public void getDatabaseSnapshot(EntityMetaData entity, Object id) {
+        snapshot.save(new EntityKey(entity.getClazz(), id), entity);
     }
 
     @Override
-    public <T> T getCachedDatabaseSnapshot(T id) {
-        return (T) snapshot.get(id);
+    public EntityMetaData getCachedDatabaseSnapshot(Class<?> clazz, Object id) {
+        return snapshot.get(new EntityKey(clazz, id));
     }
 }

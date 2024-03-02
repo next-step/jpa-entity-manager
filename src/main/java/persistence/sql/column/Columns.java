@@ -5,10 +5,7 @@ import jakarta.persistence.Transient;
 import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,4 +49,20 @@ public class Columns {
         return Collections.unmodifiableList(values);
     }
 
+    public boolean isDirty(Columns columns) {
+        Map<String, Object> stringObjectMap = this.values.stream()
+                .filter(this::isNotNull)
+                .collect(Collectors.toMap(
+                        GeneralColumn::getName,
+                        GeneralColumn::getValue
+                ));
+
+        return columns.values.stream()
+                .filter(this::isNotNull)
+                .anyMatch(column -> !column.getValue().equals(stringObjectMap.get(column.getName())));
+    }
+
+    private boolean isNotNull(GeneralColumn column) {
+        return column.getName() != null && column.getValue() != null;
+    }
 }

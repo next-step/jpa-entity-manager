@@ -4,14 +4,14 @@ import java.util.Optional;
 
 public interface PersistenceContext {
 
-    Optional<Object> getEntity(Long id);
+    <T> Optional<T> getEntity(Class<T> clazz, Object id);
 
-    void addEntity(Long id, Object entity);
+    void addEntity(Object entity, Object id);
 
-    void removeEntity(Long id);
+    void removeEntity(Class<?> clazz, Object id);
 
-    Object getDatabaseSnapshot(Long id, Object entity);
+    void getDatabaseSnapshot(EntityMetaData entityMetaData, Object id);
 
-    <T> T getCachedDatabaseSnapshot(T id);
+    EntityMetaData getCachedDatabaseSnapshot(Class<?> clazz, Object id);
 
 }

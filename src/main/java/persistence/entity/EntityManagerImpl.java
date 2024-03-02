@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.GenerationType;
 import jdbc.JdbcTemplate;
+import org.h2.mvstore.tx.Transaction;
+import persistence.sql.column.Columns;
 import persistence.sql.column.IdColumn;
 import persistence.sql.dialect.Dialect;
 
@@ -27,20 +29,20 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        Object entity = persistContext.getEntity(id)
+        EntityMetaData entityMetaData = new EntityMetaData(clazz, new Columns(clazz.getDeclaredFields(), dialect));
+        Object entity = persistContext.getEntity(clazz, id)
                 .orElseGet(() -> {
                     T findEntity = entityLoader.find(clazz, id);
                     savePersistence(findEntity, id);
                     return findEntity;
                 });
-        persistContext.getDatabaseSnapshot(id, entity);
+        persistContext.getDatabaseSnapshot(entityMetaData, id);
         return clazz.cast(entity);
     }
 
     @Override
     public <T> T persist(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-
         GenerationType generationType = idColumn.getIdGeneratedStrategy().getGenerationType();
         if (dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
             long id = entityPersister.insertByGeneratedKey(entity);
@@ -77,16 +79,15 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void remove(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-        persistContext.removeEntity(idColumn.getValue());
+        persistContext.removeEntity(entity.getClass(), idColumn.getValue());
         entityPersister.delete(entity, idColumn.getValue());
     }
 
     @Override
     public <T> T merge(T entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
-
-        Object cachedDatabaseSnapshot = persistContext.getCachedDatabaseSnapshot(idColumn.getValue());
-        if (!cachedDatabaseSnapshot.equals(entity)) {
+        EntityMetaData entityMetaData = persistContext.getCachedDatabaseSnapshot(entity.getClass(), idColumn.getValue());
+        if (entityMetaData.isDirty(new EntityMetaData(entity, dialect))) {
             savePersistence(entity, idColumn.getValue());
             entityPersister.update(entity, idColumn.getValue());
             return entity;
@@ -95,9 +96,9 @@ public class EntityManagerImpl implements EntityManager {
         return entity;
     }
 
-    private <T> void savePersistence(T entity, Long id) {
-        persistContext.getDatabaseSnapshot(id, entity);
-        persistContext.addEntity(id, entity);
+    private void savePersistence(Object entity, Long id) {
+        persistContext.getDatabaseSnapshot(new EntityMetaData(entity, dialect), id);
+        persistContext.addEntity(entity, id);
     }
 
     @Override
