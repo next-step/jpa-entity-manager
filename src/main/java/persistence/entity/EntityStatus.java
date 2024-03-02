@@ -1,4 +1,4 @@
-package persistence.entity.state;
+package persistence.entity;
 
 public enum EntityStatus {
     MANAGED,

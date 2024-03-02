@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import persistence.entity.event.Event;
-import persistence.entity.state.EntityStatus;
 import persistence.jpa.Cache;
 import persistence.jpa.SnapShot;
 
