@@ -28,7 +28,7 @@ public class SingleTableEntityPersister implements EntityPersister {
         try {
             jdbcTemplate.execute(updateQuery);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
     }
