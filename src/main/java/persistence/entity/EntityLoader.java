@@ -29,12 +29,7 @@ public class EntityLoader {
     }
 
     public <T> Optional<T> findOne(T entity, Long id) {
-        List<?> entities = jdbcTemplate.query(
-                selectQueryBuilder.findById(entity.getClass(), id),
-                new RowMapperImpl<>(entity.getClass()));
-        if (entities.isEmpty()) {
-            return Optional.empty();
-        }
-        return (Optional<T>) Optional.ofNullable(entities.get(0));
+        Class<T> clazz = (Class<T>) entity.getClass();
+        return findOne(clazz, id);
     }
 }
