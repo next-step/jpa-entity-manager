@@ -3,7 +3,9 @@ package persistence.sql.dml.query.builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
+import persistence.sql.dml.query.clause.ColumnClause;
+import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
@@ -17,18 +19,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SelectQueryBuilderTest {
 
     private EntityMappingTable entityMappingTable;
+    private SelectQueryBuilder selectQueryBuilder;
 
     @BeforeEach
     void setUp() {
         this.entityMappingTable = EntityMappingTable.from(Person.class);
+        this.selectQueryBuilder = new SelectQueryBuilder(entityMappingTable.getTableName(), new ColumnClause(entityMappingTable.getDomainTypes().getColumnName()));
     }
 
     @DisplayName("조건문 없는 SELECT문을 반환한다.")
     @Test
     void sqlTest() {
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.from(entityMappingTable);
+        WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
-        assertThat(selectQueryBuilder.toSql()).isEqualTo("SELECT id,nick_name,old,email FROM Person ");
+        assertThat(selectQueryBuilder.toSql(whereClause)).isEqualTo("SELECT id,nick_name,old,email FROM Person ");
     }
 
     @DisplayName("조건문 있는 SELECT문을 반환한다.")
@@ -39,9 +43,9 @@ class SelectQueryBuilderTest {
         Criterion criterion = new Criterion(domainType.getColumnName(), "1", Operators.EQUALS);
         Criteria criteria = new Criteria(Collections.singletonList(criterion));
 
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(entityMappingTable, criteria);
+        WhereClause whereClause = new WhereClause(criteria);
 
-        assertThat(selectQueryBuilder.toSql()).isEqualTo("SELECT id,nick_name,old,email FROM Person WHERE id='1'");
+        assertThat(selectQueryBuilder.toSql(whereClause)).isEqualTo("SELECT id,nick_name,old,email FROM Person WHERE id='1'");
     }
 
 }

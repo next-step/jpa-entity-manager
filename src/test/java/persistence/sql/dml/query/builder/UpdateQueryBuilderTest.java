@@ -2,9 +2,11 @@ package persistence.sql.dml.query.builder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.clause.UpdateColumnClause;
+import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
 
@@ -28,10 +30,12 @@ class UpdateQueryBuilderTest {
     void updateQueryTest() {
         Criterion criterion = Criterion.of(pkDomainType.getColumnName(), pkDomainType.getValue().toString());
         Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        WhereClause whereClause = new WhereClause(criteria);
 
-        UpdateQueryBuilder queryBuilder = UpdateQueryBuilder.of(entityMappingTable, criteria);
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMappingTable.getTableName());
+        UpdateColumnClause updateColumnClause = UpdateColumnClause.from(entityMappingTable.getDomainTypes());
 
-        assertThat(queryBuilder.toSql()).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
+        assertThat(updateQueryBuilder.toSql(updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
     }
 
 }
