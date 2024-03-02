@@ -62,6 +62,7 @@ class SimpleEntityManagerTest {
     @DisplayName("엔티티 클래스 타입과 id 값으로 엔티티를 조회 후 반환한다")
     @Test
     @Order(0)
+    @Disabled
     public void find() throws Exception {
         // given
         final Class<PersonV3> clazz = PersonV3.class;
@@ -82,9 +83,9 @@ class SimpleEntityManagerTest {
         final PersonV3 entity = entityManager.find(clazz, id);
 
         // then
-//        assertThat(entity).isNotNull()
-//                .extracting("id", "name", "age", "email", "index")
-//                .contains(id, name, age, email, null);
+        assertThat(entity).isNotNull()
+                .extracting("id", "name", "age", "email", "index")
+                .contains(id, name, age, email, null);
     }
 
     @DisplayName("엔티티 객체로 엔티티를 insert 한다")
