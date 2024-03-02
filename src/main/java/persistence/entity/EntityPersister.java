@@ -10,6 +10,8 @@ public class EntityPersister {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final EntityInformation entityInformation;
+
     private final InsertQueryBuild insertQueryBuilder;
 
     private final UpdateQueryBuild updateQueryBuilder;
@@ -18,13 +20,14 @@ public class EntityPersister {
 
     public EntityPersister(JdbcTemplate jdbcTemplate, InsertQueryBuild insertQueryBuilder, UpdateQueryBuild updateQueryBuilder, DeleteQueryBuild deleteQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityInformation = new EntityInformation();
         this.insertQueryBuilder = insertQueryBuilder;
         this.updateQueryBuilder = updateQueryBuilder;
         this.deleteQueryBuilder = deleteQueryBuilder;
     }
 
-    public <T> boolean update(T entity, Object id) {
-        Query query = updateQueryBuilder.update(entity, id);
+    public boolean update(Object entity) {
+        Query query = updateQueryBuilder.update(entity);
         try {
             executeQuery(query);
             return true;
@@ -33,12 +36,17 @@ public class EntityPersister {
         }
     }
 
-    public <T> void insert(T entity) {
+    public void insert(Object entity) {
         Query query = insertQueryBuilder.insert(entity);
+        if (entityInformation.isNew(entity)) {
+            Long id = jdbcTemplate.executeAndReturnGeneratedKey(query.getSql());
+            entityInformation.setEntityId(entity, id);
+            return;
+        }
         executeQuery(query);
     }
 
-    public <T> void delete(T entity) {
+    public void delete(Object entity) {
         Query query = deleteQueryBuilder.delete(entity);
         executeQuery(query);
     }
@@ -46,4 +54,6 @@ public class EntityPersister {
     private void executeQuery(Query query) {
         jdbcTemplate.execute(query.getSql());
     }
+
+
 }

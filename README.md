@@ -14,3 +14,14 @@
 1. `RowMapper`를 리팩터링하여 동적으로 `Entity`를 생성한다.
    - 구현 클래스 명은 `EntityLoader`로 Read 작업을 수행해 `Entity`를 로드하는 역할을 하도록 한다.
 2. `EntityManager`에서 Read에 대한 책임은 `EntityLoader`로 이동한다.
+
+## 3단계 - First Level Cache, Dirty Check
+
+1. `PersistenceContext`에서 1차 캐싱을 구현한다. 
+   - `addEntity`시 1차 캐시에 Entity를 넣고, 
+   - `getEntity`시 1차 캐시에 값을 뒤지고, 
+   - `removeEntity`시 1차 캐시의 값을 제거한다. 
+   
+2. `snapshot` 만들기
+   - `snapshot`을 만들어 별도의 저장소에 저장한다.
+   - `entityManager.save` 호출시 snapshot 저장소에 저장된 엔티티와 (최초 상태) 비교하여 `dirty checking`을 구현한다.

@@ -7,10 +7,10 @@ public class UpdateQueryBuilder implements UpdateQueryBuild {
     private static final String UPDATE_TEMPLATE = "update %s set %s where %s;";
 
     @Override
-    public Query update(Object entity, Object id) {
+    public Query update(Object entity) {
         DatabaseTable table = new DatabaseTable(entity);
 
-        Condition condition = Condition.equal(table.getPrimaryColumn(), id);
+        Condition condition = Condition.equal(table.getPrimaryColumn());
         String whereClause = new Where(table.getName())
                 .and(condition)
                 .getWhereClause();

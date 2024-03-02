@@ -27,6 +27,8 @@ class EntityManagerImplTest {
 
     private static DatabaseServer server;
     private static EntityManager entityManager;
+    private static PersistenceContext persistenceContext;
+    private static CustomJpaRepository<Person, Long> repository;
 
     @BeforeAll
     static void initDatabase() throws SQLException {
@@ -38,8 +40,9 @@ class EntityManagerImplTest {
         jdbcTemplate.execute(ddlQueryBuilder.createQuery(Person.class));
         EntityPersister entityPersister = new EntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(), new DeleteQueryBuilder());
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new SelectQueryBuilder());
-
-        entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        persistenceContext = new PersistenceContextImpl(new SimpleSnapshotStorage());
+        entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
+        repository = new CustomJpaRepository<>(entityManager, new EntityInformation());
     }
 
     @AfterAll
@@ -69,7 +72,7 @@ class EntityManagerImplTest {
         String updateEmail = "katd6@naver.com";
         Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
         entityManager.persist(person);
-        entityManager.update(new Person(updateName, updateAge, updateEmail, 2), id);
+        entityManager.merge(new Person(id, updateName, updateAge, updateEmail, 2));
 
         Person updatePerson = entityManager.find(Person.class, id);
 
@@ -86,4 +89,36 @@ class EntityManagerImplTest {
         assertThat(field.get(instance)).isEqualTo(fieldValue);
     }
 
+    @Test
+    void should_cache_entity() {
+        Long id = 3L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+        entityManager.merge(person);
+        Person cacheEntity = entityManager.find(Person.class, id);
+
+        assertThat(cacheEntity).isEqualTo(person);
+    }
+
+    @Test
+    void should_remove_cache() {
+        Long id = 4L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+        entityManager.merge(person);
+        entityManager.remove(person);
+
+        assertThat(persistenceContext.getEntity(person.getClass(), id)).isNull();
+    }
+
+    @Test
+    void should_dirty_check_entity() {
+        Long id = 5L;
+        Person person = new Person(id, "cs", 29, "katd216@gmail.com", 0);
+        Person newPerson = new Person(id, "newPerson", 32, "katd6@naver.com", 1);
+        entityManager.merge(person);
+
+
+        assertThat(persistenceContext.isDirty(newPerson)).isTrue();
+        entityManager.merge(newPerson);
+        assertThat(persistenceContext.getEntity(person.getClass(), id)).isEqualTo(newPerson);
+    }
 }
