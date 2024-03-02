@@ -16,7 +16,7 @@
 
 ### step3
 
-- [ ] PersistenceContext 구현체를 구현하고 1차 캐싱을 적용하기
+- [x] PersistenceContext 구현체를 구현하고 1차 캐싱을 적용하기
   - Map을 필드로 가지는 캐시 일급 컬렉션을 만들자.
   - add 할 때는 map에 넣어준다.
   - remove 할 때는 map에서 제거한다.
