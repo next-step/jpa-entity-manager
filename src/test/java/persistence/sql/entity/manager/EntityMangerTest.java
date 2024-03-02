@@ -3,8 +3,15 @@ package persistence.sql.entity.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
 import persistence.sql.db.H2Database;
+import persistence.sql.dml.query.builder.DeleteQueryBuilder;
+import persistence.sql.dml.query.builder.InsertQueryBuilder;
+import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import persistence.sql.dml.query.builder.UpdateQueryBuilder;
+import persistence.sql.dml.query.clause.ColumnClause;
+import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.util.Optional;
 
@@ -12,13 +19,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityMangerTest extends H2Database {
 
-    private EntityManger<Person, Long> entityManger;
+    private EntityManger<Person> entityManger;
 
     private Person person;
 
     @BeforeEach
     void setUp() {
-        this.entityManger = new EntityManagerImpl<>(jdbcTemplate, Person.class);
+        final EntityMappingTable entityMappingTable = EntityMappingTable.from(Person.class);
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+
+        this.entityManger = new EntityManagerImpl<>(
+                jdbcTemplate,
+                new EntityManagerMapper<>(Person.class),
+                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
+                new EntityPersisterImpl<>(
+                        jdbcTemplate,
+                        new InsertQueryBuilder(entityMappingTable.getTableName()),
+                        new UpdateQueryBuilder(entityMappingTable.getTableName()),
+                        new DeleteQueryBuilder(entityMappingTable.getTableName())
+                ));
 
         this.person = new Person(1L, "박재성", 10, "jason");
 
