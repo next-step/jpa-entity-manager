@@ -27,7 +27,7 @@ public class EntityPersisterImpl implements EntityPersister {
     public boolean update(Object entity, Object id) {
 
         UpdateQueryBuilder queryBuilder = updateQueryBuilder.build(entity);
-        String query = queryBuilder.updateById(id);
+        String query = queryBuilder.toStatementWithId(id);
         try {
             jdbcTemplate.execute(query);
             return true;
@@ -35,6 +35,12 @@ public class EntityPersisterImpl implements EntityPersister {
             log.info("Error updating entity: {} and id: {}", entity.getClass().getSimpleName(), id);
             return false;
         }
+    }
+
+    @Override
+    public long insertByGeneratedKey(Object entity) {
+        String query = insertQueryBuilder.build(entity);
+        return jdbcTemplate.executeInsertByGeneratedKey(query);
     }
 
     @Override
@@ -46,7 +52,7 @@ public class EntityPersisterImpl implements EntityPersister {
     @Override
     public void delete(Object entity, Object id) {
         DeleteQueryBuilder queryBuilder = deleteQueryBuilder.build(entity);
-        String query = queryBuilder.deleteById(id);
+        String query = queryBuilder.toStatementWithId(id);
         jdbcTemplate.execute(query);
     }
 }

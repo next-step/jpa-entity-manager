@@ -21,7 +21,7 @@ public class EntityLoaderImpl implements EntityLoader {
     @Override
     public <T> T find(Class<T> entity, Long id) {
         SelectQueryBuilder queryBuilder = selectQueryBuilder.build(entity);
-        String query = queryBuilder.toStatementById(id);
+        String query = queryBuilder.toStatementWithId(id);
         return jdbcTemplate.queryForObject(query, new GenericRowMapper<T>(entity, dialect));
     }
 }

@@ -30,16 +30,23 @@ class EntityManagerImplTest {
     private TableColumn table;
     private Dialect dialect;
     private EntityManager entityManager;
+    private PersistenceContext persistContext;
 
     @BeforeEach
     void setUp() throws SQLException {
         DatabaseServer server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(jdbcTemplate, new MysqlDialect());
         Class<Person> personEntity = Person.class;
         table = new TableColumn(personEntity);
         dialect = new MysqlDialect();
+        persistContext = new HibernatePersistContext();
+        entityManager = new EntityManagerImpl(
+                new MysqlDialect(),
+                persistContext,
+                new EntityPersisterImpl(jdbcTemplate, new MysqlDialect()),
+                new EntityLoaderImpl(jdbcTemplate, new MysqlDialect())
+        );
 
         createTable(personEntity);
     }
@@ -114,7 +121,6 @@ class EntityManagerImplTest {
         entityManager.persist(person);
 
         // then
-        PersistenceContext persistContext = entityManager.getPersistContext();
         Optional<Object> findPerson = persistContext.getEntity(person.getId());
 
         assertAll(
@@ -170,7 +176,6 @@ class EntityManagerImplTest {
         entityManager.remove(person);
 
         // then
-        PersistenceContext persistContext = entityManager.getPersistContext();
         Optional<Object> findPerson = persistContext.getEntity(person.getId());
         assertThat(findPerson).isEmpty();
     }
@@ -203,7 +208,6 @@ class EntityManagerImplTest {
         entityManager.merge(person);
 
         // then
-        PersistenceContext persistContext = entityManager.getPersistContext();
         Optional<Object> findPerson = persistContext.getEntity(person.getId());
         assertAll(
                 () -> assertThat(findPerson).isPresent(),

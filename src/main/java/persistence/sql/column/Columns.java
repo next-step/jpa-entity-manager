@@ -52,10 +52,4 @@ public class Columns {
         return Collections.unmodifiableList(values);
     }
 
-    public String getColumnValues() {
-        return this.values.stream()
-                .map(GeneralColumn::getValue)
-                .map(String::valueOf)
-                .collect(Collectors.joining(COMMA));
-    }
 }

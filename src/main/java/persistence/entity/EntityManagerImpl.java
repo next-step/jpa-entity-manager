@@ -15,10 +15,14 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
+        this(dialect, new HibernatePersistContext(), new EntityPersisterImpl(jdbcTemplate, dialect), new EntityLoaderImpl(jdbcTemplate, dialect));
+    }
+
+    public EntityManagerImpl(Dialect dialect, PersistenceContext persistContext, EntityPersister entityPersister, EntityLoader entityLoader) {
         this.dialect = dialect;
-        this.persistContext = new HibernatePersistContext();
-        this.entityLoader = new EntityLoaderImpl(jdbcTemplate, dialect);
-        this.entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect);
+        this.persistContext = persistContext;
+        this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
 
     @Override
@@ -31,28 +35,24 @@ public class EntityManagerImpl implements EntityManager {
                 });
         persistContext.getDatabaseSnapshot(id, entity);
         return clazz.cast(entity);
-
     }
 
     @Override
-    public Object persist(Object entity) {
+    public <T> T persist(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
 
         GenerationType generationType = idColumn.getIdGeneratedStrategy().getGenerationType();
-        if (!dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
-            savePersistence(entity, idColumn.getValue());
-            entityPersister.insert(entity);
-            return entity;
-        }
-
-        if (idColumn.isNull()) {
-            setIdValue(entity, getIdField(entity, idColumn), 1L);
+        if (dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
+            long id = entityPersister.insertByGeneratedKey(entity);
+            savePersistence(entity, id);
+            setIdValue(entity, getIdField(entity, idColumn), id);
+            return (T) entity;
         }
 
         savePersistence(entity, idColumn.getValue());
         entityPersister.insert(entity);
 
-        return entity;
+        return (T) entity;
     }
 
     private void setIdValue(Object entity, Field idField, long idValue) {
@@ -98,16 +98,6 @@ public class EntityManagerImpl implements EntityManager {
     private <T> void savePersistence(T entity, Long id) {
         persistContext.getDatabaseSnapshot(id, entity);
         persistContext.addEntity(id, entity);
-    }
-
-    @Override
-    public PersistenceContext getPersistContext() {
-        return persistContext;
-    }
-
-    @Override
-    public <T> T getSnapshot(T id) {
-        return persistContext.getCachedDatabaseSnapshot(id);
     }
 
     @Override

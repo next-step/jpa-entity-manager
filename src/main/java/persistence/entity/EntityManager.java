@@ -12,9 +12,5 @@ public interface EntityManager {
 
     <T> T merge(T entity);
 
-    PersistenceContext getPersistContext();
-
-    <T> T getSnapshot(T id);
-
     Dialect getDialect();
 }

@@ -19,7 +19,7 @@ class DeleteQueryBuilderTest {
         Person person = new Person("username", 50, "test@test.com", 1);
 
         //when
-        String query = deleteQueryBuilder.build(person).deleteById(1L);
+        String query = deleteQueryBuilder.build(person).toStatementWithId(1L);
 
         //then
         assertThat(query).isEqualTo("delete from users where id = 1");
