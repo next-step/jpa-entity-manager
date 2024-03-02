@@ -18,10 +18,12 @@
 
 ### 3단계 - First Level Cache, Dirty Check
 
-- [ ] 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
-- [ ] 요구사항2 - snapshot 만들기
-- [ ] 요구사항3 - 더티체킹 구현
+- [x] 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+- [x] 요구사항2 - snapshot 만들기
+- [x] 요구사항3 - 더티체킹 구현
 
 ### 4단계 - EntityEntry
 
-- [ ] 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자
+- [x] 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자
+- [ ] // XXX: Difference -> Changes 네이밍 변경
+- [x] // FirstLevelCache 를 별도 클래스로 분리

@@ -30,7 +30,8 @@ public class EntityPersister {
     }
 
     public void insert(Object entity) {
-        String query = insertQueryBuilder.buildQuery(entity);
+        Long id = getRowId(entity);
+        String query = insertQueryBuilder.buildQuery(id, columnValues(entity));
         jdbcTemplate.execute(query);
     }
 
@@ -39,7 +40,7 @@ public class EntityPersister {
     }
 
     public void update(Long id, Object entity) {
-        doUpdate(id, new ColumnValueMap(entity).getColumnValueMap());
+        doUpdate(id, columnValues(entity));
     }
 
     private void doUpdate(Long id, Map<String, Object> map) {
@@ -50,5 +51,15 @@ public class EntityPersister {
     public void delete(Long id) {
         String query = deleteQueryBuilder.buildQuery(Map.of("id", id));
         jdbcTemplate.execute(query);
+    }
+
+    // XXX: 중복
+    private static Long getRowId(Object entity) {
+        EntityMetadata entityMetadata = new EntityMetadata(entity.getClass());
+        return entityMetadata.getPrimaryKeyValue(entity);
+    }
+
+    private Map<String, Object> columnValues(Object entity) {
+        return new ColumnValueMap(entity).getColumnValueMap();
     }
 }

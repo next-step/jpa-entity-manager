@@ -54,4 +54,8 @@ public class EntityMetadata {
     public Field getFieldByColumnName(String columnName) {
         return columnsMetadata.getFieldByColumnName(columnName);
     }
+
+    public boolean hasAutoIncrementPrimaryKey() {
+        return columnsMetadata.hasAutoIncrementPrimaryKey();
+    }
 }

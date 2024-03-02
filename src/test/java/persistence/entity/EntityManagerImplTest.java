@@ -1,13 +1,16 @@
 package persistence.entity;
 
 import database.sql.Person;
+import database.sql.dml.NoAutoIncrementUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.context.PrimaryKeyMissingException;
 import testsupport.H2DatabaseTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static testsupport.EntityTestUtils.*;
 
 class EntityManagerImplTest extends H2DatabaseTest {
@@ -24,13 +27,19 @@ class EntityManagerImplTest extends H2DatabaseTest {
     }
 
     @Test
-    void find() {
+    void persistAndFind() {
         Person person = newPerson(null, "abc123", 14, "c123@d.com");
         entityManager.persist(person);
 
         Person found = entityManager.find(Person.class, 1L);
 
         assertSamePerson(found, person, false);
+    }
+
+    @Test
+    void persistNoAutoIncrementEntityWithoutId() {
+        NoAutoIncrementUser user = new NoAutoIncrementUser(null, "abc123", 14, "c123@d.com");
+        assertThrows(PrimaryKeyMissingException.class, () -> entityManager.persist(user));
     }
 
     @Test

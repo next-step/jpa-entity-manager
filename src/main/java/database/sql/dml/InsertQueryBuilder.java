@@ -1,20 +1,27 @@
 package database.sql.dml;
 
 import database.sql.util.EntityMetadata;
+import persistence.entity.context.PrimaryKeyMissingException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static database.sql.Util.quote;
 
 public class InsertQueryBuilder {
     private final String tableName;
+    private final String primaryKeyColumnName;
     private final List<String> generalColumnNames;
+    private final boolean hasAutoIncrementPrimaryKey;
 
+    // XXX: private 함수들 정리 필요. 비슷한 코드가 두 벌씩 있음
     public InsertQueryBuilder(EntityMetadata entityMetadata) {
-        this.tableName = entityMetadata.getTableName();
-        this.generalColumnNames = entityMetadata.getGeneralColumnNames();
+        tableName = entityMetadata.getTableName();
+        primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
+        generalColumnNames = entityMetadata.getGeneralColumnNames();
+        hasAutoIncrementPrimaryKey = entityMetadata.hasAutoIncrementPrimaryKey();
     }
 
     public InsertQueryBuilder(Class<?> entityClass) {
@@ -22,29 +29,62 @@ public class InsertQueryBuilder {
     }
 
     public String buildQuery(Map<String, Object> valueMap) {
-        return String.format("INSERT INTO %s (%s) VALUES (%s)",
-                             tableName,
-                             String.join(", ", columnClauses(valueMap)),
-                             valueClauses(valueMap));
+        checkGenerationStrategy(null);
+
+        return buildQuery(
+                columnClauses(valueMap),
+                valueClauses(valueMap));
     }
 
-    public String buildQuery(Object entity) {
-        return buildQuery(columnValues(entity));
+    public String buildQuery(Long id, Map<String, Object> valueMap) {
+        checkGenerationStrategy(id);
+
+        if (id == null) {
+            return buildQuery(valueMap);
+        }
+
+        return buildQuery(columnClauses(primaryKeyColumnName, valueMap), valueClauses(id, valueMap));
     }
 
-    private List<String> columnClauses(Map<String, Object> valueMap) {
+    private void checkGenerationStrategy(Long id) {
+        if (!hasAutoIncrementPrimaryKey && id == null) {
+            throw new PrimaryKeyMissingException();
+        }
+    }
+
+    private String buildQuery(String columns, String values) {
+        return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, values);
+    }
+
+    private List<String> columns(Map<String, Object> valueMap) {
         return generalColumnNames.stream()
                 .filter(valueMap::containsKey)
                 .collect(Collectors.toList());
     }
 
-    private String valueClauses(Map<String, Object> valueMap) {
-        return columnClauses(valueMap).stream()
-                .map(columnName -> quote(valueMap.get(columnName)))
-                .collect(Collectors.joining(", "));
+    private String columnClauses(Map<String, Object> valueMap) {
+        StringJoiner joiner = new StringJoiner(", ");
+        columns(valueMap).forEach(joiner::add);
+        return joiner.toString();
     }
 
-    private Map<String, Object> columnValues(Object entity) {
-        return new ColumnValueMap(entity).getColumnValueMap();
+    private String columnClauses(String primaryKeyColumnName, Map<String, Object> valueMap) {
+        StringJoiner joiner = new StringJoiner(", ");
+        joiner.add(primaryKeyColumnName);
+        columns(valueMap).forEach(joiner::add);
+        return joiner.toString();
+    }
+
+    private String valueClauses(Map<String, Object> valueMap) {
+        StringJoiner joiner = new StringJoiner(", ");
+        columns(valueMap).forEach(key -> joiner.add(quote(valueMap.get(key))));
+        return joiner.toString();
+    }
+
+    private String valueClauses(Long id, Map<String, Object> valueMap) {
+        StringJoiner joiner = new StringJoiner(", ");
+        joiner.add(quote(id));
+        columns(valueMap).forEach(key -> joiner.add(quote(valueMap.get(key))));
+        return joiner.toString();
     }
 }

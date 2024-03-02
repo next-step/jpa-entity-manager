@@ -67,16 +67,27 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(Object entity) {
-        if (getRowId(entity) == null) {
-            insertNewEntity(entity);
+    public void addEntity(Object newEntity) {
+        if (isInsertOperation(newEntity)) {
+            insertNewEntity(newEntity);
         } else {
-            updateExistingEntity(entity);
+            updateExistingEntity(newEntity);
         }
+    }
+
+    /**
+     * entity 에 id=null 이거나, id 값으로 database 에서 조회가 안되면 insert 해야 한다고 판단한다.
+     */
+    private boolean isInsertOperation(Object newEntity) {
+        Long id = getRowId(newEntity);
+        if (id == null) return true;
+
+        return getEntity(newEntity.getClass(), id) == null;
     }
 
     private void insertNewEntity(Object entity) {
         Class<?> entityClass = entity.getClass();
+        Long id = getRowId(entity);
 
         entityPersisterOf(entityClass).insert(entity);
 

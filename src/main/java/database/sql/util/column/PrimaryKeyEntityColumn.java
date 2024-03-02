@@ -35,4 +35,8 @@ public class PrimaryKeyEntityColumn extends AbstractEntityColumn {
     public boolean isPrimaryKeyField() {
         return true;
     }
+
+    public boolean hasAutoIncrementPrimaryKey() {
+        return autoIncrement;
+    }
 }

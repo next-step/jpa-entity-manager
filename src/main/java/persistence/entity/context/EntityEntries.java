@@ -39,6 +39,6 @@ public class EntityEntries {
         if (id == null) {
             throw new RuntimeException("id is null");
         }
-        return EntityKey.from(entityClass, id);
+        return EntityKey.of(entityClass, id);
     }
 }

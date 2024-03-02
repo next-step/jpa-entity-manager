@@ -31,7 +31,12 @@ public class QueryBuilder {
 
     public String buildInsertQuery(Object entity) {
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity.getClass());
-        return insertQueryBuilder.buildQuery(entity);
+
+        return insertQueryBuilder.buildQuery(columnValues(entity));
+    }
+
+    private Map<String, Object> columnValues(Object entity) {
+        return new ColumnValueMap(entity).getColumnValueMap();
     }
 
     /* UPDATE */

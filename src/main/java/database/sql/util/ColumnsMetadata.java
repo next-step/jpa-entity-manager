@@ -2,6 +2,7 @@ package database.sql.util;
 
 import database.sql.util.column.EntityColumn;
 import database.sql.util.column.FieldToEntityColumnConverter;
+import database.sql.util.column.PrimaryKeyEntityColumn;
 import database.sql.util.type.TypeConverter;
 import jakarta.persistence.Transient;
 
@@ -67,5 +68,9 @@ public class ColumnsMetadata {
     public Field getFieldByColumnName(String columnName) {
         String upperCase = columnName.toUpperCase();
         return fieldByColumnNameMap.get(upperCase);
+    }
+
+    public boolean hasAutoIncrementPrimaryKey() {
+        return ((PrimaryKeyEntityColumn) primaryKey).hasAutoIncrementPrimaryKey();
     }
 }

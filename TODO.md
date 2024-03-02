@@ -6,6 +6,7 @@
 - mock 대신 h2 사용한 방식으로 테스트코드 작성(delete test) -- 여러 테스트에서 사용할 수 있게..
 - ParameterizedTest 의 MethodSource 를 fixture, constant class, enum(써봄) 중 하나로 바꿔보기
 - dialect 개념을 만들고 typeconverter 를 집어넣기
+- 생성자에 들어있는 로직들을 별도 메서드로 분리해내기(생성자는 생성만 하고 끝마치도록)
 
 # 커밋 전에 확인할 것
 

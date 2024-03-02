@@ -98,10 +98,23 @@ class PersistenceContextImplTest extends H2DatabaseTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 객체를 업데이트하려고 해본다")
+    @DisplayName("아직 db 에 없는 ID 를 가진 객체를 persist 해본다.")
     void scenario5() {
+        assertThat(persistenceContext.getEntity(Person.class, 20L)).isNull();
+
         Person person = new Person(20L, "가나다라", 22, "email2@test.com");
-        assertThrows(UnsupportedOperationException.class, () -> persistenceContext.addEntity(person));
+        persistenceContext.addEntity(person);
+
+        Person fetched = (Person) persistenceContext.getEntity(Person.class, 20L);
+        assertAll(
+                () -> assertSamePerson(fetched, person, true),
+                () -> assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
+                        "SELECT id, nick_name, old, email FROM users WHERE id = 20",
+                        "SELECT id, nick_name, old, email FROM users WHERE id = 20",
+                        "INSERT INTO users (id, nick_name, old, email) VALUES (20, '가나다라', 22, 'email2@test.com')",
+                        "SELECT max(id) as id FROM users",
+                        "SELECT id, nick_name, old, email FROM users WHERE id = 20")
+        );
     }
 
 }

@@ -3,7 +3,6 @@ package persistence.entity.context;
 import java.util.Objects;
 
 class EntityKey {
-
     private final String entityClass;
     private final Long id;
 
@@ -12,7 +11,7 @@ class EntityKey {
         this.id = id;
     }
 
-    public static EntityKey from(Class<?> entityClass, Long id) {
+    public static EntityKey of(Class<?> entityClass, Long id) {
         return new EntityKey(entityClass.getName(), id);
     }
 
