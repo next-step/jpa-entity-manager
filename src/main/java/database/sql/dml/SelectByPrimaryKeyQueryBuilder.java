@@ -1,6 +1,6 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
+import database.mapping.EntityMetadata;
 
 public class SelectByPrimaryKeyQueryBuilder {
     private final String tableName;
@@ -13,8 +13,8 @@ public class SelectByPrimaryKeyQueryBuilder {
         this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
     }
 
-    public SelectByPrimaryKeyQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public SelectByPrimaryKeyQueryBuilder(Class<?> clazz) {
+        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Long id) {

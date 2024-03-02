@@ -1,9 +1,9 @@
-package persistence.entity;
+package persistence.entity.database;
 
 import database.sql.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import persistence.entity.database.EntityLoader;
+import persistence.entity.EntityManagerImpl;
 import testsupport.H2DatabaseTest;
 
 import java.util.List;
@@ -17,13 +17,13 @@ class EntityLoaderTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = new EntityManagerImpl(loggingJdbcTemplate);
-        entityLoader = new EntityLoader(loggingJdbcTemplate, Person.class);
+        entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
+        entityLoader = new EntityLoader(loggingJdbcTemplate);
     }
 
     @Test
     void loadMissingRecord() {
-        assertThat(entityLoader.load(1L)).isEmpty();
+        assertThat(entityLoader.load(Person.class, 1L)).isEmpty();
     }
 
     @Test
@@ -31,7 +31,7 @@ class EntityLoaderTest extends H2DatabaseTest {
         Person person = new Person(null, "abc123", 14, "c123@d.com");
         entityManager.persist(person);
 
-        Person found = (Person) entityLoader.load(1L).get();
+        Person found = (Person) entityLoader.load(Person.class, 1L).get();
 
         assertSamePerson(found, person, false);
     }
@@ -43,7 +43,7 @@ class EntityLoaderTest extends H2DatabaseTest {
         entityManager.persist(p1);
         entityManager.persist(p2);
 
-        List<Object> result = entityLoader.load(List.of(1L, 2L));
+        List<Object> result = entityLoader.load(Person.class, List.of(1L, 2L));
 
         assertSamePerson((Person) result.get(0), p1, false);
         assertSamePerson((Person) result.get(1), p2, false);

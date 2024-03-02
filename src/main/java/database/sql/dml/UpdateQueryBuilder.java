@@ -1,7 +1,7 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
-import database.sql.util.column.EntityColumn;
+import database.mapping.EntityMetadata;
+import database.mapping.column.EntityColumn;
 
 import java.util.List;
 import java.util.Map;
@@ -18,8 +18,8 @@ public class UpdateQueryBuilder {
         this.generalColumns = entityMetadata.getGeneralColumns();
     }
 
-    public UpdateQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public UpdateQueryBuilder(Class<?> clazz) {
+        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(long id, Map<String, Object> changes) {

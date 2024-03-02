@@ -1,6 +1,6 @@
 package database.sql.ddl;
 
-import database.sql.util.EntityMetadata;
+import database.mapping.EntityMetadata;
 
 public class DropQueryBuilder {
     private final String tableName;
@@ -9,8 +9,8 @@ public class DropQueryBuilder {
         this.tableName = entityMetadata.getTableName();
     }
 
-    public DropQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public DropQueryBuilder(Class<?> clazz) {
+        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery() {

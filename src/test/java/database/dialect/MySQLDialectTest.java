@@ -1,12 +1,10 @@
-package database.sql.util;
+package database.dialect;
 
-import database.sql.util.type.MySQLTypeConverter;
-import database.sql.util.type.TypeConverter;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MySQLTypeConverterTest {
+class MySQLDialectTest {
 
     @Test
     void convert() {
@@ -17,8 +15,8 @@ class MySQLTypeConverterTest {
     }
 
     private void assertConversion(Class<?> entityType, Integer columnLength, String databaseType) {
-        TypeConverter converter = new MySQLTypeConverter();
+        Dialect dialect = MySQLDialect.INSTANCE;
 
-        assertThat(converter.convert(entityType, columnLength)).isEqualTo(databaseType);
+        assertThat(dialect.convertToSqlTypeDefinition(entityType, columnLength)).isEqualTo(databaseType);
     }
 }

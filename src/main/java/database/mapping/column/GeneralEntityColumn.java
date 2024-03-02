@@ -1,8 +1,9 @@
-package database.sql.util.column;
+package database.mapping.column;
 
-import database.sql.util.type.TypeConverter;
+import database.dialect.Dialect;
 
 import java.lang.reflect.Field;
+import java.util.StringJoiner;
 
 public class GeneralEntityColumn extends AbstractEntityColumn {
     private final boolean nullable;
@@ -18,8 +19,12 @@ public class GeneralEntityColumn extends AbstractEntityColumn {
     }
 
     @Override
-    public String toColumnDefinition(TypeConverter typeConverter) {
-        return columnName + " " + typeConverter.convert(type, columnLength) + " " + toNullableDefinition();
+    public String toColumnDefinition(Dialect dialect) {
+        return new StringJoiner(" ")
+                .add(columnName)
+                .add(dialect.convertToSqlTypeDefinition(type, columnLength))
+                .add(dialect.nullableDefinition(nullable))
+                .toString();
     }
 
     @Override
@@ -27,7 +32,4 @@ public class GeneralEntityColumn extends AbstractEntityColumn {
         return false;
     }
 
-    private String toNullableDefinition() {
-        return nullable ? "NULL" : "NOT NULL";
-    }
 }

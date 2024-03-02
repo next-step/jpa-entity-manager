@@ -4,7 +4,7 @@ import database.sql.Person;
 import database.sql.dml.NoAutoIncrementUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import persistence.entity.context.PrimaryKeyMissingException;
+import persistence.entity.database.PrimaryKeyMissingException;
 import testsupport.H2DatabaseTest;
 
 import java.util.List;
@@ -18,7 +18,7 @@ class EntityManagerImplTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = new EntityManagerImpl(loggingJdbcTemplate);
+        entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
     }
 
     @Test

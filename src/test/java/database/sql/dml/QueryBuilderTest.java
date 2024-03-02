@@ -19,12 +19,12 @@ class QueryBuilderTest {
     @Test
     void buildInsertQuery() {
         QueryBuilder builder = QueryBuilder.getInstance();
-        Class<?> entityClass = Person4.class;
+        Class<?> clazz = Person4.class;
         Map<String, Object> valueMap = new HashMap<>();
         valueMap.put("nick_name", "abc");
         valueMap.put("old", "14");
         valueMap.put("email", "a@b.com");
-        String actual = builder.buildInsertQuery(entityClass, valueMap);
+        String actual = builder.buildInsertQuery(clazz, valueMap);
 
         assertThat(actual).isEqualTo("INSERT INTO users (nick_name, old, email) VALUES ('abc', 14, 'a@b.com')");
     }

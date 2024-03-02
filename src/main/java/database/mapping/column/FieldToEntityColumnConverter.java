@@ -1,4 +1,4 @@
-package database.sql.util.column;
+package database.mapping.column;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +29,8 @@ public class FieldToEntityColumnConverter {
 
         if (isId) {
             boolean autoIncrement = isAutoIncrement(generatedValueAnnotation);
-            return new PrimaryKeyEntityColumn(field, columnName, type, columnLength, autoIncrement);
+            boolean hasIdGenerationStrategy = generatedValueAnnotation != null;
+            return new PrimaryKeyEntityColumn(field, columnName, type, columnLength, autoIncrement, hasIdGenerationStrategy);
         }
 
         boolean nullable = isNullable(columnAnnotation);

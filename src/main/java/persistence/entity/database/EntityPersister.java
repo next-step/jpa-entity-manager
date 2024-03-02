@@ -1,10 +1,11 @@
 package persistence.entity.database;
 
-import database.sql.dml.ColumnValueMap;
+import database.mapping.ColumnValueMap;
+import database.mapping.EntityClass;
+import database.mapping.EntityMetadata;
 import database.sql.dml.DeleteQueryBuilder;
 import database.sql.dml.InsertQueryBuilder;
 import database.sql.dml.UpdateQueryBuilder;
-import database.sql.util.EntityMetadata;
 import jdbc.JdbcTemplate;
 
 import java.util.Map;
@@ -15,53 +16,73 @@ import java.util.Map;
  */
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
-    private final EntityMetadata entityMetadata;
-    private final InsertQueryBuilder insertQueryBuilder;
-    private final UpdateQueryBuilder updateQueryBuilder;
-    private final DeleteQueryBuilder deleteQueryBuilder;
 
-    public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> entityClass) {
+    public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.entityMetadata = new EntityMetadata(entityClass);
-        this.insertQueryBuilder = new InsertQueryBuilder(entityMetadata);
-        this.updateQueryBuilder = new UpdateQueryBuilder(entityMetadata);
-        this.deleteQueryBuilder = new DeleteQueryBuilder(entityMetadata);
     }
 
-    public void insert(Object entity) {
-        // XXX: id 없는거 예외 처리는 여기서
-        Long id = getRowId(entity);
-        String query = insertQueryBuilder.buildQuery(id, columnValues(entity));
-        jdbcTemplate.execute(query);
-        // TODO: getlastid
+    public Long insert(Class<?> clazz, Object entity) {
+        EntityClass entityClass = EntityClass.of(clazz);
+        EntityMetadata metadata = entityClass.getMetadata();
+
+        Long id = metadata.getPrimaryKeyValue(entity);
+        checkGenerationStrategy(metadata, id);
+        id = metadata.hasIdGenerationStrategy() ? null : id;
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata)
+                .id(id)
+                .values(columnValues(entity));
+        jdbcTemplate.execute(insertQueryBuilder.toQueryString());
+
+        return getLastId(metadata.getTableName());
 //        jdbcTemplate.execute2(query);
     }
 
-    public void update(Long id, Map<String, Object> changes) {
-        doUpdate(id, changes);
+    /**
+     * id 없고 strategy 있고 --> 무시하거나 예외 내야 함
+     *
+     * @param entityMetadata
+     * @param id
+     */
+    private void checkGenerationStrategy(EntityMetadata entityMetadata, Long id) {
+        boolean hasIdGenerationStrategy = entityMetadata.hasIdGenerationStrategy();
+        if (!hasIdGenerationStrategy && id == null) {
+            throw new PrimaryKeyMissingException();
+        }
     }
 
-    public void update(Long id, Object entity) {
-        doUpdate(id, columnValues(entity));
+    public void update(Class<?> clazz, Long id, Map<String, Object> changes) {
+        doUpdate(clazz, id, changes);
     }
 
-    private void doUpdate(Long id, Map<String, Object> map) {
+    public void update(Class<?> clazz, Long id, Object entity) {
+        update(clazz, id, columnValues(entity));
+    }
+
+    private void doUpdate(Class<?> clazz, Long id, Map<String, Object> map) {
+        EntityClass entityClass = EntityClass.of(clazz);
+        EntityMetadata metadata = entityClass.getMetadata();
+
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(metadata);
         String query = updateQueryBuilder.buildQuery(id, map);
         jdbcTemplate.execute(query);
     }
 
-    public void delete(Long id) {
-        String query = deleteQueryBuilder.buildQuery(Map.of("id", id));
+    public void delete(Class<?> clazz, Long id) {
+        EntityClass entityClass = EntityClass.of(clazz);
+        EntityMetadata metadata = entityClass.getMetadata();
+
+        DeleteQueryBuilder deleteQueryBuilder1 = new DeleteQueryBuilder(metadata);
+        String query = deleteQueryBuilder1.buildQuery(Map.of("id", id));
         jdbcTemplate.execute(query);
     }
 
-    // XXX: 중복
-    private static Long getRowId(Object entity) {
-        EntityMetadata entityMetadata = new EntityMetadata(entity.getClass());
-        return entityMetadata.getPrimaryKeyValue(entity);
+    private Map<String, Object> columnValues(Object entity) {
+        return ColumnValueMap.fromEntity(entity).getMap();
     }
 
-    private Map<String, Object> columnValues(Object entity) {
-        return new ColumnValueMap(entity).getColumnValueMap();
+    // XXX: 데이터베이스에서 지원하는 방식으로 변경하기
+    private Long getLastId(String tableName) {
+        String query = "SELECT max(id) as id FROM " + tableName;
+        return jdbcTemplate.queryForObject(query, resultSet -> resultSet.getLong("id"));
     }
 }

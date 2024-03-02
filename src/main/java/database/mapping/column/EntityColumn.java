@@ -1,6 +1,6 @@
-package database.sql.util.column;
+package database.mapping.column;
 
-import database.sql.util.type.TypeConverter;
+import database.dialect.Dialect;
 
 import java.lang.reflect.Field;
 
@@ -14,7 +14,7 @@ public interface EntityColumn {
 
     String getColumnName();
 
-    String toColumnDefinition(TypeConverter typeConverter);
+    String toColumnDefinition(Dialect dialect);
 
     boolean isPrimaryKeyField();
 }

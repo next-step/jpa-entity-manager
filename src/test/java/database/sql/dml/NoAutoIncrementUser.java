@@ -21,6 +21,9 @@ public class NoAutoIncrementUser {
     @Transient
     private Integer index;
 
+    public NoAutoIncrementUser() {
+    }
+
     public NoAutoIncrementUser(Long id, String name, Integer age, String email) {
         this.id = id;
         this.name = name;

@@ -2,6 +2,7 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
+import database.dialect.MySQLDialect;
 import database.sql.Person;
 import database.sql.ddl.QueryBuilder;
 import jdbc.JdbcTemplate;
@@ -20,10 +21,10 @@ public class Application {
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-            String query = QueryBuilder.getInstance().buildCreateQuery(Person.class);
+            String query = QueryBuilder.getInstance().buildCreateQuery(Person.class, MySQLDialect.INSTANCE);
             jdbcTemplate.execute(query);
 
-            EntityManagerImpl entityManager = new EntityManagerImpl(jdbcTemplate);
+            EntityManagerImpl entityManager = EntityManagerImpl.from(jdbcTemplate);
             entityManager.persist(new Person("abc", 18, "abc@example.com"));
             System.out.println(entityManager.find(Person.class, 1L));
             System.out.println(entityManager.find(Person.class, 1L));

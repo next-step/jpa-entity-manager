@@ -1,11 +1,9 @@
 package database.sql.ddl;
 
-import database.sql.util.type.MySQLTypeConverter;
-import database.sql.util.type.TypeConverter;
+import database.dialect.Dialect;
 
 public class QueryBuilder {
     private static final QueryBuilder INSTANCE = new QueryBuilder();
-    private static final TypeConverter typeConverter = new MySQLTypeConverter();
 
     private QueryBuilder() {
     }
@@ -14,13 +12,13 @@ public class QueryBuilder {
         return INSTANCE;
     }
 
-    public String buildCreateQuery(Class<?> entityClass) {
-        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(entityClass, typeConverter);
+    public String buildCreateQuery(Class<?> clazz, Dialect dialect) {
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(clazz, dialect);
         return createQueryBuilder.buildQuery();
     }
 
-    public String buildDeleteQuery(Class<?> entityClass) {
-        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entityClass);
+    public String buildDeleteQuery(Class<?> clazz) {
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(clazz);
         return dropQueryBuilder.buildQuery();
     }
 }

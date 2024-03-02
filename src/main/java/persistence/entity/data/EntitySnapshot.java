@@ -1,7 +1,7 @@
 package persistence.entity.data;
 
-import database.sql.util.EntityMetadata;
-import database.sql.util.column.EntityColumn;
+import database.mapping.EntityMetadata;
+import database.mapping.column.EntityColumn;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class EntitySnapshot {
             return ret;
         }
 
-        EntityMetadata entityMetadata = new EntityMetadata(entity.getClass());
+        EntityMetadata entityMetadata = EntityMetadata.fromClass(entity.getClass());
         for (EntityColumn column : entityMetadata.getGeneralColumns()) {
             String key = column.getColumnName();
             Object value = column.getValue(entity);
@@ -29,7 +29,7 @@ public class EntitySnapshot {
         return ret;
     }
 
-    public Map<String, Object> changes(EntitySnapshot newEntitySnapshot) {
+    public Map<String, Object> diff(EntitySnapshot newEntitySnapshot) {
         Map<String, Object> changes = new HashMap<>();
 
         for (String key : newEntitySnapshot.snapshot.keySet()) {
@@ -49,4 +49,6 @@ public class EntitySnapshot {
         }
         return !oldValue.equals(newValue);
     }
+
+
 }

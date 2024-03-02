@@ -10,25 +10,15 @@ public class FirstLevelCache {
         this.map = new HashMap<>();
     }
 
-    public Object get(Class<?> entityClass, Long id) {
-        EntityKey entityKey = getCacheKey(entityClass, id);
+    public Object get(EntityKey entityKey) {
         return map.get(entityKey);
     }
 
-    public void store(Class<?> entityClass, Long id, Object entity) {
-        EntityKey entityKey = getCacheKey(entityClass, id);
+    public void store(EntityKey entityKey, Object entity) {
         map.put(entityKey, entity);
     }
 
-    public void delete(Class<?> entityClass, Long id) {
-        EntityKey entityKey = getCacheKey(entityClass, id);
+    public void delete(EntityKey entityKey) {
         map.remove(entityKey);
-    }
-
-    private static EntityKey getCacheKey(Class<?> entityClass, Long id) {
-        if (id == null) {
-            throw new RuntimeException("id is null");
-        }
-        return EntityKey.of(entityClass, id);
     }
 }

@@ -1,6 +1,6 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
+import database.mapping.EntityMetadata;
 
 import java.util.List;
 import java.util.Map;
@@ -16,8 +16,8 @@ public class SelectQueryBuilder {
         this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
     }
 
-    public SelectQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public SelectQueryBuilder(Class<?> clazz) {
+        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
@@ -29,6 +29,6 @@ public class SelectQueryBuilder {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return new WhereClause(conditionMap, allColumnNames).toQuery();
+        return WhereClause.from(conditionMap, allColumnNames).toQuery();
     }
 }

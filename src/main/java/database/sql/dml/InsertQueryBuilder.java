@@ -1,7 +1,6 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
-import persistence.entity.context.PrimaryKeyMissingException;
+import database.mapping.EntityMetadata;
 
 import java.util.List;
 import java.util.Map;
@@ -13,79 +12,61 @@ import static database.sql.Util.quote;
 public class InsertQueryBuilder {
     private final String tableName;
     private final String primaryKeyColumnName;
-    private final List<String> generalColumnNames;
-    private final boolean hasAutoIncrementPrimaryKey;
+    private final List<String> columnNames;
 
-    // XXX: private 함수들 정리 필요. 비슷한 코드가 두 벌씩 있음
-    public InsertQueryBuilder(EntityMetadata entityMetadata) {
-        tableName = entityMetadata.getTableName();
-        primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
-        generalColumnNames = entityMetadata.getGeneralColumnNames();
-        hasAutoIncrementPrimaryKey = entityMetadata.hasAutoIncrementPrimaryKey();
+    private Long id;
+    private boolean includeIdField;
+    private Map<String, Object> values;
+
+    public InsertQueryBuilder(EntityMetadata metadata) {
+        this.includeIdField = false;
+        this.id = null;
+
+        tableName = metadata.getTableName();
+        primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
+        columnNames = metadata.getGeneralColumnNames();
     }
 
-    public InsertQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public InsertQueryBuilder id(Long id) {
+        this.includeIdField = id != null;
+        this.id = id;
+        return this;
     }
 
-    public String buildQuery(Map<String, Object> valueMap) {
-        checkGenerationStrategy(null);
-
-        return buildQuery(
-                columnClauses(valueMap),
-                valueClauses(valueMap));
+    public InsertQueryBuilder values(Map<String, Object> values) {
+        this.values = values;
+        return this;
     }
 
-    public String buildQuery(Long id, Map<String, Object> valueMap) {
-        checkGenerationStrategy(id);
+    public String toQueryString() {
+        if (values == null) throw new RuntimeException("values are required");
 
-        if (id == null) {
-            return buildQuery(valueMap);
-        }
-
-        return buildQuery(columnClauses(primaryKeyColumnName, valueMap), valueClauses(id, valueMap));
-    }
-
-    // XXX Persister insert() 로 옮기기
-    private void checkGenerationStrategy(Long id) {
-        if (!hasAutoIncrementPrimaryKey && id == null) {
-            throw new PrimaryKeyMissingException();
-        }
-    }
-
-    private String buildQuery(String columns, String values) {
-        return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, values);
+        return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columnClauses(), valueClauses());
     }
 
     private List<String> columns(Map<String, Object> valueMap) {
-        return generalColumnNames.stream()
+        return columnNames.stream()
                 .filter(valueMap::containsKey)
                 .collect(Collectors.toList());
     }
 
-    private String columnClauses(Map<String, Object> valueMap) {
+    private String columnClauses() {
+        List<String> columns = columns(values);
         StringJoiner joiner = new StringJoiner(", ");
-        columns(valueMap).forEach(joiner::add);
+        if (includeIdField) {
+            joiner.add(primaryKeyColumnName);
+        }
+        columns.forEach(joiner::add);
         return joiner.toString();
     }
 
-    private String columnClauses(String primaryKeyColumnName, Map<String, Object> valueMap) {
+    private String valueClauses() {
+        List<String> columns = columns(values);
         StringJoiner joiner = new StringJoiner(", ");
-        joiner.add(primaryKeyColumnName);
-        columns(valueMap).forEach(joiner::add);
-        return joiner.toString();
-    }
-
-    private String valueClauses(Map<String, Object> valueMap) {
-        StringJoiner joiner = new StringJoiner(", ");
-        columns(valueMap).forEach(key -> joiner.add(quote(valueMap.get(key))));
-        return joiner.toString();
-    }
-
-    private String valueClauses(Long id, Map<String, Object> valueMap) {
-        StringJoiner joiner = new StringJoiner(", ");
-        joiner.add(quote(id));
-        columns(valueMap).forEach(key -> joiner.add(quote(valueMap.get(key))));
+        if (includeIdField) {
+            joiner.add(quote(id));
+        }
+        columns.forEach(key -> joiner.add(quote(values.get(key))));
         return joiner.toString();
     }
 }

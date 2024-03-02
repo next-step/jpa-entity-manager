@@ -1,4 +1,4 @@
-package database.sql.util.column;
+package database.mapping.column;
 
 import java.lang.reflect.Field;
 
@@ -19,7 +19,6 @@ public abstract class AbstractEntityColumn implements EntityColumn {
         this.type = type;
         this.columnLength = columnLength;
     }
-
 
     @Override
     public Field getField() {

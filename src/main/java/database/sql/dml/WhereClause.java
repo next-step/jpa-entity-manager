@@ -13,14 +13,18 @@ public class WhereClause {
     private final Map<String, Object> conditionMap;
     private final List<String> allColumnNames;
 
-    public WhereClause(Map<String, Object> conditionMap, List<String> allColumnNames) {
+    private WhereClause(Map<String, Object> conditionMap, List<String> allColumnNames) {
         this.conditionMap = conditionMap;
         this.allColumnNames = allColumnNames;
-
-        checkConditionColumns(conditionMap, allColumnNames);
     }
 
-    private void checkConditionColumns(Map<String, Object> conditionMap, List<String> allColumnNames) {
+    public static WhereClause from(Map<String, Object> conditionMap, List<String> allColumnNames) {
+        checkColumnNameInCondition(conditionMap, allColumnNames);
+
+        return new WhereClause(conditionMap, allColumnNames);
+    }
+
+    private static void checkColumnNameInCondition(Map<String, Object> conditionMap, List<String> allColumnNames) {
         for (String inputColumnName : conditionMap.keySet()) {
             if (!allColumnNames.contains(inputColumnName)) {
                 throw new RuntimeException("Invalid query: " + inputColumnName);

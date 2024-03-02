@@ -1,12 +1,9 @@
-package persistence.entity;
+package persistence.entity.data;
 
 import database.sql.Person;
 import org.junit.jupiter.api.Test;
-import persistence.entity.data.EntitySnapshot;
 
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +17,7 @@ class EntitySnapshotTest {
         EntitySnapshot oldEntitySnapshot = EntitySnapshot.of(null);
         EntitySnapshot entitySnapshot = EntitySnapshot.of(person);
 
-        Map<String, Object> changes = oldEntitySnapshot.changes(entitySnapshot);
+        Map<String, Object> changes = oldEntitySnapshot.diff(entitySnapshot);
 
         assertAll(
                 () -> assertThat(changes.get("nick_name")).isNull(),
@@ -64,7 +61,7 @@ class EntitySnapshotTest {
     }
 
     private Map<String, Object> changes(Person p1, Person p2) {
-        return EntitySnapshot.of(p1).changes(EntitySnapshot.of(p2));
+        return EntitySnapshot.of(p1).diff(EntitySnapshot.of(p2));
     }
 
 }

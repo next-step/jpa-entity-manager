@@ -1,8 +1,9 @@
-package database.sql.util;
+package database.mapping;
 
+import database.dialect.Dialect;
+import database.dialect.MySQLDialect;
+import database.mapping.column.EntityColumn;
 import database.sql.Person;
-import database.sql.util.column.EntityColumn;
-import database.sql.util.type.MySQLTypeConverter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,9 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ColumnsMetadataTest {
-    private final MySQLTypeConverter typeConverter = new MySQLTypeConverter();
+    private final Dialect dialect = MySQLDialect.INSTANCE;
 
-    private final ColumnsMetadata columnsMetadata = new ColumnsMetadata(Person.class);
+    private final ColumnsMetadata columnsMetadata = ColumnsMetadata.fromClass(Person.class);
 
     @Test
     void getAllColumnNames() {
@@ -24,7 +25,7 @@ class ColumnsMetadataTest {
 
     @Test
     void getColumnDefinitions() {
-        List<String> columnDefinitions = columnsMetadata.getColumnDefinitions(typeConverter);
+        List<String> columnDefinitions = columnsMetadata.getColumnDefinitions(dialect);
         assertThat(columnDefinitions).containsExactly(
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY",
                 "nick_name VARCHAR(255) NULL",

@@ -1,4 +1,4 @@
-package database.sql.util;
+package database.mapping;
 
 import database.sql.dml.Person4;
 import org.junit.jupiter.api.Test;

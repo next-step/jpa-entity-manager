@@ -1,9 +1,9 @@
-package database.sql.util;
+package database.mapping;
 
-import database.sql.util.column.EntityColumn;
-import database.sql.util.column.FieldToEntityColumnConverter;
-import database.sql.util.column.PrimaryKeyEntityColumn;
-import database.sql.util.type.TypeConverter;
+import database.dialect.Dialect;
+import database.mapping.column.EntityColumn;
+import database.mapping.column.FieldToEntityColumnConverter;
+import database.mapping.column.PrimaryKeyEntityColumn;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
@@ -19,33 +19,46 @@ public class ColumnsMetadata {
     private final List<EntityColumn> generalColumns;
     private final Map<String, Field> fieldByColumnNameMap;
 
-    public ColumnsMetadata(Class<?> entityClass) {
-        allEntityColumns = Arrays.stream(entityClass.getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
+    private ColumnsMetadata(List<EntityColumn> allEntityColumns, EntityColumn primaryKey,
+                           List<EntityColumn> generalColumns,
+                           Map<String, Field> fieldByColumnNameMap) {
+        this.allEntityColumns = allEntityColumns;
+        this.primaryKey = primaryKey;
+        this.generalColumns = generalColumns;
+        this.fieldByColumnNameMap = fieldByColumnNameMap;
+    }
+
+    public static ColumnsMetadata fromClass(Class<?> clazz) {
+        List<Field> fields = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> !field.isAnnotationPresent(Transient.class)).collect(Collectors.toList());
+
+        List<EntityColumn> allEntityColumns = fields.stream()
                 .map(field -> new FieldToEntityColumnConverter(field).convert())
                 .collect(Collectors.toList());
 
-        primaryKey = allEntityColumns.stream()
-                .filter(EntityColumn::isPrimaryKeyField).findFirst().get();
+        EntityColumn primaryKey = allEntityColumns.stream()
+                .filter(EntityColumn::isPrimaryKeyField)
+                .findFirst().get();
 
-        generalColumns = allEntityColumns.stream()
+        List<EntityColumn> generalColumns = allEntityColumns.stream()
                 .filter(columnMetadata -> !columnMetadata.isPrimaryKeyField())
                 .collect(Collectors.toList());
 
         // TODO: H2 에서는 ResultSet 에서 돌아온 결과의 컬럼명이 대문자로 구성되어 있어서, 쉬운 비교를 위해서 미리 변환해서 저장해둠.
         // dialect 마다 상황이 다를 수도 있음. (대소문자를 구별해서 nick_name과 NICK_NAME 을 다르게 처리하는 경우에는 에러 발생한다)
-        fieldByColumnNameMap = allEntityColumns.stream()
-                .collect(Collectors.toMap(entityColumn -> entityColumn.getColumnName().toUpperCase(),
-                                          EntityColumn::getField));
+        Map<String, Field> fieldByColumnNameMap = allEntityColumns.stream()
+                .collect(Collectors.toMap(entityColumn -> entityColumn.getColumnName().toUpperCase(), EntityColumn::getField));
+
+        return new ColumnsMetadata(allEntityColumns, primaryKey, generalColumns, fieldByColumnNameMap);
     }
 
     public List<String> getAllColumnNames() {
         return allEntityColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.toList());
     }
 
-    public List<String> getColumnDefinitions(TypeConverter typeConverter) {
+    public List<String> getColumnDefinitions(Dialect dialect) {
         return allEntityColumns.stream()
-                .map(entityColumn -> entityColumn.toColumnDefinition(typeConverter))
+                .map(entityColumn -> entityColumn.toColumnDefinition(dialect))
                 .collect(Collectors.toList());
     }
 
@@ -70,7 +83,7 @@ public class ColumnsMetadata {
         return fieldByColumnNameMap.get(upperCase);
     }
 
-    public boolean hasAutoIncrementPrimaryKey() {
-        return ((PrimaryKeyEntityColumn) primaryKey).hasAutoIncrementPrimaryKey();
+    public boolean hasIdGenerationStrategy() {
+        return ((PrimaryKeyEntityColumn) primaryKey).hasIdGenerationStrategy();
     }
 }

@@ -1,7 +1,7 @@
-package database.sql.util;
+package database.mapping;
 
-import database.sql.util.column.EntityColumn;
-import database.sql.util.type.TypeConverter;
+import database.dialect.Dialect;
+import database.mapping.column.EntityColumn;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -10,13 +10,16 @@ public class EntityMetadata {
     private final TableMetadata tableMetadata;
     private final ColumnsMetadata columnsMetadata;
 
-    public EntityMetadata(Object entity) {
-        this(entity.getClass());
+    private EntityMetadata(TableMetadata tableMetadata, ColumnsMetadata columnsMetadata) {
+        this.tableMetadata = tableMetadata;
+        this.columnsMetadata = columnsMetadata;
     }
 
-    public EntityMetadata(Class<?> entityClass) {
-        tableMetadata = new TableMetadata(entityClass);
-        columnsMetadata = new ColumnsMetadata(entityClass);
+    public static EntityMetadata fromClass(Class<?> clazz) {
+        return new EntityMetadata(
+                new TableMetadata(clazz),
+                ColumnsMetadata.fromClass(clazz)
+        );
     }
 
     public String getTableName() {
@@ -31,8 +34,8 @@ public class EntityMetadata {
         return String.join(", ", columnsMetadata.getAllColumnNames());
     }
 
-    public List<String> getColumnDefinitions(TypeConverter typeConverter) {
-        return columnsMetadata.getColumnDefinitions(typeConverter);
+    public List<String> getColumnDefinitions(Dialect dialect) {
+        return columnsMetadata.getColumnDefinitions(dialect);
     }
 
     public String getPrimaryKeyColumnName() {
@@ -55,7 +58,7 @@ public class EntityMetadata {
         return columnsMetadata.getFieldByColumnName(columnName);
     }
 
-    public boolean hasAutoIncrementPrimaryKey() {
-        return columnsMetadata.hasAutoIncrementPrimaryKey();
+    public boolean hasIdGenerationStrategy() {
+        return columnsMetadata.hasIdGenerationStrategy();
     }
 }
