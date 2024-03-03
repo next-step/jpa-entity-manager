@@ -13,9 +13,9 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
-    public void execute(final String sql) {
+    public boolean execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
-            statement.execute(sql);
+            return statement.execute(sql);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
