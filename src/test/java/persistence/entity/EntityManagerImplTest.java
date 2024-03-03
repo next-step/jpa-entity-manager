@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.exception.ObjectNotFoundException;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.ddl.view.mysql.MySQLPrimaryKeyResolver;
 import persistence.sql.dml.DeleteQueryBuilder;
@@ -60,8 +61,8 @@ class EntityManagerImplTest {
         entityManager.remove(foundPerson);
 
         assertThatThrownBy(() -> entityManager.find(Person.class, id))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Expected 1 result, got 0");
+                .isInstanceOf(ObjectNotFoundException.class)
+                .hasMessageContaining("deleted/gone status not permitted to update/loading/saving");
     }
 
     @Test
