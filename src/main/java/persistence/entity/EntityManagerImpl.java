@@ -34,7 +34,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-
         Object cached = persistenceContext.getEntity(clazz, id);
         if (Objects.isNull(cached)) {
             Optional<Object> load = entityLoader.load(clazz, id);

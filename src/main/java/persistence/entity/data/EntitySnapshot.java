@@ -49,6 +49,4 @@ public class EntitySnapshot {
         }
         return !oldValue.equals(newValue);
     }
-
-
 }

@@ -22,7 +22,6 @@ class ColumnsMetadataTest {
         assertThat(allColumnNames).containsExactly("id", "nick_name", "old", "email");
     }
 
-
     @Test
     void getColumnDefinitions() {
         List<String> columnDefinitions = columnsMetadata.getColumnDefinitions(dialect);
