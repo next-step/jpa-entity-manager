@@ -81,8 +81,7 @@ public class EntityManagerImpl implements EntityManager {
     public void remove(Object entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
         persistContext.removeEntity(entity.getClass(), idColumn.getValue());
-        entityPersister.delete(entity, idColumn.getValue());
-        persistContext.addActionQueue(new DeleteEvent<>(idColumn.getValue(), entity));
+        persistContext.addDeleteActionQueue(new DeleteEvent<>(idColumn.getValue(), entity));
     }
 
     @Override
@@ -91,7 +90,7 @@ public class EntityManagerImpl implements EntityManager {
         EntityMetaData entityMetaData = new EntityMetaData(entity, dialect);
         EntityMetaData previousEntity = persistContext.getCachedDatabaseSnapshot(entity.getClass(), idColumn.getValue());
          if (entityMetaData.isDirty(previousEntity)) {
-            persistContext.addActionQueue(new UpdateEvent<>(idColumn.getValue(), entity));
+            persistContext.addUpdateActionQueue(new UpdateEvent<>(idColumn.getValue(), entity));
             savePersistence(entity, idColumn.getValue());
             return entity;
         }
@@ -106,8 +105,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void flush() {
-        persistContext.getActionQueue()
-                .forEach(event -> event.excetute(entityPersister));
+        persistContext.getUpdateActionQueue()
+                .forEach(event -> entityPersister.update(event.getEntity(), event.getId()));
+        persistContext.getDeleteActionQueue()
+            .forEach(event -> {
+                entityPersister.delete(event.getEntity(), event.getId());
+                persistContext.updateEntityEntryToGone(event.getEntity(), event.getId());
+            });
     }
 
     @Override

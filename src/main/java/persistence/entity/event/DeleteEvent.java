@@ -1,8 +1,7 @@
 package persistence.entity.event;
 
-import persistence.entity.EntityPersister;
 
-public class DeleteEvent<T, ID> implements Event<T, ID> {
+public class DeleteEvent<T, ID> {
     private final ID id;
     private final T entity;
 
@@ -11,9 +10,11 @@ public class DeleteEvent<T, ID> implements Event<T, ID> {
         this.entity = entity;
     }
 
-    @Override
-    public void excetute(EntityPersister entityPersister) {
-        entityPersister.delete(entity, id);
+    public ID getId() {
+        return id;
     }
 
+    public T getEntity() {
+        return entity;
+    }
 }

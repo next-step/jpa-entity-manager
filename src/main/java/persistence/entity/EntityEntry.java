@@ -1,16 +1,10 @@
 package persistence.entity;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class EntityEntry {
-    private final Map<EntityKey, EntityStatus> state;
+    private final EntityStatus status;
 
-    public EntityEntry() {
-        this.state = new HashMap<>();
-    }
-
-    public void updateState(EntityKey entityKey, EntityStatus entityStatus) {
-        state.put(entityKey, entityStatus);
+    public EntityEntry(EntityStatus status) {
+        this.status = status;
     }
 }

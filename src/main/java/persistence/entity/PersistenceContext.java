@@ -1,9 +1,10 @@
 package persistence.entity;
 
-import persistence.entity.event.Event;
-
 import java.util.Optional;
 import java.util.Queue;
+
+import persistence.entity.event.DeleteEvent;
+import persistence.entity.event.UpdateEvent;
 
 public interface PersistenceContext {
 
@@ -17,7 +18,13 @@ public interface PersistenceContext {
 
     EntityMetaData getCachedDatabaseSnapshot(Class<?> clazz, Object id);
 
-    Queue<Event> getActionQueue();
+    Queue<DeleteEvent> getDeleteActionQueue();
 
-    void addActionQueue(Event event);
+    Queue<UpdateEvent> getUpdateActionQueue();
+
+    void addDeleteActionQueue(DeleteEvent event);
+
+    void addUpdateActionQueue(UpdateEvent event);
+
+    void updateEntityEntryToGone(Object entity, Object id);
 }

@@ -50,7 +50,7 @@ public class Columns {
     }
 
     public boolean isDirty(Columns columns) {
-        Map<String, Object> stringObjectMap = this.values.stream()
+        Map<String, Object> columnsNameValueMap = this.values.stream()
                 .filter(this::isNotNull)
                 .collect(Collectors.toMap(
                         GeneralColumn::getName,
@@ -59,7 +59,7 @@ public class Columns {
 
         return columns.values.stream()
                 .filter(this::isNotNull)
-                .anyMatch(column -> !column.getValue().equals(stringObjectMap.get(column.getName())));
+                .anyMatch(column -> !column.getValue().equals(columnsNameValueMap.get(column.getName())));
     }
 
     private boolean isNotNull(GeneralColumn column) {

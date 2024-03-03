@@ -1,8 +1,6 @@
 package persistence.entity.event;
 
-import persistence.entity.EntityPersister;
-
-public class UpdateEvent<T, ID> implements Event<T, ID> {
+public class UpdateEvent<T, ID> {
 
     private final ID id;
     private final T entity;
@@ -12,8 +10,11 @@ public class UpdateEvent<T, ID> implements Event<T, ID> {
         this.entity = entity;
     }
 
-    @Override
-    public void excetute(EntityPersister entityPersister) {
-        entityPersister.update(entity, id);
+    public ID getId() {
+        return id;
+    }
+
+    public T getEntity() {
+        return entity;
     }
 }
