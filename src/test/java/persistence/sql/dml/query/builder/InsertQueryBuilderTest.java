@@ -2,7 +2,10 @@ package persistence.sql.dml.query.builder;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
+import persistence.sql.dml.query.clause.ColumnClause;
+import persistence.sql.dml.query.clause.ValueClause;
+import persistence.sql.entity.EntityMappingTable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +16,13 @@ class InsertQueryBuilderTest {
     void insertQueryBuild() {
         Person person = new Person(1L, "신성수", 20, "tlstjdtn@nextstep.com");
 
-        String sql = InsertQueryBuilder.from(person).toSql();
+        final EntityMappingTable entityMappingTable = EntityMappingTable.from(person.getClass());
+        final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityMappingTable.getTableName());
+
+        ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        ValueClause valueClause = ValueClause.from(person, entityMappingTable.getDomainTypes());
+
+        String sql = insertQueryBuilder.toSql(columnClause, valueClause);
 
         assertThat(sql).isEqualTo("INSERT INTO Person (id,nick_name,old,email) VALUES (1,'신성수',20,'tlstjdtn@nextstep.com')");
     }

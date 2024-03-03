@@ -5,21 +5,22 @@ import persistence.sql.dialect.database.TypeMapper;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.DomainTypes;
+import persistence.sql.entity.model.TableName;
 
 import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static persistence.sql.constant.SqlConstant.COMMA;
+import static persistence.sql.constant.SqlFormat.CREATE;
+
 public class CreateQueryBuilder {
 
-    private static final String CREATE_SQL = "CREATE TABLE %s(\n%s\n);";
-    private static final String DELIMITER = ",\n";
-
-    private final String tableName;
+    private final TableName tableName;
     private final List<ColumnBuilder> columnBuilders;
 
-    private CreateQueryBuilder(final String tableName,
+    private CreateQueryBuilder(final TableName tableName,
                                final List<ColumnBuilder> columnBuilders) {
         this.tableName = tableName;
         this.columnBuilders = columnBuilders;
@@ -40,7 +41,7 @@ public class CreateQueryBuilder {
                                                          final ConstraintsMapper constantTypeMapper) {
         Spliterator<DomainType> spliterator = domainTypes.spliterator();
         return StreamSupport.stream(spliterator, false)
-                .filter(DomainType::isNotTransient)
+                .filter(DomainType::isEntityColumn)
                 .map(domainType -> new ColumnBuilder(domainType, typeMapper, constantTypeMapper))
                 .collect(Collectors.toList());
     }
@@ -48,9 +49,9 @@ public class CreateQueryBuilder {
     public String toSql() {
         String columns = columnBuilders.stream()
                 .map(ColumnBuilder::build)
-                .collect(Collectors.joining(DELIMITER));
+                .collect(Collectors.joining(COMMA.getValue()));
 
-        return String.format(CREATE_SQL, tableName, columns);
+        return String.format(CREATE.getFormat(), tableName.getName(), columns);
     }
 
 }

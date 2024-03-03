@@ -3,6 +3,7 @@ package persistence.sql.entity.manager;
 import persistence.sql.dml.exception.*;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.NormalDomainType;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;

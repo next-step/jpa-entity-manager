@@ -3,9 +3,9 @@ package persistence.sql.ddl.query.builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.LegacyPerson;
-import persistence.entity.Person;
-import persistence.entity.User;
+import domain.LegacyPerson;
+import domain.Person;
+import domain.User;
 import persistence.sql.dialect.database.ConstraintsMapper;
 import persistence.sql.dialect.database.TypeMapper;
 import persistence.sql.dialect.h2.H2ConstraintsMapper;
@@ -43,9 +43,7 @@ class CreateQueryBuilderTest {
         );
 
         final String expected = "CREATE TABLE LegacyPerson(\n" +
-                "id BIGINT PRIMARY KEY,\n" +
-                "name VARCHAR,\n" +
-                "age INTEGER\n" +
+                "id BIGINT PRIMARY KEY,name VARCHAR,age INTEGER\n" +
                 ");";
 
         assertThat(createQueryBuilder.toSql()).isEqualTo(expected);
@@ -61,10 +59,7 @@ class CreateQueryBuilderTest {
         );
 
         final String expected = "CREATE TABLE Person(\n" +
-                "id BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
-                "nick_name VARCHAR,\n" +
-                "old INTEGER,\n" +
-                "email VARCHAR  NOT NULL\n" +
+                "id BIGINT PRIMARY KEY AUTO_INCREMENT,nick_name VARCHAR,old INTEGER,email VARCHAR  NOT NULL\n" +
                 ");";
 
         assertThat(createQueryBuilder.toSql()).isEqualTo(expected);
@@ -80,10 +75,7 @@ class CreateQueryBuilderTest {
         );
 
         final String expected = "CREATE TABLE users(\n" +
-                "id BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
-                "nick_name VARCHAR,\n" +
-                "old INTEGER,\n" +
-                "email VARCHAR  NOT NULL\n" +
+                "id BIGINT PRIMARY KEY AUTO_INCREMENT,nick_name VARCHAR,old INTEGER,email VARCHAR  NOT NULL\n" +
                 ");";
 
         assertThat(createQueryBuilder.toSql()).isEqualTo(expected);

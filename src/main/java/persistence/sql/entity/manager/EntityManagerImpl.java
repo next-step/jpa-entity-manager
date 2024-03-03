@@ -1,73 +1,83 @@
 package persistence.sql.entity.manager;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
-import persistence.sql.dml.query.builder.SelectQueryBuilder;
-import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import persistence.sql.dml.query.clause.WhereClause;
+import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.Operators;
+import persistence.sql.entity.model.PrimaryDomainType;
+import persistence.sql.entity.persister.EntityPersister;
 
 import java.util.Collections;
 import java.util.List;
 
-public class EntityManagerImpl<T, K> implements EntityManger<T, K> {
+public class EntityManagerImpl<T> implements EntityManger<T> {
 
     private final JdbcTemplate jdbcTemplate;
     private final EntityManagerMapper<T> entityManagerMapper;
+    private final SelectQueryBuilder selectQueryBuilder;
+    private final EntityPersister<T> entityPersister;
+
 
     public EntityManagerImpl(final JdbcTemplate jdbcTemplate,
-                             Class<T> clazz) {
+                             final EntityManagerMapper<T> entityManagerMapper,
+                             final SelectQueryBuilder selectQueryBuilder,
+                             final EntityPersister<T> entityPersister) {
         this.jdbcTemplate = jdbcTemplate;
-        this.entityManagerMapper = new EntityManagerMapper<>(clazz);
+        this.entityManagerMapper = entityManagerMapper;
+        this.selectQueryBuilder = selectQueryBuilder;
+        this.entityPersister = entityPersister;
     }
-
 
     @Override
     public List<T> findAll(final Class<T> clazz) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
+        WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.from(entityMappingTable);
-        return jdbcTemplate.query(selectQueryBuilder.toSql(), entityManagerMapper::mapper);
+        String sql = selectQueryBuilder.toSql(whereClause);
+
+        return jdbcTemplate.query(sql, entityManagerMapper::mapper);
     }
 
     @Override
-    public T find(final Class<T> clazz, final K id) {
+    public T find(final Class<T> clazz, final Object id) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
+        final PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
 
-        Criterion criterion = new Criterion(pkDomainType.getColumnName(), id.toString(), Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        final Criterion criterion = new Criterion(primaryDomainType.getColumnName(), id.toString(), Operators.EQUALS);
+        final Criteria criteria = new Criteria(Collections.singletonList(criterion));
 
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(entityMappingTable, criteria);
-        return jdbcTemplate.queryForObject(selectQueryBuilder.toSql(), entityManagerMapper::mapper);
+        final WhereClause whereClause = new WhereClause(criteria);
+
+        final String sql = selectQueryBuilder.toSql(whereClause);
+
+        return jdbcTemplate.queryForObject(sql, entityManagerMapper::mapper);
     }
 
     @Override
     public void persist(final T entity) {
-        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.from(entity);
-        jdbcTemplate.execute(insertQueryBuilder.toSql());
+        final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
+        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
+        final Object key = pkDomainType.getValue();
+
+        final T object = find((Class<T>) entity.getClass(), key);
+
+        if (object == null) {
+            entityPersister.insert(entity);
+            return;
+        }
+        entityPersister.update(entity);
     }
 
     @Override
     public void remove(final T entity) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(entity.getClass());
-        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
-
-        Criterion criterion = new Criterion(pkDomainType.getColumnName(), entityManagerMapper.getFieldValue(entity, pkDomainType.getColumnName()), Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
-
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.of(entityMappingTable.getTableName(), criteria);
-        jdbcTemplate.execute(deleteQueryBuilder.toSql());
+        entityPersister.delete(entity);
     }
 
     @Override
     public void removeAll(final Class<T> clazz) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.from(entityMappingTable.getTableName());
-
-        jdbcTemplate.execute(deleteQueryBuilder.toSql());
+        entityPersister.deleteAll();
     }
 }

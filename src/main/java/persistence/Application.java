@@ -5,12 +5,12 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.LegacyPerson;
-import persistence.sql.StandardDialectResolver;
+import domain.LegacyPerson;
 import persistence.sql.ddl.query.builder.CreateQueryBuilder;
 import persistence.sql.ddl.query.builder.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectResolutionInfo;
+import persistence.sql.dialect.database.Database;
 import persistence.sql.entity.EntityMappingTable;
 
 public class Application {
@@ -27,7 +27,7 @@ public class Application {
             // DB 정보
             DialectResolutionInfo dialectResolutionInfo = new DialectResolutionInfo(server.getConnection().getMetaData());
             // 방언 설정
-            Dialect dialect = StandardDialectResolver.resolveDialect(dialectResolutionInfo);
+            Dialect dialect = Database.from(dialectResolutionInfo).getDialectSupplier().get();
 
             final EntityMappingTable entityMappingTable = EntityMappingTable.from(LegacyPerson.class);
             String createTableSql = CreateQueryBuilder.of(entityMappingTable, dialect.getTypeMapper(), dialect.getConstantTypeMapper()).toSql();

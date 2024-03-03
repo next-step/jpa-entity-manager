@@ -3,15 +3,23 @@ package persistence.sql.entity.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import domain.Person;
 import persistence.repository.Repository;
 import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
+import persistence.sql.dml.conditional.Criteria;
+import persistence.sql.dml.conditional.Criterion;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import persistence.sql.dml.query.clause.ColumnClause;
+import persistence.sql.dml.query.clause.WhereClause;
+import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.entity.model.Operators;
+import persistence.sql.entity.model.PrimaryDomainType;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +37,7 @@ class EntityManagerMapperTest extends H2Database {
         this.personRepository = new RepositoryImpl<>(jdbcTemplate, Person.class);
         this.entityManagerMapper = new EntityManagerMapper<>(Person.class);
         this.connection = server.getConnection();
-        this.selectQueryBuilder = SelectQueryBuilder.from(entityMappingTable);
+        this.selectQueryBuilder = new SelectQueryBuilder(entityMappingTable.getTableName(), new ColumnClause(entityMappingTable.getDomainTypes().getColumnName()));
 
         personRepository.deleteAll();
 
@@ -42,7 +50,11 @@ class EntityManagerMapperTest extends H2Database {
     @DisplayName("디비에서 조회된 컬럼들이 자동으로 객체에 매핑이 된다.")
     @Test
     void mapperTest() throws SQLException {
-        String sql = selectQueryBuilder.toSql();
+        PrimaryDomainType primaryDomainType = EntityMappingTable.of(Person.class, person1).getPkDomainTypes();
+
+        WhereClause whereClause = new WhereClause(Criteria.fromPkCriterion(primaryDomainType));
+
+        String sql = selectQueryBuilder.toSql(whereClause);
 
         Person person = executeQuery(sql);
 
