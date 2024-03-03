@@ -1,24 +1,24 @@
 package persistence.sql.dml;
 
 import persistence.sql.meta.PrimaryKey;
+import persistence.sql.meta.simple.Table;
 
 public class DeleteQueryBuilder {
 
     public static final String DELETE_DEFAULT_DML = "delete from %s where %s";
-    private final String tableName;
-    private final PrimaryKey primaryKey;
 
-    public DeleteQueryBuilder(String tableName, PrimaryKey primaryKey) {
-        this.tableName = tableName;
-        this.primaryKey = primaryKey;
+    public DeleteQueryBuilder() {
     }
 
     public String createDeleteQuery(Object object) {
-        return String.format(DELETE_DEFAULT_DML, this.tableName, deleteWhere(object));
+        final Table table = Table.ofInstance(object);
+
+        return String.format(DELETE_DEFAULT_DML, table.name(), deleteWhere(table, object));
     }
 
-    private String deleteWhere(Object object) {
-        return String.format("%s = %s", this.primaryKey.name(), this.primaryKey.value(object));
+    private String deleteWhere(Table table, Object object) {
+        final PrimaryKey primaryKey = table.primaryKey();
+        return String.format("%s = %s", primaryKey.name(), primaryKey.value(object));
     }
 
 }
