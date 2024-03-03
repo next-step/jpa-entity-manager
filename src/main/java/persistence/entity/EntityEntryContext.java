@@ -19,7 +19,7 @@ public class EntityEntryContext {
 
     private EntityEntry getEntry(EntityCacheKey entityCacheKey) {
         EntityEntry cachedEntry = context.get(entityCacheKey);
-        if (cachedEntry == null){
+        if (cachedEntry == null) {
             SimpleEntityEntry newEntry = new SimpleEntityEntry();
             context.put(entityCacheKey, newEntry);
             return newEntry;

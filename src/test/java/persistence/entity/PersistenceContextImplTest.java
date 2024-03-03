@@ -17,8 +17,8 @@ class PersistenceContextImplTest {
         Person foundEntity = persistenceContext.getEntity(Person.class, 1L);
 
         assertAll(
-                ()-> assertThat(person).isEqualTo(foundEntity),
-                ()-> assertThat(person == foundEntity).isTrue()
+                () -> assertThat(person).isEqualTo(foundEntity),
+                () -> assertThat(person == foundEntity).isTrue()
         );
     }
 

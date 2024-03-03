@@ -64,8 +64,8 @@ public class SimpleEntityEntry implements EntityEntry {
         }
     }
 
-    private void validateDeleteOrGoneViolation(){
-        if (status.equals(DELETED) || status.equals(GONE)){
+    private void validateDeleteOrGoneViolation() {
+        if (status.equals(DELETED) || status.equals(GONE)) {
             throw new ObjectNotFoundException("deleted/gone status not permitted to update/loading/saving");
         }
     }
