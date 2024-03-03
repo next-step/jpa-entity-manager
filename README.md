@@ -25,3 +25,8 @@
 2. `snapshot` 만들기
    - `snapshot`을 만들어 별도의 저장소에 저장한다.
    - `entityManager.save` 호출시 snapshot 저장소에 저장된 엔티티와 (최초 상태) 비교하여 `dirty checking`을 구현한다.
+
+
+   ## 4단계 - EntityEntry
+
+1. Entity 상태 관리 역할을 담당하는 `EntityEntry`를 도입하여, CRUD 작업시 Entity 상태를 동적으로 변경한다.   
