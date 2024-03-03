@@ -15,8 +15,8 @@ public class SnapShot {
     }
 
 
-    public void save(EntityKey entityKey, EntityMetaData entity) {
-        snapshot.put(entityKey, entity);
+    public EntityMetaData save(EntityKey entityKey, EntityMetaData entity) {
+        return snapshot.put(entityKey, entity);
     }
 
     public EntityMetaData get(EntityKey entityKey) {

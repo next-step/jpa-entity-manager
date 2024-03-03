@@ -53,13 +53,8 @@ public class HibernatePersistContext implements PersistenceContext {
     }
 
     @Override
-    public void getDatabaseSnapshot(EntityMetaData entity, Object id) {
-        snapshot.save(new EntityKey(entity.getClazz(), id), entity);
-    }
-
-    @Override
-    public EntityMetaData getCachedDatabaseSnapshot(Class<?> clazz, Object id) {
-        return snapshot.get(new EntityKey(clazz, id));
+    public EntityMetaData getDatabaseSnapshot(EntityMetaData entity, Object id) {
+        return snapshot.save(new EntityKey(entity.getClazz(), id), entity);
     }
 
     @Override
@@ -86,6 +81,11 @@ public class HibernatePersistContext implements PersistenceContext {
     public void updateEntityEntryToGone(Object entity, Object id) {
         EntityKey entityKey = new EntityKey(entity.getClass(), id);
         entityEntries.put(entityKey, new EntityEntry(EntityStatus.GONE));
+    }
+
+    @Override
+    public <T> EntityMetaData getSnapshot(T entity, Object id) {
+        return snapshot.get(new EntityKey(entity.getClass(), id));
     }
 
 }

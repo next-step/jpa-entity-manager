@@ -161,6 +161,7 @@ class EntityManagerImplTest {
 
 		// when
 		entityManager.remove(person);
+		entityManager.flush();
 
 		// then
 		assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))

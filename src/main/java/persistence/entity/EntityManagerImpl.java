@@ -88,7 +88,7 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T merge(T entity) {
         IdColumn idColumn = new IdColumn(entity, dialect);
         EntityMetaData entityMetaData = new EntityMetaData(entity, dialect);
-        EntityMetaData previousEntity = persistContext.getCachedDatabaseSnapshot(entity.getClass(), idColumn.getValue());
+        EntityMetaData previousEntity = persistContext.getSnapshot(entity, idColumn.getValue());
          if (entityMetaData.isDirty(previousEntity)) {
             persistContext.addUpdateActionQueue(new UpdateEvent<>(idColumn.getValue(), entity));
             savePersistence(entity, idColumn.getValue());

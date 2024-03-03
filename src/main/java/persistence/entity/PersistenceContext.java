@@ -14,9 +14,7 @@ public interface PersistenceContext {
 
     void removeEntity(Class<?> clazz, Object id);
 
-    void getDatabaseSnapshot(EntityMetaData entityMetaData, Object id);
-
-    EntityMetaData getCachedDatabaseSnapshot(Class<?> clazz, Object id);
+    EntityMetaData getDatabaseSnapshot(EntityMetaData entityMetaData, Object id);
 
     Queue<DeleteEvent> getDeleteActionQueue();
 
@@ -27,4 +25,6 @@ public interface PersistenceContext {
     void addUpdateActionQueue(UpdateEvent event);
 
     void updateEntityEntryToGone(Object entity, Object id);
+
+    <T> EntityMetaData getSnapshot(T entity, Object id);
 }
