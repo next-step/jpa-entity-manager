@@ -3,6 +3,8 @@ package persistence.sql.meta.simple;
 import jakarta.persistence.GenerationType;
 import persistence.sql.meta.Column;
 
+import java.util.Objects;
+
 public class SimpleColumn implements Column {
 
     private final String name;
@@ -52,5 +54,18 @@ public class SimpleColumn implements Column {
     @Override
     public boolean isNullable() {
         return this.isNullable;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final SimpleColumn that = (SimpleColumn) object;
+        return isNullable == that.isNullable && Objects.equals(name, that.name) && generationType == that.generationType && Objects.equals(type, that.type) && Objects.equals(simpleValue, that.simpleValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, isNullable, generationType, type, simpleValue);
     }
 }

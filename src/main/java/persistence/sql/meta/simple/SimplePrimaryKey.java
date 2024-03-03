@@ -3,7 +3,10 @@ package persistence.sql.meta.simple;
 import jakarta.persistence.GenerationType;
 import persistence.sql.meta.PrimaryKey;
 
-public class SimplePrimaryKey implements PrimaryKey {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class SimplePrimaryKey implements PrimaryKey, Serializable {
 
     private SimpleColumn primaryKey;
 
@@ -31,4 +34,16 @@ public class SimplePrimaryKey implements PrimaryKey {
         return this.primaryKey.generateType();
     }
 
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final SimplePrimaryKey that = (SimplePrimaryKey) object;
+        return Objects.equals(primaryKey, that.primaryKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(primaryKey);
+    }
 }
