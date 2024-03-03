@@ -4,7 +4,7 @@ import persistence.sql.column.IdColumn;
 import persistence.sql.column.TableColumn;
 import persistence.sql.dialect.Dialect;
 
-public class DeleteQueryBuilder {
+public class DeleteQueryBuilder implements DmlQueryBuilder {
 
     private static final String DELETE_QUERY_FORMAT = "delete from %s";
     private static final String WHERE_CLAUSE_FORMAT = " where %s = %d";
@@ -25,7 +25,8 @@ public class DeleteQueryBuilder {
         return this;
     }
 
-    public String deleteById(Object id) {
+    @Override
+    public String toStatementWithId(Object id) {
         return query + String.format(WHERE_CLAUSE_FORMAT, idColumn.getName(), id);
     }
 }

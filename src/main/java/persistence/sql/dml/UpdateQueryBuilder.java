@@ -8,7 +8,7 @@ import persistence.sql.dialect.Dialect;
 import java.util.stream.Collectors;
 
 
-public class UpdateQueryBuilder {
+public class UpdateQueryBuilder implements DmlQueryBuilder {
     private static final String UPDATE_QUERY_FORMAT = "update %s set %s ";
     private static final String COLUMN_FORMAT = "%s = %s";
     private static final String WHERE_CLAUSE_FORMAT = "where %s = %d";
@@ -38,7 +38,8 @@ public class UpdateQueryBuilder {
                 .collect(Collectors.joining(COMMA));
     }
 
-    public String updateById(Object id) {
+    @Override
+    public String toStatementWithId(Object id) {
         return query + String.format(WHERE_CLAUSE_FORMAT, idColumn.getName(), id);
     }
 }

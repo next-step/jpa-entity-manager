@@ -33,4 +33,37 @@ class ColumnsTest {
         // then
         assertThat(result).isEqualTo("nick_name, old, email");
     }
+
+    @DisplayName("column들의 값을 비교하여 다르면 true를 반환한다.")
+    @Test
+    void isDirty() {
+        // given
+        Person person1 = new Person("KIM", "kim@test.com", 30);
+        Person person2 = new Person("LEE", "kim@test.com", 20);
+        Columns columns = new Columns(person1, new MysqlDialect());
+        Columns columns2 = new Columns(person2, new MysqlDialect());
+
+        //when
+        boolean result = columns.isDirty(columns2);
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("column들의 값을 비교하여 같으면 false를 반환한다.")
+    @Test
+    void isDirtyWhenSameData() {
+        // given
+        Person person = new Person("KIM", "kim@test.com", 30);
+        Columns columns = new Columns(person, new MysqlDialect());
+        Columns columns2 = new Columns(person, new MysqlDialect());
+
+        //when
+        boolean result = columns.isDirty(columns2);
+
+        //then
+        assertThat(result).isFalse();
+    }
+
 }
+

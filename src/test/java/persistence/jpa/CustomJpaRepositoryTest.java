@@ -69,7 +69,7 @@ class CustomJpaRepositoryTest {
         //when
         String email = "hong@test.com";
         String name = "name";
-        Person person = (Person) jpaRepository.save(new Person(name, email, 20));
+        Person person = jpaRepository.save(new Person(name, email, 20));
 
         // then
         assertAll(

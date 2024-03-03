@@ -60,8 +60,8 @@ public class IdColumn implements Column {
         return idGeneratedStrategy;
     }
 
-    public Long getValue(){
-        return (Long) generalColumn.getValue();
+    public <T> T getValue(){
+        return (T) generalColumn.getValue();
     }
 
     @Override
