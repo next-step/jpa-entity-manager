@@ -38,7 +38,6 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
                 () -> assertThrows(ObjectNotFoundException.class, () -> entityManager.find(Person.class, 1L)),
                 () -> assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
                         "INSERT INTO users (nick_name, old, email) VALUES ('abc', 7, 'def@example.com')",
-                        "SELECT max(id) as id FROM users",
                         "SELECT id, nick_name, old, email FROM users WHERE id = 1",
                         "DELETE FROM users WHERE id = 1"
                 )
@@ -73,7 +72,7 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
         assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
                 "INSERT INTO users (id, nick_name, old, email) VALUES (20, '가나다', 21, 'email@test.com')",
                 "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
-                "SELECT max(id) as id FROM users",
+                "SELECT id, nick_name, old, email FROM users WHERE id = 1",
                 "SELECT id, nick_name, old, email FROM users WHERE id = 20",
                 "UPDATE users SET nick_name = '가나다라마', old = 22, email = 'email2@test.com' WHERE id = 20"
         );
@@ -93,7 +92,6 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
 
         assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
                 "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
-                "SELECT max(id) as id FROM users",
                 "SELECT id, nick_name, old, email FROM users WHERE id = 1",
                 "DELETE FROM users WHERE id = 1"
         );
@@ -113,7 +111,6 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
                 () -> assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
                         "SELECT id, nick_name, old, email FROM users WHERE id = 20",
                         "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
-                        "SELECT max(id) as id FROM users",
                         "SELECT id, nick_name, old, email FROM users WHERE id = 1")
         );
     }

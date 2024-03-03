@@ -31,19 +31,16 @@ public class EntityPersister {
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata)
                 .id(id)
                 .values(columnValues(entity));
-        jdbcTemplate.execute(insertQueryBuilder.toQueryString());
-
-        return getLastId(metadata.getTableName());
-//        jdbcTemplate.execute2(query);
+        Long generatedId = jdbcTemplate.execute(insertQueryBuilder.toQueryString());
+        return generatedId;
     }
 
     /**
      * id 없고 strategy 있고 --> 무시하거나 예외 내야 함
-     *
-     * @param entityMetadata
-     * @param id
      */
     private void checkGenerationStrategy(EntityMetadata entityMetadata, Long id) {
+        // XXX: GenerationType 에 따라서 분기 칠 수 있을까?
+        // id 가 필요한지 안 필요한지를 메타데이터에 물어보면 좋을듯
         boolean hasIdGenerationStrategy = entityMetadata.hasIdGenerationStrategy();
         if (!hasIdGenerationStrategy && id == null) {
             throw new PrimaryKeyMissingException();
@@ -78,11 +75,5 @@ public class EntityPersister {
 
     private Map<String, Object> columnValues(Object entity) {
         return ColumnValueMap.fromEntity(entity).getMap();
-    }
-
-    // XXX: 데이터베이스에서 지원하는 방식으로 변경하기
-    private Long getLastId(String tableName) {
-        String query = "SELECT max(id) as id FROM " + tableName;
-        return jdbcTemplate.queryForObject(query, resultSet -> resultSet.getLong("id"));
     }
 }
