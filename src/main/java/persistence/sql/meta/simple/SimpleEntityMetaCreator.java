@@ -114,10 +114,6 @@ public class SimpleEntityMetaCreator  {
                 field.getType(), createSimpleValue(field, object));
     }
     private static SimpleColumn createColumnValueById(final Field field, final Long id) {
-        System.out.println("asdsad");
-        System.out.println(field.getName());
-        System.out.println(field.getType());
-        System.out.println(id);
         Object key = null;
         try {
             field.setAccessible(true);
