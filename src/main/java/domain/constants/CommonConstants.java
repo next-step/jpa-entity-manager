@@ -6,4 +6,6 @@ public class CommonConstants {
     }
 
     public static final String COMMA = ", ";
+    public static final String EQUAL = " = ";
+    public static final String AND = " and ";
 }

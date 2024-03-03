@@ -22,18 +22,27 @@ public class JdbcTemplate {
         }
     }
 
+    public int executeUpdate(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            return statement.executeUpdate(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     /**
      * getLastIndex 수행 메소드
      */
-    public Long executeAndReturnKey(final String sql) {
+    public Object executeAndReturnKey(final String sql) {
         ResultSet resultSet = null;
 
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
             resultSet = statement.getGeneratedKeys();
-            Long seq = null;
+            Object seq = null;
             if (resultSet.next()) {
-                seq = resultSet.getLong("id");
+                seq = resultSet.getObject("id");
             }
             return seq;
         } catch (Exception e) {

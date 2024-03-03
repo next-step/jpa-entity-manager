@@ -18,38 +18,32 @@ import java.util.stream.Stream;
 import static domain.Constraints.NOT_NULL;
 import static domain.Constraints.NULL;
 import static domain.Constraints.PRIMARY_KEY;
+import static domain.constants.CommonConstants.COMMA;
 
-public class DdlQueryBuilder {
+public class CreateQueryBuilder {
+
+    private static final String CREATE_TABLE_QUERY = "CREATE TABLE %s ( %s );";
 
     private final JavaMappingType javaMappingType;
     private final Dialect dialect;
     private final EntityMetaData entityMetaData;
 
-    private static final String CREATE_TABLE_QUERY = "CREATE TABLE %s ( %s );";
-    private static final String DROP_TABLE_QUERY = "DROP TABLE %s IF EXISTS;";
-    private static final String COMMA = ", ";
-
-    public DdlQueryBuilder(Dialect dialect, EntityMetaData entityMetaData) {
+    public CreateQueryBuilder(Dialect dialect, EntityMetaData entityMetaData) {
         this.javaMappingType = new JavaMappingType();
         this.dialect = dialect;
         this.entityMetaData = entityMetaData;
     }
 
-    public String createTable(Class<?> clazz) {
-        StringBuilder sb = new StringBuilder();
-        Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> !isTransientField(field))
-                .forEach(field -> {
-                    sb.append(getFieldInfo(field));
-                    sb.append(COMMA);
-                });
-
-        String result = sb.toString().replaceAll(",[\\s,]*$", "");
-        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableName(), result);
+    public String createTable(Object object) {
+        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableName(), createClause(object.getClass()));
     }
 
-    public String dropTable() {
-        return String.format(DROP_TABLE_QUERY, entityMetaData.getTableName());
+    private String createClause(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> !isTransientField(field))
+                .map(this::getFieldInfo)
+                .collect(Collectors.joining(COMMA))
+                .replaceAll(",[\\s,]*$", "");
     }
 
     private boolean isTransientField(Field field) {
