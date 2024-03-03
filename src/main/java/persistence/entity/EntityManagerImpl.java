@@ -9,9 +9,11 @@ import persistence.sql.dml.SelectQueryBuilder;
 public class EntityManagerImpl implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityPersister = new EntityPersisterImpl(jdbcTemplate);
     }
 
     @Override
@@ -22,13 +24,11 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
-        jdbcTemplate.execute(insertQueryBuilder.build());
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entity);
-        jdbcTemplate.execute(deleteQueryBuilder.build());
+        entityPersister.delete(entity);
     }
 }
