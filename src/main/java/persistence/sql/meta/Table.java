@@ -1,6 +1,6 @@
 package persistence.sql.meta;
 
-public interface EntityMetaCreator {
+public interface Table {
     String name();
     PrimaryKey primaryKey();
     Columns columns();

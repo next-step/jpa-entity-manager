@@ -5,7 +5,7 @@ import jakarta.persistence.GenerationType;
 public interface Column {
     String getFieldName();
 
-    String value(Object object);
+    Object value();
 
     Class<?> type();
 

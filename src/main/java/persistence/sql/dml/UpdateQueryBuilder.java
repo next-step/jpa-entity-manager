@@ -1,8 +1,7 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.Columns;
-import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.simple.Table;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
+import persistence.sql.meta.simple.SimpleTable;
 
 import java.util.stream.Collectors;
 
@@ -15,19 +14,19 @@ public class UpdateQueryBuilder {
     }
 
     public String createUpdateQuery(Object object) {
-        Table table = Table.ofInstance(object);
+        SimpleTable table = SimpleEntityMetaCreator.tableOfInstance(object);
 
-        return String.format(UPDATE_DEFAULT_DML, table.name(), setClause(table, object), whereClause(table, object));
+        return String.format(UPDATE_DEFAULT_DML, table.name(), setClause(table), whereClause(table));
     }
 
-    private String setClause(Table table, Object object) {
+    private String setClause(SimpleTable table) {
         return table.columns().getColumns().stream()
-                .map(e -> setColumnSetting(e.getFieldName(), e.value(object)))
+                .map(e -> setColumnSetting(e.getFieldName(), String.valueOf(e.value())))
                 .collect(Collectors.joining(", "));
     }
 
-    private String whereClause(Table table, Object object) {
-        return setColumnSetting(table.primaryKey().name(), table.primaryKey().value(object));
+    private String whereClause(SimpleTable table) {
+        return setColumnSetting(table.primaryKey().name(), String.valueOf(table.primaryKey().value()));
     }
 
     private String setColumnSetting(String name, String value) {

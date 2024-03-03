@@ -16,7 +16,7 @@ class UpdateQueryBuilderTest {
 
         String findAllQuery = updateQueryBuilder.createUpdateQuery(person);
 
-        String expected = "update users set nick_name='simpson', old=31, email='qwe5507@gmail.com' where id=1L";
+        String expected = "update users set nick_name='simpson', old=31, email='qwe5507@gmail.com' where id=1";
         assertThat(findAllQuery).isEqualTo(expected);
     }
 }

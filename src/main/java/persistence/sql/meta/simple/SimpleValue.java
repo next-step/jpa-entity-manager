@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class SimpleValue {
 
-    private final String value;
+    private final Object value;
 
-    public SimpleValue(final String value) {
+    public SimpleValue(final Object value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 

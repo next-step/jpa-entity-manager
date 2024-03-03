@@ -20,8 +20,8 @@ public class SimplePrimaryKey implements PrimaryKey, Serializable {
     }
 
     @Override
-    public String value(final Object object) {
-        return this.primaryKey.value(object);
+    public Object value() {
+        return this.primaryKey.value();
     }
 
     @Override

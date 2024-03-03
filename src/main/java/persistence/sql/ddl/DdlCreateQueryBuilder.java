@@ -4,7 +4,8 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.simple.Table;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
+import persistence.sql.meta.simple.SimpleTable;
 
 import java.util.stream.Collectors;
 
@@ -21,11 +22,11 @@ public class DdlCreateQueryBuilder {
     }
 
     public String createDdl(Class<?> clazz) {
-        final Table table = Table.ofClass(clazz);
+        final SimpleTable table = SimpleEntityMetaCreator.tableOfClass(clazz);
         return String.format(CREATE_DEFAULT_DDL, table.name(), createColumns(table));
     }
 
-    private String createColumns(Table table) {
+    private String createColumns(SimpleTable table) {
         return String.join(COMMA, primaryKeyClause(table.primaryKey()),
                 columnClause(table.columns()),
                 constraintClause(table.primaryKey()));

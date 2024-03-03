@@ -23,9 +23,9 @@ public class SimpleColumns implements Columns {
     }
 
     @Override
-    public List<String> values(Object object) {
+    public List<String> values() {
         return this.columns.stream()
-                .map(c -> c.value(object))
+                .map(s-> String.valueOf(s.value()))
                 .collect(Collectors.toList());
     }
 

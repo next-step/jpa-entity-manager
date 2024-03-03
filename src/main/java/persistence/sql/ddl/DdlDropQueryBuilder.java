@@ -1,6 +1,7 @@
 package persistence.sql.ddl;
 
-import persistence.sql.meta.simple.Table;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
+import persistence.sql.meta.simple.SimpleTable;
 
 public class DdlDropQueryBuilder {
 
@@ -10,7 +11,7 @@ public class DdlDropQueryBuilder {
     }
 
     public String dropDdl(Class<?> clazz) {
-        final Table table = Table.ofClass(clazz);
+        final SimpleTable table = SimpleEntityMetaCreator.tableOfClass(clazz);
         return String.format(DROP_TABLE_DEFAULT_DDL, table.name());
     }
 }

@@ -53,7 +53,7 @@ class EntityManagerImplTest {
     @DisplayName("EntityManagerImpl persist를 호출하면 엔티티를 저장한다.")
     @Test
     void persistTest() {
-        final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
+        final Person person = new Person(1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);

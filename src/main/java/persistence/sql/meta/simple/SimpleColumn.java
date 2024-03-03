@@ -37,7 +37,7 @@ public class SimpleColumn implements Column {
     }
 
     @Override
-    public String value(final Object object) {
+    public Object value() {
         return this.simpleValue.getValue();
     }
 

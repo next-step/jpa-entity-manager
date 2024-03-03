@@ -1,7 +1,8 @@
 package persistence.sql.dml;
 
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.simple.Table;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
+import persistence.sql.meta.simple.SimpleTable;
 
 public class SelectQueryBuilder {
 
@@ -12,18 +13,18 @@ public class SelectQueryBuilder {
     }
 
     public String createFindAllQuery(Class<?> clazz) {
-        final Table table = Table.ofClass(clazz);
+        final SimpleTable table = SimpleEntityMetaCreator.tableOfClass(clazz);
 
         return String.format(SELECT_FIND_ALL_DEFAULT_DML, select(table), table.name());
     }
 
     public String createFindByIdQuery(Class<?> clazz, Long id) {
-        final Table table = Table.ofClass(clazz);
+        final SimpleTable table = SimpleEntityMetaCreator.tableOfClass(clazz);
 
         return String.format(SELECT_FIND_ID_DEFAULT_DML, createFindAllQuery(clazz), selectWhere(table.primaryKey(), id));
     }
 
-    private String select(Table table) {
+    private String select(SimpleTable table) {
         return String.format("%s, %s", table.primaryKey().name(), String.join(", ", table.columns().names()));
     }
 

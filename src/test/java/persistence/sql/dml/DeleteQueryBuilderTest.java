@@ -16,7 +16,7 @@ public class DeleteQueryBuilderTest {
 
         String deleteQuery = deleteQueryBuilder.createDeleteQuery(person);
 
-        String expected = "delete from users where id = 1L";
+        String expected = "delete from users where id = 1";
         assertThat(deleteQuery).isEqualTo(expected);
     }
 }

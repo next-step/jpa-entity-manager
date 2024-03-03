@@ -6,7 +6,7 @@ public interface Columns {
 
     List<String> names();
 
-    List<String> values(Object object);
+    List<String> values();
 
     List<? extends Column> getColumns();
 }
