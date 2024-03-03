@@ -27,7 +27,7 @@ public class EntityPersister {
 
         Long id = metadata.getPrimaryKeyValue(entity);
         checkGenerationStrategy(metadata, id);
-        id = metadata.hasIdGenerationStrategy() ? null : id;
+        id = metadata.requiresIdWhenInserting() ? id : null;
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata)
                 .id(id)
                 .values(columnValues(entity));
@@ -35,14 +35,8 @@ public class EntityPersister {
         return generatedId;
     }
 
-    /**
-     * id 없고 strategy 있고 --> 무시하거나 예외 내야 함
-     */
     private void checkGenerationStrategy(EntityMetadata entityMetadata, Long id) {
-        // XXX: GenerationType 에 따라서 분기 칠 수 있을까?
-        // id 가 필요한지 안 필요한지를 메타데이터에 물어보면 좋을듯
-        boolean hasIdGenerationStrategy = entityMetadata.hasIdGenerationStrategy();
-        if (!hasIdGenerationStrategy && id == null) {
+        if (entityMetadata.requiresIdWhenInserting() && id == null) {
             throw new PrimaryKeyMissingException();
         }
     }

@@ -7,7 +7,7 @@ import java.util.StringJoiner;
 
 public class PrimaryKeyEntityColumn extends AbstractEntityColumn {
     private final boolean autoIncrement;
-    private final boolean hasIdGenerationStrategy;
+    private final boolean isRequiredId;
 
     // field 생성 후 주입이 어려워서 테스트가 쉽지 않다
     public PrimaryKeyEntityColumn(Field field,
@@ -15,11 +15,11 @@ public class PrimaryKeyEntityColumn extends AbstractEntityColumn {
                                   Class<?> type,
                                   Integer columnLength,
                                   boolean autoIncrement,
-                                  boolean hasIdGenerationStrategy) {
+                                  boolean isRequiredId) {
         super(field, columnName, type, columnLength);
 
         this.autoIncrement = autoIncrement;
-        this.hasIdGenerationStrategy = hasIdGenerationStrategy;
+        this.isRequiredId = isRequiredId;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PrimaryKeyEntityColumn extends AbstractEntityColumn {
         return true;
     }
 
-    public boolean hasIdGenerationStrategy() {
-        return hasIdGenerationStrategy;
+    public boolean isRequiredId() {
+        return isRequiredId;
     }
 }

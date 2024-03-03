@@ -29,12 +29,17 @@ public class FieldToEntityColumnConverter {
 
         if (isId) {
             boolean autoIncrement = isAutoIncrement(generatedValueAnnotation);
-            boolean hasIdGenerationStrategy = generatedValueAnnotation != null;
-            return new PrimaryKeyEntityColumn(field, columnName, type, columnLength, autoIncrement, hasIdGenerationStrategy);
+            boolean isRequiredId = getGenerateStrategy(generatedValueAnnotation) == GenerationType.AUTO;
+            return new PrimaryKeyEntityColumn(field, columnName, type, columnLength, autoIncrement, isRequiredId);
         }
 
         boolean nullable = isNullable(columnAnnotation);
         return new GeneralEntityColumn(field, columnName, type, columnLength, nullable);
+    }
+
+    private static GenerationType getGenerateStrategy(GeneratedValue generatedValueAnnotation) {
+        if (generatedValueAnnotation == null) return GenerationType.AUTO;
+        return generatedValueAnnotation.strategy();
     }
 
     private String getColumnNameFromAnnotation(Column columnAnnotation, String defaultName) {

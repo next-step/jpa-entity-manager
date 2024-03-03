@@ -58,7 +58,7 @@ public class EntityMetadata {
         return columnsMetadata.getFieldByColumnName(columnName);
     }
 
-    public boolean hasIdGenerationStrategy() {
-        return columnsMetadata.hasIdGenerationStrategy();
+    public boolean requiresIdWhenInserting() {
+        return columnsMetadata.isRequiredId();
     }
 }

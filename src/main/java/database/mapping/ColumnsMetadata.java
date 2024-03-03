@@ -83,7 +83,7 @@ public class ColumnsMetadata {
         return fieldByColumnNameMap.get(upperCase);
     }
 
-    public boolean hasIdGenerationStrategy() {
-        return ((PrimaryKeyEntityColumn) primaryKey).hasIdGenerationStrategy();
+    public boolean isRequiredId() {
+        return ((PrimaryKeyEntityColumn) primaryKey).isRequiredId();
     }
 }
