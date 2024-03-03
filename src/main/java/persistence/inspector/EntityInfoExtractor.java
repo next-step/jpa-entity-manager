@@ -50,11 +50,11 @@ public class EntityInfoExtractor {
         return EntityFieldInspector.hasAnnotation(id, Id.class);
     }
 
-    public static Object getFieldValue(Object object, Field field) {
+    public static <T> T getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
 
-            return field.get(object);
+            return (T) field.get(object);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

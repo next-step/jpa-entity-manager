@@ -3,23 +3,21 @@ package persistence.core;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
-import org.h2.jdbc.JdbcSQLSyntaxErrorException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
-import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EntityPersisterTest {
+class DefaultEntityPersisterTest {
 
     private DatabaseServer server;
     JdbcTemplate jdbcTemplate;
     DDLExcuteor ddlExcuteor;
-    EntityPersister entityPersister;
+    DefaultEntityPersister defaultEntityPersister;
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -31,7 +29,7 @@ class EntityPersisterTest {
 
         createTable();
 
-        entityPersister = new EntityPersister(jdbcTemplate, Person.class);
+        defaultEntityPersister = new DefaultEntityPersister(jdbcTemplate);
     }
 
     @AfterEach
@@ -98,17 +96,17 @@ class EntityPersisterTest {
     @Test
     public void deleteTest() throws Exception {
         insert(getInsertData());
-        entityPersister.delete(select(1L));
+        defaultEntityPersister.delete(select(1L));
 
         assertThrowsExactly(RuntimeException.class, () -> select(1L));
     }
 
     private <T> void insert(T entity) {
-        entityPersister.insert(entity);
+        defaultEntityPersister.insert(entity);
     }
 
     private <T> T select(Long id) throws Exception {
-        return entityPersister.select(Person.class, id);
+        return defaultEntityPersister.select(Person.class, id);
     }
 
 

@@ -1,8 +1,6 @@
 package jdbc;
 
 import persistence.core.EntityContextManager;
-import persistence.entity.metadata.EntityColumn;
-import persistence.entity.metadata.EntityMetadata;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -1,11 +1,5 @@
 package persistence.entity.metadata;
 
-import jdbc.PersonRowMapper;
-import jdbc.RowMapper;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class EntityMetadata {
 
     private EntityTable entityTable;
