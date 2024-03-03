@@ -10,11 +10,6 @@ public class EntityMetadata {
 
     private EntityTable entityTable;
     private EntityColumns columns;
-    private PersonRowMapper rowMapper = new PersonRowMapper();
-
-    public PersonRowMapper getRowMapper() {
-        return rowMapper;
-    }
 
     public EntityTable getEntityTable() {
         return entityTable;

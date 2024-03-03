@@ -30,6 +30,12 @@ public class EntityColumns {
                 .collect(Collectors.toList());
     }
 
+    public EntityColumn getColumnByColumnName(String columnName) {
+        return columns.stream()
+                .filter(column -> column.getColumnName().equals(columnName))
+                .findFirst().orElse(null);
+    }
+
 
 
 }

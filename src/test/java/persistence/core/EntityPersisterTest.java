@@ -17,27 +17,35 @@ import static org.junit.jupiter.api.Assertions.*;
 class EntityPersisterTest {
 
     private DatabaseServer server;
+    JdbcTemplate jdbcTemplate;
+    DDLExcuteor ddlExcuteor;
     EntityPersister entityPersister;
 
     @BeforeEach
     public void setUp() throws SQLException {
-        EntityContextManager.loadEntities();
-        try {
-            new DDLExcuteor().createTable(Person.class);
-        } catch (RuntimeException e) {
-            // ignore
-        }
-
         server = new H2();
         server.start();
+        jdbcTemplate = new JdbcTemplate(server.getConnection());
+        ddlExcuteor = new DDLExcuteor(jdbcTemplate);
+        EntityContextManager.loadEntities();
 
-        entityPersister = new EntityPersister(new JdbcTemplate(server.getConnection()), Person.class);
+        createTable();
+
+        entityPersister = new EntityPersister(jdbcTemplate, Person.class);
     }
 
     @AfterEach
     public void tearDown() throws SQLException {
-        new DDLExcuteor().dropTable(Person.class);
+        dropTable();
         server.stop();
+    }
+
+    private void createTable() {
+        ddlExcuteor.createTable(Person.class);
+    }
+
+    private void dropTable() {
+        ddlExcuteor.dropTable(Person.class);
     }
 
     private Person getInsertData() {

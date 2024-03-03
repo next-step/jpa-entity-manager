@@ -1,6 +1,6 @@
 package persistence.core;
 
-import database.DatabaseServer;
+import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import persistence.entity.metadata.EntityColumn;
@@ -30,7 +30,7 @@ public class EntityPersister extends EntityContextManager {
 
     public <T> T select(Class<?> entityClass, Long id) throws Exception {
         String sql = dmlQueryBuilder.selectByIdQuery(entityClass, id);
-        Object o = jdbcTemplate.queryForObject(sql, entityMetadata.getRowMapper());
+        Object o = jdbcTemplate.queryForObject(sql, new DefaultRowMapper<T>((Class<T>) entityClass));
 
         return (T) o;
     }
@@ -61,20 +61,6 @@ public class EntityPersister extends EntityContextManager {
         String sql = dmlQueryBuilder.deleteSql(entity);
         jdbcTemplate.execute(sql);
         // Delete the entity from the database
-    }
-
-    // todo RowMapper를 어떻게 구현한담..
-    private RowMapper getRowMapper(Class<?> clazz) throws Exception {
-        Object entity = clazz.getDeclaredConstructor(String.class, int.class).newInstance();
-
-        RowMapper<Object> rowMapper = resultSet -> {
-            for (EntityColumn column : entityMetadata.getColumns().getColumns()) {
-                setEntityValues(entity, column.getField(), resultSet.getObject(column.getColumnName()));
-            }
-            return entity;
-        };
-
-        return rowMapper;
     }
 
     private void setEntityValues(Object instance, Field field, Object value) throws IllegalAccessException {
