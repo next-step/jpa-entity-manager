@@ -3,7 +3,6 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
-import database.DatabaseVendor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,11 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.core.DDLExcuteor;
+import persistence.core.DefaultEntityLoader;
 import persistence.core.EntityManager;
 import persistence.core.EntityManagerImpl;
+import persistence.entity.EntityValue;
 import persistence.entity.Person;
-import persistence.sql.ddl.DDLQueryBuilder;
-import persistence.sql.ddl.DDLQueryBuilderFactory;
+import persistence.entity.metadata.DefaultEntityMetadataReader;
+import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
@@ -37,7 +38,7 @@ class EntityManagerImplTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlExcuteor = new DDLExcuteor(jdbcTemplate);
-        entityManager = new EntityManagerImpl(server);
+        entityManager = new EntityManagerImpl(server, new DefaultEntityLoader(jdbcTemplate, DMLQueryBuilder.getInstance()), new EntityValue(new DefaultEntityMetadataReader()));
 
         createTable(Person.class);
     }
@@ -57,9 +58,7 @@ class EntityManagerImplTest {
         person.setAge(30);
         person.setEmail("test@gmail.com");
 
-        entityManager.persist(person);
-
-        Person persistedPerson = entityManager.find(Person.class, 1L);
+        Person persistedPerson = entityManager.persist(person);
 
         assertAll(
                 () -> assertThat(persistedPerson).isNotNull(),

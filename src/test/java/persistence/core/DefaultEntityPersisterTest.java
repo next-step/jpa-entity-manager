@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
+import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
@@ -17,7 +18,9 @@ class DefaultEntityPersisterTest {
     private DatabaseServer server;
     JdbcTemplate jdbcTemplate;
     DDLExcuteor ddlExcuteor;
-    DefaultEntityPersister defaultEntityPersister;
+    DefaultEntityPersister entityPersister;
+    DefaultEntityLoader entityLoader;
+
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -29,7 +32,8 @@ class DefaultEntityPersisterTest {
 
         createTable();
 
-        defaultEntityPersister = new DefaultEntityPersister(jdbcTemplate);
+        entityPersister = new DefaultEntityPersister(jdbcTemplate);
+        entityLoader = new DefaultEntityLoader(jdbcTemplate, DMLQueryBuilder.getInstance());
     }
 
     @AfterEach
@@ -54,15 +58,6 @@ class DefaultEntityPersisterTest {
         return person;
     }
 
-    private Person selectedData() {
-        Person person = new Person();
-        person.setId(1L);
-        person.setName("jinny");
-        person.setAge(30);
-        person.setEmail("test@test.com");
-        return person;
-    }
-
     @Test
     public void insertTest() throws Exception {
         insert(getInsertData());
@@ -79,34 +74,19 @@ class DefaultEntityPersisterTest {
     }
 
     @Test
-    public void selectTest() throws Exception {
-        insert(getInsertData());
-
-        Person select = select(1L);
-
-        assertAll(
-                () -> assertNotNull(select),
-                () -> assertEquals(select.getId(), 1L),
-                () -> assertEquals(select.getName(), "jinny"),
-                () -> assertEquals(select.getAge(), 30)
-        );
-
-    }
-
-    @Test
     public void deleteTest() throws Exception {
         insert(getInsertData());
-        defaultEntityPersister.delete(select(1L));
+        entityPersister.delete(select(1L));
 
         assertThrowsExactly(RuntimeException.class, () -> select(1L));
     }
 
     private <T> void insert(T entity) {
-        defaultEntityPersister.insert(entity);
+        entityPersister.insert(entity);
     }
 
     private <T> T select(Long id) throws Exception {
-        return defaultEntityPersister.select(Person.class, id);
+        return (T) entityLoader.find(Person.class, id);
     }
 
 
