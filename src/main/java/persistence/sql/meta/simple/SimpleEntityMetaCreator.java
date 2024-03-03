@@ -87,7 +87,7 @@ public class SimpleEntityMetaCreator  {
         return new SimpleColumns(simpleColumns);
     }
 
-    private static Columns createColumnValues(Object object) {
+    public static Columns createColumnValues(Object object) {
         final List<SimpleColumn> simpleColumns = Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(SimpleEntityMetaCreator::isNotTransientField)
                 .filter(SimpleEntityMetaCreator::isNotIdField)

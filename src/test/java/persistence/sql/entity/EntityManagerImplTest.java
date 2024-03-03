@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityManagerImplTest {
+
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach

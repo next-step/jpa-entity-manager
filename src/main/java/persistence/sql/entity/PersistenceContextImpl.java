@@ -1,13 +1,16 @@
 package persistence.sql.entity;
 
+import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static persistence.sql.meta.simple.SimpleEntityMetaCreator.createColumnValues;
+
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<PrimaryKey, Object> entitiesByKey = new HashMap<>();
-    private final Map<PrimaryKey, Object> entitySnapshotsByKey = new HashMap<>();
+    private final Map<PrimaryKey, Columns> entitySnapshotsByKey = new HashMap<>();
 
     @Override
     public Object getEntity(final PrimaryKey id) {
@@ -17,7 +20,9 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void addEntity(final PrimaryKey id, final Object entity) {
         entitiesByKey.put(id, entity);
-        entitySnapshotsByKey.put(id, entity);
+
+        final Columns columnValues = createColumnValues(entity);
+        entitySnapshotsByKey.put(id, columnValues);
     }
 
     @Override
@@ -29,7 +34,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public boolean isDirty(final PrimaryKey id, final Object entity) {
         if (entitySnapshotsByKey.containsKey(id)) {
-            return !entitySnapshotsByKey.get(id).equals(entity);
+            final Columns columnValues = createColumnValues(entity);
+            return !entitySnapshotsByKey.get(id).equals(columnValues);
         }
 
         return false;

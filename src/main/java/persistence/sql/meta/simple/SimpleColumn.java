@@ -68,4 +68,15 @@ public class SimpleColumn implements Column {
     public int hashCode() {
         return Objects.hash(name, isNullable, generationType, type, simpleValue);
     }
+
+    @Override
+    public String toString() {
+        return "SimpleColumn{" +
+                "name='" + name + '\'' +
+                ", isNullable=" + isNullable +
+                ", generationType=" + generationType +
+                ", type=" + type +
+                ", simpleValue=" + simpleValue +
+                '}';
+    }
 }

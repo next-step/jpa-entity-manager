@@ -63,4 +63,11 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.removeEntity(key);
         entityPersister.delete(entity);
     }
+
+    @Override
+    public boolean isDirty(Object entity) {
+        final PrimaryKey key = createPrimaryKeyValue(entity);
+
+        return persistenceContext.isDirty(key, entity);
+    }
 }
