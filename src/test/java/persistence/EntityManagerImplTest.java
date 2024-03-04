@@ -38,7 +38,7 @@ class EntityManagerImplTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlExcuteor = new DDLExcuteor(jdbcTemplate);
-        entityManager = new EntityManagerImpl(server, new DefaultEntityLoader(jdbcTemplate, DMLQueryBuilder.getInstance()), new EntityValue(new DefaultEntityMetadataReader()));
+        entityManager = new EntityManagerImpl(server);
 
         createTable(Person.class);
     }

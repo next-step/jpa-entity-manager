@@ -8,16 +8,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
-    private final EntityValue entityValue;
 
-
-    public EntityManagerImpl(DatabaseServer server, EntityLoader entityLoader, EntityValue entityValue) throws SQLException {
-        this.jdbcTemplate = new JdbcTemplate(server.getConnection());
-        this.entityLoader = entityLoader;
-        this.entityValue = entityValue;
+    public EntityManagerImpl(DatabaseServer server) throws SQLException {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+        this.entityLoader = new DefaultEntityLoader(jdbcTemplate);
         this.entityPersister = new DefaultEntityPersister(jdbcTemplate);
     }
 
@@ -40,7 +36,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) throws Exception {
-
         entityPersister.delete(entity);
     }
 

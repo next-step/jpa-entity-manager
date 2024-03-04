@@ -16,7 +16,7 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     }
 
     @Override
-    public T mapRow(ResultSet resultSet) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchFieldException {
+    public T mapRow(ResultSet resultSet) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         T object = mappedClass.getDeclaredConstructor().newInstance();
         int columnCount = resultSet.getMetaData().getColumnCount();
 

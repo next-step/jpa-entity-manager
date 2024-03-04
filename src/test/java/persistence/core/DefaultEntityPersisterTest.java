@@ -5,6 +5,7 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
 import persistence.sql.dml.DMLQueryBuilder;
@@ -33,7 +34,7 @@ class DefaultEntityPersisterTest {
         createTable();
 
         entityPersister = new DefaultEntityPersister(jdbcTemplate);
-        entityLoader = new DefaultEntityLoader(jdbcTemplate, DMLQueryBuilder.getInstance());
+        entityLoader = new DefaultEntityLoader(jdbcTemplate);
     }
 
     @AfterEach
@@ -59,10 +60,12 @@ class DefaultEntityPersisterTest {
     }
 
     @Test
+    @DisplayName("insert Test")
     public void insertTest() throws Exception {
-        insert(getInsertData());
+        Person insertData = getInsertData();
+        insert(insertData);
 
-        Person select = select(1L);
+        Person select = select(insertData.getClass(), 1L);
 
         assertAll(
                 () -> assertNotNull(select),
@@ -74,21 +77,43 @@ class DefaultEntityPersisterTest {
     }
 
     @Test
+    @DisplayName("delete후 해당 id로 조회가 되면 안됨")
     public void deleteTest() throws Exception {
-        insert(getInsertData());
-        entityPersister.delete(select(1L));
+        Person insertData = getInsertData();
+        insert(insertData);
+        entityPersister.delete(select(insertData.getClass(), 1L));
 
-        assertThrowsExactly(RuntimeException.class, () -> select(1L));
+        assertThrowsExactly(RuntimeException.class, () -> select(insertData.getClass(), 1L));
     }
 
-    private <T> void insert(T entity) {
-        entityPersister.insert(entity);
+    @Test
+    @DisplayName("update후 entity에 변경된 정보 반영")
+    public void updateTest() throws Exception {
+        Person insertData = getInsertData();
+        Long id = insert(getInsertData());
+        insertData.setId(id);
+        insertData.setAge(33);
+
+        update(insertData);
+
+        Person select = select(insertData.getClass(), id);
+        assertAll(
+            () -> assertEquals(select.getAge(), 33)
+        );
     }
 
-    private <T> T select(Long id) throws Exception {
-        return (T) entityLoader.find(Person.class, id);
+
+    private <T> Long insert(T entity) {
+        return entityPersister.insert(entity);
     }
 
+    private <T> T select(Class<T> entityClass, Long id) throws Exception {
+        return entityLoader.find(entityClass, id);
+    }
+
+    private <T> void update(T entity) throws Exception {
+        entityPersister.update(entity);
+    }
 
 
 }

@@ -5,6 +5,7 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
 import persistence.sql.dml.DMLQueryBuilder;
@@ -28,7 +29,7 @@ class DefaultEntityLoaderTest {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlExcuteor = new DDLExcuteor(jdbcTemplate);
         entityPersister = new DefaultEntityPersister(jdbcTemplate);
-        entityLoader = new DefaultEntityLoader(jdbcTemplate, DMLQueryBuilder.getInstance());
+        entityLoader = new DefaultEntityLoader(jdbcTemplate);
 
         EntityContextManager.loadEntities();
 
@@ -42,6 +43,7 @@ class DefaultEntityLoaderTest {
     }
 
     @Test
+    @DisplayName("findAll Test")
     public void findAllTest() throws Exception {
         insertSampleData(5);
 
@@ -51,6 +53,7 @@ class DefaultEntityLoaderTest {
     }
 
     @Test
+    @DisplayName("findById Test")
     public void findTest() throws Exception {
         insertSampleData(5);
 
