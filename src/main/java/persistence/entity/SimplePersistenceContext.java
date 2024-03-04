@@ -23,6 +23,7 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public void addEntity(Long id, Object entity) {
+        bindEntityId(entity, id);
         cache.put(id, entity);
         snapshot.put(id, entity);
     }
@@ -47,6 +48,15 @@ public class SimplePersistenceContext implements PersistenceContext {
 
         PKColumn pkColumn = table.getPKColumn();
         return (Long) entityBinder.getValue(pkColumn);
+    }
+
+    private void bindEntityId(Object entity, Long id) {
+        Table table = new Table(entity.getClass());
+
+        EntityBinder entityBinder = new EntityBinder(entity);
+
+        PKColumn pkColumn = table.getPKColumn();
+        entityBinder.bindValue(pkColumn, id);
     }
 
     @Override
