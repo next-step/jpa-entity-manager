@@ -14,7 +14,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         EntityKey entityKey = EntityKey.of(clazz, id);
 
         if (!entityEntries.canGet(entityKey)) return null;
-        return firstLevelCache.get(entityKey);
+        return firstLevelCache.find(entityKey);
     }
 
     @Override
@@ -23,7 +23,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         if (entityEntries.canAdd(entityKey)) {
             firstLevelCache.store(entityKey, entity);
-            entityEntries.manage(entityKey);
+            entityEntries.managed(entityKey);
         }
     }
 
@@ -39,7 +39,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         EntityKey entityKey = EntityKey.of(entity);
 
         if (entityEntries.canRemove(entityKey)) {
-            entityEntries.setAsDeleted(entityKey);
+            entityEntries.deleted(entityKey);
             firstLevelCache.delete(entityKey);
             entityEntries.gone(entityKey);
         }

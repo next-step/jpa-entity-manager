@@ -26,6 +26,10 @@ public class EntityMetadata {
         return tableMetadata.getTableName();
     }
 
+    public String getEntityClassName() {
+        return tableMetadata.getEntityClassName();
+    }
+
     public List<String> getAllColumnNames() {
         return columnsMetadata.getAllColumnNames();
     }

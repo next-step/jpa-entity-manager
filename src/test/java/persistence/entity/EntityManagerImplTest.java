@@ -39,7 +39,9 @@ class EntityManagerImplTest extends H2DatabaseTest {
     @Test
     void persistNoAutoIncrementEntityWithoutId() {
         NoAutoIncrementUser user = new NoAutoIncrementUser(null, "abc123", 14, "c123@d.com");
-        assertThrows(PrimaryKeyMissingException.class, () -> entityManager.persist(user));
+
+        PrimaryKeyMissingException ex = assertThrows(PrimaryKeyMissingException.class, () -> entityManager.persist(user));
+        assertThat(ex.getMessage()).isEqualTo("Primary key is not assigned when inserting: database.sql.dml.NoAutoIncrementUser");
     }
 
     @Test

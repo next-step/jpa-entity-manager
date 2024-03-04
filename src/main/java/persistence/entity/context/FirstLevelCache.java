@@ -10,7 +10,7 @@ public class FirstLevelCache {
         this.map = new HashMap<>();
     }
 
-    public Object get(EntityKey entityKey) {
+    public Object find(EntityKey entityKey) {
         return map.get(entityKey);
     }
 

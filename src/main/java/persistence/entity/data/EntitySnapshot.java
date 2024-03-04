@@ -14,19 +14,19 @@ public class EntitySnapshot {
     }
 
     public static EntitySnapshot of(Object entity) {
-        EntitySnapshot ret = new EntitySnapshot();
+        EntitySnapshot newSnapshot = new EntitySnapshot();
 
         if (entity == null) {
-            return ret;
+            return newSnapshot;
         }
 
         EntityMetadata entityMetadata = EntityMetadata.fromClass(entity.getClass());
         for (EntityColumn column : entityMetadata.getGeneralColumns()) {
             String key = column.getColumnName();
             Object value = column.getValue(entity);
-            ret.snapshot.put(key, value);
+            newSnapshot.snapshot.put(key, value);
         }
-        return ret;
+        return newSnapshot;
     }
 
     public Map<String, Object> diff(EntitySnapshot newEntitySnapshot) {

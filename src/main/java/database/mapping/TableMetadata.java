@@ -17,4 +17,8 @@ public class TableMetadata {
         }
         return clazz.getSimpleName();
     }
+
+    public String getEntityClassName() {
+        return clazz.getName();
+    }
 }

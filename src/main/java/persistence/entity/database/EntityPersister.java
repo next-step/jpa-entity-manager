@@ -37,7 +37,7 @@ public class EntityPersister {
 
     private void checkGenerationStrategy(EntityMetadata entityMetadata, Long id) {
         if (entityMetadata.requiresIdWhenInserting() && id == null) {
-            throw new PrimaryKeyMissingException();
+            throw new PrimaryKeyMissingException(entityMetadata.getEntityClassName());
         }
     }
 
