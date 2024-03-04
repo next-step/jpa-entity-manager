@@ -1,25 +1,18 @@
 package persistence.entity;
 
-import domain.EntityMetaData;
-import jdbc.JdbcTemplate;
-import jdbc.RowMapperImpl;
-import persistence.sql.dml.SelectQueryBuilder;
-
 public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityLoader entityLoader;
 
-    public SimpleEntityManager(EntityPersister entityPersister, JdbcTemplate jdbcTemplate) {
+    public SimpleEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
         this.entityPersister = entityPersister;
-        this.jdbcTemplate = jdbcTemplate;
+        this.entityLoader = entityLoader;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(new EntityMetaData(clazz));
-        return jdbcTemplate.queryForObject(selectQueryBuilder.findByIdQuery(id), new RowMapperImpl<>(clazz));
-
+        return entityLoader.findById(clazz, id);
     }
 
     public Object persist(Object object) {
