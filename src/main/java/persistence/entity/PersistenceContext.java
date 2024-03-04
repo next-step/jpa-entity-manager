@@ -8,5 +8,7 @@ public interface PersistenceContext {
 
     void removeEntity(Object entity);
 
+    boolean isCached(Object entity);
+
     Object getDatabaseSnapshot(Long id, Object entity);
 }

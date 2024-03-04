@@ -33,6 +33,13 @@ public class SimplePersistenceContext implements PersistenceContext {
         cache.remove(id);
     }
 
+    @Override
+    public boolean isCached(Object entity) {
+        Long entityId = getEntityId(entity);
+        Object cachedEntity = getEntity(entityId);
+        return cachedEntity != null;
+    }
+
     private Long getEntityId(Object entity) {
         Table table = new Table(entity.getClass());
 
