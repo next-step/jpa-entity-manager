@@ -9,5 +9,9 @@ public interface PersistenceContext {
     void removeEntity(Object entity);
 
     boolean isDirty(Object entity);
+
+    EntityEntry getEntry(Object entity);
+
+    void addEntry(Object entity, EntityEntry entry);
 }
 

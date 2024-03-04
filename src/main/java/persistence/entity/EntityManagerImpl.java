@@ -8,20 +8,17 @@ public class EntityManagerImpl implements EntityManager {
 
     private final PersistenceContext persistenceContext;
 
-    private final EntityEntryContext entityEntryContext;
-
     public EntityManagerImpl(EntityPersister entityPersister,
                              EntityLoader entityLoader, PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
         this.persistenceContext = persistenceContext;
-        this.entityEntryContext = new EntityEntryContext();
     }
 
 
     @Override
     public <T> T persist(T entity) {
-        EntityEntry entry = entityEntryContext.get(entity);
+        EntityEntry entry = persistenceContext.getEntry(entity);
         persist(entity, entry);
         persistenceContext.addEntity(entity);
         return entity;
@@ -41,7 +38,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private void saveOrUpdate(Object entity) {
-        EntityEntry entry = entityEntryContext.get(entity);
+        EntityEntry entry = persistenceContext.getEntry(entity);
         if (persistenceContext.isDirty(entity)) {
             entry.preUpdate();
             entityPersister.update(entity);
@@ -53,7 +50,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        EntityEntry entry = entityEntryContext.get(entity);
+        EntityEntry entry = persistenceContext.getEntry(entity);
         entry.preRemove();
         entityPersister.delete(entity);
         entry.postRemove();
@@ -71,7 +68,7 @@ public class EntityManagerImpl implements EntityManager {
         entry.preLoad();
         T foundEntity = entityLoader.find(clazz, id);
         entry.postLoad();
-        entityEntryContext.add(foundEntity, entry);
+        persistenceContext.addEntry(foundEntity, entry);
         persistenceContext.addEntity(foundEntity);
         return foundEntity;
     }
