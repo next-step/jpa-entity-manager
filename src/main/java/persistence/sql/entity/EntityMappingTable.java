@@ -32,12 +32,6 @@ public class EntityMappingTable {
         );
     }
 
-    private static Table getTable(final Class<?> clazz) {
-        return clazz.isAnnotationPresent(Table.class) ?
-                clazz.getAnnotation(Table.class) :
-                null;
-    }
-
     public static EntityMappingTable of(final Class<?> clazz,
                                         final Object object) {
         return new EntityMappingTable(
@@ -45,6 +39,12 @@ public class EntityMappingTable {
                 DomainTypes.of(clazz.getDeclaredFields(), object),
                 getTable(clazz)
         );
+    }
+
+    private static Table getTable(final Class<?> clazz) {
+        return clazz.isAnnotationPresent(Table.class) ?
+                clazz.getAnnotation(Table.class) :
+                null;
     }
 
     public TableName getTableName() {
