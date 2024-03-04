@@ -35,6 +35,8 @@ class SimpleEntityMangerTest {
     private static DDLQueryBuilder ddlQueryBuilder;
     private static DMLQueryBuilder dmlQueryBuilder;
 
+    private static EntityPersister entityPersister;
+    private static EntityLoader entityLoader;
     private static EntityManager entityManager;
 
     @BeforeAll
@@ -47,9 +49,9 @@ class SimpleEntityMangerTest {
         Database database = new SimpleDatabase(jdbcTemplate);
 
         EntityMetaCache entityMetaCache = new EntityMetaCache();
-        EntityPersister persister = new EntityPersister(database, entityMetaCache);
-        EntityLoader loader = new EntityLoader(database, entityMetaCache);
-        entityManager = new SimpleEntityManger(persister, loader);
+        entityPersister = new EntityPersister(database, entityMetaCache);
+        entityLoader = new EntityLoader(database, entityMetaCache);
+        entityManager = new SimpleEntityManger(entityPersister, entityLoader);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -69,16 +71,15 @@ class SimpleEntityMangerTest {
 
         Stream<Person3> persons = createPersons();
 
-        persons.forEach(person -> {
-            String insertQuery = dmlQueryBuilder.buildInsertQuery(person);
-            jdbcTemplate.execute(insertQuery);
-        });
+        persons.forEach(person -> entityManager.persist(person));
     }
 
     @AfterEach
     void setDown() {
         String dropQuery = ddlQueryBuilder.buildDropQuery();
         jdbcTemplate.execute(dropQuery);
+
+        entityManager = new SimpleEntityManger(entityPersister, entityLoader);
     }
 
     private Stream<Person3> createPersons() {
