@@ -1,20 +1,19 @@
-package persistence.sql.entity.manager;
+package persistence.sql.entity.loader;
 
 import persistence.sql.dml.exception.*;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
-import persistence.sql.entity.model.NormalDomainType;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.util.Spliterator;
 import java.util.stream.StreamSupport;
 
-public class EntityManagerMapper<T> {
+public class EntityLoaderMapper<T> {
 
     private final Class<T> clazz;
 
-    public EntityManagerMapper(Class<T> clazz) {
+    public EntityLoaderMapper(Class<T> clazz) {
         this.clazz = clazz;
     }
 
@@ -62,16 +61,6 @@ public class EntityManagerMapper<T> {
             field.set(instance, value);
         } catch (Exception e) {
             throw new FieldSetValueException();
-        }
-    }
-
-    public String getFieldValue(final T entity, final String columnName) {
-        try {
-            Field field = clazz.getDeclaredField(columnName);
-            field.setAccessible(true);
-            return field.get(entity).toString();
-        } catch (Exception e) {
-            throw new NotFoundIdException();
         }
     }
 }
