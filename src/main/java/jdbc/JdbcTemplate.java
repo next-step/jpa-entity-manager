@@ -13,7 +13,7 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
-    public Long execute(final String sql) {
+    public Object execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
             ResultSet generatedKeys = statement.getGeneratedKeys();

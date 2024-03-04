@@ -18,7 +18,7 @@ public class DefaultEntityPersister implements EntityPersister {
     @Override
     public Long insert(Object entity) {
         String sql = dmlQueryBuilder.insertSql(entity);
-        return jdbcTemplate.execute(sql);
+        return (Long) jdbcTemplate.execute(sql);
     }
 
     @Override
