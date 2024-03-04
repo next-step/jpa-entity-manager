@@ -67,10 +67,11 @@ public class EntityManagerImpl implements EntityManager {
         if (cachedEntity != null) {
             return cachedEntity;
         }
-        EntityEntry entry = entityEntryContext.get(clazz, id);
+        EntityEntry entry = new SimpleEntityEntry();
         entry.preLoad();
         T foundEntity = entityLoader.find(clazz, id);
         entry.postLoad();
+        entityEntryContext.add(foundEntity, entry);
         persistenceContext.addEntity(foundEntity);
         return foundEntity;
     }

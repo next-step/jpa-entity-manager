@@ -5,25 +5,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityEntryContext {
 
-    private final Map<EntityCacheKey, EntityEntry> context = new ConcurrentHashMap<>();
+    private final Map<Object, EntityEntry> context = new ConcurrentHashMap<>();
 
     public EntityEntry get(Object entity) {
-        EntityCacheKey entityCacheKey = new EntityCacheKey(entity);
-        return getEntry(entityCacheKey);
-    }
-
-    public EntityEntry get(Class<?> clazz, Object id) {
-        EntityCacheKey entityCacheKey = new EntityCacheKey(clazz, id);
-        return getEntry(entityCacheKey);
-    }
-
-    private EntityEntry getEntry(EntityCacheKey entityCacheKey) {
-        EntityEntry cachedEntry = context.get(entityCacheKey);
+        EntityEntry cachedEntry = context.get(entity);
         if (cachedEntry == null) {
             SimpleEntityEntry newEntry = new SimpleEntityEntry();
-            context.put(entityCacheKey, newEntry);
+            context.put(entity, newEntry);
             return newEntry;
         }
         return cachedEntry;
     }
+
+    public <T> void add(Object entity, EntityEntry entry) {
+        context.put(entity, entry);
+    }
+
 }

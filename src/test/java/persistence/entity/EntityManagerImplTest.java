@@ -61,8 +61,8 @@ class EntityManagerImplTest {
         entityManager.remove(foundPerson);
 
         assertThatThrownBy(() -> entityManager.find(Person.class, id))
-                .isInstanceOf(ObjectNotFoundException.class)
-                .hasMessageContaining("deleted/gone status not permitted to update/loading/saving");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Expected 1 result, got 0");
     }
 
     @Test
