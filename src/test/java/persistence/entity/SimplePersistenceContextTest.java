@@ -55,4 +55,11 @@ class SimplePersistenceContextTest {
 
         assertThat(person == result).isTrue();
     }
+
+    @Test
+    void getDatabaseSnapshot() {
+        Object result = persistenceContext.getDatabaseSnapshot(1L, person);
+
+        assertThat(result == person).isTrue();
+    }
 }
