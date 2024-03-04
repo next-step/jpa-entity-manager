@@ -5,8 +5,6 @@ import persistence.sql.dml.DMLQueryBuilder;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 
-import java.util.List;
-
 public class EntityPersister {
 
     private final Database database;
@@ -17,12 +15,12 @@ public class EntityPersister {
         this.entityMetaCache = entityMetaCache;
     }
 
-    public void create(Object entity) {
+    public Object create(Object entity) {
         Class<?> clazz = entity.getClass();
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
         String insertQuery = queryBuilder.buildInsertQuery(entity);
-        database.execute(insertQuery);
+        return database.executeInsertQuery(insertQuery);
     }
 
     public void update(Object entity) {
