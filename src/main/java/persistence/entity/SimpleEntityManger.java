@@ -64,8 +64,7 @@ public class SimpleEntityManger implements EntityManager {
         Object id = getEntityId(entity);
         Object snapshot = persistenceContext.getDatabaseSnapshot((Long) id, entity);
         if (snapshot == null) {
-            persistenceContext.addEntity((Long) id, entity);
-            return false;
+            snapshot = find(clazz, id);
         }
 
         EntityBinder entityBinder = new EntityBinder(entity);
