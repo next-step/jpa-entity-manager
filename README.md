@@ -22,7 +22,7 @@
   - remove 할 때는 map에서 제거한다.
   - 넣은 객체와 꺼낸 객체의 동일성을 보장하자.
 
-- [ ] 엔티티의 상태를 저장하는 snapshot 구현하기
+- [x] 엔티티의 상태를 저장하는 snapshot 구현하기
   - 스냅샷을 저장하는 map을 만든다.
   - 엔티티를 조회했을 때 snapshot을 생성한다.
   - persist할 때 snapshot과 entity를 비교한다.

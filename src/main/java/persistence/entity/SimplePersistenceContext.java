@@ -9,9 +9,11 @@ import java.util.Map;
 public class SimplePersistenceContext implements PersistenceContext {
 
     private final Map<Long, Object> cache;
+    private final Map<Long, Object> snapshot;
 
     public SimplePersistenceContext() {
         this.cache = new HashMap<>();
+        this.snapshot = new HashMap<>();
     }
 
     @Override
@@ -22,6 +24,7 @@ public class SimplePersistenceContext implements PersistenceContext {
     @Override
     public void addEntity(Long id, Object entity) {
         cache.put(id, entity);
+        snapshot.put(id, entity);
     }
 
     @Override
@@ -37,5 +40,10 @@ public class SimplePersistenceContext implements PersistenceContext {
 
         PKColumn pkColumn = table.getPKColumn();
         return (Long) entityBinder.getValue(pkColumn);
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(Long id, Object entity) {
+        return snapshot.get(id);
     }
 }
