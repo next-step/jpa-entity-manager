@@ -13,7 +13,7 @@ public class PrimaryDomainType implements DomainType {
     private final GenerationType generationType;
     private final EntityColumn entityColumn;
 
-    public PrimaryDomainType(final Field field,
+    private PrimaryDomainType(final Field field,
                              final GenerationType generationType,
                              final EntityColumn entityColumn) {
         this.field = field;

@@ -27,10 +27,6 @@ public class ValueClause {
                 .collect(Collectors.toList()));
     }
 
-    public List<String> getValues() {
-        return values;
-    }
-
     private static Field getField(final Class<?> clazz,
                                   final String fieldName) {
         try {
