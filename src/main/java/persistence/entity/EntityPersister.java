@@ -18,7 +18,7 @@ public class EntityPersister {
     public Object create(Object entity) {
         DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String insertQuery = queryBuilder.buildInsertQuery(entity);
-        return database.executeInsertQuery(insertQuery);
+        return database.executeQueryAndGetGeneratedKey(insertQuery);
     }
 
     public void update(Object entity) {

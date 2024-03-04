@@ -18,8 +18,8 @@ public class SimpleDatabase implements Database {
     }
 
     @Override
-    public Object executeInsertQuery(String insertSql) {
-        return jdbcTemplate.queryAndGetGeneratedKey(insertSql);
+    public Object executeQueryAndGetGeneratedKey(String sql) {
+        return jdbcTemplate.queryAndGetGeneratedKey(sql);
     }
 
     @Override

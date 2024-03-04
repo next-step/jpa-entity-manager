@@ -6,7 +6,7 @@ public interface Database {
 
     void execute(String sql);
 
-    Object executeInsertQuery(String insertSql);
+    Object executeQueryAndGetGeneratedKey(String insertSql);
 
     <T> T executeQueryForObject(Class<T> clazz, String sql);
 
