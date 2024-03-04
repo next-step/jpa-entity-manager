@@ -18,6 +18,11 @@ public class SimpleDatabase implements Database {
     }
 
     @Override
+    public Object executeInsertQuery(String insertSql) {
+        return jdbcTemplate.queryAndGetGeneratedKey(insertSql);
+    }
+
+    @Override
     public <T> T executeQueryForObject(Class<T> clazz, String sql) {
         return jdbcTemplate.queryForObject(sql, new EntityRowMapper<>(clazz));
     }
