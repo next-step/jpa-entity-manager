@@ -1,15 +1,13 @@
-package persistence.sql.entity.manager;
+package persistence.sql.entity.loader;
 
-import jakarta.persistence.EntityManager;
+import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
 import persistence.repository.Repository;
 import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
 import persistence.sql.dml.conditional.Criteria;
-import persistence.sql.dml.conditional.Criterion;
 import persistence.sql.dml.query.builder.DeleteQueryBuilder;
 import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
@@ -17,19 +15,19 @@ import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.model.Operators;
+import persistence.sql.entity.manager.EntityManagerImpl;
+import persistence.sql.entity.manager.EntityManger;
 import persistence.sql.entity.model.PrimaryDomainType;
 import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EntityManagerMapperTest extends H2Database {
-    private EntityManagerMapper<Person> entityManagerMapper;
+class EntityLoaderMapperTest extends H2Database {
+    private EntityLoaderMapper<Person> entityLoaderMapper;
     private Connection connection;
     private SelectQueryBuilder selectQueryBuilder;
     private Repository<Person, Long> personRepository;
@@ -39,13 +37,16 @@ class EntityManagerMapperTest extends H2Database {
 
     @BeforeEach
     void setUp() throws SQLException {
-        this.entityManagerMapper = new EntityManagerMapper<>(Person.class);
+        this.entityLoaderMapper = new EntityLoaderMapper<>(Person.class);
 
         final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+
         final EntityManger<Person> entityManager = new EntityManagerImpl<>(
-                jdbcTemplate,
-                entityManagerMapper,
-                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
+                new EntityLoaderImpl<>(
+                        jdbcTemplate,
+                        entityLoaderMapper,
+                        new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause)
+                ),
                 new EntityPersisterImpl<>(
                         jdbcTemplate,
                         new InsertQueryBuilder(entityMappingTable.getTableName()),
@@ -84,7 +85,7 @@ class EntityManagerMapperTest extends H2Database {
     private Person executeQuery(final String sql) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             resultSet.next();
-            return entityManagerMapper.mapper(resultSet);
+            return entityLoaderMapper.mapper(resultSet);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("SQL 에러가 발생하였습니다.");
