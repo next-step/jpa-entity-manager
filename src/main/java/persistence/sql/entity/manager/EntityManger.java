@@ -13,5 +13,4 @@ public interface EntityManger<T> {
     void remove(T entity);
 
     void removeAll(Class<T> clazz);
-
 }
