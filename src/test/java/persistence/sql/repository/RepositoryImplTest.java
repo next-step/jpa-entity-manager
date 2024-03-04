@@ -8,6 +8,15 @@ import persistence.repository.Repository;
 import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
 import persistence.sql.dml.exception.InvalidDeleteNullPointException;
+import persistence.sql.dml.query.builder.DeleteQueryBuilder;
+import persistence.sql.dml.query.builder.InsertQueryBuilder;
+import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import persistence.sql.dml.query.builder.UpdateQueryBuilder;
+import persistence.sql.dml.query.clause.ColumnClause;
+import persistence.sql.entity.manager.EntityManagerImpl;
+import persistence.sql.entity.manager.EntityManagerMapper;
+import persistence.sql.entity.manager.EntityManger;
+import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +33,19 @@ class RepositoryImplTest extends H2Database {
 
     @BeforeEach
     void setUp() {
-        personRepository = new RepositoryImpl<>(jdbcTemplate, Person.class);
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final EntityManger<Person> entityManager = new EntityManagerImpl<>(
+                jdbcTemplate,
+                new EntityManagerMapper<>(Person.class),
+                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
+                new EntityPersisterImpl<>(
+                        jdbcTemplate,
+                        new InsertQueryBuilder(entityMappingTable.getTableName()),
+                        new UpdateQueryBuilder(entityMappingTable.getTableName()),
+                        new DeleteQueryBuilder(entityMappingTable.getTableName())
+                )
+        );
+        personRepository = new RepositoryImpl<>(entityManager, Person.class);
         personRepository.deleteAll();
 
         person1 = new Person(1L, "박재성", 10, "jason");

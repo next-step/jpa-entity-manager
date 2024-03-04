@@ -21,22 +21,9 @@ public class RepositoryImpl<T, K> implements Repository<T, K> {
     private final EntityManger<T> entityManger;
     private final Class<T> clazz;
 
-    public RepositoryImpl(final JdbcTemplate jdbcTemplate,
+    public RepositoryImpl(final EntityManger<T> entityManger,
                           final Class<T> clazz) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
-
-        this.entityManger = new EntityManagerImpl<>(
-                jdbcTemplate,
-                new EntityManagerMapper<>(clazz),
-                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
-                new EntityPersisterImpl<>(
-                        jdbcTemplate,
-                        new InsertQueryBuilder(entityMappingTable.getTableName()),
-                        new UpdateQueryBuilder(entityMappingTable.getTableName()),
-                        new DeleteQueryBuilder(entityMappingTable.getTableName())
-                )
-        );
+        this.entityManger = entityManger;
         this.clazz = clazz;
     }
 

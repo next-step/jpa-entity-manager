@@ -1,5 +1,6 @@
 package persistence.sql.entity.manager;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,12 +10,16 @@ import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.builder.DeleteQueryBuilder;
+import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.Operators;
 import persistence.sql.entity.model.PrimaryDomainType;
+import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,8 +39,23 @@ class EntityManagerMapperTest extends H2Database {
 
     @BeforeEach
     void setUp() throws SQLException {
-        this.personRepository = new RepositoryImpl<>(jdbcTemplate, Person.class);
         this.entityManagerMapper = new EntityManagerMapper<>(Person.class);
+
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final EntityManger<Person> entityManager = new EntityManagerImpl<>(
+                jdbcTemplate,
+                entityManagerMapper,
+                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
+                new EntityPersisterImpl<>(
+                        jdbcTemplate,
+                        new InsertQueryBuilder(entityMappingTable.getTableName()),
+                        new UpdateQueryBuilder(entityMappingTable.getTableName()),
+                        new DeleteQueryBuilder(entityMappingTable.getTableName())
+                )
+        );
+
+        this.personRepository = new RepositoryImpl<>(entityManager, Person.class);
+
         this.connection = server.getConnection();
         this.selectQueryBuilder = new SelectQueryBuilder(entityMappingTable.getTableName(), new ColumnClause(entityMappingTable.getDomainTypes().getColumnName()));
 
