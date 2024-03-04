@@ -3,14 +3,12 @@ package persistence.sql.ddl;
 import domain.EntityMetaData;
 import domain.H2GenerationType;
 import domain.dialect.Dialect;
-import domain.vo.JavaMappingType;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
 import java.sql.Types;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,30 +22,23 @@ public class CreateQueryBuilder {
 
     private static final String CREATE_TABLE_QUERY = "CREATE TABLE %s ( %s );";
 
-    private final JavaMappingType javaMappingType;
     private final Dialect dialect;
     private final EntityMetaData entityMetaData;
 
     public CreateQueryBuilder(Dialect dialect, EntityMetaData entityMetaData) {
-        this.javaMappingType = new JavaMappingType();
         this.dialect = dialect;
         this.entityMetaData = entityMetaData;
     }
 
     public String createTable(Object object) {
-        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableName(), createClause(object.getClass()));
+        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableName(), createClause(entityMetaData.getIdAndColumnFields(object)));
     }
 
-    private String createClause(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> !isTransientField(field))
+    private String createClause(List<Field> fields) {
+        return fields.stream()
                 .map(this::getFieldInfo)
                 .collect(Collectors.joining(COMMA))
                 .replaceAll(",[\\s,]*$", "");
-    }
-
-    private boolean isTransientField(Field field) {
-        return field.isAnnotationPresent(Transient.class);
     }
 
     private String getFieldInfo(Field field) {
@@ -67,8 +58,7 @@ public class CreateQueryBuilder {
     }
 
     public String getFieldType(Field field) {
-        Integer javaTypeByClass = javaMappingType.getJavaTypeByClass(field.getType());
-        return dialect.getColumnDefine(javaTypeByClass);
+        return dialect.getTypeToStr(field.getType());
     }
 
     public String getFieldLength(Field field) {
@@ -106,7 +96,7 @@ public class CreateQueryBuilder {
     }
 
     private boolean isVarcharType(Field field) {
-        Integer javaTypeByClass = javaMappingType.getJavaTypeByClass(field.getType());
+        Integer javaTypeByClass = dialect.getJavaTypeByClass(field.getType());
         return javaTypeByClass.equals(Types.VARCHAR);
     }
 

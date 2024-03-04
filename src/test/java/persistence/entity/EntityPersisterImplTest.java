@@ -6,7 +6,6 @@ import domain.EntityMetaData;
 import domain.Person3;
 import domain.dialect.Dialect;
 import domain.dialect.H2Dialect;
-import domain.vo.JavaMappingType;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -26,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityPersisterImplTest {
 
-    static JavaMappingType javaMappingType = new JavaMappingType();
     static Dialect dialect = new H2Dialect();
     static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
 
     static DatabaseServer server;
     static JdbcTemplate jdbcTemplate;
     static EntityPersister entityPersister;
+    static EntityLoader entityLoader;
     static SimpleEntityManager simpleEntityManager;
 
     Person3 person;
@@ -41,9 +40,11 @@ class EntityPersisterImplTest {
     static void init() throws SQLException {
         server = new H2();
         server.start();
+
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, javaMappingType, dialect, entityMetaData);
-        simpleEntityManager = new SimpleEntityManager(new EntityPersisterImpl(jdbcTemplate, javaMappingType, dialect, entityMetaData), jdbcTemplate);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect, entityMetaData);
+        entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
+        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader);
     }
 
     @BeforeEach
@@ -73,7 +74,6 @@ class EntityPersisterImplTest {
                 () -> assertThat(person3.getAge()).isEqualTo(person.getAge()),
                 () -> assertThat(person3.getEmail()).isEqualTo(person.getEmail())
         );
-
     }
 
     @DisplayName("insert 후 update 테스트")
@@ -98,7 +98,7 @@ class EntityPersisterImplTest {
     }
 
     private void insertData() {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(javaMappingType, dialect, entityMetaData);
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
         jdbcTemplate.execute(updateQueryBuilder.insertQuery(person));
     }
 
@@ -106,5 +106,4 @@ class EntityPersisterImplTest {
         DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entityMetaData);
         jdbcTemplate.execute(dropQueryBuilder.dropTable());
     }
-
 }
