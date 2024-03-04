@@ -16,17 +16,13 @@ public class EntityPersister {
     }
 
     public Object create(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String insertQuery = queryBuilder.buildInsertQuery(entity);
         return database.executeInsertQuery(insertQuery);
     }
 
     public void update(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
 
         Object id = getEntityId(entity);
         String updateByIdQuery = queryBuilder.buildUpdateByIdQuery(entity, id);
@@ -35,9 +31,7 @@ public class EntityPersister {
     }
 
     public void delete(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
 
         Object id = getEntityId(entity);
         String deleteByIdQuery = queryBuilder.buildDeleteByIdQuery(id);
@@ -45,9 +39,18 @@ public class EntityPersister {
         database.execute(deleteByIdQuery);
     }
 
-    private Object getEntityId(Object entity) {
+    private DMLQueryBuilder createDMLQueryBuilder(Object entity) {
+        Table table = createTable(entity);
+        return new DMLQueryBuilder(table);
+    }
+
+    private Table createTable(Object entity) {
         Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
+        return entityMetaCache.getTable(clazz);
+    }
+
+    private Object getEntityId(Object entity) {
+        Table table = createTable(entity);
 
         EntityBinder entityBinder = new EntityBinder(entity);
 
