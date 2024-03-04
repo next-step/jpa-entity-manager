@@ -11,3 +11,9 @@
   - [x] delte 메소드 만들기
 
 - [x] EntityManager의 책임 줄이기
+
+
+# 2단계 요구사항
+
+- [ ] RowMapper 리팩터링
+- [ ] EntityManager 의 책임 줄여주기
