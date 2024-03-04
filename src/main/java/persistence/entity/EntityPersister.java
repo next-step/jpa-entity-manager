@@ -21,13 +21,13 @@ public class EntityPersister {
         return database.executeQueryAndGetGeneratedKey(insertQuery);
     }
 
-    public void update(Object entity) {
+    public Object update(Object entity) {
         DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
 
         Object id = getEntityId(entity);
         String updateByIdQuery = queryBuilder.buildUpdateByIdQuery(entity, id);
 
-        database.execute(updateByIdQuery);
+        return database.executeQueryAndGetGeneratedKey(updateByIdQuery);
     }
 
     public void delete(Object entity) {
