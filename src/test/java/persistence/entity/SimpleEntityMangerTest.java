@@ -4,6 +4,7 @@ import database.Database;
 import database.DatabaseServer;
 import database.H2;
 import database.SimpleDatabase;
+import jakarta.persistence.EntityExistsException;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class SimpleEntityMangerTest {
@@ -120,12 +122,32 @@ class SimpleEntityMangerTest {
         assertThat(findPerson).isEqualTo(expectPerson);
     }
 
-    @DisplayName("person이 이미 있는 경우 값을 update 한다.")
+    @DisplayName("이미 존재하는 엔티티인 경우 EntityExistException을 throw 한다.")
     @Test
-    void persistWithUpdate() {
+    void persistIsExist() {
+        Person3 person = new Person3(1L, "qwer", 1, "email@email.com");
+
+        assertThatThrownBy(() -> entityManager.persist(person))
+                .isInstanceOf(EntityExistsException.class);
+    }
+
+    @DisplayName("person이 없는 경우 엔티티를 create 한다.")
+    @Test
+    void merge() {
+        Person3 person = new Person3(4L, "qwer", 123, "email@email.com");
+
+        entityManager.merge(person);
+
+        Person3 result = findByIdPerson(4L);
+        assertThat(result).isEqualTo(person);
+    }
+
+    @DisplayName("person이 이미 있는 경우 엔티티를 update 한다.")
+    @Test
+    void mergeWithUpdate() {
         Person3 person = new Person3(1L, "qwerqwrwr", 1231231, "email@email,com");
 
-        entityManager.persist(person);
+        entityManager.merge(person);
 
         Person3 result = findByIdPerson(1L);
         assertThat(result).isEqualTo(person);
