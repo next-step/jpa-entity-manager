@@ -13,6 +13,7 @@ import persistence.sql.entity.persister.EntityPersister;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class EntityManagerImpl<T> implements EntityManger<T> {
 
@@ -45,10 +46,7 @@ public class EntityManagerImpl<T> implements EntityManger<T> {
     public T find(final Class<T> clazz, final Object id) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         final PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
-
-        final Criterion criterion = new Criterion(primaryDomainType.getColumnName(), id.toString(), Operators.EQUALS);
-        final Criteria criteria = new Criteria(Collections.singletonList(criterion));
-
+        final Criteria criteria = Criteria.ofCriteria(Map.of(primaryDomainType.getColumnName(), id.toString()));
         final WhereClause whereClause = new WhereClause(criteria);
 
         final String sql = selectQueryBuilder.toSql(whereClause);

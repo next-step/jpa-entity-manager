@@ -13,6 +13,7 @@ import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.Operators;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,10 +40,7 @@ class SelectQueryBuilderTest {
     @Test
     void whereSqlTest() {
         DomainType domainType = entityMappingTable.getPkDomainTypes();
-
-        Criterion criterion = new Criterion(domainType.getColumnName(), "1", Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
-
+        Criteria criteria = Criteria.ofCriteria(Map.of(domainType.getColumnName(), "1"));
         WhereClause whereClause = new WhereClause(criteria);
 
         assertThat(selectQueryBuilder.toSql(whereClause)).isEqualTo("SELECT id,nick_name,old,email FROM Person WHERE id='1'");

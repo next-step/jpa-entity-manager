@@ -9,6 +9,7 @@ import persistence.sql.dml.query.clause.UpdateColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.PrimaryDomainType;
 
 import java.util.Collections;
 
@@ -28,8 +29,7 @@ class UpdateQueryBuilderTest {
 
     @Test
     void updateQueryTest() {
-        Criterion criterion = Criterion.of(pkDomainType.getColumnName(), pkDomainType.getValue().toString());
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        Criteria criteria = Criteria.fromPkCriterion((PrimaryDomainType) pkDomainType);
         WhereClause whereClause = new WhereClause(criteria);
 
         UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMappingTable.getTableName());

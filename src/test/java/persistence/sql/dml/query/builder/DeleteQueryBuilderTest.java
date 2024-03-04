@@ -13,6 +13,7 @@ import persistence.sql.entity.model.Operators;
 import persistence.sql.entity.model.TableName;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,8 +30,7 @@ class DeleteQueryBuilderTest {
     @Test
     void deleteById() {
         DomainType pkDomainTypes = entityMappingTable.getPkDomainTypes();
-        Criterion criterion = new Criterion(pkDomainTypes.getColumnName(), "1", Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        Criteria criteria = Criteria.ofCriteria(Map.of(pkDomainTypes.getColumnName(), "1"));
         WhereClause whereClause = new WhereClause(criteria);
 
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(new TableName("person"));
