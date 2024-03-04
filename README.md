@@ -15,5 +15,5 @@
 
 # 2단계 요구사항
 
-- [ ] RowMapper 리팩터링
-- [ ] EntityManager 의 책임 줄여주기
+- [x] RowMapper 리팩터링
+- [x] EntityManager 의 책임 줄여주기
