@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.mapping.Column;
+import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.Table;
 
 import java.util.List;

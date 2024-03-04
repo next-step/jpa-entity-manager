@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
 import persistence.sql.mapping.Column;
+import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.Table;
 import persistence.sql.mapping.Value;
 

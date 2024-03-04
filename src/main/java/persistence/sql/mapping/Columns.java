@@ -1,4 +1,4 @@
-package persistence.sql.dml;
+package persistence.sql.mapping;
 
 import persistence.sql.mapping.Column;
 
