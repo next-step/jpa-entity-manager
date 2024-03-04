@@ -46,7 +46,7 @@ public class EntityManagerImpl<T> implements EntityManger<T> {
     public T find(final Class<T> clazz, final Object id) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         final PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
-        final Criteria criteria = Criteria.ofCriteria(Map.of(primaryDomainType.getColumnName(), id.toString()));
+        final Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(primaryDomainType.getColumnName(), id.toString())));
         final WhereClause whereClause = new WhereClause(criteria);
 
         final String sql = selectQueryBuilder.toSql(whereClause);

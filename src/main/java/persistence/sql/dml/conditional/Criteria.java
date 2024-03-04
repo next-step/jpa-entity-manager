@@ -22,11 +22,8 @@ public class Criteria {
         return new Criteria(Collections.singletonList(criterion));
     }
 
-    public static Criteria ofCriteria(Map<String, String> where) {
-        return new Criteria(where.entrySet()
-                .stream()
-                .map(entry -> Criterion.of(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList()));
+    public static Criteria ofCriteria(final List<Criterion> criterion) {
+        return new Criteria(criterion);
     }
 
     public static Criteria emptyInstance() {

@@ -1,19 +1,17 @@
 package persistence.sql.dml.query.builder;
 
+import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
-import persistence.sql.dml.query.clause.WhereClause;
-import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.clause.WhereClause;
+import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
-import persistence.sql.entity.model.Operators;
 import persistence.sql.entity.model.TableName;
 
 import java.util.Collections;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +28,7 @@ class DeleteQueryBuilderTest {
     @Test
     void deleteById() {
         DomainType pkDomainTypes = entityMappingTable.getPkDomainTypes();
-        Criteria criteria = Criteria.ofCriteria(Map.of(pkDomainTypes.getColumnName(), "1"));
+        Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(pkDomainTypes.getColumnName(), "1")));
         WhereClause whereClause = new WhereClause(criteria);
 
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(new TableName("person"));

@@ -22,7 +22,7 @@ class CriteriaTest {
     @DisplayName("지정된 조건문을 반환한다.")
     @Test
     void existsCriteria() {
-        Criteria criteria = Criteria.ofCriteria(Map.of("name", "1"));
+        Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of("name", "1")));
 
         assertThat(criteria.toSql()).isEqualTo("name='1'");
     }

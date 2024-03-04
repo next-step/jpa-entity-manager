@@ -40,7 +40,7 @@ class SelectQueryBuilderTest {
     @Test
     void whereSqlTest() {
         DomainType domainType = entityMappingTable.getPkDomainTypes();
-        Criteria criteria = Criteria.ofCriteria(Map.of(domainType.getColumnName(), "1"));
+        Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(domainType.getColumnName(), "1")));
         WhereClause whereClause = new WhereClause(criteria);
 
         assertThat(selectQueryBuilder.toSql(whereClause)).isEqualTo("SELECT id,nick_name,old,email FROM Person WHERE id='1'");
