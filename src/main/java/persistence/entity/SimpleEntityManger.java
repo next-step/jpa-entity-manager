@@ -24,6 +24,11 @@ public class SimpleEntityManger implements EntityManager {
     }
 
     @Override
+    public void merge(Object entity) {
+
+    }
+
+    @Override
     public void remove(Object entity) {
         persister.delete(entity);
     }
