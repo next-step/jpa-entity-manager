@@ -15,7 +15,7 @@ import static persistence.sql.constant.SqlFormat.STRING_FORMAT;
 public class ValueClause {
     private final List<String> values;
 
-    public ValueClause(final List<String> values) {
+    private ValueClause(final List<String> values) {
         this.values = values;
     }
 
