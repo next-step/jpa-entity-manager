@@ -1,13 +1,6 @@
 package persistence.sql.ddl.domain;
 
-import jakarta.persistence.Id;
-import persistence.sql.ddl.constraint.Constraint;
-import persistence.sql.ddl.constraint.NotNull;
-import persistence.sql.ddl.constraint.PrimaryKey;
-
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Column {
 
@@ -19,27 +12,14 @@ public class Column {
 
     private final int length;
 
-    private final Constraints constraints;
+    private final Constraint constraint;
 
     public Column(Field field) {
         this.field = field;
         this.name = createColumnName(field);
         this.type = createColumnType(field);
         this.length = createColumnLength(field);
-        this.constraints = createColumnConstraints(field);
-    }
-
-    private Constraints createColumnConstraints(Field field) {
-        final List<Constraint> newConstraints = new ArrayList<>();
-        if (field.isAnnotationPresent(jakarta.persistence.Column.class) && !field.getAnnotation(jakarta.persistence.Column.class).nullable()) {
-            newConstraints.add(new NotNull());
-        }
-
-        if (field.isAnnotationPresent(Id.class)) {
-            newConstraints.add(new PrimaryKey(field));
-        }
-
-        return new Constraints(newConstraints);
+        this.constraint = new Constraint(field);
     }
 
     private int createColumnLength(Field field) {
@@ -61,6 +41,10 @@ public class Column {
         return Type.of(field.getType());
     }
 
+    public Field getField() {
+        return field;
+    }
+
     public Type getType() {
         return type;
     }
@@ -73,15 +57,15 @@ public class Column {
         return length;
     }
 
-    public Field getField() {
-        return field;
-    }
-
-    public List<Constraint> getConstraints() {
-        return constraints.getConstraints();
+    public Constraint getConstraint() {
+        return constraint;
     }
 
     public boolean isPrimaryKey() {
-        return constraints.hasPrimaryKeyConstraint();
+        return constraint.isPrimaryKey();
+    }
+
+    private boolean isNotNull() {
+        return constraint.isNotNull();
     }
 }

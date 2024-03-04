@@ -27,7 +27,7 @@ public class SelectQueryBuilder implements QueryBuilder {
     public SelectQueryBuilder(Class<?> clazz, Object id) {
         this.table = new Table(clazz);
         this.columns = new Columns(createColumns(clazz));
-        this.whereQueryBuilder = new WhereQueryBuilder(new Value(columns.getPrimaryKey(), String.valueOf(id)));
+        this.whereQueryBuilder = new WhereQueryBuilder(new Value(columns.getPrimaryKeyColumn(), String.valueOf(id)));
     }
 
     private List<Column> createColumns(Class<?> clazz) {

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.entity.Person;
 
 import java.sql.SQLException;
@@ -18,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class EntityManagerImplTest {
+class EntityPersisterImplTest {
 
     private JdbcTemplate jdbcTemplate;
 
@@ -36,53 +35,56 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("데이터베이스에서 Person 조회 테스트")
-    void entityManagerFindTest() {
+    @DisplayName("EntityPersisterImpl 객체를 이용한 엔티티 업데이트 테스트")
+    void entityPersisterUpdateTest() {
         // given
         EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
-        jdbcTemplate.execute(new InsertQueryBuilder(new Person("jay", 30, "jay@gmail.com")).build());
+        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate);
+        entityPersister.insert(new Person("jay", 32, "jamie@gmail.com"));
+        String updateName = "jamie";
+        int updateAge = 34;
 
         // when
+        entityPersister.update(new Person(1L, updateName, updateAge, null));
+        Person person = entityManager.find(Person.class, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(person.getName()).isEqualTo(updateName),
+                () -> assertThat(person.getAge()).isEqualTo(updateAge)
+        );
+    }
+
+    @Test
+    @DisplayName("EntityPersisterImpl 객체를 이용한 엔티티 저장 테스트")
+    void entityPersisterInsertTest() {
+        // given
+        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate);
+
+        // when
+        entityPersister.insert(new Person("jamie", 32, "jamie@gmail.com"));
         Person person = entityManager.find(Person.class, 1L);
 
         // then
         assertAll(
                 () -> assertThat(person.getId()).isEqualTo(1L),
-                () -> assertThat(person.getName()).isEqualTo("jay"),
-                () -> assertThat(person.getAge()).isEqualTo(30),
-                () -> assertThat(person.getEmail()).isEqualTo("jay@gmail.com")
+                () -> assertThat(person.getName()).isEqualTo("jamie"),
+                () -> assertThat(person.getAge()).isEqualTo(32),
+                () -> assertThat(person.getEmail()).isEqualTo("jamie@gmail.com")
         );
     }
 
     @Test
-    @DisplayName("데이터베이스에 Person 저장 테스트")
-    void entityManagerPersistTest() {
+    @DisplayName("EntityPersisterImpl 객체를 이용한 엔티티 삭제 테스트")
+    void entityPersisterDeleteTest() {
         // given
         EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
-        Person person = new Person("jamie", 34, "jaime@gmail.com");
+        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate);
+        entityPersister.insert(new Person("jay", 30, "jay@gmail.com"));
 
         // when
-        entityManager.persist(person);
-        Person findedPerson = entityManager.find(Person.class, 1L);
-
-        // then
-        assertAll(
-                () -> assertThat(findedPerson.getId()).isEqualTo(1L),
-                () -> assertThat(findedPerson.getName()).isEqualTo("jamie"),
-                () -> assertThat(findedPerson.getAge()).isEqualTo(34),
-                () -> assertThat(findedPerson.getEmail()).isEqualTo("jaime@gmail.com")
-        );
-    }
-
-    @Test
-    @DisplayName("데이터베이스에서 Person 삭제 테스트")
-    void entityManagerRemoveTest() {
-        // given
-        EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
-        jdbcTemplate.execute(new InsertQueryBuilder(new Person("jay", 30, "jay@gmail.com")).build());
-
-        // when
-        entityManager.remove(new Person(1L, "jay", 30, "jay@gmail.com"));
+        entityPersister.delete(new Person(1L, "jay", 30, "jay@gmail.com"));
 
         // then
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))

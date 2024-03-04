@@ -14,7 +14,7 @@ public class Columns {
         return columns;
     }
 
-    public Column getPrimaryKey() {
+    public Column getPrimaryKeyColumn() {
         return columns.stream()
                 .filter(Column::isPrimaryKey)
                 .findFirst()

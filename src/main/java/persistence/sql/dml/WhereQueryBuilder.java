@@ -43,7 +43,7 @@ public class WhereQueryBuilder implements QueryBuilder {
         try {
             Field field = clazz.getDeclaredField(column);
             return new Value(new Column(field), field.getType(), value);
-        } catch (Exception e) {
+        } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }

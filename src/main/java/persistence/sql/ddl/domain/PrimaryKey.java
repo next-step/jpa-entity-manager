@@ -1,15 +1,17 @@
-package persistence.sql.ddl.constraint;
+package persistence.sql.ddl.domain;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 import java.lang.reflect.Field;
 
-public class PrimaryKey implements Constraint {
+public class PrimaryKey {
 
+    private final boolean isPrimaryKey;
     private final GenerationType generationType;
 
     public PrimaryKey(Field field) {
+        this.isPrimaryKey = field.isAnnotationPresent(jakarta.persistence.Id.class);
         this.generationType = createGenerationType(field);
     }
 
@@ -18,6 +20,10 @@ public class PrimaryKey implements Constraint {
             return field.getAnnotation(GeneratedValue.class).strategy();
         }
         return null;
+    }
+
+    public boolean isPrimaryKey() {
+        return isPrimaryKey;
     }
 
     public GenerationType getGenerationType() {

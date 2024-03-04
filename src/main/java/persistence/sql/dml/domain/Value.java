@@ -14,7 +14,7 @@ public class Value {
         try {
             Field field = column.getField();
             field.setAccessible(true);
-            this.value = convertValue(field.getType(), String.valueOf(field.get(object)));
+            this.value = convertValue(field.getType(), field.get(object));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -30,11 +30,22 @@ public class Value {
         this.value = convertValue(valueType, String.valueOf(value));
     }
 
-    public String convertValue(Class<?> type, String value) {
+    public String convertValue(Class<?> type, Object value) {
+        if (value == null) {
+            return null;
+        }
         if (type.equals(String.class)) {
             value = "'" + value + "'";
         }
-        return value;
+        return String.valueOf(value);
+    }
+
+    public boolean isNotPrimaryKeyValue() {
+        return !column.isPrimaryKey();
+    }
+
+    public boolean isValueNotNull() {
+        return value != null;
     }
 
     public Column getColumn() {

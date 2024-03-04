@@ -22,14 +22,47 @@ public class Person {
     @Transient
     private Integer index;
 
-    protected Person() {
-
+    public Person() {
     }
 
     public Person(String name, Integer age, String email) {
         this.name = name;
         this.age = age;
         this.email = email;
+    }
+
+    public Person(Long id, String name, Integer age, String email) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", email='" + email + '\'' +
+                ", index=" + index +
+                '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
 }
