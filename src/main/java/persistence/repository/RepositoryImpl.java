@@ -1,17 +1,7 @@
 package persistence.repository;
 
-import jdbc.JdbcTemplate;
 import persistence.sql.dml.exception.InvalidDeleteNullPointException;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
-import persistence.sql.dml.query.builder.SelectQueryBuilder;
-import persistence.sql.dml.query.builder.UpdateQueryBuilder;
-import persistence.sql.dml.query.clause.ColumnClause;
-import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.manager.EntityManagerImpl;
-import persistence.sql.entity.manager.EntityManagerMapper;
 import persistence.sql.entity.manager.EntityManger;
-import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.util.List;
 import java.util.Optional;
