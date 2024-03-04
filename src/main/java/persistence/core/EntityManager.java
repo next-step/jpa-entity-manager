@@ -2,16 +2,16 @@ package persistence.core;
 
 import persistence.entity.Person;
 
+import java.sql.SQLException;
+
 public interface EntityManager {
 
-    <T> void createTable(Class<T> tClass);
+    <T> T find(Class<T> clazz, Long Id) throws Exception;
 
-    void dropTable(Class<Person> personClass);
+   <T> T persist(T entity) throws SQLException;
 
-    <T> T find(Class<T> clazz, Long Id);
+    void remove(Object entity) throws Exception;
 
-   <T> T persist(T entity);
-
-    void remove(Object entity);
+    void update(Object entity) throws Exception;
 
 }

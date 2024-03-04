@@ -13,8 +13,8 @@ public class EntityMetadataBuilder {
 
     public static EntityMetadata build(Class<?> clazz) {
         EntityMetadata metadata = new EntityMetadata();
-        metadata.setTableName(EntityInfoExtractor.getTableName(clazz));
-        metadata.setColumns(buildColumns(clazz));
+        metadata.setEntityTable(new EntityTable(clazz.getSimpleName(), EntityInfoExtractor.getTableName(clazz)));
+        metadata.setColumns(new EntityColumns(buildColumns(clazz)));
 
         return metadata;
     }
@@ -27,12 +27,15 @@ public class EntityMetadataBuilder {
 
     private static EntityColumn buildColumn(Field field) {
         EntityColumn column = new EntityColumn();
-        column.setName(EntityInfoExtractor.getColumnName(field));
+        column.setField(field);
+        column.setFieldName(field.getName());
+        column.setColumnName(EntityInfoExtractor.getColumnName(field));
         column.setSqlTypeCode(dataType.getSqlTypeCode(field.getType()));
         column.setPrimaryKey(EntityInfoExtractor.isPrimaryKey(field));
         column.setNullable(EntityFieldInspector.isNullable(field));
         column.setGenerationType(EntityFieldInspector.getGenerationType(field));
         column.setLength(EntityFieldInspector.getLength(field));
+
         return column;
     }
 

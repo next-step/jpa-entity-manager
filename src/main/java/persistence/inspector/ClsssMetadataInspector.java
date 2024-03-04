@@ -16,8 +16,10 @@ public class ClsssMetadataInspector extends EntityFieldInspector{
 
     public static String getTableName(Class<?> clazz) {
         if (clazz.isAnnotationPresent(Table.class) && !clazz.getAnnotation(Table.class).name().isBlank()) {
+
             return clazz.getAnnotation(Table.class).name();
         }
+
         return clazz.getSimpleName().toLowerCase();
     }
 

@@ -12,10 +12,11 @@ class EntityMetadataBuilderTest {
         EntityMetadata metadata = EntityMetadataBuilder.build(Person.class);
 
         assertAll(
-                () -> assertEquals("users", metadata.getTableName()),
-                () -> assertEquals(4, metadata.getColumns().size()),
-                () -> assertEquals("id", metadata.getIdColumn().getName()),
-                () -> assertEquals(3, metadata.getInsertTargetColumns().size())
+                () -> assertEquals("users", metadata.getEntityTable().getTableName()),
+                () -> assertEquals("Person", metadata.getEntityTable().getEntityName()),
+                () -> assertEquals(4, metadata.getColumns().getColumns().size()),
+                () -> assertEquals("id", metadata.getColumns().getIdColumn().getColumnName()),
+                () -> assertEquals(3, metadata.getColumns().getInsertTargetColumns().size())
         );
     }
 
