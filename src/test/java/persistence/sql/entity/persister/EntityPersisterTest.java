@@ -11,8 +11,10 @@ import persistence.sql.dml.query.builder.SelectQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.entity.loader.EntityLoader;
+import persistence.sql.entity.loader.EntityLoaderImpl;
 import persistence.sql.entity.manager.EntityManagerImpl;
-import persistence.sql.entity.manager.EntityManagerMapper;
+import persistence.sql.entity.loader.EntityLoaderMapper;
 import persistence.sql.entity.manager.EntityManger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EntityPersisterTest extends H2Database {
 
     private EntityPersister<Person> entityPersister;
+    private EntityLoader<Person> entityLoader;
     private EntityManger<Person> entityManager;
     private Person person;
     private Person person2;
@@ -34,9 +37,13 @@ class EntityPersisterTest extends H2Database {
                 new InsertQueryBuilder(entityMappingTable.getTableName()),
                 new UpdateQueryBuilder(entityMappingTable.getTableName()),
                 new DeleteQueryBuilder(entityMappingTable.getTableName()));
-        this.entityManager = new EntityManagerImpl<>(jdbcTemplate,
-                new EntityManagerMapper<>(Person.class),
-                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
+        this.entityLoader = new EntityLoaderImpl<>(
+                jdbcTemplate,
+                new EntityLoaderMapper<>(Person.class),
+                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause));
+
+        this.entityManager = new EntityManagerImpl<>(
+                entityLoader,
                 entityPersister);
 
         this.person = new Person(1L, "박재성", 10, "jason");

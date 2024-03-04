@@ -11,6 +11,8 @@ import persistence.sql.dml.query.builder.SelectQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.entity.loader.EntityLoaderImpl;
+import persistence.sql.entity.loader.EntityLoaderMapper;
 import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.util.Optional;
@@ -29,15 +31,18 @@ class EntityMangerTest extends H2Database {
         final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
 
         this.entityManger = new EntityManagerImpl<>(
-                jdbcTemplate,
-                new EntityManagerMapper<>(Person.class),
-                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
+                new EntityLoaderImpl<>(
+                        jdbcTemplate,
+                        new EntityLoaderMapper<>(Person.class),
+                        new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause)
+                ),
                 new EntityPersisterImpl<>(
                         jdbcTemplate,
                         new InsertQueryBuilder(entityMappingTable.getTableName()),
                         new UpdateQueryBuilder(entityMappingTable.getTableName()),
                         new DeleteQueryBuilder(entityMappingTable.getTableName())
-                ));
+                )
+        );
 
         this.person = new Person(1L, "박재성", 10, "jason");
 
