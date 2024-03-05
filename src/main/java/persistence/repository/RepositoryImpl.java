@@ -1,50 +1,50 @@
 package persistence.repository;
 
 import persistence.sql.dml.exception.InvalidDeleteNullPointException;
-import persistence.sql.entity.manager.EntityManger;
+import persistence.sql.entity.manager.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
 
 public class RepositoryImpl<T, K> implements Repository<T, K> {
 
-    private final EntityManger<T> entityManger;
+    private final EntityManager entityManager;
     private final Class<T> clazz;
 
-    public RepositoryImpl(final EntityManger<T> entityManger,
+    public RepositoryImpl(final EntityManager entityManager,
                           final Class<T> clazz) {
-        this.entityManger = entityManger;
+        this.entityManager = entityManager;
         this.clazz = clazz;
     }
 
     @Override
     public List<T> findAll() {
-        return entityManger.findAll(clazz);
+        return entityManager.findAll(clazz);
     }
 
     @Override
     public Optional<T> findById(Object id) {
-        return Optional.ofNullable(entityManger.find(clazz, id));
+        return Optional.ofNullable(entityManager.find(clazz, id));
     }
 
     @Override
     public T save(T t) {
-        entityManger.persist(t);
+        entityManager.persist(t);
         return t;
     }
 
     @Override
     public void deleteAll() {
-        entityManger.removeAll(clazz);
+        entityManager.removeAll(clazz);
     }
 
     @Override
     public void deleteById(Object id) {
-        T t = entityManger.find(clazz, id);
+        T t = entityManager.find(clazz, id);
         if (t == null) {
             throw new InvalidDeleteNullPointException();
         }
 
-        entityManger.remove(t);
+        entityManager.remove(t);
     }
 }
