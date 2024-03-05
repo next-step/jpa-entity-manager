@@ -9,17 +9,21 @@ import java.sql.ResultSet;
 import java.util.Spliterator;
 import java.util.stream.StreamSupport;
 
-public class EntityLoaderMapper<T> {
+public class EntityLoaderMapper {
 
-    private final Class<T> clazz;
+    private EntityLoaderMapper() {}
 
-    public EntityLoaderMapper(Class<T> clazz) {
-        this.clazz = clazz;
+    private static class EntityLoaderMapperSingleton {
+        private static final EntityLoaderMapper ENTITY_LOADER_MAPPER = new EntityLoaderMapper();
     }
 
-    public T mapper(ResultSet resultSet) {
+    public static EntityLoaderMapper getInstance() {
+        return EntityLoaderMapperSingleton.ENTITY_LOADER_MAPPER;
+    }
+
+    public <T> T mapper(Class<T> clazz, ResultSet resultSet) {
         EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        T instance = createInstance();
+        T instance = createInstance(clazz);
 
         Spliterator<DomainType> spliterator = entityMappingTable.getDomainTypes().spliterator();
         StreamSupport.stream(spliterator, false)
@@ -31,7 +35,7 @@ public class EntityLoaderMapper<T> {
         return instance;
     }
 
-    private T createInstance() {
+    private <T> T createInstance(final Class<T> clazz) {
         try {
             return clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
@@ -39,7 +43,7 @@ public class EntityLoaderMapper<T> {
         }
     }
 
-    private Field getField(Class<T> clazz, String name) {
+    private Field getField(Class<?> clazz, String name) {
         try {
             return clazz.getDeclaredField(name);
         } catch (Exception e) {
