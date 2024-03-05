@@ -12,6 +12,7 @@ import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.InsertQueryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityMangerImplTest extends H2DBTestSupport {
@@ -36,7 +37,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
-    @DisplayName("요구사항1: find")
+    @DisplayName("find 시 영속성 컨텍스트에 없으면 쿼리하고 컨텍스트에 저장한다.")
     void testFind() {
         Long id = 1L;
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
@@ -44,11 +45,14 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         Person findPerson = entityManger.find(Person.class, id);
 
-        assertThat(findPerson).isNotNull();
+        assertSoftly(softly -> {
+            softly.assertThat(findPerson).isNotNull();
+            softly.assertThat(persistenceContext.getEntity(id)).isNotNull();
+        });
     }
 
     @Test
-    @DisplayName("find시 영속성 컨텍스트에 있으면 쿼리 하지 않는다.")
+    @DisplayName("find 시 영속성 컨텍스트에 있으면 쿼리 하지 않는다.")
     void testFindFromPersistenceContext() {
         Long id = 1L;
         Person person = new Person(id, "nick_name", 10, "test@test.com", null);

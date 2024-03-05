@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import jdbc.RowMapper;
-import persistence.Person;
 import persistence.sql.mapping.ColumnData;
 import persistence.sql.mapping.Columns;
 
@@ -22,11 +20,14 @@ public class EntityMangerImpl implements EntityManger {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        Object entity = persistenceContext.getEntity(id);
-        if(entity != null) {
-            return (T) entity;
+        Object cachedEntity = persistenceContext.getEntity(id);
+        if(cachedEntity != null) {
+            return (T) cachedEntity;
         }
-        return entityLoader.find(clazz, id);
+        T foundEntity = entityLoader.find(clazz, id);
+        persistenceContext.addEntity(id, foundEntity);
+
+        return foundEntity;
     }
 
     @Override
