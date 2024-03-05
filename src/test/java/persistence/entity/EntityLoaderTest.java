@@ -30,7 +30,7 @@ class EntityLoaderTest extends H2DBTestSupport {
         jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
-    @DisplayName("find test")
+    @DisplayName("rowMapper 를 이용한 find 테스트")
     @Test
     void testFind() {
         Person person = new Person(null, "nick_name", 10, "email", null);
