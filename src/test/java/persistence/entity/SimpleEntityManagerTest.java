@@ -26,7 +26,8 @@ class SimpleEntityManagerTest {
     private final Dialect dialect = new H2Dialect();
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
     private final EntityPersister entityPersister = new SingleTableEntityPersister(tableBinder, dmlQueryBuilder, jdbcTemplate);
-    private final EntityManager entityManager = new SimpleEntityManager(entityPersister);
+    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, dmlQueryBuilder, jdbcTemplate);
+    private final EntityManager entityManager = new SimpleEntityManager(entityPersister, entityLoader);
 
     private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersonV3.class);
 
@@ -62,7 +63,6 @@ class SimpleEntityManagerTest {
     @DisplayName("엔티티 클래스 타입과 id 값으로 엔티티를 조회 후 반환한다")
     @Test
     @Order(0)
-    @Disabled
     public void find() throws Exception {
         // given
         final Class<PersonV3> clazz = PersonV3.class;
