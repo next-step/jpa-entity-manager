@@ -8,13 +8,18 @@ import static persistence.sql.constant.SqlFormat.UPDATE;
 
 public class UpdateQueryBuilder {
 
-    private final TableName tableName;
+    private UpdateQueryBuilder() {}
 
-    public UpdateQueryBuilder(final TableName tableName) {
-        this.tableName = tableName;
+    private static class UpdateQuerySingleton {
+        private static final UpdateQueryBuilder UPDATE_QUERY_BUILDER = new UpdateQueryBuilder();
     }
 
-    public String toSql(final UpdateColumnClause updateColumnClause,
+    public static UpdateQueryBuilder getInstance() {
+        return UpdateQuerySingleton.UPDATE_QUERY_BUILDER;
+    }
+
+    public String toSql(final TableName tableName,
+                        final UpdateColumnClause updateColumnClause,
                         final WhereClause whereClause) {
         return String.format(UPDATE.getFormat(),
                 tableName.getName(),

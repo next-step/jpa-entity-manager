@@ -7,16 +7,20 @@ import persistence.sql.entity.model.TableName;
 import static persistence.sql.constant.SqlFormat.SELECT;
 
 public class SelectQueryBuilder {
-    private final TableName tableName;
-    private final ColumnClause columnClause;
 
-    public SelectQueryBuilder(final TableName tableName,
-                              final ColumnClause columnClause) {
-        this.tableName = tableName;
-        this.columnClause = columnClause;
+    private SelectQueryBuilder() { }
+
+    private static class SelectQuerySingleton {
+        private static final SelectQueryBuilder SELECT_QUERY_BUILDER = new SelectQueryBuilder();
     }
 
-    public String toSql(final WhereClause whereClause) {
+    public static SelectQueryBuilder getInstance() {
+        return SelectQuerySingleton.SELECT_QUERY_BUILDER;
+    }
+
+    public String toSql(final TableName tableName,
+                        final ColumnClause columnClause,
+                        final WhereClause whereClause) {
         return String.format(SELECT.getFormat(),
                 columnClause.toSql(),
                 tableName.getName(),
