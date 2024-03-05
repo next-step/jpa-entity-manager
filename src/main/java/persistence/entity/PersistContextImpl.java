@@ -17,6 +17,7 @@ public class PersistContextImpl implements PersistenceContext {
     @Override
     public void addEntity(Long id, Object entity) {
         entitiesByKey.put(id, entity);
+        snapshotsByKey.put(id, entity);
     }
 
     @Override
@@ -24,10 +25,5 @@ public class PersistContextImpl implements PersistenceContext {
         Columns columns = Columns.createColumnsWithValue(entity);
         ColumnData keyColumn = columns.getKeyColumn();
         entitiesByKey.remove(keyColumn.getValue());
-    }
-
-    @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
-        return snapshotsByKey.put(id, entity);
     }
 }
