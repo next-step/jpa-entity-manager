@@ -86,6 +86,18 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
+    @DisplayName("persist시 persistenceContext에 저장된다.")
+    void testSaveEntityIntoPersistenceContext() {
+        Person person = new Person(null, "nick_name", 10, "df", null);
+
+        Person saved = (Person) entityManger.persist(person);
+
+        Person findEntity = (Person) persistenceContext.getEntity(saved.getId());
+        assertThat(findEntity.getId()).isEqualTo(person.getId());
+    }
+
+
+    @Test
     @DisplayName("요구사항3: delete")
     void testDelete() {
         Person person = new Person(1L, "nick_name", 10, "df", null);

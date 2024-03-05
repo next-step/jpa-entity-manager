@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jdbc.RowMapper;
 import persistence.Person;
+import persistence.sql.mapping.ColumnData;
+import persistence.sql.mapping.Columns;
 
 public class EntityMangerImpl implements EntityManger {
     private final EntityPersister entityPersister;
@@ -33,6 +35,10 @@ public class EntityMangerImpl implements EntityManger {
         if (!isEntityUpdated) {
             entityPersister.insert(entity);
         }
+
+        Columns columns = Columns.createColumnsWithValue(entity);
+        ColumnData keyColumn = columns.getKeyColumn();
+        persistenceContext.addEntity((Long)keyColumn.getValue(), entity);
 
         return entity;
     }
