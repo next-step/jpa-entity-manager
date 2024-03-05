@@ -20,16 +20,16 @@ import static persistence.sql.dml.BooleanExpression.eq;
 
 class EntityPersisterTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
-    private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
-    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);
 
     @BeforeEach
     public void setUp() {
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);
         jdbcTemplate.execute(createQueryBuilder.build());
     }
 
     @AfterEach
     public void cleanUp() {
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
         jdbcTemplate.execute(dropQueryBuilder.build());
     }
 

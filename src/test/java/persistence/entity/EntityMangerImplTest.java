@@ -19,19 +19,18 @@ class EntityMangerImplTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
     private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dynamicRowMapperFactory);
     private final EntityManger entityManger = new EntityMangerImpl(entityPersister, entityLoader);
-    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
-    private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
 
     @BeforeEach
     public void setUp() {
-        String sql = createQueryBuilder.build();
-        jdbcTemplate.execute(sql);
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
+        jdbcTemplate.execute(createQueryBuilder.build());
     }
 
     @AfterEach
     public void cleanUp() {
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
         jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
