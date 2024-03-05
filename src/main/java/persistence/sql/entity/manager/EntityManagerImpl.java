@@ -7,35 +7,35 @@ import persistence.sql.entity.persister.EntityPersister;
 
 import java.util.List;
 
-public class EntityManagerImpl<T> implements EntityManger<T> {
+public class EntityManagerImpl implements EntityManager {
 
-    private final EntityLoader<T> entityLoader;
-    private final EntityPersister<T> entityPersister;
+    private final EntityLoader entityLoader;
+    private final EntityPersister entityPersister;
 
 
-    public EntityManagerImpl(final EntityLoader<T> entityLoader,
-                             final EntityPersister<T> entityPersister) {
+    public EntityManagerImpl(final EntityLoader entityLoader,
+                             final EntityPersister entityPersister) {
         this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
     }
 
     @Override
-    public List<T> findAll(final Class<T> clazz) {
+    public <T> List<T> findAll(final Class<T> clazz) {
         return entityLoader.findAll(clazz);
     }
 
     @Override
-    public T find(final Class<T> clazz, final Object id) {
+    public <T> T find(final Class<T> clazz, final Object id) {
         return entityLoader.find(clazz, id);
     }
 
     @Override
-    public void persist(final T entity) {
+    public void persist(final Object entity) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
         final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
         final Object key = pkDomainType.getValue();
 
-        final T object = find((Class<T>) entity.getClass(), key);
+        final Object object = find(entity.getClass(), key);
 
         if (object == null) {
             entityPersister.insert(entity);
@@ -45,12 +45,12 @@ public class EntityManagerImpl<T> implements EntityManger<T> {
     }
 
     @Override
-    public void remove(final T entity) {
+    public void remove(final Object entity) {
         entityPersister.delete(entity);
     }
 
     @Override
-    public void removeAll(final Class<T> clazz) {
-        entityPersister.deleteAll();
+    public void removeAll(final Class<?> clazz) {
+        entityPersister.deleteAll(clazz);
     }
 }
