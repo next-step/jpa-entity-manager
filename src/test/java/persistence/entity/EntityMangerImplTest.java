@@ -96,7 +96,6 @@ class EntityMangerImplTest extends H2DBTestSupport {
         assertThat(findEntity.getId()).isEqualTo(person.getId());
     }
 
-
     @Test
     @DisplayName("요구사항3: delete")
     void testDelete() {

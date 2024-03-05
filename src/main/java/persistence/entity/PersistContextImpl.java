@@ -7,21 +7,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PersistContextImpl implements PersistenceContext {
-    private final Map<Long, Object> cache = new HashMap<>();
+    private final Map<Long, Object> entitiesByKey = new HashMap<>();
+    private final Map<Long, Object> snapshotsByKey = new HashMap<>();
     @Override
     public Object getEntity(Long id) {
-        return cache.get(id);
+        return entitiesByKey.get(id);
     }
 
     @Override
     public void addEntity(Long id, Object entity) {
-        cache.put(id, entity);
+        entitiesByKey.put(id, entity);
     }
 
     @Override
     public void removeEntity(Object entity) {
         Columns columns = Columns.createColumnsWithValue(entity);
         ColumnData keyColumn = columns.getKeyColumn();
-        cache.remove(keyColumn.getValue());
+        entitiesByKey.remove(keyColumn.getValue());
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(Long id, Object entity) {
+        return snapshotsByKey.put(id, entity);
     }
 }
