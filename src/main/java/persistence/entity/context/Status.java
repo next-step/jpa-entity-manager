@@ -1,5 +1,7 @@
 package persistence.entity.context;
 
+import java.util.function.Supplier;
+
 import static persistence.entity.context.StatusSupplier.*;
 
 public enum Status {
@@ -13,15 +15,15 @@ public enum Status {
     LOADING(UNSUPPORTED, YES, NO, NO),
     SAVING(UNSUPPORTED, NO, NO, NO);
 
-    private final StatusSupplier getPermission;
-    private final StatusSupplier addPermission;
-    private final StatusSupplier deletePermission;
-    private final StatusSupplier alreadyRemoved;
+    private final Supplier<Boolean> getPermission;
+    private final Supplier<Boolean> addPermission;
+    private final Supplier<Boolean> deletePermission;
+    private final Supplier<Boolean> alreadyRemoved;
 
-    Status(StatusSupplier getPermission,
-           StatusSupplier addPermission,
-           StatusSupplier deletePermission,
-           StatusSupplier alreadyRemoved) {
+    Status(Supplier<Boolean> getPermission,
+           Supplier<Boolean> addPermission,
+           Supplier<Boolean> deletePermission,
+           Supplier<Boolean> alreadyRemoved) {
         this.getPermission = getPermission;
         this.addPermission = addPermission;
         this.deletePermission = deletePermission;
@@ -29,19 +31,18 @@ public enum Status {
     }
 
     public boolean canGet() {
-        return getPermission.check();
+        return getPermission.get();
     }
 
     public boolean canAdd() {
-        return addPermission.check();
+        return addPermission.get();
     }
 
     public boolean canDelete() {
-        return deletePermission.check();
+        return deletePermission.get();
     }
 
     public boolean isAlreadyRemoved() {
-        return alreadyRemoved.check();
+        return alreadyRemoved.get();
     }
-
 }

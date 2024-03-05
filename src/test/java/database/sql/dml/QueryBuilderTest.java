@@ -32,7 +32,7 @@ class QueryBuilderTest {
     @Test
     void buildSelectQuery() {
         String actual = builder.buildSelectQuery(Person4.class);
-        assertThat(actual).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE 1");
+        assertThat(actual).isEqualTo("SELECT id, nick_name, old, email FROM users");
     }
 
     @Test

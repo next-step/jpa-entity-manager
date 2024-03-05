@@ -1,13 +1,8 @@
-package database.sql.dml;
+package database.sql.dml.where;
 
-import database.sql.Util;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static database.sql.Util.quote;
 
 public class WhereClause {
     private final Map<String, Object> conditionMap;
@@ -34,27 +29,17 @@ public class WhereClause {
 
     public String toQuery() {
         if (conditionMap.isEmpty()) {
-            return "1";
+            return FilterExpression.EMPTY;
         }
 
         return allColumnNames.stream()
                 .filter(conditionMap::containsKey)
                 .map(columnName -> columnAndValue(columnName, conditionMap.get(columnName)))
-                .collect(Collectors.joining(" AND "));
+                .collect(Collectors.joining(" AND ", "WHERE ", ""));
     }
 
     private static String columnAndValue(String columnName, Object value) {
-        // 리스트로 들어왔을 땐 IN 쿼리로
-        if (value instanceof List) {
-            return String.format("%s IN %s", columnName, inClause((Collection<?>) value));
-        } else {
-            return String.format("%s = %s", columnName, quote(value));
-        }
-    }
-
-    private static String inClause(Collection<?> value) {
-        return value.stream()
-                .map(Util::quote)
-                .collect(Collectors.joining(", ", "(", ")"));
+        FilterExpression expr = FilterExpression.from(columnName, value);
+        return expr.toQuery();
     }
 }

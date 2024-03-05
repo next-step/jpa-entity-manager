@@ -1,9 +1,11 @@
 package database.sql.dml;
 
 import database.mapping.EntityMetadata;
+import database.sql.dml.where.WhereClause;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class SelectQueryBuilder {
     private final String tableName;
@@ -21,7 +23,15 @@ public class SelectQueryBuilder {
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
-        return String.format("SELECT %s FROM %s WHERE %s", joinedAllColumnNames, tableName, whereClause(conditionMap));
+        StringJoiner query = new StringJoiner(" ")
+                .add("SELECT")
+                .add(joinedAllColumnNames)
+                .add("FROM").add(tableName);
+        String whereClause = whereClause(conditionMap);
+        if (!whereClause.isEmpty()) {
+            query.add(whereClause);
+        }
+        return query.toString();
     }
 
     public String buildQuery() {
