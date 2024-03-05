@@ -2,8 +2,6 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import persistence.sql.ddl.exception.IdAnnotationMissingException;
-import persistence.sql.dialect.Dialect;
-import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.*;
 import persistence.sql.mapping.ColumnData;
 import persistence.sql.mapping.Columns;
@@ -26,7 +24,7 @@ public class EntityPersister {
 
     public boolean update(Object entity) {
         TableData table = TableData.from(entity.getClass());
-        Columns columns = Columns.createColumnsWithValue(entity.getClass(), entity);
+        Columns columns = Columns.createColumnsWithValue(entity);
         ColumnData keyColumn = columns.getKeyColumn();
 
         if(keyColumn.getValue() == null) {
@@ -72,7 +70,7 @@ public class EntityPersister {
 
     public void delete(Object entity) {
         Class<?> clazz = entity.getClass();
-        ColumnData idColumn = Columns.createColumnsWithValue(clazz, entity).getKeyColumn();
+        ColumnData idColumn = Columns.createColumnsWithValue(entity).getKeyColumn();
 
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(clazz);
         WhereBuilder builder = new WhereBuilder();

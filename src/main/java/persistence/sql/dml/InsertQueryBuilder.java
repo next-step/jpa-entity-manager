@@ -13,7 +13,7 @@ public class InsertQueryBuilder {
     }
 
     public String build(Object entity) {
-        Columns columns = Columns.createColumnsWithValue(entity.getClass(), entity);
+        Columns columns = Columns.createColumnsWithValue(entity);
 
         return String.format(
                 "insert into %s (%s) values (%s)",
