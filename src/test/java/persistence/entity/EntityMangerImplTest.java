@@ -17,7 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EntityMangerImplTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
     private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
-    private final EntityManger entityManger = new EntityMangerImpl(entityPersister, entityLoader);
+    private final PersistenceContext persistenceContext = new PersistContextImpl();
+    private final EntityManger entityManger =
+            new EntityMangerImpl(entityPersister, entityLoader, persistenceContext);
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
 
@@ -44,6 +46,19 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         assertThat(findPerson).isNotNull();
     }
+
+    @Test
+    @DisplayName("find시 영속성 컨텍스트에 있으면 쿼리 하지 않는다.")
+    void testFindFromPersistenceContext() {
+        Long id = 1L;
+        Person person = new Person(id, "nick_name", 10, "test@test.com", null);
+        persistenceContext.addEntity(id, person);
+
+        Person findPerson = entityManger.find(Person.class, id);
+
+        assertThat(findPerson).isNotNull();
+    }
+
 
     @Test
     @DisplayName("요구사항2: persist insert 로 나가는 경우")
