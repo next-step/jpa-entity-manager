@@ -4,9 +4,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import persistence.sql.QueryException;
-import persistence.sql.dml.QueryNumberValueBinder;
-import persistence.sql.dml.QueryStringValueBinder;
-import persistence.sql.dml.QueryValueBinder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -18,17 +15,8 @@ public class ColumnBinder {
 
     private final ColumnTypeMapper columnTypeMapper;
 
-    private final List<QueryValueBinder> queryValueBinders = initQueryValueBinders();
-
     public ColumnBinder(ColumnTypeMapper columnTypeMapper) {
         this.columnTypeMapper = columnTypeMapper;
-    }
-
-    private List<QueryValueBinder> initQueryValueBinders() {
-        return List.of(
-                new QueryStringValueBinder(),
-                new QueryNumberValueBinder()
-        );
     }
 
     public List<Column> createColumns(final Class<?> clazz) {
@@ -116,20 +104,10 @@ public class ColumnBinder {
 
             final Value valueObject = column.getValue();
             valueObject.setValue(value);
-            valueObject.setValueClause(valueClause(valueObject));
         } catch (IllegalAccessException e) {
             throw new QueryException(column.getName() + " column set value exception");
         }
 
-    }
-
-    private String valueClause(final Value value) {
-
-        return queryValueBinders.stream()
-                .filter(binder -> binder.support(value))
-                .findFirst()
-                .orElseThrow(() -> new QueryException("not found InsertQueryValueBinder for " + value.getOriginalType() + " type"))
-                .bind(value.getValue());
     }
 
 }
