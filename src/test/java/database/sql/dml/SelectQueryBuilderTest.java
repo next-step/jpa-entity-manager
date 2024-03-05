@@ -32,9 +32,8 @@ class SelectQueryBuilderTest {
 
     @Test
     void buildSelectQueryWithInvalidColumn() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            selectQueryBuilder.buildQuery(Map.of("aaaaa", List.of()));
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                                                  () -> selectQueryBuilder.buildQuery(Map.of("aaaaa", List.of())));
         assertThat(exception.getMessage()).isEqualTo("Invalid query: aaaaa");
     }
 }

@@ -31,8 +31,7 @@ public class EntityPersister {
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata)
                 .id(id)
                 .values(columnValues(entity));
-        Long generatedId = jdbcTemplate.execute(insertQueryBuilder.toQueryString());
-        return generatedId;
+        return jdbcTemplate.execute(insertQueryBuilder.toQueryString());
     }
 
     private void checkGenerationStrategy(EntityMetadata entityMetadata, Long id) {
