@@ -8,7 +8,6 @@ public class EntityManagerImpl implements EntityManager {
 
     private final PersistenceContext persistenceContext;
 
-
     public EntityManagerImpl(EntityPersister entityPersister,
                              EntityLoader entityLoader, PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
@@ -19,11 +18,17 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
-        entityPersister.insert(entity);
+        EntityEntry entry = persistenceContext.getEntry(entity);
+        persist(entity, entry);
         persistenceContext.addEntity(entity);
         return entity;
     }
 
+    private <T> void persist(T entity, EntityEntry entry) {
+        entry.prePersist();
+        entityPersister.insert(entity);
+        entry.postPersist();
+    }
 
     @Override
     public <T> T merge(T entity) {
@@ -33,17 +38,22 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private void saveOrUpdate(Object entity) {
+        EntityEntry entry = persistenceContext.getEntry(entity);
         if (persistenceContext.isDirty(entity)) {
+            entry.preUpdate();
             entityPersister.update(entity);
+            entry.postUpdate();
             return;
         }
-        entityPersister.insert(entity);
+        persist(entity, entry);
     }
-
 
     @Override
     public void remove(Object entity) {
+        EntityEntry entry = persistenceContext.getEntry(entity);
+        entry.preRemove();
         entityPersister.delete(entity);
+        entry.postRemove();
         persistenceContext.removeEntity(entity);
     }
 
@@ -54,7 +64,11 @@ public class EntityManagerImpl implements EntityManager {
         if (cachedEntity != null) {
             return cachedEntity;
         }
+        EntityEntry entry = new SimpleEntityEntry();
+        entry.preLoad();
         T foundEntity = entityLoader.find(clazz, id);
+        entry.postLoad();
+        persistenceContext.addEntry(foundEntity, entry);
         persistenceContext.addEntity(foundEntity);
         return foundEntity;
     }

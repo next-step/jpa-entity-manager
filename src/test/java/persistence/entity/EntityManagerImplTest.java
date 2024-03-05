@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.exception.ObjectNotFoundException;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.ddl.view.mysql.MySQLPrimaryKeyResolver;
 import persistence.sql.dml.DeleteQueryBuilder;
