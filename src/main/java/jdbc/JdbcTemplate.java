@@ -18,7 +18,7 @@ public class JdbcTemplate {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -26,10 +26,9 @@ public class JdbcTemplate {
         try (final Statement statement = connection.createStatement()) {
             return statement.executeUpdate(sql);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
-
 
     /**
      * getLastIndex 수행 메소드
@@ -46,7 +45,7 @@ public class JdbcTemplate {
             }
             return seq;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } finally {
             try {
                 if (resultSet != null) {
@@ -61,7 +60,7 @@ public class JdbcTemplate {
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         final List<T> results = query(sql, rowMapper);
         if (results.size() != 1) {
-            throw new RuntimeException("Expected 1 result, got " + results.size());
+            throw new IllegalStateException("Expected 1 result, got " + results.size());
         }
         return results.get(0);
     }
@@ -74,7 +73,7 @@ public class JdbcTemplate {
             }
             return result;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

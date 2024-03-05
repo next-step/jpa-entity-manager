@@ -3,17 +3,15 @@ package persistence.sql.dml;
 import domain.EntityMetaData;
 import domain.H2GenerationType;
 import domain.dialect.Dialect;
-import domain.vo.ColumnAndValue;
 import domain.vo.ColumnName;
+import domain.vo.ColumnNameAndValue;
 import domain.vo.ColumnValue;
-import domain.vo.JavaMappingType;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -26,12 +24,10 @@ public class UpdateQueryBuilder {
     private static final String INSERT_DATA_QUERY = "INSERT INTO %s (%s) VALUES (%s);";
     private static final String UPDATE_DATA_QUERY = "UPDATE %s SET %s WHERE %s;";
 
-    private final JavaMappingType javaMappingType;
     private final Dialect dialect;
     private final EntityMetaData entityMetaData;
 
-    public UpdateQueryBuilder(JavaMappingType javaMappingType, Dialect dialect, EntityMetaData entityMetaData) {
-        this.javaMappingType = javaMappingType;
+    public UpdateQueryBuilder(Dialect dialect, EntityMetaData entityMetaData) {
         this.dialect = dialect;
         this.entityMetaData = entityMetaData;
     }
@@ -45,16 +41,16 @@ public class UpdateQueryBuilder {
     }
 
     private String columnsClause(Object object) {
-        LinkedList<Field> fields = getFields(object);
-        return getFields(object).stream()
-                .map(field -> new ColumnName(fields, field))
+        List<Field> fields = entityMetaData.getIdAndColumnFields(object);
+        return fields.stream()
+                .map(this::getColumnName)
                 .map(ColumnName::getName)
                 .reduce((o1, o2) -> String.join(COMMA, o1, String.valueOf(o2)))
                 .orElseThrow(() -> new IllegalStateException("Id 혹은 Column 타입이 없습니다."));
     }
 
     private String valuesClause(Object object) {
-        return getFields(object).stream()
+        return entityMetaData.getIdAndColumnFields(object).stream()
                 .map(field -> {
                     field.setAccessible(true);
                     try {
@@ -71,14 +67,12 @@ public class UpdateQueryBuilder {
                         }
 
                         if (Objects.isNull(fieldValue)) {
-                            return new ColumnValue(javaMappingType, null, null);
+                            return new ColumnValue(null);
                         }
 
-                        Integer javaTypeByClass = javaMappingType.getJavaTypeByClass(field.getType());
-                        String columnDefine = dialect.getColumnDefine(javaTypeByClass);
-
-                        fieldValue = columnDefine.equals("varchar") ? "'" + fieldValue + "'" : fieldValue;
-                        return new ColumnValue(javaMappingType, javaTypeByClass, fieldValue);
+                        String typeToStr = dialect.getTypeToStr(field.getType());
+                        fieldValue = typeToStr.equals("varchar") ? "'" + fieldValue + "'" : fieldValue;
+                        return new ColumnValue(fieldValue);
                     } catch (IllegalAccessException e) {
                         throw new IllegalStateException("필드 정보를 가져올 수 없습니다.");
                     }
@@ -90,7 +84,7 @@ public class UpdateQueryBuilder {
     }
 
     private String setClause(Object object) {
-        LinkedList<Field> columnFields = getFields(object).stream()
+        LinkedList<Field> columnFields = entityMetaData.getIdAndColumnFields(object).stream()
                 .filter(field -> !entityMetaData.isIdField(field))
                 .collect(Collectors.toCollection(LinkedList::new));
 
@@ -98,7 +92,7 @@ public class UpdateQueryBuilder {
     }
 
     private String whereClause(Object object) {
-        LinkedList<Field> idField = getFields(object).stream()
+        LinkedList<Field> idField = entityMetaData.getIdAndColumnFields(object).stream()
                 .filter(entityMetaData::isIdField)
                 .collect(Collectors.toCollection(LinkedList::new));
 
@@ -107,16 +101,15 @@ public class UpdateQueryBuilder {
 
     private String columnNameAndValueClause(LinkedList<Field> fields, Object object, String delimiter) {
         return fields.stream()
-                .map(field -> new ColumnAndValue(getColumnName(fields, field), getColumnValue(object, field)))
-                .filter(ColumnAndValue::isNotBlankOrEmpty)
-                .map(columnAndValue -> String.join(EQUAL, columnAndValue.getColumnName().getName(),
-                        String.valueOf(columnAndValue.getColumnValue().getValue())))
+                .map(field -> new ColumnNameAndValue(getColumnName(field), getColumnValue(object, field)))
+                .filter(ColumnNameAndValue::isNotBlankOrEmpty)
+                .map(columnNameAndValue -> columnNameAndValue.joinNameAndValueWithDelimiter(EQUAL))
                 .reduce((o1, o2) -> String.join(delimiter, o1, o2))
                 .orElseThrow(() -> new IllegalStateException("update 데이터가 없습니다."));
     }
 
-    private ColumnName getColumnName(LinkedList<Field> fields, Field field) {
-        return new ColumnName(fields, field);
+    private ColumnName getColumnName(Field field) {
+        return new ColumnName(entityMetaData.getFieldName(field));
     }
 
     private ColumnValue getColumnValue(Object object, Field field) {
@@ -125,11 +118,9 @@ public class UpdateQueryBuilder {
             Object fieldValue = field.get(object);
 
             if (Objects.nonNull(fieldValue)) {
-                Integer javaTypeByClass = javaMappingType.getJavaTypeByClass(field.getType());
-                String columnDefine = dialect.getColumnDefine(javaTypeByClass);
-
-                fieldValue = columnDefine.equals("varchar") ? "'" + fieldValue + "'" : fieldValue;
-                return new ColumnValue(javaMappingType, javaTypeByClass, fieldValue);
+                String typeToStr = dialect.getTypeToStr(field.getType());
+                fieldValue = typeToStr.equals("varchar") ? "'" + fieldValue + "'" : fieldValue;
+                return new ColumnValue(fieldValue);
             }
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("필드 정보를 가져올 수 없습니다.");
@@ -138,18 +129,8 @@ public class UpdateQueryBuilder {
         return null;
     }
 
-    private LinkedList<Field> getFields(Object object) {
-        return Arrays.stream(object.getClass().getDeclaredFields())
-                .filter(this::isNotTransientField)
-                .collect(Collectors.toCollection(LinkedList::new));
-    }
-
     private boolean isColumnField(Field field) {
         return field.isAnnotationPresent(Column.class);
-    }
-
-    private boolean isNotTransientField(Field field) {
-        return !field.isAnnotationPresent(Transient.class);
     }
 
     private void isValidIdFieldValue(Field field, Object fieldValue) {

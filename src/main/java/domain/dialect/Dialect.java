@@ -1,19 +1,34 @@
 package domain.dialect;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Dialect {
 
-    private final HashMap<Integer, String> map = new HashMap<>();
+    private final Map<Integer, Class<?>> javaTypeToClassMap = new HashMap<>();
+    private final Map<Class<?>, Integer> javaClassToTypeMap = new HashMap<>();
 
     protected Dialect() {
     }
 
-    protected void registerColumnType(int code, String name) {
-        map.put(code, name);
+    protected void registerColumnType(Integer code, Class<?> clazz) {
+        javaTypeToClassMap.put(code, clazz);
+        javaClassToTypeMap.put(clazz, code);
     }
 
-    public String getColumnDefine(int typeCode) {
-        return map.get(typeCode);
+    public Class<?> getClassByType(Integer javaType) {
+        return javaTypeToClassMap.get(javaType);
     }
+
+    public Integer getJavaTypeByClass(Class<?> clazz) {
+        return javaClassToTypeMap.get(clazz);
+    }
+
+    protected boolean containsJavaType(Integer javaType) {
+        return javaTypeToClassMap.containsKey(javaType);
+    }
+
+    public abstract String getTypeToStr(Class<?> clazz);
+
+    public abstract void checkJavaType(Integer typeCode);
 }

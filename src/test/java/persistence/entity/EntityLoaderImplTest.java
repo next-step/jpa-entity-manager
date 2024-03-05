@@ -7,6 +7,7 @@ import domain.Person3;
 import domain.dialect.Dialect;
 import domain.dialect.H2Dialect;
 import jdbc.JdbcTemplate;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,9 +22,8 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class EntityPersisterImplTest {
+class EntityLoaderImplTest {
 
     static Dialect dialect = new H2Dialect();
     static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
@@ -63,11 +63,11 @@ class EntityPersisterImplTest {
         server.stop();
     }
 
-    @DisplayName("insert 테스트")
+    @DisplayName("findById 테스트")
     @Test
-    void insertTest() {
+    void findByIdTest() {
         entityPersister.insert(person);
-        Person3 person3 = simpleEntityManager.find(person.getClass(), person.getId());
+        Person3 person3 = entityLoader.findById(person.getClass(), person.getId());
         assertAll(
                 () -> assertThat(person3.getId()).isEqualTo(person.getId()),
                 () -> assertThat(person3.getName()).isEqualTo(person.getName()),
@@ -76,30 +76,23 @@ class EntityPersisterImplTest {
         );
     }
 
-    @DisplayName("insert 후 update 테스트")
+    @DisplayName("findAll 테스트")
     @Test
-    void updateTest() {
-        insertData();
-        boolean result = entityPersister.update(new Person3(person.getId(), "test", 35, "test@test.com"));
-        assertThat(result).isTrue();
-    }
+    void findAllTest() {
+        entityPersister.insert(person);
 
-    @DisplayName("delete 후 조회하려고 할 때 exception 테스트")
-    @Test
-    void deleteTest() {
-        insertData();
-        entityPersister.delete(person);
-        assertThrows(RuntimeException.class, () -> simpleEntityManager.find(person.getClass(), person.getId()));
+        person = new Person3(2L, "test2", 22, "test2@test.com");
+        entityPersister.insert(person);
+
+        person = new Person3(3L, "test3", 23, "test3@test.com");
+        entityPersister.insert(person);
+
+        assertThat(entityLoader.findAll(person.getClass())).hasSize(3);
     }
 
     private void createTable() {
         CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(dialect, entityMetaData);
         jdbcTemplate.execute(createQueryBuilder.createTable(person));
-    }
-
-    private void insertData() {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
-        jdbcTemplate.execute(updateQueryBuilder.insertQuery(person));
     }
 
     private void dropTable() {
