@@ -10,13 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.core.DDLExcuteor;
-import persistence.core.DefaultEntityLoader;
 import persistence.core.EntityManager;
 import persistence.core.EntityManagerImpl;
-import persistence.entity.EntityValue;
 import persistence.entity.Person;
-import persistence.entity.metadata.DefaultEntityMetadataReader;
-import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
@@ -58,14 +54,7 @@ class EntityManagerImplTest {
         person.setAge(30);
         person.setEmail("test@gmail.com");
 
-        Person persistedPerson = entityManager.persist(person);
-
-        assertAll(
-                () -> assertThat(persistedPerson).isNotNull(),
-                () -> assertThat(persistedPerson.getName()).isEqualTo("jinny"),
-                () -> assertThat(persistedPerson.getAge()).isEqualTo(30),
-                () -> assertThat(persistedPerson.getEmail()).isEqualTo("test@gmail.com")
-        );
+        entityManager.persist(person);
     }
 
     private void createTable(Class<?> clazz) {

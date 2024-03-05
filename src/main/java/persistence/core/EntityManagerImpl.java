@@ -2,10 +2,8 @@ package persistence.core;
 
 import database.DatabaseServer;
 import jdbc.JdbcTemplate;
-import persistence.entity.EntityValue;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
@@ -18,20 +16,14 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> List<T> find(Class<T> clazz) throws Exception {
-        return entityLoader.find(clazz);
+    public <T> T find(Class<T> clazz, Object Id) throws Exception {
+        return entityLoader.find(clazz, (Long) Id);
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) throws Exception {
-        return entityLoader.find(clazz, Id);
-    }
-
-    @Override
-    public <T> T persist(T entity) throws Exception {
+    public void persist(Object entity) throws Exception {
         Long id = entityPersister.insert(entity);
-
-        return (T) entityLoader.find(entity.getClass(), id);
+        entityPersister.setIdentifier(entity, id);
     }
 
     @Override
@@ -39,8 +31,4 @@ public class EntityManagerImpl implements EntityManager {
         entityPersister.delete(entity);
     }
 
-    @Override
-    public void update(Object entity) throws Exception {
-        entityPersister.update(entity);
-    }
 }

@@ -1,9 +1,8 @@
 package persistence.sql.dml;
 
-import persistence.entity.EntityValue;
-import persistence.entity.metadata.EntityColumn;
 import persistence.entity.metadata.DefaultEntityMetadataReader;
-import persistence.entity.metadata.EntityMetadataReader;
+import persistence.entity.metadata.EntityColumn;
+import persistence.entity.metadata.EntityDataManipulator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,13 +10,6 @@ import java.util.stream.Collectors;
 public class DMLQueryBuilder {
 
     private static DMLQueryBuilder dmlQueryBuilder = null;
-    private EntityMetadataReader entityMetadataReader;
-    private EntityValue entityValue;
-
-    private DMLQueryBuilder() {
-        entityMetadataReader = new DefaultEntityMetadataReader();
-        entityValue = new EntityValue(entityMetadataReader);
-    }
 
     public static DMLQueryBuilder getInstance() {
         if (dmlQueryBuilder == null) {
@@ -29,9 +21,9 @@ public class DMLQueryBuilder {
     private static final  String COLUMN_SEPARATOR = ", ";
 
     public String insertSql(Object entity) {
-        String tableName = entityMetadataReader.getTableName(entity.getClass());
-        String columns = getColumnNamesClause(entityMetadataReader.getInsertTargetColumns(entity.getClass()));
-        String columnValues = getColumnValueClause(entity, entityMetadataReader.getInsertTargetColumns(entity.getClass()));
+        String tableName = DefaultEntityMetadataReader.getTableName(entity.getClass());
+        String columns = getColumnNamesClause(DefaultEntityMetadataReader.getInsertTargetColumns(entity.getClass()));
+        String columnValues = getColumnValueClause(entity, DefaultEntityMetadataReader.getInsertTargetColumns(entity.getClass()));
 
         return DMLQueryFormatter.createInsertQuery(tableName, columns, columnValues);
     }
@@ -43,30 +35,30 @@ public class DMLQueryBuilder {
     }
 
     public String selectAllSql(Class<?> clazz) {
-        String columnsClause = entityMetadataReader.getColumns(clazz).stream()
+        String columnsClause = DefaultEntityMetadataReader.getColumns(clazz).stream()
             .map(EntityColumn::getColumnName)
             .collect(Collectors.joining(COLUMN_SEPARATOR));
 
-        return DMLQueryFormatter.createSelectQuery(columnsClause, entityMetadataReader.getTableName(clazz));
+        return DMLQueryFormatter.createSelectQuery(columnsClause, DefaultEntityMetadataReader.getTableName(clazz));
     }
 
     public String selectByIdQuery(Class<?> clazz, Object id) {
         String sql = selectAllSql(clazz);
-        String condition = createCondition(entityMetadataReader.getIdColumnName(clazz), id, "=");
+        String condition = createCondition(DefaultEntityMetadataReader.getIdColumnName(clazz), id, "=");
 
         return DMLQueryFormatter.createSelectByConditionQuery(sql, condition);
     }
 
     public String deleteSql(Object entity) {
-        String tableName = entityMetadataReader.getTableName(entity.getClass());
+        String tableName = DefaultEntityMetadataReader.getTableName(entity.getClass());
         String deleteConditionClause = wherePrimaryKeyClause( entity);
 
         return DMLQueryFormatter.createDeleteQuery(tableName, deleteConditionClause);
     }
 
     public String updateSql(Object entity) {
-        String tableName = entityMetadataReader.getTableName(entity.getClass());
-        String columnValueSetClause = columnValueSetClause(entity, entityMetadataReader.getInsertTargetColumns(entity.getClass()));
+        String tableName = DefaultEntityMetadataReader.getTableName(entity.getClass());
+        String columnValueSetClause = columnValueSetClause(entity, DefaultEntityMetadataReader.getInsertTargetColumns(entity.getClass()));
         String conditionClause = wherePrimaryKeyClause(entity);
 
         return DMLQueryFormatter.createUpdateQuery(tableName, columnValueSetClause, conditionClause);
@@ -79,8 +71,8 @@ public class DMLQueryBuilder {
     }
 
     private String wherePrimaryKeyClause(Object object) {
-        String idColumnName = entityMetadataReader.getIdColumnName(object.getClass());
-        Long value = getColumnValue(object, idColumnName);
+        String idColumnName = DefaultEntityMetadataReader.getIdColumnName(object.getClass());
+        Long value = (Long) getColumnValue(object, idColumnName);
 
         return createCondition(idColumnName, value, "=");
     }
@@ -100,8 +92,8 @@ public class DMLQueryBuilder {
         return formatValue(getColumnValue(entity, columnName));
     }
 
-    private <T> T getColumnValue(Object entity, String columnName) {
-        return entityValue.getValue(entity, columnName);
+    private Object getColumnValue(Object entity, String columnName) {
+        return EntityDataManipulator.getValue(entity, columnName);
     }
 
     private String formatValue(Object value) {

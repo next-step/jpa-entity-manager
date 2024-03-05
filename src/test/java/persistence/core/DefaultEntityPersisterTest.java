@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
-import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
@@ -114,6 +113,5 @@ class DefaultEntityPersisterTest {
     private <T> void update(T entity) throws Exception {
         entityPersister.update(entity);
     }
-
 
 }

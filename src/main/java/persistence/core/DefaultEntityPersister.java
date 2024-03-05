@@ -1,6 +1,7 @@
 package persistence.core;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.metadata.EntityDataManipulator;
 import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
@@ -8,7 +9,6 @@ import java.sql.SQLException;
 public class DefaultEntityPersister implements EntityPersister {
     private final JdbcTemplate jdbcTemplate;
     private final DMLQueryBuilder dmlQueryBuilder;
-
 
     public DefaultEntityPersister(JdbcTemplate jdbcTemplate) throws SQLException {
         this.jdbcTemplate = jdbcTemplate;
@@ -33,6 +33,11 @@ public class DefaultEntityPersister implements EntityPersister {
     public void delete(Object entity) throws Exception {
         String sql = dmlQueryBuilder.deleteSql(entity);
         jdbcTemplate.execute(sql);
+    }
+
+    @Override
+    public void setIdentifier(Object entity, Object id) throws Exception {
+        EntityDataManipulator.setIdValue(entity, id);
     }
 
 }
