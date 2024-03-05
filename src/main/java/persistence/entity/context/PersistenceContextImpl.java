@@ -13,7 +13,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     public Object getEntity(Class<?> clazz, Long id) {
         EntityKey entityKey = EntityKey.of(clazz, id);
 
-        if (!entityEntries.canGet(entityKey)) return null;
+        if (!entityEntries.isReadable(entityKey)) return null;
         return firstLevelCache.find(entityKey);
     }
 
@@ -21,7 +21,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     public void addEntity(Object entity) {
         EntityKey entityKey = EntityKey.of(entity);
 
-        if (entityEntries.canAdd(entityKey)) {
+        if (entityEntries.isAssignable(entityKey)) {
             firstLevelCache.store(entityKey, entity);
             entityEntries.managed(entityKey);
         }
@@ -38,7 +38,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     public void removeEntity(Object entity) {
         EntityKey entityKey = EntityKey.of(entity);
 
-        if (entityEntries.canRemove(entityKey)) {
+        if (entityEntries.isRemovable(entityKey)) {
             entityEntries.deleted(entityKey);
             firstLevelCache.delete(entityKey);
             entityEntries.gone(entityKey);

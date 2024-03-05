@@ -5,8 +5,6 @@ import java.util.function.Supplier;
 import static persistence.entity.context.StatusSupplier.*;
 
 public enum Status {
-    INITIALIZING(NOT_INITIALIZED, NOT_INITIALIZED, NOT_INITIALIZED, NOT_INITIALIZED),
-
     NONE(NO, YES, NO, NO),
     MANAGED(YES, YES, YES, NO),
     READ_ONLY(YES, UNSUPPORTED, NO, NO),
@@ -15,31 +13,31 @@ public enum Status {
     LOADING(UNSUPPORTED, YES, NO, NO),
     SAVING(UNSUPPORTED, NO, NO, NO);
 
-    private final Supplier<Boolean> getPermission;
-    private final Supplier<Boolean> addPermission;
-    private final Supplier<Boolean> deletePermission;
+    private final Supplier<Boolean> readable;
+    private final Supplier<Boolean> assignable;
+    private final Supplier<Boolean> removable;
     private final Supplier<Boolean> alreadyRemoved;
 
-    Status(Supplier<Boolean> getPermission,
-           Supplier<Boolean> addPermission,
-           Supplier<Boolean> deletePermission,
+    Status(Supplier<Boolean> readable,
+           Supplier<Boolean> assignable,
+           Supplier<Boolean> removable,
            Supplier<Boolean> alreadyRemoved) {
-        this.getPermission = getPermission;
-        this.addPermission = addPermission;
-        this.deletePermission = deletePermission;
+        this.readable = readable;
+        this.assignable = assignable;
+        this.removable = removable;
         this.alreadyRemoved = alreadyRemoved;
     }
 
-    public boolean canGet() {
-        return getPermission.get();
+    public boolean isReadable() {
+        return readable.get();
     }
 
-    public boolean canAdd() {
-        return addPermission.get();
+    public boolean isAssignable() {
+        return assignable.get();
     }
 
-    public boolean canDelete() {
-        return deletePermission.get();
+    public boolean isRemovable() {
+        return removable.get();
     }
 
     public boolean isAlreadyRemoved() {

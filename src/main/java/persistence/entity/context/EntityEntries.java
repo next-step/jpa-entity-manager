@@ -22,25 +22,20 @@ public class EntityEntries {
         entityEntryOf(entityKey).gone();
     }
 
-    public boolean canGet(EntityKey entityKey) {
-        return statusOf(entityKey).canGet();
+    public boolean isReadable(EntityKey entityKey) {
+        return entityEntryOf(entityKey).isReadable();
     }
 
-    public boolean canAdd(EntityKey entityKey) {
-        return statusOf(entityKey).canAdd();
+    public boolean isAssignable(EntityKey entityKey) {
+        return entityEntryOf(entityKey).isAssignable();
     }
 
     public boolean isRemoved(EntityKey entityKey) {
-        return statusOf(entityKey).isAlreadyRemoved();
+        return entityEntryOf(entityKey).isAlreadyRemoved();
     }
 
-    public boolean canRemove(EntityKey entityKey) {
-        return statusOf(entityKey).canDelete();
-    }
-
-    private Status statusOf(EntityKey entityKey) {
-        EntityEntry entityEntry = entityEntriesMap.getOrDefault(entityKey, EntityEntry.NONE);
-        return entityEntry.getStatus();
+    public boolean isRemovable(EntityKey entityKey) {
+        return entityEntryOf(entityKey).isRemovable();
     }
 
     private EntityEntry entityEntryOf(EntityKey entityKey) {

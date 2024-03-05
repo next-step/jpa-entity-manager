@@ -1,8 +1,6 @@
 package persistence.entity.context;
 
 public class EntityEntry {
-    public static final EntityEntry NONE = new EntityEntry(Status.NONE);
-
     private Status status;
 
     private EntityEntry(Status status) {
@@ -10,11 +8,7 @@ public class EntityEntry {
     }
 
     public static EntityEntry create() {
-        return new EntityEntry(Status.INITIALIZING);
-    }
-
-    public Status getStatus() {
-        return status;
+        return new EntityEntry(Status.NONE);
     }
 
     public void managed() {
@@ -27,5 +21,21 @@ public class EntityEntry {
 
     public void gone() {
         this.status = Status.GONE;
+    }
+
+    public boolean isReadable() {
+        return status.isReadable();
+    }
+
+    public boolean isAssignable() {
+        return status.isAssignable();
+    }
+
+    public boolean isAlreadyRemoved() {
+        return status.isAlreadyRemoved();
+    }
+
+    public boolean isRemovable() {
+        return status.isRemovable();
     }
 }
