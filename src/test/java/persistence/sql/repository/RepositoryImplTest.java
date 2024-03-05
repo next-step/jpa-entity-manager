@@ -1,23 +1,13 @@
 package persistence.sql.repository;
 
+import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
 import persistence.repository.Repository;
 import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
 import persistence.sql.dml.exception.InvalidDeleteNullPointException;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
-import persistence.sql.dml.query.builder.SelectQueryBuilder;
-import persistence.sql.dml.query.builder.UpdateQueryBuilder;
-import persistence.sql.dml.query.clause.ColumnClause;
-import persistence.sql.entity.loader.EntityLoaderImpl;
-import persistence.sql.entity.manager.EntityManagerImpl;
-import persistence.sql.entity.loader.EntityLoaderMapper;
-import persistence.sql.entity.manager.EntityManger;
-import persistence.sql.entity.persister.EntityPersisterImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,20 +24,6 @@ class RepositoryImplTest extends H2Database {
 
     @BeforeEach
     void setUp() {
-        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
-        final EntityManger<Person> entityManager = new EntityManagerImpl<>(
-                new EntityLoaderImpl<>(
-                        jdbcTemplate,
-                        new EntityLoaderMapper<>(Person.class),
-                        new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause)
-                ),
-                new EntityPersisterImpl<>(
-                        jdbcTemplate,
-                        new InsertQueryBuilder(entityMappingTable.getTableName()),
-                        new UpdateQueryBuilder(entityMappingTable.getTableName()),
-                        new DeleteQueryBuilder(entityMappingTable.getTableName())
-                )
-        );
         personRepository = new RepositoryImpl<>(entityManager, Person.class);
         personRepository.deleteAll();
 
