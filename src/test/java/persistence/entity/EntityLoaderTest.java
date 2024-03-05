@@ -13,10 +13,9 @@ import persistence.sql.dml.InsertQueryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.*;
 
 class EntityLoaderTest extends H2DBTestSupport {
-    EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new DynamicRowMapperFactory());
+    EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
 
     @BeforeEach
     public void setUp() {

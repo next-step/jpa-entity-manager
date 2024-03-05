@@ -15,9 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityMangerImplTest extends H2DBTestSupport {
-    private final DynamicRowMapperFactory dynamicRowMapperFactory = new DynamicRowMapperFactory();
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
-    private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dynamicRowMapperFactory);
+    private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
     private final EntityManger entityManger = new EntityMangerImpl(entityPersister, entityLoader);
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
