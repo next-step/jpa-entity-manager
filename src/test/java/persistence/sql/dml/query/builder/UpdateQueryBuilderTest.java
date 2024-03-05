@@ -32,10 +32,10 @@ class UpdateQueryBuilderTest {
         Criteria criteria = Criteria.fromPkCriterion((PrimaryDomainType) pkDomainType);
         WhereClause whereClause = new WhereClause(criteria);
 
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMappingTable.getTableName());
+        UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.getInstance();
         UpdateColumnClause updateColumnClause = UpdateColumnClause.from(entityMappingTable.getDomainTypes());
 
-        assertThat(updateQueryBuilder.toSql(updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
+        assertThat(updateQueryBuilder.toSql(entityMappingTable.getTableName(), updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
     }
 
 }

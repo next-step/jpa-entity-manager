@@ -31,9 +31,9 @@ class DeleteQueryBuilderTest {
         Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(pkDomainTypes.getColumnName(), "1")));
         WhereClause whereClause = new WhereClause(criteria);
 
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(new TableName("person"));
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.getInstance();
 
-        assertThat(deleteQueryBuilder.toSql(whereClause)).isEqualTo("DELETE FROM person WHERE id='1'");
+        assertThat(deleteQueryBuilder.toSql(new TableName("person"), whereClause)).isEqualTo("DELETE FROM person WHERE id='1'");
     }
 
 }
