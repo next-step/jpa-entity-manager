@@ -16,13 +16,13 @@ public class Length {
         if (field.isAnnotationPresent(jakarta.persistence.Column.class)) {
             return field.getAnnotation(jakarta.persistence.Column.class).length();
         }
-        return 0;
+        return 255;
     }
 
-    public String getLengthString() {
-        if (length == 0) {
-            return EMPTY_STRING;
+    public String getLengthString(Type type) {
+        if (Type.VARCHAR.equals(type)) {
+            return "(" + length + ")";
         }
-        return "(" + length + ")";
+        return EMPTY_STRING;
     }
 }

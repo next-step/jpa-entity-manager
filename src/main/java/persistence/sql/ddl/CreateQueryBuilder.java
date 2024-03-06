@@ -5,8 +5,6 @@ import persistence.sql.ddl.domain.Column;
 import persistence.sql.ddl.domain.Columns;
 import persistence.sql.ddl.domain.Table;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,15 +16,8 @@ public class CreateQueryBuilder implements QueryBuilder {
     private final Table table;
 
     public CreateQueryBuilder(Class<?> clazz) {
-        this.columns = new Columns(createColumns(clazz));
+        this.columns = new Columns(clazz);
         this.table = new Table(clazz);
-    }
-
-    private List<Column> createColumns(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(this::isNotTransientAnnotationPresent)
-                .map(Column::new)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -46,8 +37,23 @@ public class CreateQueryBuilder implements QueryBuilder {
 
     private String generateColumn(Column column) {
         return Stream.of(column.getName(),
-                        DIALECT.getTypeString(column.getType(), column.getLength()),
-                        DIALECT.getConstraintString(column.getConstraint()))
+                        generateColumnType(column),
+                        generateColumnAttribute(column))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.joining(SPACE));
+    }
+
+    private String generateColumnType(Column column) {
+        return String.join(EMPTY_STRING,
+                DIALECT.getTypeString(column.getType()),
+                column.getLength());
+    }
+
+    private String generateColumnAttribute(Column defaultColumn) {
+        return Stream.of(
+                        DIALECT.getPrimaryKeyString(defaultColumn),
+                        DIALECT.getGenerationTypeString(defaultColumn),
+                        DIALECT.getConstraintString(defaultColumn))
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.joining(SPACE));
     }

@@ -6,18 +6,16 @@ import java.util.List;
 
 public enum Type {
 
-    TINYINT(List.of(Byte.class, byte.class), null),
-    SMALLINT(List.of(Short.class, short.class), null),
-    INTEGER(List.of(Integer.class, int.class), null),
-    VARCHAR(List.of(String.class), 255),
-    BIGINT(List.of(BigInteger.class, Long.class, long.class), null);
+    TINYINT(List.of(Byte.class, byte.class)),
+    SMALLINT(List.of(Short.class, short.class)),
+    INTEGER(List.of(Integer.class, int.class)),
+    VARCHAR(List.of(String.class)),
+    BIGINT(List.of(BigInteger.class, Long.class, long.class));
 
     private final List<Class<?>> supportedClasses;
-    private final Integer defaultLength;
 
-    Type(List<Class<?>> classes, Integer defaultLength) {
+    Type(List<Class<?>> classes) {
         this.supportedClasses = classes;
-        this.defaultLength = defaultLength;
     }
 
     public static Type of(Class<?> type) {
@@ -25,10 +23,6 @@ public enum Type {
                 .filter(t -> t.supportedClasses.contains(type))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported type: " + type));
-    }
-
-    public Integer getDefaultLength() {
-        return defaultLength;
     }
 
 }

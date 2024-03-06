@@ -1,19 +1,18 @@
 package persistence.sql.ddl.dialect;
 
 import jakarta.persistence.GenerationType;
-import persistence.sql.ddl.domain.Constraint;
-import persistence.sql.ddl.domain.PrimaryKey;
+import persistence.sql.ddl.domain.Column;
 import persistence.sql.ddl.domain.Type;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class H2Dialect implements Dialect {
 
     private static final String EMPTY_STRING = "";
-    private static final String SPACE = " ";
+
+    private static final String PRIMARY_KEY_ATTRIBUTE = "PRIMARY KEY";
+    private static final String NOT_NULL_ATTRIBUTE = "NOT NULL";
 
     private final Map<Type, String> types = new EnumMap<>(Type.class);
     private final Map<GenerationType, String> generationTypes = new EnumMap<>(GenerationType.class);
@@ -37,53 +36,32 @@ public class H2Dialect implements Dialect {
     }
 
     @Override
-    public String getTypeString(Type type, int length) {
-        return String.join(EMPTY_STRING,
-                types.get(type),
-                getTypeLength(type, length)
-        );
-    }
-
-    private String getTypeLength(Type type, int length) {
-        if (type.getDefaultLength() == null) {
-            return EMPTY_STRING;
-        }
-        if (length == 0) {
-            return "(" + type.getDefaultLength() + ")";
-        }
-        return "(" + length + ")";
+    public String getTypeString(Type type) {
+        return types.get(type);
     }
 
     @Override
-    public String getConstraintString(Constraint constraint) {
-        return Stream.of(getIsNotNull(constraint),
-                        getGenerationTypeString(constraint))
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.joining(SPACE));
-    }
-
-    private String getIsNotNull(Constraint constraint) {
-        if (constraint.isNotNull()) {
-            return "NOT NULL";
+    public String getPrimaryKeyString(Column column) {
+        if (column.isPrimaryKey()) {
+            return PRIMARY_KEY_ATTRIBUTE;
         }
         return EMPTY_STRING;
     }
 
-    private String getGenerationTypeString(Constraint constraint) {
-        if (constraint.isPrimaryKey()) {
-            return Stream.of("PRIMARY KEY",
-                            getGenerationType(constraint.getPrimaryKey()))
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.joining(SPACE));
+    @Override
+    public String getConstraintString(Column column) {
+        if (column.isNotNull()) {
+            return NOT_NULL_ATTRIBUTE;
         }
         return EMPTY_STRING;
     }
 
-    private String getGenerationType(PrimaryKey primaryKey) {
-        if (primaryKey.getGenerationType() == null) {
-            return EMPTY_STRING;
+    @Override
+    public String getGenerationTypeString(Column column) {
+        if (column.isPrimaryKey() && column.getGenerationType() != null) {
+            return generationTypes.get(column.getGenerationType());
         }
-        return generationTypes.get(primaryKey.getGenerationType());
+        return EMPTY_STRING;
     }
 
 }

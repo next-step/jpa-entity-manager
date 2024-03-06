@@ -10,6 +10,7 @@ public interface QueryBuilder {
 
     String COMMA = ", ";
     String SPACE = " ";
+    String EMPTY_STRING = "";
 
     Dialect DIALECT = new H2Dialect();
 
