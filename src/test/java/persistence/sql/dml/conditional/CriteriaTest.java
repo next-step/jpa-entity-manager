@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.entity.model.Operators;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,8 +22,7 @@ class CriteriaTest {
     @DisplayName("지정된 조건문을 반환한다.")
     @Test
     void existsCriteria() {
-        Criterion criterion = new Criterion("name", "1", Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of("name", "1")));
 
         assertThat(criteria.toSql()).isEqualTo("name='1'");
     }

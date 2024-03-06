@@ -7,13 +7,20 @@ import persistence.sql.entity.model.TableName;
 import static persistence.sql.constant.SqlFormat.INSERT;
 
 public class InsertQueryBuilder {
-    private final TableName tableName;
 
-    public InsertQueryBuilder(final TableName tableName) {
-        this.tableName = tableName;
+    private InsertQueryBuilder() {
     }
 
-    public String toSql(final ColumnClause columnClause,
+    private static class InsertQuerySingleton {
+        private static final InsertQueryBuilder INSERT_QUERY_BUILDER = new InsertQueryBuilder();
+    }
+
+    public static InsertQueryBuilder getInstance() {
+        return InsertQuerySingleton.INSERT_QUERY_BUILDER;
+    }
+
+    public String toSql(final TableName tableName,
+                        final ColumnClause columnClause,
                         final ValueClause valueClause) {
 
         return String.format(INSERT.getFormat(),

@@ -10,7 +10,7 @@ public class Criterion {
     private final String value;
     private final Operators operators;
 
-    public Criterion(final String key,
+    private Criterion(final String key,
                      final String value,
                      final Operators operators) {
         this.key = key;

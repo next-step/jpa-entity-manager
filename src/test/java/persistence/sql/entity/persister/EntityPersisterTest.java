@@ -1,48 +1,25 @@
 package persistence.sql.entity.persister;
 
+import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
 import persistence.sql.db.H2Database;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
-import persistence.sql.dml.query.builder.SelectQueryBuilder;
-import persistence.sql.dml.query.builder.UpdateQueryBuilder;
-import persistence.sql.dml.query.clause.ColumnClause;
-import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.manager.EntityManagerImpl;
-import persistence.sql.entity.manager.EntityManagerMapper;
-import persistence.sql.entity.manager.EntityManger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityPersisterTest extends H2Database {
 
-    private EntityPersister<Person> entityPersister;
-    private EntityManger<Person> entityManager;
     private Person person;
     private Person person2;
 
 
     @BeforeEach
     void setUp() {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.from(Person.class);
-        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
-
-        this.entityPersister = new EntityPersisterImpl<>(jdbcTemplate,
-                new InsertQueryBuilder(entityMappingTable.getTableName()),
-                new UpdateQueryBuilder(entityMappingTable.getTableName()),
-                new DeleteQueryBuilder(entityMappingTable.getTableName()));
-        this.entityManager = new EntityManagerImpl<>(jdbcTemplate,
-                new EntityManagerMapper<>(Person.class),
-                new SelectQueryBuilder(entityMappingTable.getTableName(), columnClause),
-                entityPersister);
-
         this.person = new Person(1L, "박재성", 10, "jason");
         this.person2 = new Person(2L, "이동규", 20, "cu");
 
-        entityPersister.deleteAll();
+        entityPersister.deleteAll(Person.class);
         entityPersister.insert(person);
     }
 

@@ -15,7 +15,7 @@ import static persistence.sql.constant.SqlFormat.STRING_FORMAT;
 public class ValueClause {
     private final List<String> values;
 
-    public ValueClause(final List<String> values) {
+    private ValueClause(final List<String> values) {
         this.values = values;
     }
 
@@ -25,10 +25,6 @@ public class ValueClause {
                 .stream()
                 .map(domainType -> getValue(instance, getField(instance.getClass(), domainType.getName())))
                 .collect(Collectors.toList()));
-    }
-
-    public List<String> getValues() {
-        return values;
     }
 
     private static Field getField(final Class<?> clazz,

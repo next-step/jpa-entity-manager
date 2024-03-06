@@ -7,13 +7,18 @@ import static persistence.sql.constant.SqlFormat.DELETE;
 
 public class DeleteQueryBuilder {
 
-    private final TableName tableName;
+    private DeleteQueryBuilder() {}
 
-    public DeleteQueryBuilder(final TableName tableName) {
-        this.tableName = tableName;
+    private static class DeleteQuerySingleton {
+        private static final DeleteQueryBuilder DELETE_QUERY_BUILDER = new DeleteQueryBuilder();
     }
 
-    public String toSql(final WhereClause whereClause) {
+    public static DeleteQueryBuilder getInstance() {
+        return DeleteQuerySingleton.DELETE_QUERY_BUILDER;
+    }
+
+    public String toSql(final TableName tableName,
+                        final WhereClause whereClause) {
         return String.format(DELETE.getFormat(),
                 tableName.getName(),
                 whereClause.toSql()

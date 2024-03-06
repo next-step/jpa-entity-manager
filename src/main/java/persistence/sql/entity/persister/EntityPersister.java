@@ -1,15 +1,15 @@
 package persistence.sql.entity.persister;
 
-public interface EntityPersister<T> {
+public interface EntityPersister {
 
-    boolean update(T entity);
+    boolean update(Object entity);
 
-    void insert(T entity);
+    void insert(Object entity);
 
-    Object insertWithPk(T entity);
+    Object insertWithPk(Object entity);
 
-    void delete(T entity);
+    void delete(Object entity);
 
-    void deleteAll();
+    void deleteAll(Class<?> clazz);
 
 }

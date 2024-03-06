@@ -1,26 +1,29 @@
-package persistence.sql.entity.manager;
+package persistence.sql.entity.loader;
 
 import persistence.sql.dml.exception.*;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
-import persistence.sql.entity.model.NormalDomainType;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.util.Spliterator;
 import java.util.stream.StreamSupport;
 
-public class EntityManagerMapper<T> {
+public class EntityLoaderMapper {
 
-    private final Class<T> clazz;
+    private EntityLoaderMapper() {}
 
-    public EntityManagerMapper(Class<T> clazz) {
-        this.clazz = clazz;
+    private static class EntityLoaderMapperSingleton {
+        private static final EntityLoaderMapper ENTITY_LOADER_MAPPER = new EntityLoaderMapper();
     }
 
-    public T mapper(ResultSet resultSet) {
+    public static EntityLoaderMapper getInstance() {
+        return EntityLoaderMapperSingleton.ENTITY_LOADER_MAPPER;
+    }
+
+    public <T> T mapper(Class<T> clazz, ResultSet resultSet) {
         EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        T instance = createInstance();
+        T instance = createInstance(clazz);
 
         Spliterator<DomainType> spliterator = entityMappingTable.getDomainTypes().spliterator();
         StreamSupport.stream(spliterator, false)
@@ -32,7 +35,7 @@ public class EntityManagerMapper<T> {
         return instance;
     }
 
-    private T createInstance() {
+    private <T> T createInstance(final Class<T> clazz) {
         try {
             return clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
@@ -40,7 +43,7 @@ public class EntityManagerMapper<T> {
         }
     }
 
-    private Field getField(Class<T> clazz, String name) {
+    private Field getField(Class<?> clazz, String name) {
         try {
             return clazz.getDeclaredField(name);
         } catch (Exception e) {
@@ -62,16 +65,6 @@ public class EntityManagerMapper<T> {
             field.set(instance, value);
         } catch (Exception e) {
             throw new FieldSetValueException();
-        }
-    }
-
-    public String getFieldValue(final T entity, final String columnName) {
-        try {
-            Field field = clazz.getDeclaredField(columnName);
-            field.setAccessible(true);
-            return field.get(entity).toString();
-        } catch (Exception e) {
-            throw new NotFoundIdException();
         }
     }
 }

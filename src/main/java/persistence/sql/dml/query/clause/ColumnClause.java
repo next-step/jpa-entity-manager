@@ -12,10 +12,6 @@ public class ColumnClause {
         this.columns = columns;
     }
 
-    public List<String> getColumns() {
-        return columns;
-    }
-
     public String toSql() {
         return String.join(COMMA.getValue(), columns);
     }

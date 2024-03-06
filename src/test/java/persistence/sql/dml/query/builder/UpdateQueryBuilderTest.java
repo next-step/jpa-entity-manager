@@ -9,6 +9,7 @@ import persistence.sql.dml.query.clause.UpdateColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.PrimaryDomainType;
 
 import java.util.Collections;
 
@@ -28,14 +29,13 @@ class UpdateQueryBuilderTest {
 
     @Test
     void updateQueryTest() {
-        Criterion criterion = Criterion.of(pkDomainType.getColumnName(), pkDomainType.getValue().toString());
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        Criteria criteria = Criteria.fromPkCriterion((PrimaryDomainType) pkDomainType);
         WhereClause whereClause = new WhereClause(criteria);
 
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMappingTable.getTableName());
+        UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.getInstance();
         UpdateColumnClause updateColumnClause = UpdateColumnClause.from(entityMappingTable.getDomainTypes());
 
-        assertThat(updateQueryBuilder.toSql(updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
+        assertThat(updateQueryBuilder.toSql(entityMappingTable.getTableName(), updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
     }
 
 }

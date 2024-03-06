@@ -1,9 +1,9 @@
 package persistence.sql.repository;
 
+import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
 import persistence.repository.Repository;
 import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
@@ -24,7 +24,7 @@ class RepositoryImplTest extends H2Database {
 
     @BeforeEach
     void setUp() {
-        personRepository = new RepositoryImpl<>(jdbcTemplate, Person.class);
+        personRepository = new RepositoryImpl<>(entityManager, Person.class);
         personRepository.deleteAll();
 
         person1 = new Person(1L, "박재성", 10, "jason");

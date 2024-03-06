@@ -82,7 +82,7 @@ public class ReflectionTest {
                 .filter(method -> method.isAnnotationPresent(PrintView.class))
                 .forEach(method -> runMethod(carInstance, method));
 
-        assertThat(out.toString()).isEqualTo("자동차 정보를 출력 합니다.\n");
+        assertThat(out.toString()).isEqualTo("자동차 정보를 출력 합니다." + System.lineSeparator());
     }
 
     @Test

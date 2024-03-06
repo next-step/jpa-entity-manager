@@ -14,9 +14,10 @@ class WhereClauseTest {
     @DisplayName("조건문을 반환한다.")
     @Test
     void whereClause() {
-        Criterion equalsId = Criterion.of("id", "123");
-        Criterion equalsName = Criterion.of("name", "1243");
-        Criteria criteria = new Criteria(List.of(equalsId, equalsName));
+        Criteria criteria = Criteria.ofCriteria(List.of(
+                Criterion.of("id", "123"),
+                Criterion.of("name", "1243")
+        ));
 
         assertThat(criteria.toSql()).isEqualTo("id='123'AND name='1243'");
     }

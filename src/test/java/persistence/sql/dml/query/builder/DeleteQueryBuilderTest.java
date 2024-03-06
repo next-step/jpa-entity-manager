@@ -1,15 +1,14 @@
 package persistence.sql.dml.query.builder;
 
+import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
-import persistence.sql.dml.query.clause.WhereClause;
-import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.dml.conditional.Criteria;
 import persistence.sql.dml.conditional.Criterion;
+import persistence.sql.dml.query.clause.WhereClause;
+import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
-import persistence.sql.entity.model.Operators;
 import persistence.sql.entity.model.TableName;
 
 import java.util.Collections;
@@ -29,13 +28,12 @@ class DeleteQueryBuilderTest {
     @Test
     void deleteById() {
         DomainType pkDomainTypes = entityMappingTable.getPkDomainTypes();
-        Criterion criterion = new Criterion(pkDomainTypes.getColumnName(), "1", Operators.EQUALS);
-        Criteria criteria = new Criteria(Collections.singletonList(criterion));
+        Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(pkDomainTypes.getColumnName(), "1")));
         WhereClause whereClause = new WhereClause(criteria);
 
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(new TableName("person"));
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.getInstance();
 
-        assertThat(deleteQueryBuilder.toSql(whereClause)).isEqualTo("DELETE FROM person WHERE id='1'");
+        assertThat(deleteQueryBuilder.toSql(new TableName("person"), whereClause)).isEqualTo("DELETE FROM person WHERE id='1'");
     }
 
 }
