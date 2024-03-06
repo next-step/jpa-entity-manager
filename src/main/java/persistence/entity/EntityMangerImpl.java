@@ -1,8 +1,5 @@
 package persistence.entity;
 
-import persistence.sql.mapping.ColumnData;
-import persistence.sql.mapping.Columns;
-
 public class EntityMangerImpl implements EntityManger {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
@@ -19,13 +16,14 @@ public class EntityMangerImpl implements EntityManger {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long id) {
-        Object cachedEntity = persistenceContext.getEntity(id);
+    public <T> T find(Class<T> clazz, Object id) {
+        EntityKey entityKey = new EntityKey(clazz, id);
+        Object cachedEntity = persistenceContext.getEntity(entityKey);
         if(cachedEntity != null) {
             return (T) cachedEntity;
         }
         T foundEntity = entityLoader.find(clazz, id);
-        persistenceContext.addEntity(id, foundEntity);
+        persistenceContext.addEntity(entityKey, foundEntity);
 
         return foundEntity;
     }
@@ -37,9 +35,7 @@ public class EntityMangerImpl implements EntityManger {
             entityPersister.insert(entity);
         }
 
-        Columns columns = Columns.createColumnsWithValue(entity);
-        ColumnData keyColumn = columns.getKeyColumn();
-        persistenceContext.addEntity((Long)keyColumn.getValue(), entity);
+        persistenceContext.addEntity(EntityKey.fromEntity(entity), entity);
 
         return entity;
     }

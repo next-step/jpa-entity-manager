@@ -13,7 +13,7 @@ public class EntityLoader {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> T find(Class<T> clazz, Object id) {
         TableData table = TableData.from(clazz);
         Columns columns = Columns.createColumns(clazz);
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns);

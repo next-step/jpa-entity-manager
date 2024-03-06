@@ -2,11 +2,11 @@ package persistence.entity;
 
 public interface PersistenceContext {
 
-    Object getEntity(Long id);
+    Object getEntity(EntityKey id);
 
-    void addEntity(Long id, Object entity);
+    void addEntity(EntityKey id, Object entity);
 
     void removeEntity(Object entity);
 
-    boolean isDirty(Long id, Object entity);
+    boolean isDirty(EntityKey id, Object entity);
 }

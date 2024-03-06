@@ -45,9 +45,10 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         Person findPerson = entityManger.find(Person.class, id);
 
+        EntityKey entityKey = new EntityKey(Person.class, id);
         assertSoftly(softly -> {
             softly.assertThat(findPerson).isNotNull();
-            softly.assertThat(persistenceContext.getEntity(id)).isNotNull();
+            softly.assertThat(persistenceContext.getEntity(entityKey)).isNotNull();
         });
     }
 
@@ -56,7 +57,8 @@ class EntityMangerImplTest extends H2DBTestSupport {
     void testFindFromPersistenceContext() {
         Long id = 1L;
         Person person = new Person(id, "nick_name", 10, "test@test.com", null);
-        persistenceContext.addEntity(id, person);
+        EntityKey entityKey = new EntityKey(Person.class, id);
+        persistenceContext.addEntity(entityKey, person);
 
         Person findPerson = entityManger.find(Person.class, id);
 
@@ -96,7 +98,8 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         Person saved = (Person) entityManger.persist(person);
 
-        Person findEntity = (Person) persistenceContext.getEntity(saved.getId());
+
+        Person findEntity = (Person) persistenceContext.getEntity(EntityKey.fromEntity(saved));
         assertThat(findEntity.getId()).isEqualTo(person.getId());
     }
 
