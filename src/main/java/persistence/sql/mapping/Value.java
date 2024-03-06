@@ -25,9 +25,7 @@ public class Value implements Serializable {
     }
 
     public Value(final Class<?> originalType, final int sqlType, final Object value) {
-        this.originalType = originalType;
-        this.sqlType = sqlType;
-        this.value = value;
+        this(originalType, sqlType, value, null);
         this.valueClause = bindValueClause();
     }
 
