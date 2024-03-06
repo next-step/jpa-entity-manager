@@ -7,5 +7,5 @@
 
 ## 🚀 2단계 - 엔터티 초기화 (EntityLoader)
 ### 미션
-- [ ] 요구사항 1 - RowMapper 리팩터링
+- [x] 요구사항 1 - RowMapper 리팩터링
 - [ ] 요구사항 2 - EntityManager 의 책임 줄여주기

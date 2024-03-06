@@ -10,10 +10,12 @@ public class EntityManagerImpl implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityPersister = new EntityPersisterImpl(jdbcTemplate);
+        this.entityLoader = new EntityLoaderImpl(jdbcTemplate);
     }
 
     @Override
