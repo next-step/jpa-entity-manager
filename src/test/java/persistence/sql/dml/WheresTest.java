@@ -17,16 +17,16 @@ class WheresTest {
     @Test
     public void whereClause() throws Exception {
         // given
-        final Value value1 = new Value(String.class, Types.VARCHAR, "이름", "'이름'");
-        final Column column1 = new Column("name", Types.VARCHAR, value1);
-        final Value value2 = new Value(Integer.class, Types.INTEGER, 1, "1");
-        final Column column2 = new Column("age", Types.INTEGER, value2);
-        final Value value3 = new Value(String.class, Types.VARCHAR, "email@domain.com", "'email@domain.com'");
-        final Column column3 = new Column("email", Types.VARCHAR, value3);
+        final Value nameValue = new Value(String.class, Types.VARCHAR, "이름", "'이름'");
+        final Column nameColumn = new Column("name", Types.VARCHAR, nameValue);
+        final Value ageValue = new Value(Integer.class, Types.INTEGER, 1, "1");
+        final Column ageColumn = new Column("age", Types.INTEGER, ageValue);
+        final Value emailValue = new Value(String.class, Types.VARCHAR, "email@domain.com", "'email@domain.com'");
+        final Column emailColumn = new Column("email", Types.VARCHAR, emailValue);
         final List<Where> whereList = List.of(
-                new Where(column1, value1, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)),
-                new Where(column2, value2, LogicalOperator.AND, new ComparisonOperator(ComparisonOperator.Comparisons.LE)),
-                new Where(column3, value3, LogicalOperator.OR, new ComparisonOperator(ComparisonOperator.Comparisons.EQ))
+                new Where(nameColumn, nameValue, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)),
+                new Where(ageColumn, ageValue, LogicalOperator.AND, new ComparisonOperator(ComparisonOperator.Comparisons.LE)),
+                new Where(emailColumn, emailValue, LogicalOperator.OR, new ComparisonOperator(ComparisonOperator.Comparisons.EQ))
         );
 
         final Wheres wheres = new Wheres(whereList);
