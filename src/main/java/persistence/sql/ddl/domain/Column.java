@@ -1,71 +1,33 @@
 package persistence.sql.ddl.domain;
 
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.lang.reflect.Field;
 
-public class Column {
+public interface Column {
 
-    private final Field field;
-
-    private final String name;
-
-    private final Type type;
-
-    private final int length;
-
-    private final Constraint constraint;
-
-    public Column(Field field) {
-        this.field = field;
-        this.name = createColumnName(field);
-        this.type = createColumnType(field);
-        this.length = createColumnLength(field);
-        this.constraint = new Constraint(field);
-    }
-
-    private int createColumnLength(Field field) {
-        if (field.isAnnotationPresent(jakarta.persistence.Column.class)) {
-            return field.getAnnotation(jakarta.persistence.Column.class).length();
+    static Column from(Field field) {
+        if (field.isAnnotationPresent(Id.class)) {
+            return new PkColumn(field);
         }
-        return 0;
+        return new DefaultColumn(field);
     }
 
-    public String createColumnName(Field field) {
-        if (field.isAnnotationPresent(jakarta.persistence.Column.class) && !field.getAnnotation(jakarta.persistence.Column.class).name().isBlank()) {
-            return field.getAnnotation(jakarta.persistence.Column.class).name();
-        }
+    Field getField();
 
-        return field.getName();
-    }
+    String getName();
 
-    public Type createColumnType(Field field) {
-        return Type.of(field.getType());
-    }
+    Type getType();
 
-    public Field getField() {
-        return field;
-    }
+    String getLength();
 
-    public Type getType() {
-        return type;
-    }
+    boolean isNotNull();
 
-    public String getName() {
-        return name;
-    }
+    boolean isPrimaryKey();
 
-    public int getLength() {
-        return length;
-    }
+    GenerationType getGenerationType();
 
-    public Constraint getConstraint() {
-        return constraint;
-    }
+    boolean isNotAutoIncrementId();
 
-    public boolean isPrimaryKey() {
-        return constraint.isPrimaryKey();
-    }
-
-    private boolean isNotNull() {
-        return constraint.isNotNull();
-    }
 }

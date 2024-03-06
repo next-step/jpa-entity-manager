@@ -1,12 +1,16 @@
 package persistence.sql.ddl.dialect;
 
-import persistence.sql.ddl.domain.Constraint;
+import persistence.sql.ddl.domain.Column;
 import persistence.sql.ddl.domain.Type;
 
 public interface Dialect {
 
-    String getTypeString(Type type, int length);
+    String getTypeString(Type type);
 
-    String getConstraintString(Constraint constraint);
+    String getPrimaryKeyString(Column column);
+
+    String getGenerationTypeString(Column column);
+
+    String getConstraintString(Column column);
 
 }

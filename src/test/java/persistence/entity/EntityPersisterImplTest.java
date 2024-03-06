@@ -45,7 +45,7 @@ class EntityPersisterImplTest {
         int updateAge = 34;
 
         // when
-        entityPersister.update(new Person(1L, updateName, updateAge, null));
+        entityPersister.update(new Person(1L, updateName, updateAge, "jamie@gmail.com"));
         Person person = entityManager.find(Person.class, 1L);
 
         // then

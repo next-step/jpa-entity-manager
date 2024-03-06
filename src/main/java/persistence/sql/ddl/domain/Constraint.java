@@ -4,11 +4,9 @@ import java.lang.reflect.Field;
 
 public class Constraint {
 
-    private final PrimaryKey primaryKey;
     private final boolean isNotNull;
 
     public Constraint(Field field) {
-        this.primaryKey = new PrimaryKey(field);
         this.isNotNull = isNotNull(field);
     }
 
@@ -18,14 +16,6 @@ public class Constraint {
 
     public boolean isNotNull() {
         return isNotNull;
-    }
-
-    public boolean isPrimaryKey() {
-        return primaryKey.isPrimaryKey();
-    }
-
-    public PrimaryKey getPrimaryKey() {
-        return primaryKey;
     }
 
 }

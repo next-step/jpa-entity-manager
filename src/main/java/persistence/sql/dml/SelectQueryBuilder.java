@@ -4,9 +4,7 @@ import persistence.sql.QueryBuilder;
 import persistence.sql.ddl.domain.Column;
 import persistence.sql.ddl.domain.Columns;
 import persistence.sql.ddl.domain.Table;
-import persistence.sql.dml.domain.Value;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,21 +18,14 @@ public class SelectQueryBuilder implements QueryBuilder {
 
     public SelectQueryBuilder(Class<?> clazz, List<String> whereColumns, List<Object> whereValues) {
         this.table = new Table(clazz);
-        this.columns = new Columns(createColumns(clazz));
+        this.columns = new Columns(clazz);
         this.whereQueryBuilder = new WhereQueryBuilder(clazz, whereColumns, whereValues);
     }
 
     public SelectQueryBuilder(Class<?> clazz, Object id) {
         this.table = new Table(clazz);
-        this.columns = new Columns(createColumns(clazz));
-        this.whereQueryBuilder = new WhereQueryBuilder(new Value(columns.getPrimaryKeyColumn(), String.valueOf(id)));
-    }
-
-    private List<Column> createColumns(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(this::isNotTransientAnnotationPresent)
-                .map(Column::new)
-                .collect(Collectors.toList());
+        this.columns = new Columns(clazz);
+        this.whereQueryBuilder = new WhereQueryBuilder(columns.getPrimaryKeyColumn(), id);
     }
 
     @Override

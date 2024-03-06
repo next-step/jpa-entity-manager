@@ -19,7 +19,8 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Long Id) {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz, Id);
-        return jdbcTemplate.queryForObject(selectQueryBuilder.build(), resultSet -> new GenericRowMapper<T>(clazz).mapRow(resultSet));
+        return jdbcTemplate.queryForObject(selectQueryBuilder.build(),
+                resultSet -> new GenericRowMapper<T>(clazz).mapRow(resultSet));
     }
 
     @Override
