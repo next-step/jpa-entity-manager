@@ -1,16 +1,13 @@
 package persistence.entity;
 
-import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.sql.QueryException;
 import persistence.sql.dml.*;
 import persistence.sql.mapping.Column;
-import persistence.sql.mapping.ColumnBinder;
+import persistence.sql.mapping.PrimaryKey;
 import persistence.sql.mapping.Table;
 import persistence.sql.mapping.TableBinder;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 public class SingleEntityLoader implements EntityLoader {
@@ -27,14 +24,7 @@ public class SingleEntityLoader implements EntityLoader {
 
     @Override
     public <T> T load(final Class<T> clazz, final Object key) {
-        final Table table = tableBinder.createTable(clazz);
-
-        final Field idField = findIdField(clazz);
-        final Column idColumn = table.getColumn(ColumnBinder.toColumnName(idField));
-        idColumn.getValue().setValue(key);
-
-        final Where where = new Where(idColumn, idColumn.getValue(), LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ));
-        final Select select = new Select(table, List.of(where));
+        final Select select = generateSelect(clazz, key);
 
         final String selectQuery = dmlQueryBuilder.buildSelectQuery(select);
         final EntityRowMapper<T> entityRowMapper = new EntityRowMapper<>(clazz);
@@ -42,9 +32,30 @@ public class SingleEntityLoader implements EntityLoader {
         return jdbcTemplate.queryForObject(selectQuery, entityRowMapper);
     }
 
-    private <T> Field findIdField(final Class<T> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Id.class))
+    private <T> Select generateSelect(final Class<T> clazz, final Object key) {
+        final Table table = tableBinder.createTable(clazz);
+
+        final Column idColumn = setIdColumn(key, table);
+
+        final Where where = generateIdColumnWhere(idColumn);
+
+        return new Select(table, List.of(where));
+    }
+
+    private Column setIdColumn(final Object key, final Table table) {
+        final Column idColumn = findIdColumnInPrimaryKey(table.getPrimaryKey());
+        idColumn.getValue().setValue(key);
+
+        return idColumn;
+    }
+
+    private Where generateIdColumnWhere(final Column idColumn) {
+        return new Where(idColumn, idColumn.getValue(), LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ));
+    }
+
+    private Column findIdColumnInPrimaryKey(final PrimaryKey primaryKey) {
+        return primaryKey.getColumns()
+                .stream()
                 .findFirst()
                 .orElseThrow(() -> new QueryException("not found id column"));
     }
