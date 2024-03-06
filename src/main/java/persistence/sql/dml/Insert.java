@@ -1,13 +1,8 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.Table;
-import persistence.sql.mapping.Value;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Insert {
 
@@ -24,18 +19,8 @@ public class Insert {
         return this.table;
     }
 
-    public List<Column> getColumns() {
-        return this.columns.getColumns();
-    }
-
-    public List<Column> getPkColumns() {
-        return this.columns.getPkColumns();
-    }
-
     public String columnNameClause(final Dialect dialect) {
-        final String columnNameClause = getColumns().stream()
-                .map(Column::getName)
-                .collect(Collectors.joining(", "));
+        final String columnNameClause = this.columns.columnNamesClause();
 
         final StringBuilder clause = new StringBuilder()
                 .append(columnNameClause);
@@ -44,10 +29,7 @@ public class Insert {
             clause.append(", ");
         }
 
-        final String pkColumnNameClause = getPkColumns().stream()
-                .filter(column -> isPkWithValueClause(column, dialect))
-                .map(Column::getName)
-                .collect(Collectors.joining(", "));
+        final String pkColumnNameClause = this.columns.pkColumnNamesClause(dialect);
 
         clause.append(pkColumnNameClause);
 
@@ -55,10 +37,7 @@ public class Insert {
     }
 
     public String columnValueClause(final Dialect dialect) {
-        final String columnNameClause = getColumns().stream()
-                .map(Column::getValue)
-                .map(Value::getValueClause)
-                .collect(Collectors.joining(", "));
+        final String columnNameClause = this.columns.columnValuesClause();
 
         final StringBuilder clause = new StringBuilder()
                 .append(columnNameClause);
@@ -67,26 +46,11 @@ public class Insert {
             clause.append(", ");
         }
 
-        final String pkColumnNameClause = getPkColumns().stream()
-                .filter(column -> isPkWithValueClause(column, dialect))
-                .map(column -> getPkValueClause(column, dialect))
-                .collect(Collectors.joining(", "));
+        final String pkColumnNameClause = this.columns.pkColumnValuesClause(dialect);
 
         clause.append(pkColumnNameClause);
 
         return clause.toString();
-    }
-
-    private boolean isPkWithValueClause(final Column column, final Dialect dialect) {
-        return !column.isIdentifierKey() || dialect.getIdentityColumnSupport().hasIdentityInsertKeyword();
-    }
-
-    private String getPkValueClause(final Column column, final Dialect dialect) {
-        if (column.isIdentifierKey() && dialect.getIdentityColumnSupport().hasIdentityInsertKeyword()) {
-            return dialect.getIdentityColumnSupport().getIdentityInsertString();
-        }
-
-        return column.getValue().getValueClause();
     }
 
 }
