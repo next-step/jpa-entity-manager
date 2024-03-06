@@ -7,4 +7,6 @@ public interface PersistenceContext {
     void addEntity(Long id, Object entity);
 
     void removeEntity(Object entity);
+
+    boolean isDirty(Long id, Object entity);
 }

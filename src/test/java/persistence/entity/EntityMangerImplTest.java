@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EntityMangerImplTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
     private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
-    private final PersistenceContext persistenceContext = new PersistContextImpl();
+    private final PersistenceContext persistenceContext = new PersistenceContextImpl();
     private final EntityManger entityManger =
             new EntityMangerImpl(entityPersister, entityLoader, persistenceContext);
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
