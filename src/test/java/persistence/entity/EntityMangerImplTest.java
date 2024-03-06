@@ -98,7 +98,6 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         Person saved = (Person) entityManger.persist(person);
 
-
         Person findEntity = (Person) persistenceContext.getEntity(EntityKey.fromEntity(saved));
         assertThat(findEntity.getId()).isEqualTo(person.getId());
     }
@@ -113,5 +112,16 @@ class EntityMangerImplTest extends H2DBTestSupport {
         assertThrows(Exception.class, () -> {
             jdbcTemplate.queryForObject("select * from users where id = 1", rs -> new Person());
         });
+    }
+
+    @Test
+    @DisplayName("delete 영속성 컨텍스트에서 삭제한다.")
+    void removeFromPersistenceContextWhenDelete() {
+        Person person = new Person(1L, "nick_name", 10, "df", null);
+        entityManger.persist(person);
+
+        entityManger.remove(person);
+
+        assertThat(persistenceContext.getEntity(EntityKey.fromEntity(person))).isNull();
     }
 }
