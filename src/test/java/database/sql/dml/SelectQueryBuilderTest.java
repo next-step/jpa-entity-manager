@@ -14,7 +14,7 @@ class SelectQueryBuilderTest {
     @Test
     void buildSelectQuery() {
         String actual = selectQueryBuilder.buildQuery();
-        assertThat(actual).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE 1");
+        assertThat(actual).isEqualTo("SELECT id, nick_name, old, email FROM users");
     }
 
     @Test
@@ -32,9 +32,8 @@ class SelectQueryBuilderTest {
 
     @Test
     void buildSelectQueryWithInvalidColumn() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            selectQueryBuilder.buildQuery(Map.of("aaaaa", List.of()));
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                                                  () -> selectQueryBuilder.buildQuery(Map.of("aaaaa", List.of())));
         assertThat(exception.getMessage()).isEqualTo("Invalid query: aaaaa");
     }
 }

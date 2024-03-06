@@ -1,5 +1,6 @@
 package database.sql.ddl;
 
+import database.dialect.MySQLDialect;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +16,7 @@ class QueryBuilderTest {
 
     @Test
     void buildCreateQuery() {
-        String actual = builder.buildCreateQuery(OldPerson3.class);
+        String actual = builder.buildCreateQuery(OldPerson3.class, MySQLDialect.INSTANCE);
 
         assertThat(actual).isEqualTo("CREATE TABLE users (id BIGINT AUTO_INCREMENT PRIMARY KEY, nick_name VARCHAR(255) NULL, old INT NULL, email VARCHAR(255) NOT NULL)");
     }

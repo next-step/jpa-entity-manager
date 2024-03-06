@@ -1,9 +1,11 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
+import database.mapping.EntityMetadata;
+import database.sql.dml.where.WhereClause;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class SelectQueryBuilder {
     private final String tableName;
@@ -16,12 +18,20 @@ public class SelectQueryBuilder {
         this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
     }
 
-    public SelectQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public SelectQueryBuilder(Class<?> clazz) {
+        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
-        return String.format("SELECT %s FROM %s WHERE %s", joinedAllColumnNames, tableName, whereClause(conditionMap));
+        StringJoiner query = new StringJoiner(" ")
+                .add("SELECT")
+                .add(joinedAllColumnNames)
+                .add("FROM").add(tableName);
+        String whereClause = whereClause(conditionMap);
+        if (!whereClause.isEmpty()) {
+            query.add(whereClause);
+        }
+        return query.toString();
     }
 
     public String buildQuery() {
@@ -29,6 +39,6 @@ public class SelectQueryBuilder {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return new WhereClause(conditionMap, allColumnNames).toQuery();
+        return WhereClause.from(conditionMap, allColumnNames).toQuery();
     }
 }

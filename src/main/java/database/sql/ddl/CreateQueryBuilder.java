@@ -1,19 +1,19 @@
 package database.sql.ddl;
 
-import database.sql.util.EntityMetadata;
-import database.sql.util.type.TypeConverter;
+import database.dialect.Dialect;
+import database.mapping.EntityMetadata;
 
 public class CreateQueryBuilder {
     private final String tableName;
     private final String columnsWithDefinition;
 
-    public CreateQueryBuilder(EntityMetadata entityMetadata, TypeConverter typeConverter) {
+    public CreateQueryBuilder(EntityMetadata entityMetadata, Dialect dialect) {
         this.tableName = entityMetadata.getTableName();
-        this.columnsWithDefinition = String.join(", ", entityMetadata.getColumnDefinitions(typeConverter));
+        this.columnsWithDefinition = String.join(", ", entityMetadata.getColumnDefinitions(dialect));
     }
 
-    public CreateQueryBuilder(Class<?> entityClass, TypeConverter typeConverter) {
-        this(new EntityMetadata(entityClass), typeConverter);
+    public CreateQueryBuilder(Class<?> clazz, Dialect dialect) {
+        this(EntityMetadata.fromClass(clazz), dialect);
     }
 
     public String buildQuery() {

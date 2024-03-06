@@ -1,50 +1,72 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
+import database.mapping.EntityMetadata;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static database.sql.Util.quote;
 
 public class InsertQueryBuilder {
     private final String tableName;
-    private final List<String> generalColumnNames;
+    private final String primaryKeyColumnName;
+    private final List<String> columnNames;
 
-    public InsertQueryBuilder(EntityMetadata entityMetadata) {
-        this.tableName = entityMetadata.getTableName();
-        this.generalColumnNames = entityMetadata.getGeneralColumnNames();
+    private Long id;
+    private boolean includeIdField;
+    private Map<String, Object> values;
+
+    public InsertQueryBuilder(EntityMetadata metadata) {
+        this.includeIdField = false;
+        this.id = null;
+
+        tableName = metadata.getTableName();
+        primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
+        columnNames = metadata.getGeneralColumnNames();
     }
 
-    public InsertQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public InsertQueryBuilder id(Long id) {
+        this.includeIdField = id != null;
+        this.id = id;
+        return this;
     }
 
-    public String buildQuery(Map<String, Object> valueMap) {
-        return String.format("INSERT INTO %s (%s) VALUES (%s)",
-                             tableName,
-                             String.join(", ", columnClauses(valueMap)),
-                             valueClauses(valueMap));
+    public InsertQueryBuilder values(Map<String, Object> values) {
+        this.values = values;
+        return this;
     }
 
-    public String buildQuery(Object entity) {
-        return buildQuery(columnValues(entity));
+    public String toQueryString() {
+        if (values == null) throw new RuntimeException("values are required");
+
+        return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columnClauses(), valueClauses());
     }
 
-    private List<String> columnClauses(Map<String, Object> valueMap) {
-        return generalColumnNames.stream()
+    private List<String> columns(Map<String, Object> valueMap) {
+        return columnNames.stream()
                 .filter(valueMap::containsKey)
                 .collect(Collectors.toList());
     }
 
-    private String valueClauses(Map<String, Object> valueMap) {
-        return columnClauses(valueMap).stream()
-                .map(columnName -> quote(valueMap.get(columnName)))
-                .collect(Collectors.joining(", "));
+    private String columnClauses() {
+        List<String> columns = columns(values);
+        StringJoiner joiner = new StringJoiner(", ");
+        if (includeIdField) {
+            joiner.add(primaryKeyColumnName);
+        }
+        columns.forEach(joiner::add);
+        return joiner.toString();
     }
 
-    private Map<String, Object> columnValues(Object entity) {
-        return new ColumnValueMap(entity).getColumnValueMap();
+    private String valueClauses() {
+        List<String> columns = columns(values);
+        StringJoiner joiner = new StringJoiner(", ");
+        if (includeIdField) {
+            joiner.add(quote(id));
+        }
+        columns.forEach(key -> joiner.add(quote(values.get(key))));
+        return joiner.toString();
     }
 }

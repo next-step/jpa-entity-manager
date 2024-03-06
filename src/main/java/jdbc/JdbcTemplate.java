@@ -13,9 +13,14 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
-    public void execute(final String sql) {
+    public Long execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
-            statement.execute(sql);
+            statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

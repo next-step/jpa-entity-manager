@@ -1,5 +1,6 @@
 package database.sql.dml;
 
+import database.mapping.ColumnValueMap;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -29,7 +30,7 @@ class UpdateQueryBuilderTest {
     @ParameterizedTest
     @EnumSource(TestCases.class)
     void buildUpdateQuery(TestCases testCase) {
-        Map<String, Object> map = new ColumnValueMap(testCase.entity).getColumnValueMap();
+        Map<String, Object> map = ColumnValueMap.fromEntity(testCase.entity).getMap();
         String actual = updateQueryBuilder.buildQuery(testCase.id, map);
         assertThat(actual).isEqualTo(testCase.expectedQuery);
     }

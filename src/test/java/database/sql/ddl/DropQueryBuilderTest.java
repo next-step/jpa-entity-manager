@@ -14,8 +14,8 @@ class DropQueryBuilderTest {
             "database.sql.ddl.OldPerson2:DROP TABLE OldPerson2",
             "database.sql.ddl.OldPerson3:DROP TABLE users"
     }, delimiter = ':')
-    void buildDeleteQuery(Class<?> entityClass, String expected) {
-        String actual = builder.buildDeleteQuery(entityClass);
+    void buildDeleteQuery(Class<?> clazz, String expected) {
+        String actual = builder.buildDeleteQuery(clazz);
 
         assertThat(actual).isEqualTo(expected);
     }

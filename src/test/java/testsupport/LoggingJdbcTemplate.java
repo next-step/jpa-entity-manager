@@ -20,10 +20,10 @@ public class LoggingJdbcTemplate extends JdbcTemplate {
     }
 
     @Override
-    public void execute(String sql) {
+    public Long execute(String sql) {
         executedQueries.add(sql);
 
-        super.execute(sql);
+        return super.execute(sql);
     }
 
     @Override

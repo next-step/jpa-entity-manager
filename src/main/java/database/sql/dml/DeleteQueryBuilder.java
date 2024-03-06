@@ -1,9 +1,11 @@
 package database.sql.dml;
 
-import database.sql.util.EntityMetadata;
+import database.mapping.EntityMetadata;
+import database.sql.dml.where.WhereClause;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class DeleteQueryBuilder {
     private final String tableName;
@@ -16,12 +18,19 @@ public class DeleteQueryBuilder {
         this.allColumnNames = entityMetadata.getAllColumnNames();
     }
 
-    public DeleteQueryBuilder(Class<?> entityClass) {
-        this(new EntityMetadata(entityClass));
+    public DeleteQueryBuilder(Class<?> clazz) {
+        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
-        return String.format("DELETE FROM %s WHERE %s", tableName, whereClause(conditionMap));
+        StringJoiner query = new StringJoiner(" ")
+                .add("DELETE")
+                .add("FROM").add(tableName);
+        String whereClause = whereClause(conditionMap);
+        if (!whereClause.isEmpty()) {
+            query.add(whereClause);
+        }
+        return query.toString();
     }
 
     public String buildQuery(long id) {
@@ -29,6 +38,6 @@ public class DeleteQueryBuilder {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return new WhereClause(conditionMap, allColumnNames).toQuery();
+        return WhereClause.from(conditionMap, allColumnNames).toQuery();
     }
 }
