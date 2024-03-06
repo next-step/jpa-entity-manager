@@ -44,7 +44,6 @@ public class EntityMangerImpl implements EntityManger {
         return entity;
     }
 
-
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
