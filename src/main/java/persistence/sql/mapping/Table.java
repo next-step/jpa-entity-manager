@@ -11,11 +11,12 @@ public class Table {
 
     private final Map<String, Column> columns;
 
-    private PrimaryKey primaryKey;
+    private final PrimaryKey primaryKey;
 
     public Table(String name) {
         this.name = name;
         this.columns = new LinkedHashMap<>();
+        this.primaryKey = new PrimaryKey();
     }
 
     public String getName() {
@@ -30,10 +31,6 @@ public class Table {
         return this.columns.get(columnName).clone();
     }
 
-    public void setPrimaryKey(final PrimaryKey primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
     public PrimaryKey getPrimaryKey() {
         return this.primaryKey;
     }
@@ -46,7 +43,7 @@ public class Table {
         this.columns.put(column.getName(), column);
 
         if (column.isPk()) {
-            setPrimaryKey(new PrimaryKey(column));
+            primaryKey.addColumn(column);
         }
     }
 
