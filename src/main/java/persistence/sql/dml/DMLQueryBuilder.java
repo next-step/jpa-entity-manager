@@ -1,10 +1,9 @@
 package persistence.sql.dml;
 
-import persistence.entity.metadata.DefaultEntityMetadataReader;
 import persistence.entity.metadata.EntityColumn;
-import persistence.entity.metadata.EntityDataManipulator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DMLQueryBuilder {
@@ -20,12 +19,8 @@ public class DMLQueryBuilder {
 
     private static final  String COLUMN_SEPARATOR = ", ";
 
-    public String insertSql(Object entity) {
-        String tableName = DefaultEntityMetadataReader.getTableName(entity.getClass());
-        String columns = getColumnNamesClause(DefaultEntityMetadataReader.getInsertTargetColumns(entity.getClass()));
-        String columnValues = getColumnValueClause(entity, DefaultEntityMetadataReader.getInsertTargetColumns(entity.getClass()));
-
-        return DMLQueryFormatter.createInsertQuery(tableName, columns, columnValues);
+    public String insertSql(String tableName, List<EntityColumn> columns, Map<String, Object> columnValues) {
+        return DMLQueryFormatter.createInsertQuery(tableName, getColumnNamesClause(columns), columnValueSetClause(columns, columnValues))   ;
     }
 
     private String getColumnValueClause(Object entity, List<EntityColumn> insertTargetColumns) {
@@ -70,6 +65,13 @@ public class DMLQueryBuilder {
             .collect(Collectors.joining(COLUMN_SEPARATOR));
     }
 
+    private String columnValueSetClause(List<EntityColumn> columns, Map<String, Object> columnValues) {
+        return columns.stream()
+            .map(column -> column.getColumnName() + " = " + formatValue(columnValues.get(column.getColumnName())))
+            .collect(Collectors.joining(COLUMN_SEPARATOR));
+    }
+
+
     private String wherePrimaryKeyClause(Object object) {
         String idColumnName = DefaultEntityMetadataReader.getIdColumnName(object.getClass());
         Long value = (Long) getColumnValue(object, idColumnName);
@@ -84,8 +86,8 @@ public class DMLQueryBuilder {
 
     private String getColumnNamesClause(List<EntityColumn> insertTargetColumns) {
         return insertTargetColumns.stream()
-            .map(EntityColumn::getColumnName)
-            .collect(Collectors.joining(COLUMN_SEPARATOR));
+                .map(EntityColumn::getColumnName)
+                .collect(Collectors.joining(COLUMN_SEPARATOR));
     }
 
     private String getColumnValueWithSqlFormat(Object entity, String columnName) {
@@ -104,5 +106,6 @@ public class DMLQueryBuilder {
 
         return value == null ? "" : value.toString();
     }
+
 
 }

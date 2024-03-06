@@ -5,13 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.core.EntityMetaManager;
 import persistence.entity.Person;
+import persistence.entity.metadata.EntityMetadata;
 import persistence.sql.dml.DMLQueryBuilder;
 
 public class DMLQueryBuilderTest {
 
     private Person person;
     private DMLQueryBuilder dmlQueryBuilder;
+    private EntityMetaManager entityMetaManager;
 
     final String name = "kassy";
     final int age = 30;
@@ -25,12 +28,15 @@ public class DMLQueryBuilderTest {
         person.setEmail(email);
 
         dmlQueryBuilder = DMLQueryBuilder.getInstance();
+        entityMetaManager = EntityMetaManager.getInstance();
+        entityMetaManager.loadEntities();
     }
 
     @Test
     @DisplayName("insert 쿼리 생성")
     public void insertQueryTest() {
-        String query = dmlQueryBuilder.insertSql(person);
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
+        String query = dmlQueryBuilder.insertSql(entityMetadata.getTableName(), entityMetadata.getColumns().getInsertTargetColumns(), entityMetadata.getColumnValues(person));
 
         assertEquals("INSERT INTO users (nick_name, old, email) VALUES ('"+name+"', "+age+", '"+email+"')", query);
     }

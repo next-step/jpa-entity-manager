@@ -11,11 +11,24 @@ import persistence.entity.metadata.EntityMetadataBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityContextManager {
-    private static final Logger LOG = LoggerFactory.getLogger(EntityContextManager.class);
+public class EntityMetaManager {
+    private static final Logger LOG = LoggerFactory.getLogger(EntityMetaManager.class);
     protected static final Map<Class<?>, EntityMetadata> ENTITIES = new HashMap<>();
 
-    public static void loadEntities() {
+    private static EntityMetaManager entityMetaManager;
+
+    private EntityMetaManager() {
+        entityMetaManager = new EntityMetaManager();
+    }
+
+    public static EntityMetaManager getInstance() {
+        if (entityMetaManager == null) {
+            entityMetaManager = new EntityMetaManager();
+        }
+        return entityMetaManager;
+    }
+
+    public void loadEntities() {
         LOG.info("=============== Load EntityMetadata ===============");
 
         putEntityMetadata(Person.class);
@@ -23,16 +36,16 @@ public class EntityContextManager {
         putEntityMetadata(Person2.class);
     }
 
-    protected static EntityMetadata putEntityMetadata(Class<?> clazz) {
+    protected EntityMetadata putEntityMetadata(Class<?> clazz) {
         EntityMetadata entityMetadata = EntityMetadataBuilder.build(clazz);
         ENTITIES.put(clazz, entityMetadata);
 
         return entityMetadata;
     }
 
-    public static EntityMetadata getEntityMetadata(Class<?> clazz) {
+    public EntityMetadata getEntityMetadata(Class<?> clazz) {
 
-        return ENTITIES.putIfAbsent(clazz, EntityContextManager.putEntityMetadata(clazz));
+        return ENTITIES.putIfAbsent(clazz, putEntityMetadata(clazz));
     }
 
 }

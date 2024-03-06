@@ -30,7 +30,7 @@ class DefaultEntityLoaderTest {
         entityPersister = new DefaultEntityPersister(jdbcTemplate);
         entityLoader = new DefaultEntityLoader(jdbcTemplate);
 
-        EntityContextManager.loadEntities();
+        EntityMetaManager.loadEntities();
 
         createTable();
     }

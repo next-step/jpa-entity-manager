@@ -1,18 +1,18 @@
 package jdbc;
 
-import persistence.core.EntityContextManager;
+import persistence.core.EntityMetaManager;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DefaultRowMapper<T> implements RowMapper<T> {
 
     private final Class<T> mappedClass;
+    private final EntityMetaManager entityMetaManager;
 
     public DefaultRowMapper(Class<T> mappedClass) {
         this.mappedClass = mappedClass;
+        this.entityMetaManager = EntityMetaManager.getInstance();
     }
 
     @Override
@@ -22,16 +22,14 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
 
         for (int i = 1; i <= columnCount; i++) {
             String columnName = resultSet.getMetaData().getColumnName(i).toLowerCase();
-            setField(object, columnName, resultSet);
+            setValue(object, columnName, resultSet);
         }
 
         return object;
     }
 
-    private void setField(Object object, String columnName, ResultSet resultSet) throws SQLException, IllegalAccessException {
-        Field field = EntityContextManager.getEntityMetadata(object.getClass()).getColumns().getColumnByColumnName(columnName).getField();
-        field.setAccessible(true);
-        field.set(object, resultSet.getObject(columnName));
+    private void setValue(Object object, String columnName, ResultSet resultSet) throws SQLException {
+        entityMetaManager.getEntityMetadata(object.getClass()).setValue(object, columnName, resultSet.getObject(columnName));
     }
 
 
