@@ -50,7 +50,7 @@ public class EntityPersister {
     }
 
     private void setIdToEntity(Object entity, Class<?> clazz) {
-        Long generatedId = jdbcTemplate.queryForObject(
+        Object generatedId = jdbcTemplate.queryForObject(
                 generatedIdObtainStrategy.getQueryString(),
                 generatedIdObtainStrategy.getRowMapper()
         );

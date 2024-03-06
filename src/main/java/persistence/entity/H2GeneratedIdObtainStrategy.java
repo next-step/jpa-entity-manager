@@ -12,7 +12,7 @@ public class H2GeneratedIdObtainStrategy implements GeneratedIdObtainStrategy {
     }
 
     @Override
-    public RowMapper<Long> getRowMapper() {
-        return rs -> rs.getLong(1);
+    public RowMapper<Object> getRowMapper() {
+        return rs -> rs.getObject(1);
     }
 }
