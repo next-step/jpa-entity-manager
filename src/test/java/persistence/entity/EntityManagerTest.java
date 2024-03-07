@@ -102,4 +102,22 @@ class EntityManagerTest {
         Assertions.assertThat(actual.get(1).getEmail()).isEqualTo(person_짱구.getEmail());
 
     }
+
+    @Test
+    void update() {
+        // given
+        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).getInsertQuery(person_철수));
+
+        // when
+        Assertions.assertThat(entityManager.update(person_영희)).isEqualTo(true);
+
+        List<Person> result = jdbcTemplate.query(new SelectQueryBuilder(Person.class).getFindAllQuery(), new DtoMapper<>(Person.class));
+
+        // then
+        Assertions.assertThat(result.size()).isEqualTo(1L);
+        Assertions.assertThat(result.get(0).getName()).isEqualTo(person_영희.getName());
+        Assertions.assertThat(result.get(0).getAge()).isEqualTo(person_영희.getAge());
+        Assertions.assertThat(result.get(0).getEmail()).isEqualTo(person_영희.getEmail());
+
+    }
 }

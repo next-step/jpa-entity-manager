@@ -6,8 +6,11 @@ import persistence.sql.ddl.value.ValueClauses;
 import persistence.sql.exception.InvalidEntityException;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static persistence.sql.common.SqlConstant.COMMA;
 
 public class UpdateQueryBuilder {
     public static final String UPDATE_QUERY = "UPDATE %s SET %s WHERE %s";
@@ -29,16 +32,16 @@ public class UpdateQueryBuilder {
         List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).toList();
         List<String> values = new ValueClauses(fields, entity).values();
 
-        StringBuilder setClauses = new StringBuilder();
+        List<String> setClauses = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
-            setClauses.append(columnNames.get(i)).append(EQUALS).append(values.get(i));
+            setClauses.add(columnNames.get(i) + EQUALS + values.get(i));
         }
 
         if (tableClause.primaryKeyValue() != null) {
             String whereClause = String.format("WHERE %s = %d", tableClause.primaryKeyName(), tableClause.primaryKeyValue());
-            return String.format(UPDATE_QUERY, tableClause.name(), setClauses, whereClause);
+            return String.format(UPDATE_QUERY, tableClause.name(), String.join(COMMA, setClauses), whereClause);
         }
 
-        return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), setClauses);
+        return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), String.join(COMMA, setClauses));
     }
 }

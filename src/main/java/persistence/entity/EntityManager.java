@@ -14,11 +14,18 @@ public interface EntityManager<T> {
      * @param entity 저장 대상
      * @return 저장 결과
      */
-    Object persist(Object entity);
+    T persist(T entity);
+
+    /**
+     * 업데이트
+     * @param entity 업데이트 대상
+     * @return 업데이트 결과
+     */
+    boolean update(T entity);
 
     /**
      * 제거
      * @param entity 삭제 대상
      */
-    void remove(Object entity);
+    void remove(T entity);
 }
