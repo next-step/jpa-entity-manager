@@ -19,7 +19,7 @@ class EntityPersisterTest extends H2Database {
         this.person = new Person(1L, "박재성", 10, "jason");
         this.person2 = new Person(2L, "이동규", 20, "cu");
 
-        entityPersister.deleteAll(Person.class);
+        entityManager.removeAll(Person.class);
         entityPersister.insert(person);
     }
 

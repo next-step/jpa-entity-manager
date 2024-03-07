@@ -18,7 +18,7 @@ class EntityMangerTest extends H2Database {
     void setUp() {
         this.person = new Person(1L, "박재성", 10, "jason");
 
-        entityManager.remove(person);
+        entityManager.removeAll(Person.class);
         entityManager.persist(person);
     }
 
@@ -44,7 +44,7 @@ class EntityMangerTest extends H2Database {
     @Test
     void updateTest() {
         Person updatePerson = new Person(person.getId(), "이동규", 20, "cu");
-        entityManager.persist(updatePerson);
+        entityManager.merge(updatePerson);
 
         Person findPerson = entityManager.find(Person.class, person.getId());
         assertThat(findPerson).isEqualTo(updatePerson);
