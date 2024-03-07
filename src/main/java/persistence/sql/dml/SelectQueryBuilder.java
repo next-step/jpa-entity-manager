@@ -41,7 +41,7 @@ public class SelectQueryBuilder implements QueryBuilder {
     private String generateColumns() {
         return columns.getColumns().stream()
                 .map(Column::getName)
-                .filter(s -> !s.isEmpty())
+                .filter(name -> !name.isEmpty())
                 .collect(Collectors.joining(COMMA));
     }
 }

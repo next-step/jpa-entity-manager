@@ -38,7 +38,7 @@ public class InsertQueryBuilder implements QueryBuilder {
         return columns.getColumns().stream()
                 .filter(Column::isNotAutoIncrementId)
                 .map(Column::getName)
-                .filter(s -> !s.isEmpty())
+                .filter(name -> !name.isEmpty())
                 .collect(Collectors.joining(COMMA));
     }
 
@@ -46,7 +46,7 @@ public class InsertQueryBuilder implements QueryBuilder {
         return values.getValues().stream()
                 .filter(Value::isNotAutoIncrementId)
                 .map(Value::getValue)
-                .filter(s -> !s.isEmpty())
+                .filter(value -> !value.isEmpty())
                 .collect(Collectors.joining(COMMA));
     }
 }
