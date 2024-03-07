@@ -27,7 +27,7 @@ public class InsertQueryBuilder {
         this.tableClause = new TableClause(entity);
     }
 
-    public String getInsertQuery(Object instance) {
+    public String getInsertQuery(Object entity) {
 
         List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
 
@@ -35,7 +35,7 @@ public class InsertQueryBuilder {
                 String.join(COMMA, tableClause.columnNames()) +
                 CLOSING_PARENTHESIS +
                 VALUES +
-                String.join(COMMA, new ValueClauses(fields, instance).getQueries()) +
+                String.join(COMMA, new ValueClauses(fields, entity).getQueries()) +
                 CLOSING_PARENTHESIS;
     }
 
@@ -45,9 +45,9 @@ public class InsertQueryBuilder {
             throw new InvalidValueClausesException();
         }
 
-        Object instance;
+        Object entity;
         try {
-            instance = initInstance(columnNames, columValues);
+            entity = initInstance(columnNames, columValues);
         } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException |
                  InstantiationException e) {
             throw new IllegalArgumentException("잚못된 요청입니다.");
@@ -59,14 +59,13 @@ public class InsertQueryBuilder {
     private Object initInstance(List<String> columnNames, List<Object> columValues)
             throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
             NoSuchFieldException {
-        Object instance;
-        instance = tableClause.newInstance();
+        Object entity = tableClause.newInstance();
 
         for (int i = 0; i < columnNames.size(); i++) {
-            Field field = instance.getClass().getDeclaredField(columnNames.get(i));
+            Field field = entity.getClass().getDeclaredField(columnNames.get(i));
             field.setAccessible(true);
-            field.set(instance, columValues.get(i));
+            field.set(entity, columValues.get(i));
         }
-        return instance;
+        return entity;
     }
 }

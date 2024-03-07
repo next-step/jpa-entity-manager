@@ -16,6 +16,7 @@ import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static persistence.entity.TestFixture.person_철수;
@@ -82,7 +83,7 @@ class EntityManagerTest {
     void remove() {
         // given
         List<String> insertQueries = Stream.of(persistence.sql.dml.TestFixture.person_철수, person_영희, person_짱구)
-                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).toList();
+                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).collect(Collectors.toList());
 
         for (String query : insertQueries) {
             jdbcTemplate.execute(query);

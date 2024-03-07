@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static persistence.sql.common.SqlConstant.COMMA;
 
@@ -29,7 +30,7 @@ public class UpdateQueryBuilder {
 
         List<String> columnNames = this.tableClause.columnNames();
 
-        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).toList();
+        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
         List<String> values = new ValueClauses(fields, entity).values();
 
         List<String> setClauses = new ArrayList<>();

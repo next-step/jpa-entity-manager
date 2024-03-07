@@ -24,6 +24,6 @@ public class ValueClauses {
     }
 
     public List<String> values() {
-        return this.values.stream().map(ValueClause::value).toList();
+        return this.values.stream().map(ValueClause::value).collect(Collectors.toList());
     }
 }
