@@ -1,8 +1,10 @@
 package persistence.sql.dml;
 
+import persistence.sql.QueryException;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Table;
+import persistence.sql.mapping.Value;
 import util.StringUtils;
 
 import java.util.List;
@@ -15,8 +17,17 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
 
     private final Dialect dialect;
 
+    private final List<QueryValueBinder> queryValueBinders = initQueryValueBinders();
+
     public DefaultDmlQueryBuilder(Dialect dialect) {
         this.dialect = dialect;
+    }
+
+    private List<QueryValueBinder> initQueryValueBinders() {
+        return List.of(
+                new QueryStringValueBinder(),
+                new QueryNumberValueBinder()
+        );
     }
 
     @Override
@@ -35,7 +46,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 .append(SPACE)
                 .append("(");
 
-        final String columnNameClause = insert.columnNameClause(dialect);
+        final String columnNameClause = buildInsertColumnsNameClause(insert.getInsertableColumnNames(dialect));
 
         statement.append(columnNameClause)
                 .append(")")
@@ -45,7 +56,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 .append(SPACE)
                 .append("(");
 
-        final String valuesClause = insert.columnValueClause(dialect);
+        final String valuesClause = buildInsertColumnsValueClause(insert.getColumns(), insert.getInsertablePkColumns(dialect), dialect);
 
         return statement
                 .append(valuesClause)
@@ -53,17 +64,54 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 .toString();
     }
 
-    private String insertColumnsClause(final List<Column> columns) {
+    private String buildInsertColumnsNameClause(final List<String> columnNames) {
+        return String.join(", ", columnNames);
+    }
 
+    private String buildInsertColumnsValueClause(final List<Column> columns, final List<Column> pkColumns, final Dialect dialect) {
+        return String.join(", ", getColumnsValueClause(columns), getPkColumnsValueClause(pkColumns, dialect));
+    }
+
+    private String getColumnsValueClause(final List<Column> columns) {
         return columns.stream()
-                .map(this::columnClause)
-                .filter(StringUtils::isNotBlank)
+                .map(this::getColumnValueClause)
                 .collect(Collectors.joining(", "));
     }
 
-    private String columnClause(final Column column) {
+    private String getColumnValueClause(final Column column) {
+        final Value value = column.getValue();
+        final QueryValueBinder queryValueBinder = findQueryValueBinder(value);
 
-        return column.getName();
+        return queryValueBinder.bind(value.getValue());
+    }
+
+    private String getPkColumnsValueClause(final List<Column> pkColumns, final Dialect dialect) {
+        return pkColumns.stream()
+                .map(column -> getPkValueClause(column, dialect))
+                .collect(Collectors.joining(", "));
+    }
+
+    private String getPkValueClause(final Column column, final Dialect dialect) {
+        if (column.isIdentifierKey() && dialect.getIdentityColumnSupport().hasIdentityInsertKeyword()) {
+            return dialect.getIdentityColumnSupport().getIdentityInsertString();
+        }
+
+        return getColumnValueClause(column);
+    }
+
+    private QueryValueBinder findQueryValueBinder(final Value value) {
+        return queryValueBinders.stream()
+                .filter(binder -> binder.support(value))
+                .findFirst()
+                .orElseThrow(() -> new QueryException("not found InsertQueryValueBinder for " + value.getOriginalType() + " type"));
+    }
+
+    private String buildSelectColumnsClause(final List<Column> columns) {
+
+        return columns.stream()
+                .map(Column::getName)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(", "));
     }
 
     @Override
@@ -73,13 +121,13 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
         return "select" +
                 ENTER +
                 SPACE +
-                insertColumnsClause(table.getColumns()) +
+                buildSelectColumnsClause(table.getColumns()) +
                 ENTER +
                 "from" +
                 ENTER +
                 SPACE +
                 table.getName() +
-                buildWhereClause(select.getWhereClause());
+                buildWhereClause(buildWheresClause(select.getWheres()));
     }
 
     @Override
@@ -94,8 +142,14 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 "set" +
                 ENTER +
                 SPACE +
-                update.columnSetClause() +
-                buildWhereClause(update.getWhereClause());
+                buildUpdateSetClause(update.getColumns()) +
+                buildWhereClause(buildWheresClause(update.getWheres()));
+    }
+
+    private String buildUpdateSetClause(final List<Column> columns) {
+        return columns.stream()
+                .map(column -> column.getName() + " = " + getColumnValueClause(column))
+                .collect(Collectors.joining(", "));
     }
 
     @Override
@@ -108,7 +162,22 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 ENTER +
                 SPACE +
                 table.getName() +
-                buildWhereClause(delete.getWhereClause());
+                buildWhereClause(buildWheresClause(delete.getWheres()));
+    }
+
+    public String buildWheresClause(final List<Where> wheres) {
+        return wheres.stream()
+                .map(this::buildWhereClause)
+                .collect(Collectors.joining(ENTER + SPACE));
+    }
+
+    public String buildWhereClause(final Where where) {
+        final Value value = where.getColumnValue();
+        final QueryValueBinder queryValueBinder = findQueryValueBinder(value);
+
+        final String valueClause = queryValueBinder.bind(value.getValue());
+
+        return (where.getLogicalOperator() + " " + where.getColumnName() + " " + where.getWhereOperator(valueClause)).trim();
     }
 
     private String buildWhereClause(final String whereClause) {

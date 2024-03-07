@@ -9,7 +9,7 @@ public class Delete {
 
     private final Table table;
 
-    private final Wheres whereClause;
+    private final Wheres wheres;
 
     public Delete(final Table table) {
         this(table, Collections.emptyList());
@@ -17,14 +17,14 @@ public class Delete {
 
     public Delete(final Table table, final List<Where> wheres) {
         this.table = table;
-        this.whereClause = new Wheres(wheres);
+        this.wheres = new Wheres(wheres);
     }
 
     public Table getTable() {
         return table;
     }
 
-    public String getWhereClause() {
-        return this.whereClause.wheresClause();
+    public List<Where> getWheres() {
+        return this.wheres.getWheres();
     }
 }

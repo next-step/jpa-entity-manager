@@ -1,10 +1,7 @@
 package persistence.sql.dml;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static persistence.sql.QueryBuilderConst.ENTER;
-import static persistence.sql.QueryBuilderConst.SPACE;
 
 public class Wheres {
 
@@ -17,10 +14,8 @@ public class Wheres {
                 .ifPresent(where -> where.changeLogicalOperator(LogicalOperator.NONE));
     }
 
-    public String wheresClause() {
-        return this.wheres.stream()
-                .map(Where::getWhereClause)
-                .collect(Collectors.joining(ENTER + SPACE));
+    public List<Where> getWheres() {
+        return Collections.unmodifiableList(this.wheres);
     }
 
 }
