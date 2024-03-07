@@ -33,16 +33,26 @@ public class PrimaryKeyClause {
     );
 
     private final String name;
+    private final Long value;
     private final String dataType;
     private final GenerationType generationType;
 
-    public PrimaryKeyClause(Field field) {
-        if (!field.isAnnotationPresent(jakarta.persistence.Id.class)) {
+    public PrimaryKeyClause(Class<?> entity, Field field) {
+        if (!field.isAnnotationPresent(Id.class)) {
             throw new NotIdException();
         }
         this.name = field.getName();
+        this.value = getValue(entity, field);
         this.dataType = field.getType().getSimpleName();
         this.generationType = getType(field);
+    }
+
+    private static Long getValue(Class<?> entity, Field field) {
+        try {
+            return (Long) field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new InvalidPrimaryKeyException();
+        }
     }
 
     public static Long primaryKeyValue(Object entity ) {
@@ -53,16 +63,22 @@ public class PrimaryKeyClause {
 
 
         idField.setAccessible(true);
-
+        Long id;
         try {
-            return (Long) idField.get(entity);
+            id = (Long) idField.get(entity);
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
         }
+
+        return id;
     }
 
     public String name() {
         return this.name;
+    }
+
+    public Long value() {
+        return this.value;
     }
 
     private static GenerationType getType(Field field) {

@@ -5,24 +5,20 @@ import java.lang.reflect.Field;
 public class ValueClause {
     public static final String APOSTROPHE = "'";
     private final String value;
-    public ValueClause(Field field, Object entity) {
+    public ValueClause(Field field, Object instance) {
         try {
             field.setAccessible(true);
-            this.value = getValueFromInstance(field, entity);
+            this.value = getValue(field, instance);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("value 생성에 실패하였습니다.", e);
         }
     }
 
-    private static String getValueFromInstance(Field field, Object entity) throws IllegalAccessException {
-        if (isStringField(field, entity)) {
-            return APOSTROPHE + field.get(entity) + APOSTROPHE;
+    private static String getValue(Field field, Object instance) throws IllegalAccessException {
+        if (String.class.isAssignableFrom(field.getType()) && field.get(instance) != null) {
+            return APOSTROPHE + field.get(instance) + APOSTROPHE;
         }
-        return String.valueOf(field.get(entity));
-    }
-
-    private static boolean isStringField(Field field, Object entity) throws IllegalAccessException {
-        return String.class.isAssignableFrom(field.getType()) && field.get(entity) != null;
+        return String.valueOf(field.get(instance));
     }
 
     public String value() {

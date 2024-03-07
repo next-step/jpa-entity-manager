@@ -50,7 +50,7 @@ public class TableClause {
         return Stream.of(entity.getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findFirst()
-                .map(PrimaryKeyClause::new)
+                .map(x-> new PrimaryKeyClause(entity, x))
                 .orElseThrow(NotIdException::new);
     }
 
@@ -74,6 +74,10 @@ public class TableClause {
 
     public String primaryKeyName() {
         return primaryKeyClause.name();
+    }
+
+    public Long primaryKeyValue() {
+        return primaryKeyClause.value();
     }
 
     public List<String> columnQueries() {
