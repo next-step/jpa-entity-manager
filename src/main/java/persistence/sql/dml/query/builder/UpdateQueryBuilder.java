@@ -8,14 +8,12 @@ import static persistence.sql.constant.SqlFormat.UPDATE;
 
 public class UpdateQueryBuilder {
 
+    private static final UpdateQueryBuilder INSTANCE = new UpdateQueryBuilder();
+
     private UpdateQueryBuilder() {}
 
-    private static class UpdateQuerySingleton {
-        private static final UpdateQueryBuilder UPDATE_QUERY_BUILDER = new UpdateQueryBuilder();
-    }
-
     public static UpdateQueryBuilder getInstance() {
-        return UpdateQuerySingleton.UPDATE_QUERY_BUILDER;
+        return INSTANCE;
     }
 
     public String toSql(final TableName tableName,

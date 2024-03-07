@@ -8,15 +8,13 @@ import static persistence.sql.constant.SqlFormat.INSERT;
 
 public class InsertQueryBuilder {
 
+    private static final InsertQueryBuilder INSTANCE = new InsertQueryBuilder();
+
     private InsertQueryBuilder() {
     }
 
-    private static class InsertQuerySingleton {
-        private static final InsertQueryBuilder INSERT_QUERY_BUILDER = new InsertQueryBuilder();
-    }
-
     public static InsertQueryBuilder getInstance() {
-        return InsertQuerySingleton.INSERT_QUERY_BUILDER;
+        return INSTANCE;
     }
 
     public String toSql(final TableName tableName,
