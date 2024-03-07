@@ -72,7 +72,7 @@ class DefaultDmlQueryBuilderTest {
         final Class<PersonV3> clazz = PersonV3.class;
         final Table table = tableBinder.createTable(clazz);
         final Column column = table.getColumn("id");
-        final Value value = new Value(Long.class, Types.BIGINT, 1, "1");
+        final Value value = new Value(Long.class, Types.BIGINT, 1);
         final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
         final Select select = new Select(table, wheres);
 
@@ -123,7 +123,7 @@ class DefaultDmlQueryBuilderTest {
         final Class<PersonV3> clazz = PersonV3.class;
         final Table table = tableBinder.createTable(clazz);
         final Column column = table.getColumn("id");
-        final Value value = new Value(Long.class, Types.BIGINT, 1, "1");
+        final Value value = new Value(Long.class, Types.BIGINT, 1);
         final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
         final Delete delete = new Delete(table, wheres);
 
