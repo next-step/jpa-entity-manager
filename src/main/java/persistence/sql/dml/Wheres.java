@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Wheres {
@@ -14,7 +15,7 @@ public class Wheres {
     }
 
     public List<Where> getWheres() {
-        return this.wheres;
+        return Collections.unmodifiableList(this.wheres);
     }
 
 }
