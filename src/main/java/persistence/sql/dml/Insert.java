@@ -25,11 +25,9 @@ public class Insert {
     }
 
     public List<String> getInsertableColumnNames(final Dialect dialect) {
-        final List<String> insertablePkColumnNames = getInsertablePkColumns(dialect).stream()
-                .map(Column::getName)
-                .collect(Collectors.toList());
-
         final List<String> newColumns = new ArrayList<>(this.columns.getColumnNames());
+
+        final List<String> insertablePkColumnNames = this.columns.getPkColumnNamesWithValueClause(dialect);
         newColumns.addAll(insertablePkColumnNames);
 
         return newColumns;

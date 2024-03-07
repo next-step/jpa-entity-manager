@@ -2,6 +2,7 @@ package persistence.sql.mapping;
 
 import persistence.sql.dialect.Dialect;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,15 +18,21 @@ public class Columns {
     }
 
     public List<Column> getColumns() {
-        return this.columns;
+        return Collections.unmodifiableList(this.columns);
     }
 
     public List<Column> getPkColumns() {
-        return this.pkColumns;
+        return Collections.unmodifiableList(this.pkColumns);
     }
 
     public List<String> getColumnNames() {
         return this.columns.stream()
+                .map(Column::getName)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getPkColumnNamesWithValueClause(final Dialect dialect) {
+        return this.getPkColumnsWithValueClause(dialect).stream()
                 .map(Column::getName)
                 .collect(Collectors.toList());
     }
