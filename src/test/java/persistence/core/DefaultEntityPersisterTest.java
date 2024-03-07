@@ -28,7 +28,6 @@ class DefaultEntityPersisterTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlExcuteor = new DDLExcuteor(jdbcTemplate);
-        EntityMetaManager.loadEntities();
 
         createTable();
 

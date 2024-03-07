@@ -17,13 +17,11 @@ public class EntityMetaManager {
 
     private static EntityMetaManager entityMetaManager;
 
-    private EntityMetaManager() {
-        entityMetaManager = new EntityMetaManager();
-    }
-
     public static EntityMetaManager getInstance() {
         if (entityMetaManager == null) {
             entityMetaManager = new EntityMetaManager();
+            entityMetaManager.loadEntities();   // TEST 편의상 인스턴스 최초 생성시 Load
+
         }
         return entityMetaManager;
     }

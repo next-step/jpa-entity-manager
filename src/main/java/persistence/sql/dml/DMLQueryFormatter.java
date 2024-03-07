@@ -11,7 +11,7 @@ public class DMLQueryFormatter {
         return java.lang.String.format(insertQueryFormat, tableName, columnClause, valueClause);
     }
 
-    public static String createSelectQuery(String columnClause, String tableName) {
+    public static String createSelectQuery(String tableName, String columnClause) {
         final String selectQueryFormat = "SELECT %s FROM %s";
 
         return java.lang.String.format(selectQueryFormat, columnClause, tableName);

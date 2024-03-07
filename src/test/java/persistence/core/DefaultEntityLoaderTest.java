@@ -30,8 +30,6 @@ class DefaultEntityLoaderTest {
         entityPersister = new DefaultEntityPersister(jdbcTemplate);
         entityLoader = new DefaultEntityLoader(jdbcTemplate);
 
-        EntityMetaManager.loadEntities();
-
         createTable();
     }
 
@@ -39,16 +37,6 @@ class DefaultEntityLoaderTest {
     public void tearDown() throws SQLException {
         dropTable();
         server.stop();
-    }
-
-    @Test
-    @DisplayName("findAll Test")
-    public void findAllTest() throws Exception {
-        insertSampleData(5);
-
-        List<Person> people = entityLoader.find(Person.class);
-
-        assertEquals(5, people.size());
     }
 
     @Test

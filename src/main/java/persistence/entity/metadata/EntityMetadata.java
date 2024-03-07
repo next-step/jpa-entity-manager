@@ -1,6 +1,7 @@
 package persistence.entity.metadata;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,6 +10,10 @@ public class EntityMetadata {
 
     private EntityTable entityTable;
     private EntityColumns columns;
+
+    public EntityTable getEntityTable() {
+        return entityTable;
+    }
 
     public void setEntityTable(EntityTable entityTable) {
         this.entityTable = entityTable;
@@ -26,12 +31,8 @@ public class EntityMetadata {
         return columns;
     }
 
-    public String getIdColumnName() {
-        return columns.getIdColumn().getColumnName();
-    }
-
     public EntityColumn getIdColumn() {
-        return null;
+        return columns.getIdColumn();
     }
 
     public List<EntityColumn> getInsertTargetColumns() {
@@ -67,8 +68,11 @@ public class EntityMetadata {
     }
 
     public Map<String, Object> getColumnValues(Object entity) {
-        return columns.getColumns().stream()
-                .collect(Collectors.toMap(EntityColumn::getColumnName, column -> getValue(entity, column.getColumnName())));
+        Map<String, Object> columnValues = new HashMap<>();
+        columns.getColumns()
+                .forEach(column -> columnValues.put(column.getColumnName(), getValue(entity, column.getColumnName())));
+
+        return columnValues;
     }
 
 }

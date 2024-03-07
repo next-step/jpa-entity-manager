@@ -17,7 +17,6 @@ import persistence.entity.Person;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class EntityManagerImplTest {
 
@@ -45,6 +44,14 @@ class EntityManagerImplTest {
         server.stop();
     }
 
+    private void createTable(Class<?> clazz) {
+        ddlExcuteor.createTable(clazz);
+    }
+
+    private void dropTable(Class<?> clazz) {
+        ddlExcuteor.dropTable(clazz);
+    }
+
 
     @Test
     @DisplayName("find 실행")
@@ -55,14 +62,11 @@ class EntityManagerImplTest {
         person.setEmail("test@gmail.com");
 
         entityManager.persist(person);
+
+        Person savedPerson = entityManager.find(Person.class, 1L);
+
+        assertThat(savedPerson).isNotNull();
     }
 
-    private void createTable(Class<?> clazz) {
-        ddlExcuteor.createTable(clazz);
-    }
-
-    private void dropTable(Class<?> clazz) {
-        ddlExcuteor.dropTable(clazz);
-    }
 
 }

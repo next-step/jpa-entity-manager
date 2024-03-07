@@ -16,18 +16,18 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object Id) throws Exception {
+    public <T> T find(Class<T> clazz, Object Id) {
         return entityLoader.find(clazz, (Long) Id);
     }
 
     @Override
-    public void persist(Object entity) throws Exception {
+    public void persist(Object entity) {
         Long id = entityPersister.insert(entity);
         entityPersister.setIdentifier(entity, id);
     }
 
     @Override
-    public void remove(Object entity) throws Exception {
+    public void remove(Object entity) {
         entityPersister.delete(entity);
     }
 

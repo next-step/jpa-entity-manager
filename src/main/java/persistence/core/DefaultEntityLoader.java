@@ -2,30 +2,25 @@ package persistence.core;
 
 import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;
+import persistence.entity.metadata.EntityMetadata;
 import persistence.sql.dml.DMLQueryBuilder;
-
-import java.util.List;
 
 public class DefaultEntityLoader implements EntityLoader {
 
     private final JdbcTemplate jdbcTemplate;
+    private final EntityMetaManager entityMetaManager;
     private final DMLQueryBuilder dmlQueryBuilder;
 
     public DefaultEntityLoader(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityMetaManager = EntityMetaManager.getInstance();
         this.dmlQueryBuilder = DMLQueryBuilder.getInstance();
     }
 
     @Override
-    public <T> List<T> find(Class<T> clazz) throws Exception {
-        String sql = dmlQueryBuilder.selectAllSql(clazz);
-
-        return jdbcTemplate .query(sql, new DefaultRowMapper<>(clazz));
-    }
-
-    @Override
-    public <T> T find(Class<T> clazz, Long id) throws Exception {
-        String sql = dmlQueryBuilder.selectByIdQuery(clazz, id);
+    public <T> T find(Class<T> clazz, Long id) {
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(clazz);
+        String sql = dmlQueryBuilder.selectByIdQuery(entityMetadata.getTableName(), entityMetadata.getColumns(), id);
 
         return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
     }

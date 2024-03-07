@@ -93,4 +93,22 @@ public class EntityColumn {
             ", length=" + length +
             '}';
     }
+
+    public Object getValue(Object entity) {
+        field.setAccessible(true);
+        try {
+            return field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setValue(Object object, Object value) {
+        field.setAccessible(true);
+        try {
+            field.set(object, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
