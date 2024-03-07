@@ -69,21 +69,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
     }
 
     private String buildInsertColumnsValueClause(final List<Column> columns, final List<Column> pkColumns, final Dialect dialect) {
-
-        final String columnsValueClause = getColumnsValueClause(columns);
-
-        final StringBuilder clause = new StringBuilder()
-                .append(columnsValueClause);
-
-        if (clause.length() > 0) {
-            clause.append(", ");
-        }
-
-        final String pkColumnNameClause = getPkColumnsValueClause(pkColumns, dialect);
-
-        clause.append(pkColumnNameClause);
-
-        return clause.toString();
+        return String.join(", ", getColumnsValueClause(columns), getPkColumnsValueClause(pkColumns, dialect));
     }
 
     private String getColumnsValueClause(final List<Column> columns) {
