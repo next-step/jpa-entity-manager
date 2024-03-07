@@ -26,8 +26,4 @@ public class ColumnClauses {
     public List<String> getNames() {
         return this.columnClauses.stream().map(ColumnClause::name).collect(Collectors.toList());
     }
-
-    public int columnSize() {
-        return this.columnClauses.size();
-    }
 }

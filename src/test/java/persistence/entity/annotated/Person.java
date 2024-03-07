@@ -17,5 +17,4 @@ public class Person {
 
     @Column(nullable = false)
     private String email;
-
 }
