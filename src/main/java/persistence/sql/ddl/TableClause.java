@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TableClause {
@@ -42,7 +43,7 @@ public class TableClause {
     private static List<Field> getColumnsFrom(Class<?> entity) {
         return Arrays.stream(entity.getDeclaredFields())
                 .filter(x -> !x.isAnnotationPresent(Id.class))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private static PrimaryKeyClause extractIdFrom(Class<?> entity) {

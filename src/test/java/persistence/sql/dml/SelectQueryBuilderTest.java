@@ -15,6 +15,7 @@ import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE;
@@ -53,7 +54,7 @@ class SelectQueryBuilderTest {
                 new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),
                         new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11))
-                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).toList();
+                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).collect(Collectors.toList());
 
         for (String query : insertQueries) {
             jdbcTemplate.execute(query);
@@ -61,7 +62,7 @@ class SelectQueryBuilderTest {
 
         // when
         String findAllQuery = new SelectQueryBuilder(Person.class).getFindAllQuery();
-        List<Person> persons = jdbcTemplate.query(findAllQuery, new DtoMapper<Person>(Person.class));
+        List<Person> persons = jdbcTemplate.query(findAllQuery, new DtoMapper<>(Person.class));
 
 
         // then
@@ -78,7 +79,7 @@ class SelectQueryBuilderTest {
                 new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),
                         new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11))
-                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).toList();
+                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).collect(Collectors.toList());
 
         for (String query : insertQueries) {
             jdbcTemplate.execute(query);

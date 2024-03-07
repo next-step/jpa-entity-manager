@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static persistence.sql.common.SqlConstant.CLOSING_PARENTHESIS;
 import static persistence.sql.common.SqlConstant.COMMA;
@@ -30,7 +31,7 @@ public class InsertQueryBuilder {
 
     public String getInsertQuery(Object entity) {
 
-        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).toList();
+        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
 
         return String.format(INSERT_QUERY_START, tableClause.name()) +
                 String.join(COMMA, tableClause.columnNames()) +

@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -35,12 +36,12 @@ public class ReflectionTest {
     void testMethodRun() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         // given
         Class<Car> carClass = Car.class;
-        List<String> expected = Stream.of("test : 기아자동차", "test : 1000").sorted().toList();
+        List<String> expected = Stream.of("test : 기아자동차", "test : 1000").sorted().collect(Collectors.toList());
 
         // when
         List<Method> methodsToExecute = Arrays.stream(carClass.getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("test"))
-                .toList();
+                .collect(Collectors.toList());
 
         List<String> resultMessages = new java.util.ArrayList<>(List.of());
         for (Method method : methodsToExecute) {
@@ -49,7 +50,7 @@ public class ReflectionTest {
         }
 
         // then
-        Assertions.assertIterableEquals(resultMessages.stream().sorted().toList(), expected);
+        Assertions.assertIterableEquals(resultMessages.stream().sorted().collect(Collectors.toList()), expected);
 
     }
 
@@ -63,7 +64,7 @@ public class ReflectionTest {
         // when
         List<Method> methodsToExecute = Arrays.stream(carClass.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(PrintView.class))
-                .toList();
+                .collect(Collectors.toList());
 
         for (Method method : methodsToExecute) {
             method.invoke(carClass.getDeclaredConstructor(String.class, int.class).newInstance("기아자동차", 1000));

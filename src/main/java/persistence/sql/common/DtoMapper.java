@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DtoMapper<T> implements RowMapper<T> {
 
@@ -33,7 +34,7 @@ public class DtoMapper<T> implements RowMapper<T> {
             InvocationTargetException, NoSuchMethodException, SQLException {
         T dto;
         dto = clazz.getDeclaredConstructor().newInstance();
-        List<Field> fields = Arrays.stream(clazz.getDeclaredFields()).filter(x -> !x.isAnnotationPresent(Transient.class)).toList();
+        List<Field> fields = Arrays.stream(clazz.getDeclaredFields()).filter(x -> !x.isAnnotationPresent(Transient.class)).collect(Collectors.toList());
         for (Field field : fields) {
             field.setAccessible(true);
             Column annotation = field.getAnnotation(Column.class);
