@@ -93,4 +93,3 @@ class SelectQueryBuilderTest {
         Assertions.assertThat(selectedPerson.getId()).isEqualTo(1L);
     }
 }
-
