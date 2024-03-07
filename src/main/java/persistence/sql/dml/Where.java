@@ -20,8 +20,20 @@ public class Where {
         this.whereOperator = whereOperator;
     }
 
-    public String getWhereClause() {
-        return (this.logicalOperator.getOperator() + " " + this.column.getName() + " " + this.whereOperator.operatorClause(this.value.getValueClause())).trim();
+    public String getColumnName() {
+        return this.column.getName();
+    }
+
+    public Value getColumnValue() {
+        return this.value;
+    }
+
+    public String getLogicalOperator() {
+        return this.logicalOperator.getOperator();
+    }
+
+    public String getWhereOperator(final String valueClause) {
+        return this.whereOperator.operatorClause(valueClause);
     }
 
     public void changeLogicalOperator(final LogicalOperator logicalOperator) {
