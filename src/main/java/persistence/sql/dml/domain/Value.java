@@ -6,9 +6,8 @@ import java.lang.reflect.Field;
 
 public class Value {
 
-    private static final String NULL_STRING = "null";
-
     private final Column column;
+    private final Object originValue;
     private final String value;
 
     public Value(Column column, Object object) {
@@ -16,6 +15,7 @@ public class Value {
         try {
             Field field = column.getField();
             field.setAccessible(true);
+            this.originValue = field.get(object);
             this.value = convertValue(field.getType(), field.get(object));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -24,6 +24,7 @@ public class Value {
 
     public Value(Column column, Class<?> valueType, Object value) {
         this.column = column;
+        this.originValue = value;
         this.value = convertValue(valueType, value);
     }
 
@@ -48,6 +49,10 @@ public class Value {
 
     public String getValue() {
         return value;
+    }
+
+    public Object getOriginValue() {
+        return originValue;
     }
 
     public String getColumnName() {
