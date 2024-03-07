@@ -1,6 +1,7 @@
 package persistence.sql.mapping;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class PrimaryKey {
     }
 
     public List<Column> getColumns() {
-        return this.columns;
+        return Collections.unmodifiableList(this.columns);
     }
 
     public void addColumn(final Column column) {
