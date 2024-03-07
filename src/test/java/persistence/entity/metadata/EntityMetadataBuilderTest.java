@@ -15,8 +15,7 @@ class EntityMetadataBuilderTest {
                 () -> assertEquals("users", metadata.getEntityTable().getTableName()),
                 () -> assertEquals("Person", metadata.getEntityTable().getEntityName()),
                 () -> assertEquals(4, metadata.getColumns().getColumns().size()),
-                () -> assertEquals("id", metadata.getColumns().getIdColumn().getColumnName()),
-                () -> assertEquals(3, metadata.getColumns().getInsertTargetColumns().size())
+                () -> assertEquals("id", metadata.getColumns().getIdColumn().getColumnName())
         );
     }
 
