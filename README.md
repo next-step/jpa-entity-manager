@@ -9,3 +9,9 @@
 ### 미션
 - [x] 요구사항 1 - RowMapper 리팩터링
 - [x] 요구사항 2 - EntityManager 의 책임 줄여주기
+
+## 🚀 3단계 - First Level Cache, Dirty Check
+### 미션
+- [ ] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+- [ ] 요구사항 2 - snapshot 만들기
+- [ ] 요구사항 3 - 더티체킹 구현
