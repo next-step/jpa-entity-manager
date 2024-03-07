@@ -1,9 +1,11 @@
 package persistence.sql.dml;
 
+import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.Table;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Update {
 
@@ -11,25 +13,27 @@ public class Update {
 
     private final Columns columns;
 
-    private final Wheres whereClause;
+    private final Wheres wheres;
 
     public Update(final Table table) {
         this.table = table;
         this.columns = new Columns(table.getColumns());
-        final List<Where> wheres = this.columns.generatePkColumnWheres();
-        this.whereClause = new Wheres(wheres);
+        final List<Where> wheres = this.columns.getPkColumns().stream()
+                .map(column -> new Where(column, column.getValue(), LogicalOperator.AND, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)))
+                .collect(Collectors.toList());
+        this.wheres = new Wheres(wheres);
     }
 
     public Table getTable() {
         return table;
     }
 
-    public String getWhereClause() {
-        return this.whereClause.wheresClause();
+    public List<Column> getColumns() {
+        return this.columns.getColumns();
     }
 
-    public String columnSetClause() {
-        return columns.columnSetClause();
+    public List<Where> getWheres() {
+        return this.wheres.getWheres();
     }
 
 }
