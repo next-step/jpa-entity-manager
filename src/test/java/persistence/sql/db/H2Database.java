@@ -15,6 +15,8 @@ import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
 import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.entity.context.PersistenceContext;
+import persistence.sql.entity.context.PersistenceContextImpl;
 import persistence.sql.entity.loader.EntityLoader;
 import persistence.sql.entity.loader.EntityLoaderImpl;
 import persistence.sql.entity.loader.EntityLoaderMapper;
@@ -44,6 +46,7 @@ public abstract class H2Database {
     protected static EntityPersister entityPersister;
 
     protected static EntityManager entityManager;
+    protected static PersistenceContext persistenceContext;
 
     @BeforeAll
     static void setUpAll() throws SQLException {
@@ -56,6 +59,7 @@ public abstract class H2Database {
         deleteQueryBuilder = DeleteQueryBuilder.getInstance();
         entityLoaderMapper = EntityLoaderMapper.getInstance();
 
+        persistenceContext = new PersistenceContextImpl();
         entityPersister = new EntityPersisterImpl(
                 jdbcTemplate,
                 insertQueryBuilder,
@@ -66,7 +70,7 @@ public abstract class H2Database {
                 entityLoaderMapper,
                 selectQueryBuilder);
 
-        entityManager = new EntityManagerImpl(entityLoader, entityPersister);
+        entityManager = new EntityManagerImpl(entityLoader, entityPersister, persistenceContext);
 
         createTable();
     }
