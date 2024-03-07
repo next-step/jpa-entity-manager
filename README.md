@@ -20,6 +20,6 @@
 
 # 3단계 요구사항
 
-- [ ] PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
-- [ ] snapshot 만들기
-- [ ] 더티체킹 구현
+- [x] PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+- [x] snapshot 만들기
+- [x] 더티체킹 구현
