@@ -1,8 +1,13 @@
 package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
+import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.Table;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Insert {
 
@@ -19,38 +24,23 @@ public class Insert {
         return this.table;
     }
 
-    public String columnNameClause(final Dialect dialect) {
-        final String columnNameClause = this.columns.columnNamesClause();
+    public List<String> getInsertableColumnNames(final Dialect dialect) {
+        final List<String> insertablePkColumnNames = getInsertablePkColumns(dialect).stream()
+                .map(Column::getName)
+                .collect(Collectors.toList());
 
-        final StringBuilder clause = new StringBuilder()
-                .append(columnNameClause);
+        final List<String> newColumns = new ArrayList<>(this.columns.getColumnNames());
+        newColumns.addAll(insertablePkColumnNames);
 
-        if (clause.length() > 0) {
-            clause.append(", ");
-        }
-
-        final String pkColumnNameClause = this.columns.pkColumnNamesClause(dialect);
-
-        clause.append(pkColumnNameClause);
-
-        return clause.toString();
+        return newColumns;
     }
 
-    public String columnValueClause(final Dialect dialect) {
-        final String columnNameClause = this.columns.columnValuesClause();
+    public List<Column> getColumns() {
+        return this.columns.getColumns();
+    }
 
-        final StringBuilder clause = new StringBuilder()
-                .append(columnNameClause);
-
-        if (clause.length() > 0) {
-            clause.append(", ");
-        }
-
-        final String pkColumnNameClause = this.columns.pkColumnValuesClause(dialect);
-
-        clause.append(pkColumnNameClause);
-
-        return clause.toString();
+    public List<Column> getInsertablePkColumns(final Dialect dialect) {
+        return this.columns.getPkColumnsWithValueClause(dialect);
     }
 
 }
