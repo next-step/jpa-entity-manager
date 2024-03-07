@@ -17,11 +17,11 @@ public class InsertQueryBuilder implements QueryBuilder {
     private final Table table;
     private final Values values;
 
-    public InsertQueryBuilder(Object object) {
-        Class<?> clazz = object.getClass();
+    public InsertQueryBuilder(Object entity) {
+        Class<?> clazz = entity.getClass();
         this.table = new Table(clazz);
         this.columns = new Columns(clazz);
-        this.values = new Values(columns, object);
+        this.values = new Values(columns, entity);
     }
 
     @Override

@@ -4,7 +4,6 @@ import jdbc.JdbcTemplate;
 import persistence.entity.persistence.PersistenceContext;
 import persistence.entity.persistence.PersistenceContextImpl;
 import persistence.sql.ddl.domain.Columns;
-import persistence.sql.dml.domain.Value;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -19,22 +18,24 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) {
-        T entity = persistenceContext.getEntity(clazz, Id);
+    public <T> T find(Class<T> clazz, Long id) {
+        T entity = persistenceContext.getEntity(clazz, id);
         if (entity == null) {
-            entity = entityLoader.find(clazz, Id);
-            persistenceContext.addEntity(Id, entity);
+            entity = entityLoader.find(clazz, id);
+            persistenceContext.addEntity(id, entity);
+            persistenceContext.getDatabaseSnapshot(id, entity);
             return entity;
         }
         return entity;
     }
 
     @Override
-    public void persist(Object entity) {
-        entityPersister.insert(entity);
+    public <T> T persist(T entity) {
+        Object id = entityPersister.insert(entity);
         Columns columns = new Columns(entity.getClass());
-        Value value = new Value(columns.getPrimaryKeyColumn(), entity);
-        persistenceContext.addEntity(value.getValue(), entity);
+        columns.setPkValue(entity, id);
+        createCache(entity, id);
+        return entity;
     }
 
     @Override
@@ -42,5 +43,10 @@ public class EntityManagerImpl implements EntityManager {
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
     }
-    
+
+    private <T> void createCache(T entity, Object id) {
+        persistenceContext.addEntity(id, entity);
+        persistenceContext.getDatabaseSnapshot(id, entity);
+    }
+
 }

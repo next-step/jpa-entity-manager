@@ -17,10 +17,10 @@ public class WhereQueryBuilder implements QueryBuilder {
 
     private final Values values;
 
-    public WhereQueryBuilder(Object object) {
-        Columns columns = new Columns(object.getClass());
+    public WhereQueryBuilder(Object entity) {
+        Columns columns = new Columns(entity.getClass());
         columns.getPrimaryKeyColumn();
-        Value primaryKeyColumnValue = new Value(columns.getPrimaryKeyColumn(), object);
+        Value primaryKeyColumnValue = new Value(columns.getPrimaryKeyColumn(), entity);
         this.values = new Values(primaryKeyColumnValue);
     }
 
@@ -29,13 +29,13 @@ public class WhereQueryBuilder implements QueryBuilder {
         this.values = new Values(primaryKeyColumnValue);
     }
 
-    public WhereQueryBuilder(Class<?> clazz, List<String> whereColumns, List<Object> whereValues) {
-        validate(whereColumns, whereValues);
-        this.values = new Values(clazz, whereColumns, whereValues);
+    public WhereQueryBuilder(Class<?> clazz, List<String> whereColumnNames, List<Object> whereValues) {
+        validate(whereColumnNames, whereValues);
+        this.values = new Values(clazz, whereColumnNames, whereValues);
     }
 
-    private void validate(List<String> whereColumns, List<Object> whereValues) {
-        if (whereColumns.size() != whereValues.size()) {
+    private void validate(List<String> whereColumnNames, List<Object> whereValues) {
+        if (whereColumnNames.size() != whereValues.size()) {
             throw new IllegalArgumentException("The number of columns and values corresponding to the condition statement do not match.");
         }
     }

@@ -16,11 +16,11 @@ public class UpdateQueryBuilder implements QueryBuilder {
     private final Values values;
     private final WhereQueryBuilder whereQueryBuilder;
 
-    public UpdateQueryBuilder(Object object) {
-        Class<?> clazz = object.getClass();
+    public UpdateQueryBuilder(Object entity) {
+        Class<?> clazz = entity.getClass();
         this.table = new Table(clazz);
-        this.values = new Values(new Columns(clazz), object);
-        this.whereQueryBuilder = new WhereQueryBuilder(object);
+        this.values = new Values(new Columns(clazz), entity);
+        this.whereQueryBuilder = new WhereQueryBuilder(entity);
     }
 
     @Override

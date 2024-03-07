@@ -14,6 +14,15 @@ public interface Column {
         return new DefaultColumn(field);
     }
 
+    default void setFieldValue(Object entity, Object value) {
+        try {
+            getField().setAccessible(true);
+            getField().set(entity, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     Field getField();
 
     String getName();

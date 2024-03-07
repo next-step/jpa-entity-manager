@@ -10,13 +10,13 @@ public class Value {
     private final Object originValue;
     private final String value;
 
-    public Value(Column column, Object object) {
+    public Value(Column column, Object entity) {
         this.column = column;
         try {
             Field field = column.getField();
             field.setAccessible(true);
-            this.originValue = field.get(object);
-            this.value = convertValue(field.getType(), field.get(object));
+            this.originValue = field.get(entity);
+            this.value = convertValue(field.getType(), field.get(entity));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

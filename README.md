@@ -13,5 +13,5 @@
 ## 🚀 3단계 - First Level Cache, Dirty Check
 ### 미션
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
-- [ ] 요구사항 2 - snapshot 만들기
+- [x] 요구사항 2 - snapshot 만들기
 - [ ] 요구사항 3 - 더티체킹 구현

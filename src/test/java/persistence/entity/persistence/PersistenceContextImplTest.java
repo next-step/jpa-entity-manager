@@ -2,6 +2,7 @@ package persistence.entity.persistence;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.domain.EntitySnapshot;
 import persistence.sql.dml.entity.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,4 +53,30 @@ class PersistenceContextImplTest {
         assertThat(persistenceContext.getEntity(Person.class, 1L)).isNull();
     }
 
+    @Test
+    void getDatabaseSnapshotTest() {
+        // given
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        Person person = new Person(1L, "jay", 32, "jay@mail.com");
+
+        // when
+        EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(1L, person);
+
+        // then
+        assertThat(snapshot.getSnapshotMap()).isNotEmpty();
+    }
+
+    @Test
+    void getCachedDatabaseSnapshotTest() {
+        // given
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        Person person = new Person(1L, "jay", 32, "jay@mail.com");
+        persistenceContext.getDatabaseSnapshot(1L, person);
+
+        // when
+        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(1L, person);
+
+        // then
+        assertThat(snapshot).isNotNull();
+    }
 }
