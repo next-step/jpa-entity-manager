@@ -100,10 +100,7 @@ public class ColumnBinder {
     private void setColumnValue(final Column column, final Field field, final Object object) {
         try {
             field.setAccessible(true);
-            final Object value = field.get(object);
-
-            final Value valueObject = column.getValue();
-            valueObject.setValue(value);
+            column.setValue(field.get(object));
         } catch (IllegalAccessException e) {
             throw new QueryException(column.getName() + " column set value exception");
         }

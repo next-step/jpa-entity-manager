@@ -5,11 +5,11 @@ import persistence.sql.dialect.Dialect;
 
 public class Column {
 
-    private String name;
+    private final String name;
 
-    private int type;
+    private final int type;
 
-    private Value value;
+    private final Value value;
 
     private int length = 255;
 
@@ -20,8 +20,6 @@ public class Column {
     private boolean pk = false;
 
     private GenerationType pkStrategy = null;
-
-    private Column() {}
 
     public Column(final String columnName, final int sqlType, final Value value) {
         this.name = columnName;
@@ -39,15 +37,9 @@ public class Column {
     }
 
     public Column clone() {
-        final Column copy = new Column();
-        copy.name = this.name;
-        copy.type = this.type;
-        copy.value = this.getValue();
-        copy.length = this.length;
-        copy.nullable = this.nullable;
-        copy.unique = this.unique;
-        copy.pk = this.pk;
-        copy.pkStrategy = this.pkStrategy;
+        final Column copy = new Column(this.name, this.type, this.getValue(), this.length, this.nullable, this.unique);
+        copy.setPk(this.pk);
+        copy.setStrategy(this.pkStrategy);
 
         return copy;
     }
@@ -92,8 +84,8 @@ public class Column {
         return this.pk && this.pkStrategy == GenerationType.IDENTITY;
     }
 
-    public void setValue(final Value value) {
-        this.value = value;
+    public void setValue(final Object value) {
+        this.value.setValue(value);
     }
 
     public void setPk(final boolean pk) {

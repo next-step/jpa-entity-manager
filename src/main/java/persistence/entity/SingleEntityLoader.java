@@ -3,10 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import persistence.sql.QueryException;
 import persistence.sql.dml.*;
-import persistence.sql.mapping.Column;
-import persistence.sql.mapping.PrimaryKey;
-import persistence.sql.mapping.Table;
-import persistence.sql.mapping.TableBinder;
+import persistence.sql.mapping.*;
 
 import java.util.List;
 
@@ -35,21 +32,15 @@ public class SingleEntityLoader implements EntityLoader {
     private <T> Select generateSelect(final Class<T> clazz, final Object key) {
         final Table table = tableBinder.createTable(clazz);
 
-        final Column idColumn = setIdColumn(key, table);
-
-        final Where where = generateIdColumnWhere(idColumn);
+        final Where where = generateIdColumnWhere(table, key);
 
         return new Select(table, List.of(where));
     }
 
-    private Column setIdColumn(final Object key, final Table table) {
+    private Where generateIdColumnWhere(final Table table, final Object key) {
         final Column idColumn = findIdColumnInPrimaryKey(table.getPrimaryKey());
-        idColumn.getValue().setValue(key);
+        idColumn.setValue(key);
 
-        return idColumn;
-    }
-
-    private Where generateIdColumnWhere(final Column idColumn) {
         return new Where(idColumn, idColumn.getValue(), LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ));
     }
 
