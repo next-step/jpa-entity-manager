@@ -51,7 +51,7 @@ public class PrimaryKeyClause {
         try {
             return (Long) field.get(entity);
         } catch (IllegalAccessException e) {
-            throw new InvalidPrimaryKeyException();
+            return null;
         }
     }
 
