@@ -53,6 +53,18 @@ class PersistenceContextTest {
         );
     }
 
+    @DisplayName("1차캐시와 스냅샷 데이터가 다르면 업데이트 된다.")
+    @Test
+    void updateEntityTest() {
+        Person updatePerson = new Person(person.getId(), "이동규", 13, "cu@nextstep.com");
+
+        persistenceContext.addEntity(updatePerson, updatePerson.getId());
+
+        Person entity = persistenceContext.getEntity(Person.class, person.getId());
+
+        assertThat(person).isNotEqualTo(entity);
+    }
+
     @DisplayName("1차캐시와 스냅샷 데이터를 삭제한다.")
     @Test
     void removeEntityTest() {
