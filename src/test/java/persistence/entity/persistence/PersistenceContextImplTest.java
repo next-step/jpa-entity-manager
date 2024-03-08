@@ -63,7 +63,7 @@ class PersistenceContextImplTest {
         EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(1L, person);
 
         // then
-        assertThat(snapshot.getSnapshotMap()).isNotEmpty();
+        assertThat(snapshot.getSnapshot()).isNotZero();
     }
 
     @Test
@@ -71,12 +71,12 @@ class PersistenceContextImplTest {
         // given
         PersistenceContext persistenceContext = new PersistenceContextImpl();
         Person person = new Person(1L, "jay", 32, "jay@mail.com");
-        persistenceContext.getDatabaseSnapshot(1L, person);
+        EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(1L, person);
 
         // when
-        EntitySnapshot snapshot = persistenceContext.getCachedDatabaseSnapshot(1L, person);
+        EntitySnapshot cachedSnapshot = persistenceContext.getCachedDatabaseSnapshot(1L, person);
 
         // then
-        assertThat(snapshot).isNotNull();
+        assertThat(cachedSnapshot).isEqualTo(snapshot);
     }
 }

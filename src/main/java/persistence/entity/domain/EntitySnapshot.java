@@ -1,26 +1,27 @@
 package persistence.entity.domain;
 
-import persistence.sql.ddl.domain.Column;
 import persistence.sql.ddl.domain.Columns;
 import persistence.sql.dml.domain.Value;
+import persistence.sql.dml.domain.Values;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class EntitySnapshot {
 
-    private final Map<Column, Value> snapshotMap;
+    private final int snapshot;
 
     public EntitySnapshot(Object entity) {
         Columns columns = new Columns(entity.getClass());
-        snapshotMap = columns.getColumns().stream()
-                .collect(LinkedHashMap::new,
-                        (map, column) -> map.put(column, new Value(column, entity)),
-                        LinkedHashMap::putAll);
+        Values values = new Values(columns, entity);
+
+        this.snapshot = Objects.hash(entity.getClass(), values.getValues().stream()
+                .map(Value::getValue)
+                .collect(Collectors.joining()));
     }
 
-    public Map<Column, Value> getSnapshotMap() {
-        return snapshotMap;
+    public int getSnapshot() {
+        return snapshot;
     }
 
 }
