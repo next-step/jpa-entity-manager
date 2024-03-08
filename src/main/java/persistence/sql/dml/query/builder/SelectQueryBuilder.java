@@ -8,12 +8,15 @@ import static persistence.sql.constant.SqlFormat.SELECT;
 
 public class SelectQueryBuilder {
 
-    private static final SelectQueryBuilder INSTANCE = new SelectQueryBuilder();
+    private static SelectQueryBuilder instance;
 
     private SelectQueryBuilder() { }
 
     public static SelectQueryBuilder getInstance() {
-        return INSTANCE;
+        if(instance == null) {
+            instance = new SelectQueryBuilder();
+        }
+        return instance;
     }
 
     public String toSql(final TableName tableName,
