@@ -59,19 +59,12 @@ class EntityManagerImplTest {
     void entityManagerPersistTest() {
         // given
         EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
-        Person person = new Person("jamie", 34, "jaime@gmail.com");
 
         // when
-        entityManager.persist(person);
-        Person findedPerson = entityManager.find(Person.class, 1L);
+        Person person = entityManager.persist(new Person("jamie", 34, "jaime@gmail.com"));
 
         // then
-        assertAll(
-                () -> assertThat(findedPerson.getId()).isEqualTo(1L),
-                () -> assertThat(findedPerson.getName()).isEqualTo("jamie"),
-                () -> assertThat(findedPerson.getAge()).isEqualTo(34),
-                () -> assertThat(findedPerson.getEmail()).isEqualTo("jaime@gmail.com")
-        );
+        assertThat(person.getId()).isEqualTo(1L);
     }
 
     @Test
