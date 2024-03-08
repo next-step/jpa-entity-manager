@@ -2,11 +2,9 @@ package persistence.sql.meta.simple;
 
 import jakarta.persistence.GenerationType;
 import persistence.sql.meta.PrimaryKey;
-
-import java.io.Serializable;
 import java.util.Objects;
 
-public class SimplePrimaryKey implements PrimaryKey, Serializable {
+public class SimplePrimaryKey implements PrimaryKey {
 
     private SimpleColumn primaryKey;
 
