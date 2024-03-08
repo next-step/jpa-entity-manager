@@ -35,8 +35,7 @@ class EntityPersisterTest {
         jdbcTemplate = new JdbcTemplate(jdbcConnection);
 
         Database database = new SimpleDatabase(jdbcTemplate);
-        EntityMetaCache entityMetaCache = new EntityMetaCache();
-        persister = new EntityPersister(database, entityMetaCache);
+        persister = new EntityPersister(database);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);

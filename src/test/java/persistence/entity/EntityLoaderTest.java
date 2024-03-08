@@ -40,8 +40,7 @@ public class EntityLoaderTest {
         jdbcTemplate = new JdbcTemplate(jdbcConnection);
 
         Database database = new SimpleDatabase(jdbcTemplate);
-        EntityMetaCache entityMetaCache = new EntityMetaCache();
-        loader = new EntityLoader(database, entityMetaCache);
+        loader = new EntityLoader(database);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);

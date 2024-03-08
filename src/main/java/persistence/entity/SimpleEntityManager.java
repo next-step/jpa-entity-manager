@@ -85,8 +85,9 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private Table createTable(Object entity) {
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
         Class<?> clazz = entity.getClass();
-        return new Table(clazz);
+        return entityMetaCache.getTable(clazz);
     }
 
     @Override

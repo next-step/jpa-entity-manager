@@ -2,14 +2,18 @@ package persistence.entity;
 
 import persistence.sql.model.Table;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityMetaCache {
+public enum EntityMetaCache {
 
-    private final ConcurrentHashMap<Class<?>, Table> tables;
+    INSTANCE(new ConcurrentHashMap<>());
 
-    public EntityMetaCache() {
-        this.tables = new ConcurrentHashMap<>();
+
+    private final Map<Class<?>, Table> tables;
+
+    EntityMetaCache(Map<Class<?>, Table> tables) {
+        this.tables = tables;
     }
 
     public Table getTable(Class<?> clazz) {

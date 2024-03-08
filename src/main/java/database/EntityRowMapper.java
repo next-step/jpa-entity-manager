@@ -2,6 +2,7 @@ package database;
 
 import jdbc.RowMapper;
 import persistence.entity.EntityBinder;
+import persistence.entity.EntityMetaCache;
 import persistence.sql.model.BaseColumn;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
@@ -24,7 +25,8 @@ public class EntityRowMapper<T> implements RowMapper<T> {
         T instance = createInstance(clazz);
         EntityBinder entityBinder = new EntityBinder(instance);
 
-        Table table = new Table(clazz);
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
+        Table table = entityMetaCache.getTable(clazz);
 
         PKColumn pkColumn = table.getPKColumn();
         bindColumnValue(resultSet, pkColumn, entityBinder);

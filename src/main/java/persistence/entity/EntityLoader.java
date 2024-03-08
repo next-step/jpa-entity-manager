@@ -9,14 +9,13 @@ import java.util.List;
 public class EntityLoader {
 
     private final Database database;
-    private final EntityMetaCache entityMetaCache;
 
-    public EntityLoader(Database database, EntityMetaCache entityMetaCache) {
+    public EntityLoader(Database database) {
         this.database = database;
-        this.entityMetaCache = entityMetaCache;
     }
 
     public <T> T read(Class<T> clazz, EntityId id) {
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
         String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
@@ -24,6 +23,7 @@ public class EntityLoader {
     }
 
     public boolean isExist(Object entity) {
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
         Class<?> clazz = entity.getClass();
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
