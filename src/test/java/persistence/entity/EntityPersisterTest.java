@@ -3,9 +3,6 @@ package persistence.entity;
 import database.*;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import persistence.sql.ddl.DDLQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -17,8 +14,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class EntityPersisterTest {
 
@@ -83,22 +80,30 @@ class EntityPersisterTest {
     void create() {
         Person3 person3 = new Person3("qwer", 12, "qwe@ema.com");
 
-        persister.create(person3);
+        EntityId id = persister.create(person3);
         Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=4L", new EntityRowMapper<>(Person3.class));
 
-        Person3 expect = new Person3(4L, "qwer", 12, "qwe@ema.com");
-        assertThat(result).isEqualTo(expect);
+        Person3 expectPerson = new Person3(4L, "qwer", 12, "qwe@ema.com");
+        EntityId expectId = new EntityId(4L);
+        assertSoftly(softly -> {
+            softly.assertThat(result).isEqualTo(expectPerson);
+            softly.assertThat(id).isEqualTo(expectId);
+        });
     }
 
     @Test
     void update() {
         Person3 person = new Person3(2L, "qwer", 12, "qwe@ema.com");
 
-        persister.update(person);
-        Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=2L", new EntityRowMapper<>(Person3.class));
+        EntityId id = persister.update(person);
+        Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=2", new EntityRowMapper<>(Person3.class));
 
-        Person3 expect = new Person3(2L, "qwer", 12, "qwe@ema.com");
-        assertThat(result).isEqualTo(expect);
+        Person3 expectPerson = new Person3(2L, "qwer", 12, "qwe@ema.com");
+        EntityId expectId = new EntityId(2L);
+        assertSoftly(softly -> {
+            softly.assertThat(result).isEqualTo(expectPerson);
+            softly.assertThat(id).isEqualTo(expectId);
+        });
     }
 
     @Test

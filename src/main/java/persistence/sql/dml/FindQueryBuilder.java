@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityId;
 import persistence.sql.model.Table;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class FindQueryBuilder {
         return String.format(FIND_ALL_QUERY_FORMAT, columnsClause, tableName);
     }
 
-    public String buildById(Object id) {
+    public String buildById(EntityId id) {
         ByIdQueryBuilder byIdQueryBuilder = new ByIdQueryBuilder(table, id);
 
         String columnsClause = buildColumnsClause();

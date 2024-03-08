@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityId;
 import persistence.sql.model.Table;
 
 public class DeleteQueryBuilder {
@@ -18,7 +19,7 @@ public class DeleteQueryBuilder {
         return String.format(DELETE_ALL_QUERY_FORMAT, tableName);
     }
 
-    public String buildById(Object id) {
+    public String buildById(EntityId id) {
         ByIdQueryBuilder byIdQueryBuilder = new ByIdQueryBuilder(table, id);
 
         String tableName = table.getName();

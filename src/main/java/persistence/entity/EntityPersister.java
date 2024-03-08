@@ -5,8 +5,6 @@ import persistence.sql.dml.DMLQueryBuilder;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 
-import java.util.List;
-
 public class EntityPersister {
 
     private final Database database;
@@ -17,43 +15,38 @@ public class EntityPersister {
         this.entityMetaCache = entityMetaCache;
     }
 
-    public void create(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+    public EntityId create(Object entity) {
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String insertQuery = queryBuilder.buildInsertQuery(entity);
-        database.execute(insertQuery);
+        return database.executeQueryAndGetGeneratedKey(insertQuery);
     }
 
-    public void update(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+    public EntityId update(Object entity) {
+        EntityBinder entityBinder = new EntityBinder(entity);
+        EntityId id = entityBinder.getEntityId();
 
-        Object id = getEntityId(entity);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String updateByIdQuery = queryBuilder.buildUpdateByIdQuery(entity, id);
-
-        database.execute(updateByIdQuery);
+        return database.executeQueryAndGetGeneratedKey(updateByIdQuery);
     }
 
     public void delete(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-        DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
+        EntityBinder entityBinder = new EntityBinder(entity);
+        EntityId id = entityBinder.getEntityId();
 
-        Object id = getEntityId(entity);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String deleteByIdQuery = queryBuilder.buildDeleteByIdQuery(id);
 
         database.execute(deleteByIdQuery);
     }
 
-    private Object getEntityId(Object entity) {
+    private DMLQueryBuilder createDMLQueryBuilder(Object entity) {
+        Table table = createTable(entity);
+        return new DMLQueryBuilder(table);
+    }
+
+    private Table createTable(Object entity) {
         Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-
-        EntityBinder entityBinder = new EntityBinder(entity);
-
-        PKColumn pkColumn = table.getPKColumn();
-        return entityBinder.getValue(pkColumn);
+        return entityMetaCache.getTable(clazz);
     }
 }

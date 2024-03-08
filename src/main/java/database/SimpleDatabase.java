@@ -1,6 +1,7 @@
 package database;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityId;
 
 import java.util.List;
 
@@ -15,6 +16,12 @@ public class SimpleDatabase implements Database {
     @Override
     public void execute(String sql) {
         jdbcTemplate.execute(sql);
+    }
+
+    @Override
+    public EntityId executeQueryAndGetGeneratedKey(String sql) {
+        Object idValue = jdbcTemplate.queryAndGetGeneratedKey(sql);
+        return new EntityId(idValue);
     }
 
     @Override

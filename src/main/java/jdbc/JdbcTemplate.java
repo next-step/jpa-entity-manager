@@ -1,8 +1,6 @@
 package jdbc;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +36,33 @@ public class JdbcTemplate {
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Object queryAndGetGeneratedKey(final String sql) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            int affectedRows = statement.executeUpdate();
+            checkAffectedRows(affectedRows);
+
+            ResultSet keys = statement.getGeneratedKeys();
+            return getGeneratedKey(keys);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object getGeneratedKey(ResultSet keys) throws SQLException {
+        if (keys.next()) {
+            return keys.getObject(1);
+        }
+        throw new RuntimeException("No key was generated.");
+    }
+
+    private void checkAffectedRows(int affectedRows) {
+        if (affectedRows == 0) {
+            throw new RuntimeException("No rows were inserted.");
         }
     }
 }

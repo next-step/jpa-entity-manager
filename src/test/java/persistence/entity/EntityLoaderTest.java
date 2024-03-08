@@ -83,7 +83,8 @@ public class EntityLoaderTest {
     @Test
     @DisplayName("person을 이용하여 read 메서드 테스트")
     void read() {
-        Person3 result = loader.read(Person3.class, 3L);
+        EntityId id = new EntityId(3L);
+        Person3 result = loader.read(Person3.class, id);
 
         Person3 expect = new Person3(3L, "qwer3", 3, "email3@email.com");
         assertThat(result).isEqualTo(expect);

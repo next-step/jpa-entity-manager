@@ -4,6 +4,7 @@ import database.Database;
 import database.DatabaseServer;
 import database.H2;
 import database.SimpleDatabase;
+import jakarta.persistence.EntityExistsException;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,9 +24,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-class SimpleEntityMangerTest {
+class SimpleEntityManagerTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
@@ -33,6 +35,8 @@ class SimpleEntityMangerTest {
     private static DDLQueryBuilder ddlQueryBuilder;
     private static DMLQueryBuilder dmlQueryBuilder;
 
+    private static EntityPersister entityPersister;
+    private static EntityLoader entityLoader;
     private static EntityManager entityManager;
 
     @BeforeAll
@@ -45,9 +49,9 @@ class SimpleEntityMangerTest {
         Database database = new SimpleDatabase(jdbcTemplate);
 
         EntityMetaCache entityMetaCache = new EntityMetaCache();
-        EntityPersister persister = new EntityPersister(database, entityMetaCache);
-        EntityLoader loader = new EntityLoader(database, entityMetaCache);
-        entityManager = new SimpleEntityManger(persister, loader);
+        entityPersister = new EntityPersister(database, entityMetaCache);
+        entityLoader = new EntityLoader(database, entityMetaCache);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -67,16 +71,15 @@ class SimpleEntityMangerTest {
 
         Stream<Person3> persons = createPersons();
 
-        persons.forEach(person -> {
-            String insertQuery = dmlQueryBuilder.buildInsertQuery(person);
-            jdbcTemplate.execute(insertQuery);
-        });
+        persons.forEach(person -> entityManager.persist(person));
     }
 
     @AfterEach
     void setDown() {
         String dropQuery = ddlQueryBuilder.buildDropQuery();
         jdbcTemplate.execute(dropQuery);
+
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
     }
 
     private Stream<Person3> createPersons() {
@@ -90,7 +93,7 @@ class SimpleEntityMangerTest {
     @DisplayName("person을 이용하여 find 메서드 테스트")
     @ParameterizedTest
     @MethodSource
-    void find(Object id, Object person) {
+    void find(EntityId id, Object person) {
         Person3 result = entityManager.find(Person3.class, id);
 
         assertThat(result).isEqualTo(person);
@@ -102,9 +105,9 @@ class SimpleEntityMangerTest {
         Person3 person3 = new Person3(3L, "qwer3", 3, "email3@email.com");
 
         return Stream.of(
-                Arguments.arguments(1L, person1),
-                Arguments.arguments(2L, person2),
-                Arguments.arguments(3L, person3)
+                Arguments.arguments(new EntityId(1L), person1),
+                Arguments.arguments(new EntityId(2L), person2),
+                Arguments.arguments(new EntityId(3L), person3)
         );
     }
 
@@ -120,19 +123,40 @@ class SimpleEntityMangerTest {
         assertThat(findPerson).isEqualTo(expectPerson);
     }
 
-    @DisplayName("person이 이미 있는 경우 값을 update 한다.")
+    @DisplayName("이미 존재하는 엔티티인 경우 EntityExistException을 throw 한다.")
     @Test
-    void persistWithUpdate() {
+    void persistIsExist() {
+        Person3 person = new Person3(1L, "qwer", 1, "email@email.com");
+
+        assertThatThrownBy(() -> entityManager.persist(person))
+                .isInstanceOf(EntityExistsException.class);
+    }
+
+    @DisplayName("person이 없는 경우 엔티티를 create 한다.")
+    @Test
+    void merge() {
+        Person3 person = new Person3(4L, "qwer", 123, "email@email.com");
+
+        entityManager.merge(person);
+
+        Person3 result = findByIdPerson(4L);
+        assertThat(result).isEqualTo(person);
+    }
+
+    @DisplayName("person이 이미 있는 경우 엔티티를 update 한다.")
+    @Test
+    void mergeWithUpdate() {
         Person3 person = new Person3(1L, "qwerqwrwr", 1231231, "email@email,com");
 
-        entityManager.persist(person);
+        entityManager.merge(person);
 
         Person3 result = findByIdPerson(1L);
         assertThat(result).isEqualTo(person);
     }
 
-    private Person3 findByIdPerson(Long id) {
-        String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(id);
+    private Person3 findByIdPerson(Object id) {
+        EntityId entityId = new EntityId(id);
+        String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(entityId);
         return jdbcTemplate.queryForObject(findByIdQuery, new Person3RowMapper());
     }
 

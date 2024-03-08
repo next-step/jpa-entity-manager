@@ -4,6 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
+import persistence.entity.EntityId;
 import persistence.sql.ddl.DDLQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -90,7 +91,8 @@ public class QueryTest {
     @DisplayName("findById 쿼리 통합 테스트")
     void findByIdQuery() {
         Person3 person = new Person3(3L, "qwer3", 3, "email3@email.com");
-        Long id = person.getId();
+        Long idValue = person.getId();
+        EntityId id = new EntityId(idValue);
 
         String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(id);
         Person3 result = jdbcTemplate.queryForObject(findByIdQuery, new Person3RowMapper());
@@ -114,7 +116,8 @@ public class QueryTest {
     @DisplayName("deleteById 쿼리 통합 테스트")
     void deleteByIdQuery() {
         Person3 person = new Person3(3L, "qwer3", 3, "email3@email.com");
-        Long id = person.getId();
+        Long idValue = person.getId();
+        EntityId id = new EntityId(idValue);
 
         String deleteByIdQuery = dmlQueryBuilder.buildDeleteByIdQuery(id);
         jdbcTemplate.execute(deleteByIdQuery);

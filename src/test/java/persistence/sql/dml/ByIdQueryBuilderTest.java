@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import persistence.entity.EntityId;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person1;
 import persistence.study.sql.ddl.Person2;
@@ -17,7 +18,7 @@ public class ByIdQueryBuilderTest {
     @DisplayName("Person을 이용하여 byId 쿼리 생성하기")
     @ParameterizedTest
     @MethodSource
-    void build(Table table, Object id, String byIdQuery) {
+    void build(Table table, EntityId id, String byIdQuery) {
         ByIdQueryBuilder byIdQueryBuilder = new ByIdQueryBuilder(table, id);
 
         String result = byIdQueryBuilder.build();
@@ -27,9 +28,9 @@ public class ByIdQueryBuilderTest {
 
     private static Stream<Arguments> build() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), 1L, "id=1"),
-                Arguments.arguments(new Table(Person2.class), 2L, "id=2"),
-                Arguments.arguments(new Table(Person3.class), 500L, "id=500")
+                Arguments.arguments(new Table(Person1.class), new EntityId(1L), "id=1"),
+                Arguments.arguments(new Table(Person2.class), new EntityId(2L), "id=2"),
+                Arguments.arguments(new Table(Person3.class), new EntityId(500L), "id=500")
         );
     }
 }
