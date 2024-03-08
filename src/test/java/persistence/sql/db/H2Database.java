@@ -46,7 +46,6 @@ public abstract class H2Database {
     protected static EntityPersister entityPersister;
 
     protected static EntityManager entityManager;
-    protected static PersistenceContext persistenceContext;
 
     @BeforeAll
     static void setUpAll() throws SQLException {
@@ -59,7 +58,6 @@ public abstract class H2Database {
         deleteQueryBuilder = DeleteQueryBuilder.getInstance();
         entityLoaderMapper = EntityLoaderMapper.getInstance();
 
-        persistenceContext = new PersistenceContextImpl();
         entityPersister = new EntityPersisterImpl(
                 jdbcTemplate,
                 insertQueryBuilder,
@@ -69,8 +67,7 @@ public abstract class H2Database {
                 jdbcTemplate,
                 entityLoaderMapper,
                 selectQueryBuilder);
-
-        entityManager = new EntityManagerImpl(entityLoader, entityPersister, persistenceContext);
+        entityManager = new EntityManagerImpl(entityLoader, entityPersister);
 
         createTable();
     }

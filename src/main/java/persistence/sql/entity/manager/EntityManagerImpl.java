@@ -2,6 +2,7 @@ package persistence.sql.entity.manager;
 
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.context.PersistenceContext;
+import persistence.sql.entity.context.PersistenceContextImpl;
 import persistence.sql.entity.loader.EntityLoader;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.persister.EntityPersister;
@@ -16,11 +17,10 @@ public class EntityManagerImpl implements EntityManager {
 
 
     public EntityManagerImpl(final EntityLoader entityLoader,
-                             final EntityPersister entityPersister,
-                             final PersistenceContext persistenceContext) {
+                             final EntityPersister entityPersister) {
         this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
-        this.persistenceContext = persistenceContext;
+        this.persistenceContext = new PersistenceContextImpl();
     }
 
     @Override
@@ -52,11 +52,25 @@ public class EntityManagerImpl implements EntityManager {
         final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
         final Object key = pkDomainType.getValue();
 
-        Object cacheEntity = persistenceContext.getEntity(entity.getClass(), key);
+        final Object cacheEntity = persistenceContext.getEntity(entity.getClass(), key);
         if(cacheEntity == null) {
-            Object newKey = entityPersister.insertWithPk(entity);
-            insertEntityLoader(entity, newKey);
+            insertEntity(entity);
         }
+
+        final Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), key);
+        if(!entity.equals(snapshotEntity)) {
+            updateEntity(entity, key);
+        }
+    }
+
+    private void insertEntity(final Object entity) {
+        Object newKey = entityPersister.insertWithPk(entity);
+        insertEntityLoader(entity, newKey);
+    }
+
+    private void updateEntity(final Object entity, final Object key) {
+        entityPersister.update(entity);
+        insertEntityLoader(entity, key);
     }
 
     @Override
@@ -69,19 +83,5 @@ public class EntityManagerImpl implements EntityManager {
     public void removeAll(final Class<?> clazz) {
         entityPersister.deleteAll(clazz);
         persistenceContext.removeAll();
-    }
-
-    @Override
-    public void merge(Object entity) {
-        final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
-        final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
-        final Object key = pkDomainType.getValue();
-
-        Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), key);
-
-        if(!entity.equals(snapshotEntity)) {
-            entityPersister.update(entity);
-            insertEntityLoader(entity, key);
-        }
     }
 }
