@@ -17,13 +17,13 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T> T getEntity(Class<T> clazz, Object id) {
+    public <T> T getEntity(Class<T> clazz, EntityId id) {
         EntityKey key = new EntityKey(clazz, id);
         return (T) cache.get(key);
     }
 
     @Override
-    public void addEntity(Object id, Object entity) {
+    public void addEntity(EntityId id, Object entity) {
         bindEntityId(entity, id);
 
         EntityKey key = createEntityKey(entity, id);
@@ -31,14 +31,15 @@ public class SimplePersistenceContext implements PersistenceContext {
         snapshot.put(key, entity);
     }
 
-    private void bindEntityId(Object entity, Object id) {
+    private void bindEntityId(Object entity, EntityId id) {
         Class<?> clazz = entity.getClass();
         Table table = new Table(clazz);
 
         EntityBinder entityBinder = new EntityBinder(entity);
 
         PKColumn pkColumn = table.getPKColumn();
-        entityBinder.bindValue(pkColumn, id);
+        Object idValue = id.value();
+        entityBinder.bindValue(pkColumn, idValue);
     }
 
     @Override
@@ -54,19 +55,20 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getDatabaseSnapshot(Object id, Object entity) {
+    public Object getDatabaseSnapshot(EntityId id, Object entity) {
         EntityKey key = createEntityKey(entity, id);
         return snapshot.get(key);
     }
 
-    private EntityKey createEntityKey(Object entity, Object id) {
+    private EntityKey createEntityKey(Object entity, EntityId id) {
         Class<?> clazz = entity.getClass();
         return new EntityKey(clazz, id);
     }
 
     private EntityKey createEntityKey(Object entity) {
         Class<?> clazz = entity.getClass();
-        Object id = getEntityId(entity);
+        Object idValue = getEntityId(entity);
+        EntityId id = new EntityId(idValue);
         return new EntityKey(clazz, id);
     }
 

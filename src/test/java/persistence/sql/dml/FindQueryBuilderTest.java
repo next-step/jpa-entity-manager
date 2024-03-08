@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import persistence.entity.EntityBinder;
+import persistence.entity.EntityId;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person1;
@@ -43,7 +44,8 @@ class FindQueryBuilderTest {
         PKColumn pkColumn = table.getPKColumn();
         EntityBinder entityBinder = new EntityBinder(person);
 
-        Object id = entityBinder.getValue(pkColumn);
+        Object idValue = entityBinder.getValue(pkColumn);
+        EntityId id = new EntityId(idValue);
         FindQueryBuilder findQueryBuilder = new FindQueryBuilder(table);
 
         String result = findQueryBuilder.buildById(id);

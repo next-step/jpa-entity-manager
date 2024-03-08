@@ -14,13 +14,15 @@ class SimplePersistenceContextTest {
 
     @BeforeEach
     void setUp() {
-        persistenceContext.addEntity(1L, person);
+        EntityId id = new EntityId(1L);
+        persistenceContext.addEntity(id, person);
     }
 
     @DisplayName("1차 캐시에서 엔티티를 정상적으로 가져온다.")
     @Test
     void getEntity() {
-        Object result = persistenceContext.getEntity(Person3.class, 1L);
+        EntityId id = new EntityId(1L);
+        Object result = persistenceContext.getEntity(Person3.class, id);
 
         assertThat(result).isEqualTo(person);
     }
@@ -30,9 +32,10 @@ class SimplePersistenceContextTest {
     void addEntity() {
         Person3 person = new Person3(2L, "qwer", 123, "email@email.com");
 
-        persistenceContext.addEntity(2L, person);
+        EntityId id = new EntityId(2L);
+        persistenceContext.addEntity(id, person);
 
-        Object result = persistenceContext.getEntity(Person3.class, 2L);
+        Object result = persistenceContext.getEntity(Person3.class, id);
         assertThat(result).isEqualTo(person);
     }
 
@@ -41,7 +44,8 @@ class SimplePersistenceContextTest {
     void removeEntity() {
         persistenceContext.removeEntity(person);
 
-        Object result = persistenceContext.getEntity(Person3.class, 1L);
+        EntityId id = new EntityId(1L);
+        Object result = persistenceContext.getEntity(Person3.class, id);
         assertThat(result).isNull();
     }
 
@@ -50,15 +54,16 @@ class SimplePersistenceContextTest {
     void identity() {
         Person3 person = new Person3(2L, "qwer1", 123, "email1@email.com");
 
-        persistenceContext.addEntity(2L, person);
-        Object result = persistenceContext.getEntity(Person3.class, 2L);
+        EntityId id = new EntityId(2L);
+        persistenceContext.addEntity(id, person);
+        Object result = persistenceContext.getEntity(Person3.class, id);
 
         assertThat(person == result).isTrue();
     }
 
     @Test
     void getDatabaseSnapshot() {
-        Object result = persistenceContext.getDatabaseSnapshot(1L, person);
+        Object result = persistenceContext.getDatabaseSnapshot(new EntityId(1L), person);
 
         assertThat(result == person).isTrue();
     }

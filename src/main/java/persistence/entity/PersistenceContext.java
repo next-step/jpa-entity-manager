@@ -2,13 +2,13 @@ package persistence.entity;
 
 public interface PersistenceContext {
 
-    <T> T getEntity(Class<T> clazz, Object id);
+    <T> T getEntity(Class<T> clazz, EntityId id);
 
-    void addEntity(Object id, Object entity);
+    void addEntity(EntityId id, Object entity);
 
     void removeEntity(Object entity);
 
     boolean isCached(Object entity);
 
-    Object getDatabaseSnapshot(Object id, Object entity);
+    Object getDatabaseSnapshot(EntityId id, Object entity);
 }

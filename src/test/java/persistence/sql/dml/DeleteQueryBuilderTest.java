@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import persistence.entity.EntityBinder;
+import persistence.entity.EntityId;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person1;
@@ -36,7 +37,9 @@ class DeleteQueryBuilderTest {
     void buildById(Table table, Object instance, String deleteByIdQuery) {
         PKColumn pkColumn = table.getPKColumn();
         EntityBinder entityBinder = new EntityBinder(instance);
-        Object id = entityBinder.getValue(pkColumn);
+
+        Object idValue = entityBinder.getValue(pkColumn);
+        EntityId id = new EntityId(idValue);
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(table);
 
         String result = deleteQueryBuilder.buildById(id);

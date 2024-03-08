@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import persistence.entity.EntityBinder;
+import persistence.entity.EntityId;
 import persistence.sql.model.Column;
 import persistence.sql.model.Columns;
 import persistence.sql.model.PKColumn;
@@ -21,7 +22,7 @@ public class UpdateQueryBuilder {
         this.entityBinder = new EntityBinder(entity);
     }
 
-    public String buildById(Object id) {
+    public String buildById(EntityId id) {
         ByIdQueryBuilder byIdQueryBuilder = new ByIdQueryBuilder(table, id);
 
         String tableName = table.getName();
@@ -38,7 +39,8 @@ public class UpdateQueryBuilder {
 
     private String buildColumnsValueClause() {
         PKColumn pkColumn = table.getPKColumn();
-        Object id = entityBinder.getValue(pkColumn);
+        Object idValue = entityBinder.getValue(pkColumn);
+        EntityId id = new EntityId(idValue);
         String pkValueClause = String.format("%s,", id);
 
         Columns columns = table.getColumns();

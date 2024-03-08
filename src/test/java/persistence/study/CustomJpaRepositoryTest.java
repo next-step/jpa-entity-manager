@@ -79,7 +79,7 @@ public class CustomJpaRepositoryTest {
 
         entityManager.merge(changePerson);
 
-        Person3 expect = entityManager.find(Person3.class, 1L);
+        Person3 expect = entityManager.find(Person3.class, new EntityId(1L));
         assertThat(changePerson).isEqualTo(expect);
     }
 }

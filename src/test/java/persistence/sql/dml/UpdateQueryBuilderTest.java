@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityId;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person3;
 
@@ -15,7 +16,8 @@ class UpdateQueryBuilderTest {
         Person3 person = new Person3(1L, "qwer", 123, "qwe@qwe.com");
         UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(table, person);
 
-        String result = updateQueryBuilder.buildById(1L);
+        EntityId id = new EntityId(1L);
+        String result = updateQueryBuilder.buildById(id);
 
         assertThat(result).isEqualTo("UPDATE users SET (id,nick_name,old,email) = (1,'qwer',123,'qwe@qwe.com') WHERE id=1;");
     }

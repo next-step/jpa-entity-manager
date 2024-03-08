@@ -1,5 +1,7 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityId;
+import persistence.entity.EntityKey;
 import persistence.sql.model.Table;
 
 public class DMLQueryBuilder {
@@ -20,12 +22,12 @@ public class DMLQueryBuilder {
         return findQueryBuilder.build();
     }
 
-    public String buildFindByIdQuery(Object id) {
+    public String buildFindByIdQuery(EntityId id) {
         FindQueryBuilder findQueryBuilder = new FindQueryBuilder(table);
         return findQueryBuilder.buildById(id);
     }
 
-    public String buildUpdateByIdQuery(Object entity, Object id) {
+    public String buildUpdateByIdQuery(Object entity, EntityId id) {
         UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(table, entity);
         return updateQueryBuilder.buildById(id);
     }
@@ -35,7 +37,7 @@ public class DMLQueryBuilder {
         return deleteQueryBuilder.build();
     }
 
-    public String buildDeleteByIdQuery(Object id) {
+    public String buildDeleteByIdQuery(EntityId id) {
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(table);
         return deleteQueryBuilder.buildById(id);
     }

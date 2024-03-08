@@ -19,7 +19,7 @@ public class SimpleEntityManger implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object id) {
+    public <T> T find(Class<T> clazz, EntityId id) {
         T cachedEntity = persistenceContext.getEntity(clazz, id);
         if (cachedEntity != null) {
             return cachedEntity;
@@ -35,20 +35,20 @@ public class SimpleEntityManger implements EntityManager {
         if (isExist(entity)) {
             throw new EntityExistsException();
         }
-        Object id = persister.create(entity);
+        EntityId id = persister.create(entity);
         persistenceContext.addEntity(id, entity);
     }
 
     @Override
     public void merge(Object entity) {
         if (!isExist(entity)) {
-            Object id = persister.create(entity);
+            EntityId id = persister.create(entity);
             persistenceContext.addEntity(id, entity);
             return;
         }
 
         if (isDirty(entity)) {
-            Object id = persister.update(entity);
+            EntityId id = persister.update(entity);
             persistenceContext.addEntity(id, entity);
         }
     }
@@ -61,7 +61,7 @@ public class SimpleEntityManger implements EntityManager {
         Class<?> clazz = entity.getClass();
         Table table = new Table(clazz);
 
-        Object id = getEntityId(entity);
+        EntityId id = getEntityId(entity);
         Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
         if (snapshot == null) {
             snapshot = find(clazz, id);
@@ -79,14 +79,15 @@ public class SimpleEntityManger implements EntityManager {
                 });
     }
 
-    private Object getEntityId(Object entity) {
+    private EntityId getEntityId(Object entity) {
         Class<?> clazz = entity.getClass();
         Table table = new Table(clazz);
 
         EntityBinder entityBinder = new EntityBinder(entity);
 
         PKColumn pkColumn = table.getPKColumn();
-        return entityBinder.getValue(pkColumn);
+        Object idValue = entityBinder.getValue(pkColumn);
+        return new EntityId(idValue);
     }
 
     @Override

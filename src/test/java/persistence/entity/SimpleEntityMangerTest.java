@@ -93,7 +93,7 @@ class SimpleEntityMangerTest {
     @DisplayName("person을 이용하여 find 메서드 테스트")
     @ParameterizedTest
     @MethodSource
-    void find(Object id, Object person) {
+    void find(EntityId id, Object person) {
         Person3 result = entityManager.find(Person3.class, id);
 
         assertThat(result).isEqualTo(person);
@@ -105,9 +105,9 @@ class SimpleEntityMangerTest {
         Person3 person3 = new Person3(3L, "qwer3", 3, "email3@email.com");
 
         return Stream.of(
-                Arguments.arguments(1L, person1),
-                Arguments.arguments(2L, person2),
-                Arguments.arguments(3L, person3)
+                Arguments.arguments(new EntityId(1L), person1),
+                Arguments.arguments(new EntityId(2L), person2),
+                Arguments.arguments(new EntityId(3L), person3)
         );
     }
 
@@ -154,8 +154,9 @@ class SimpleEntityMangerTest {
         assertThat(result).isEqualTo(person);
     }
 
-    private Person3 findByIdPerson(Long id) {
-        String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(id);
+    private Person3 findByIdPerson(Object id) {
+        EntityId entityId = new EntityId(id);
+        String findByIdQuery = dmlQueryBuilder.buildFindByIdQuery(entityId);
         return jdbcTemplate.queryForObject(findByIdQuery, new Person3RowMapper());
     }
 

@@ -80,13 +80,14 @@ class EntityPersisterTest {
     void create() {
         Person3 person3 = new Person3("qwer", 12, "qwe@ema.com");
 
-        Object id = persister.create(person3);
+        EntityId id = persister.create(person3);
         Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=4L", new EntityRowMapper<>(Person3.class));
 
-        Person3 expect = new Person3(4L, "qwer", 12, "qwe@ema.com");
+        Person3 expectPerson = new Person3(4L, "qwer", 12, "qwe@ema.com");
+        EntityId expectId = new EntityId(4L);
         assertSoftly(softly -> {
-            softly.assertThat(result).isEqualTo(expect);
-            softly.assertThat(id).isEqualTo(4L);
+            softly.assertThat(result).isEqualTo(expectPerson);
+            softly.assertThat(id).isEqualTo(expectId);
         });
     }
 
@@ -94,13 +95,14 @@ class EntityPersisterTest {
     void update() {
         Person3 person = new Person3(2L, "qwer", 12, "qwe@ema.com");
 
-        Object id = persister.update(person);
-        Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=2L", new EntityRowMapper<>(Person3.class));
+        EntityId id = persister.update(person);
+        Person3 result = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id=2", new EntityRowMapper<>(Person3.class));
 
-        Person3 expect = new Person3(2L, "qwer", 12, "qwe@ema.com");
+        Person3 expectPerson = new Person3(2L, "qwer", 12, "qwe@ema.com");
+        EntityId expectId = new EntityId(2L);
         assertSoftly(softly -> {
-            softly.assertThat(result).isEqualTo(expect);
-            softly.assertThat(id).isEqualTo(2L);
+            softly.assertThat(result).isEqualTo(expectPerson);
+            softly.assertThat(id).isEqualTo(expectId);
         });
     }
 

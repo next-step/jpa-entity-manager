@@ -6,9 +6,9 @@ public class EntityKey {
 
     private final Class<?> clazz;
 
-    private final Object id;
+    private final EntityId id;
 
-    public EntityKey(Class<?> clazz, Object id) {
+    public EntityKey(Class<?> clazz, EntityId id) {
         this.clazz = clazz;
         this.id = id;
     }
@@ -17,7 +17,7 @@ public class EntityKey {
         return clazz;
     }
 
-    public Object getId() {
+    public EntityId getId() {
         return id;
     }
 
