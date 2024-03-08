@@ -13,6 +13,4 @@ public interface EntityManager {
     void remove(Object entity);
 
     void removeAll(Class<?> clazz);
-
-    void merge(Object entity);
 }
