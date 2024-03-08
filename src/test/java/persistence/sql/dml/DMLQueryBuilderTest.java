@@ -5,13 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.core.EntityMetaManager;
 import persistence.entity.Person;
+import persistence.entity.metadata.EntityMetadata;
 import persistence.sql.dml.DMLQueryBuilder;
 
 public class DMLQueryBuilderTest {
 
     private Person person;
-    private DMLQueryBuilder dmlQueryBuilder;
+    private DMLQueryBuilder dmlQueryBuilder = DMLQueryBuilder.getInstance();
+    private EntityMetaManager entityMetaManager = EntityMetaManager.getInstance();
 
     final String name = "kassy";
     final int age = 30;
@@ -23,14 +26,13 @@ public class DMLQueryBuilderTest {
         person.setName(name);
         person.setAge(age);
         person.setEmail(email);
-
-        dmlQueryBuilder = DMLQueryBuilder.getInstance();
     }
 
     @Test
     @DisplayName("insert 쿼리 생성")
     public void insertQueryTest() {
-        String query = dmlQueryBuilder.insertSql(person);
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
+        String query = dmlQueryBuilder.insertSql(entityMetadata.getTableName(), entityMetadata.getColumns(), entityMetadata.getColumnValues(person));
 
         assertEquals("INSERT INTO users (nick_name, old, email) VALUES ('"+name+"', "+age+", '"+email+"')", query);
     }
@@ -38,7 +40,8 @@ public class DMLQueryBuilderTest {
     @Test
     @DisplayName("selectAll 쿼리 생성")
     public void selectAllQueryTest() {
-        String query = dmlQueryBuilder.selectAllSql(Person.class);
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
+        String query = dmlQueryBuilder.selectAllSql(entityMetadata.getTableName(), entityMetadata.getColumns());
 
         assertEquals("SELECT id, nick_name, old, email FROM users", query);
     }
@@ -46,7 +49,8 @@ public class DMLQueryBuilderTest {
     @Test
     @DisplayName("selectById 쿼리 생성")
     void selectByIdSqlTest() {
-        String query = dmlQueryBuilder.selectByIdQuery(Person.class, 1L);
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
+        String query = dmlQueryBuilder.selectByIdQuery(entityMetadata.getTableName(), entityMetadata.getColumns(), 1L);
 
         assertEquals("SELECT id, nick_name, old, email FROM users WHERE id = 1", query);
     }
@@ -55,7 +59,8 @@ public class DMLQueryBuilderTest {
     @DisplayName("delete 쿼리 생성")
     void deleteSqlTest() {
         person.setId(1L);
-        String query = dmlQueryBuilder.deleteSql(person);
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
+        String query = dmlQueryBuilder.deleteSql(entityMetadata.getTableName(), entityMetadata.getColumns(), entityMetadata.getColumnValues(person));
 
         assertEquals("DELETE FROM users WHERE id = 1", query);
     }
@@ -64,7 +69,8 @@ public class DMLQueryBuilderTest {
     @DisplayName("update 쿼리 생성")
     void updateSqlTest() {
         person.setId(1L);
-        String query = dmlQueryBuilder.updateSql(person);
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
+        String query = dmlQueryBuilder.updateSql(entityMetadata.getTableName(), entityMetadata.getColumns(), entityMetadata.getColumnValues(person));
 
         assertEquals("UPDATE users SET nick_name = '"+name+"', old = "+age+", email = '"+email+"' WHERE id = 1", query);
     }

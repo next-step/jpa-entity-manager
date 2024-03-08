@@ -1,5 +1,8 @@
 package persistence.sql.ddl;
 
+import persistence.core.EntityMetaManager;
+import persistence.entity.metadata.EntityMetadata;
+
 public class DDLQueryBuilder {
     private final DDLSqlGenerator ddlSqlGenerator;
 
@@ -7,12 +10,12 @@ public class DDLQueryBuilder {
         this.ddlSqlGenerator = ddlSqlGenerator;
     }
 
-    public String createTableQuery(Class<?> clzz) {
-        return ddlSqlGenerator.genCreateTableQuery(clzz);
+    public String createTableQuery(EntityMetadata entityMetadata) {
+        return ddlSqlGenerator.genCreateTableQuery(entityMetadata.getTableName(), entityMetadata.getColumns().getColumns());
     }
 
-    public String dropTableQuery(Class<?> clzz) {
-        return ddlSqlGenerator.genDropTableQuery(clzz);
+    public String dropTableQuery(EntityMetadata entityMetadata) {
+        return ddlSqlGenerator.genDropTableQuery(entityMetadata.getTableName());
     }
 
 }

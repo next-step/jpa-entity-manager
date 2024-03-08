@@ -13,12 +13,18 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
-    public void execute(final String sql) {
+    public Object execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
-            statement.execute(sql);
+            statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {

@@ -3,23 +3,24 @@ package persistence.core;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
-import org.h2.jdbc.JdbcSQLSyntaxErrorException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.Person;
-import persistence.sql.dml.DMLQueryBuilder;
 
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EntityPersisterTest {
+class DefaultEntityPersisterTest {
 
     private DatabaseServer server;
     JdbcTemplate jdbcTemplate;
     DDLExcuteor ddlExcuteor;
-    EntityPersister entityPersister;
+    DefaultEntityPersister entityPersister;
+    DefaultEntityLoader entityLoader;
+
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -27,11 +28,11 @@ class EntityPersisterTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         ddlExcuteor = new DDLExcuteor(jdbcTemplate);
-        EntityContextManager.loadEntities();
 
         createTable();
 
-        entityPersister = new EntityPersister(jdbcTemplate, Person.class);
+        entityPersister = new DefaultEntityPersister(jdbcTemplate);
+        entityLoader = new DefaultEntityLoader(jdbcTemplate);
     }
 
     @AfterEach
@@ -56,35 +57,13 @@ class EntityPersisterTest {
         return person;
     }
 
-    private Person selectedData() {
-        Person person = new Person();
-        person.setId(1L);
-        person.setName("jinny");
-        person.setAge(30);
-        person.setEmail("test@test.com");
-        return person;
-    }
-
     @Test
+    @DisplayName("insert Test")
     public void insertTest() throws Exception {
-        insert(getInsertData());
+        Person insertData = getInsertData();
+        insert(insertData);
 
-        Person select = select(1L);
-
-        assertAll(
-                () -> assertNotNull(select),
-                () -> assertEquals(select.getId(), 1L),
-                () -> assertEquals(select.getName(), "jinny"),
-                () -> assertEquals(select.getAge(), 30)
-        );
-
-    }
-
-    @Test
-    public void selectTest() throws Exception {
-        insert(getInsertData());
-
-        Person select = select(1L);
+        Person select = select(insertData.getClass(), 1L);
 
         assertAll(
                 () -> assertNotNull(select),
@@ -96,21 +75,42 @@ class EntityPersisterTest {
     }
 
     @Test
+    @DisplayName("delete후 해당 id로 조회가 되면 안됨")
     public void deleteTest() throws Exception {
-        insert(getInsertData());
-        entityPersister.delete(select(1L));
+        Person insertData = getInsertData();
+        insert(insertData);
+        entityPersister.delete(select(insertData.getClass(), 1L));
 
-        assertThrowsExactly(RuntimeException.class, () -> select(1L));
+        assertThrowsExactly(RuntimeException.class, () -> select(insertData.getClass(), 1L));
     }
 
-    private <T> void insert(T entity) {
-        entityPersister.insert(entity);
+    @Test
+    @DisplayName("update후 entity에 변경된 정보 반영")
+    public void updateTest() throws Exception {
+        Person insertData = getInsertData();
+        Long id = insert(getInsertData());
+        insertData.setId(id);
+        insertData.setAge(33);
+
+        update(insertData);
+
+        Person select = select(insertData.getClass(), id);
+        assertAll(
+            () -> assertEquals(select.getAge(), 33)
+        );
     }
 
-    private <T> T select(Long id) throws Exception {
-        return entityPersister.select(Person.class, id);
+
+    private <T> Long insert(T entity) {
+        return entityPersister.insert(entity);
     }
 
+    private <T> T select(Class<T> entityClass, Long id) throws Exception {
+        return entityLoader.find(entityClass, id);
+    }
 
+    private <T> void update(T entity) throws Exception {
+        entityPersister.update(entity);
+    }
 
 }

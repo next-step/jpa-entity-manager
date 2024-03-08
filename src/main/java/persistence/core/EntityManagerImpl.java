@@ -6,39 +6,29 @@ import jdbc.JdbcTemplate;
 import java.sql.SQLException;
 
 public class EntityManagerImpl implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(DatabaseServer server) throws SQLException {
-        this.jdbcTemplate = new JdbcTemplate(server.getConnection());
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+        this.entityLoader = new DefaultEntityLoader(jdbcTemplate);
+        this.entityPersister = new DefaultEntityPersister(jdbcTemplate);
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) throws Exception {
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, clazz);
-
-        return entityPersister.select(clazz, Id);
+    public <T> T find(Class<T> clazz, Object Id) {
+        return entityLoader.find(clazz, (Long) Id);
     }
 
     @Override
-    public <T> T persist(T entity) throws SQLException {
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entity.getClass());
-
-        entityPersister.insert(entity);
-
-        return entity;
+    public void persist(Object entity) {
+        Long id = entityPersister.insert(entity);
+        entityPersister.setIdentifier(entity, id);
     }
 
     @Override
-    public void remove(Object entity) throws Exception {
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entity.getClass());
-
+    public void remove(Object entity) {
         entityPersister.delete(entity);
     }
 
-    @Override
-    public void update(Object entity) throws Exception {
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entity.getClass());
-
-        entityPersister.update(entity);
-    }
 }

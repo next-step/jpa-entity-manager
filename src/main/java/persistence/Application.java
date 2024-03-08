@@ -5,7 +5,7 @@ import database.H2;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.core.EntityContextManager;
+import persistence.core.EntityMetaManager;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -14,7 +14,8 @@ public class Application {
         logger.info("Starting application...");
         try {
 
-            EntityContextManager.loadEntities();
+            EntityMetaManager entityMetaManager = EntityMetaManager.getInstance();
+            entityMetaManager.loadEntities();
 
             final DatabaseServer server = new H2();
             server.start();

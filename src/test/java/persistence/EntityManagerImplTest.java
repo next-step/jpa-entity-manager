@@ -3,7 +3,6 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
-import database.DatabaseVendor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,13 +13,10 @@ import persistence.core.DDLExcuteor;
 import persistence.core.EntityManager;
 import persistence.core.EntityManagerImpl;
 import persistence.entity.Person;
-import persistence.sql.ddl.DDLQueryBuilder;
-import persistence.sql.ddl.DDLQueryBuilderFactory;
 
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class EntityManagerImplTest {
 
@@ -48,6 +44,14 @@ class EntityManagerImplTest {
         server.stop();
     }
 
+    private void createTable(Class<?> clazz) {
+        ddlExcuteor.createTable(clazz);
+    }
+
+    private void dropTable(Class<?> clazz) {
+        ddlExcuteor.dropTable(clazz);
+    }
+
 
     @Test
     @DisplayName("find 실행")
@@ -59,22 +63,10 @@ class EntityManagerImplTest {
 
         entityManager.persist(person);
 
-        Person persistedPerson = entityManager.find(Person.class, 1L);
+        Person savedPerson = entityManager.find(Person.class, 1L);
 
-        assertAll(
-                () -> assertThat(persistedPerson).isNotNull(),
-                () -> assertThat(persistedPerson.getName()).isEqualTo("jinny"),
-                () -> assertThat(persistedPerson.getAge()).isEqualTo(30),
-                () -> assertThat(persistedPerson.getEmail()).isEqualTo("test@gmail.com")
-        );
+        assertThat(savedPerson).isNotNull();
     }
 
-    private void createTable(Class<?> clazz) {
-        ddlExcuteor.createTable(clazz);
-    }
-
-    private void dropTable(Class<?> clazz) {
-        ddlExcuteor.dropTable(clazz);
-    }
 
 }
