@@ -11,7 +11,7 @@ public class SimpleColumn implements Column {
     private final boolean isNullable;
     private final GenerationType generationType;
     private final Class<?> type;
-    private SimpleValue simpleValue;
+    private Object value;
 
 
     public SimpleColumn(final String name, final boolean isNullable, final GenerationType generationType,
@@ -23,12 +23,12 @@ public class SimpleColumn implements Column {
     }
 
     public SimpleColumn(final String name, final boolean isNullable, final GenerationType generationType,
-                        final Class<?> type,final SimpleValue simpleValue) {
+                        final Class<?> type, final Object value) {
         this.name = name;
         this.isNullable = isNullable;
         this.generationType = generationType;
         this.type = type;
-        this.simpleValue = simpleValue;
+        this.value = value;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class SimpleColumn implements Column {
 
     @Override
     public Object value() {
-        return this.simpleValue.getValue();
+        return this.value;
     }
 
     @Override
@@ -61,12 +61,12 @@ public class SimpleColumn implements Column {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         final SimpleColumn that = (SimpleColumn) object;
-        return isNullable == that.isNullable && Objects.equals(name, that.name) && generationType == that.generationType && Objects.equals(type, that.type) && Objects.equals(simpleValue, that.simpleValue);
+        return isNullable == that.isNullable && Objects.equals(name, that.name) && generationType == that.generationType && Objects.equals(type, that.type) && Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, isNullable, generationType, type, simpleValue);
+        return Objects.hash(name, isNullable, generationType, type, value);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class SimpleColumn implements Column {
                 ", isNullable=" + isNullable +
                 ", generationType=" + generationType +
                 ", type=" + type +
-                ", simpleValue=" + simpleValue +
+                ", value=" + value +
                 '}';
     }
 }

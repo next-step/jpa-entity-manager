@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomJpaRepositoryTest {
 
-    private EntityManager entityManager;
+    private EntityManagerImpl entityManager;
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach

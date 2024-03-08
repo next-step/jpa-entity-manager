@@ -9,6 +9,4 @@ public interface EntityManager {
     Object merge(Object entity);
 
     void remove(Object entity);
-
-    boolean isDirty(Object entity);
 }

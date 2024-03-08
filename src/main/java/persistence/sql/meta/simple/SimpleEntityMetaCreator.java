@@ -114,20 +114,20 @@ public class SimpleEntityMetaCreator  {
                 field.getType(), createSimpleValue(field, object));
     }
     private static SimpleColumn createColumnValueById(final Field field, final Long id) {
-        Object key = null;
+        Object value = null;
         try {
             field.setAccessible(true);
-            key = field.get(new Person(id));
+            value = field.get(new Person(id));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+
         return new SimpleColumn(getFieldName(field), isNullable(field), generateType(field),
-//                field.getType(), createSimpleValue(field, id));
-                field.getType(), new SimpleValue(key));
+                field.getType(), value);
     }
 
 
-    private static SimpleValue createSimpleValue(Field field, Object object) {
+    private static Object createSimpleValue(Field field, Object object) {
         field.setAccessible(true);
         Object value;
         try {
@@ -137,15 +137,14 @@ public class SimpleEntityMetaCreator  {
         }
 
         if (field.getType().equals(String.class)) {
-            return new SimpleValue(String.format("'%s'", value));
+            return String.format("'%s'", value);
         }
 
         if (field.getType().equals(Long.class)) {
-//            return new SimpleValue( String.format("%dL", value));
-            return new SimpleValue(value);
+            return value;
         }
 
-        return new SimpleValue(String.valueOf(value));
+        return String.valueOf(value);
     }
 
     public static String getFieldName(final Field field) {

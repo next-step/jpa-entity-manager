@@ -64,7 +64,6 @@ public class EntityManagerImpl implements EntityManager {
         entityPersister.delete(entity);
     }
 
-    @Override
     public boolean isDirty(Object entity) {
         final PrimaryKey key = createPrimaryKeyValue(entity);
 
