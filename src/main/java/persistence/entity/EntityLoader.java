@@ -2,7 +2,6 @@ package persistence.entity;
 
 import database.Database;
 import persistence.sql.dml.DMLQueryBuilder;
-import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 
 import java.util.List;
@@ -29,21 +28,12 @@ public class EntityLoader {
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
 
-        EntityId id = getEntityId(entity);
+        EntityBinder entityBinder = new EntityBinder(entity);
+        EntityId id = entityBinder.getEntityId();
+
         String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
 
         List<?> results = database.executeQuery(clazz, findByIdQuery);
         return !results.isEmpty();
-    }
-
-    private EntityId getEntityId(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = entityMetaCache.getTable(clazz);
-
-        EntityBinder entityBinder = new EntityBinder(entity);
-
-        PKColumn pkColumn = table.getPKColumn();
-        Object idValue = entityBinder.getValue(pkColumn);
-        return new EntityId(idValue);
     }
 }

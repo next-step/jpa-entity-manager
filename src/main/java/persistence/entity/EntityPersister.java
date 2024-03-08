@@ -22,17 +22,19 @@ public class EntityPersister {
     }
 
     public EntityId update(Object entity) {
-        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
+        EntityBinder entityBinder = new EntityBinder(entity);
+        EntityId id = entityBinder.getEntityId();
 
-        EntityId id = getEntityId(entity);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String updateByIdQuery = queryBuilder.buildUpdateByIdQuery(entity, id);
         return database.executeQueryAndGetGeneratedKey(updateByIdQuery);
     }
 
     public void delete(Object entity) {
-        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
+        EntityBinder entityBinder = new EntityBinder(entity);
+        EntityId id = entityBinder.getEntityId();
 
-        EntityId id = getEntityId(entity);
+        DMLQueryBuilder queryBuilder = createDMLQueryBuilder(entity);
         String deleteByIdQuery = queryBuilder.buildDeleteByIdQuery(id);
 
         database.execute(deleteByIdQuery);
@@ -46,15 +48,5 @@ public class EntityPersister {
     private Table createTable(Object entity) {
         Class<?> clazz = entity.getClass();
         return entityMetaCache.getTable(clazz);
-    }
-
-    private EntityId getEntityId(Object entity) {
-        Table table = createTable(entity);
-
-        EntityBinder entityBinder = new EntityBinder(entity);
-
-        PKColumn pkColumn = table.getPKColumn();
-        Object idValue = entityBinder.getValue(pkColumn);
-        return new EntityId(idValue);
     }
 }

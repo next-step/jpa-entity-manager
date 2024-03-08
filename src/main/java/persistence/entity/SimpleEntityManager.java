@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jakarta.persistence.EntityExistsException;
-import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 
 import java.util.Objects;
@@ -58,18 +57,13 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private boolean isDirty(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Table table = new Table(clazz);
-
-        EntityId id = getEntityId(entity);
-        Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
-        if (snapshot == null) {
-            snapshot = find(clazz, id);
-        }
-
         EntityBinder entityBinder = new EntityBinder(entity);
+        EntityId id = entityBinder.getEntityId();
+
+        Object snapshot = getDatabaseSnapshot(entity, id);
         EntityBinder snapshotBinder = new EntityBinder(snapshot);
 
+        Table table = createTable(entity);
         return table.getColumns()
                 .stream()
                 .anyMatch(column -> {
@@ -79,15 +73,20 @@ public class SimpleEntityManager implements EntityManager {
                 });
     }
 
-    private EntityId getEntityId(Object entity) {
+    private Object getDatabaseSnapshot(Object entity, EntityId id) {
+        Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
+        if (snapshot != null) {
+            return snapshot;
+
+        }
+
         Class<?> clazz = entity.getClass();
-        Table table = new Table(clazz);
+        return find(clazz, id);
+    }
 
-        EntityBinder entityBinder = new EntityBinder(entity);
-
-        PKColumn pkColumn = table.getPKColumn();
-        Object idValue = entityBinder.getValue(pkColumn);
-        return new EntityId(idValue);
+    private Table createTable(Object entity) {
+        Class<?> clazz = entity.getClass();
+        return new Table(clazz);
     }
 
     @Override
