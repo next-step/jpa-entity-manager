@@ -30,7 +30,6 @@ public class RepositoryImpl<T, K> implements Repository<T, K> {
     @Override
     public T save(T t) {
         entityManager.persist(t);
-        entityManager.merge(t);
         return t;
     }
 
