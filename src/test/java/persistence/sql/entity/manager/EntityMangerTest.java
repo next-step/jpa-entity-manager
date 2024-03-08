@@ -44,7 +44,7 @@ class EntityMangerTest extends H2Database {
     @Test
     void updateTest() {
         Person updatePerson = new Person(person.getId(), "이동규", 20, "cu");
-        entityManager.merge(updatePerson);
+        entityManager.persist(updatePerson);
 
         Person findPerson = entityManager.find(Person.class, person.getId());
         assertThat(findPerson).isEqualTo(updatePerson);
