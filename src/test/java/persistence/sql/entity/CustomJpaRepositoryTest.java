@@ -10,6 +10,9 @@ import persistence.sql.ddl.DdlCreateQueryBuilder;
 import persistence.sql.ddl.DdlDropQueryBuilder;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.domain.Person;
+import persistence.sql.entity.impl.EntityLoaderImpl;
+import persistence.sql.entity.impl.EntityManagerImpl;
+import persistence.sql.entity.impl.EntityPersisterImpl;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,9 +1,10 @@
-package persistence.sql.entity;
+package persistence.sql.entity.impl;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
+import persistence.sql.entity.EntityPersister;
 
 public class EntityPersisterImpl implements EntityPersister {
 

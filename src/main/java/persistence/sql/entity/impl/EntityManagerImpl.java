@@ -1,5 +1,9 @@
-package persistence.sql.entity;
+package persistence.sql.entity.impl;
 
+import persistence.sql.entity.EntityLoader;
+import persistence.sql.entity.EntityManager;
+import persistence.sql.entity.EntityPersister;
+import persistence.sql.entity.PersistenceContext;
 import persistence.sql.meta.PrimaryKey;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 

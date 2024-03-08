@@ -1,5 +1,6 @@
-package persistence.sql.entity;
+package persistence.sql.entity.impl;
 
+import persistence.sql.entity.PersistenceContext;
 import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
 

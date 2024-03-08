@@ -1,8 +1,10 @@
-package persistence.sql.entity;
+package persistence.sql.entity.impl;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.entity.EntityLoader;
+import persistence.sql.meta.simple.SimpleRowMapper;
 
 public class EntityLoaderImpl implements EntityLoader {
 
