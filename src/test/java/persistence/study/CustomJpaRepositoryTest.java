@@ -10,13 +10,11 @@ import persistence.entity.*;
 import persistence.sql.ddl.DDLQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
-import persistence.sql.dml.DMLQueryBuilder;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person3;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +41,7 @@ public class CustomJpaRepositoryTest {
         EntityMetaCache entityMetaCache = new EntityMetaCache();
         entityPersister = new EntityPersister(database, entityMetaCache);
         entityLoader = new EntityLoader(database, entityMetaCache);
-        entityManager = new SimpleEntityManger(entityPersister, entityLoader);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -69,7 +67,7 @@ public class CustomJpaRepositoryTest {
         String dropQuery = ddlQueryBuilder.buildDropQuery();
         jdbcTemplate.execute(dropQuery);
 
-        entityManager = new SimpleEntityManger(entityPersister, entityLoader);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
     }
 
     @Test

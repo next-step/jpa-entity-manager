@@ -6,13 +6,13 @@ import persistence.sql.model.Table;
 
 import java.util.Objects;
 
-public class SimpleEntityManger implements EntityManager {
+public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersister persister;
     private final EntityLoader loader;
     private final PersistenceContext persistenceContext;
 
-    public SimpleEntityManger(EntityPersister persister, EntityLoader loader) {
+    public SimpleEntityManager(EntityPersister persister, EntityLoader loader) {
         this.persister = persister;
         this.loader = loader;
         this.persistenceContext = new SimplePersistenceContext();

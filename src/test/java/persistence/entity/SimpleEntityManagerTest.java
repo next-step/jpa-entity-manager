@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-class SimpleEntityMangerTest {
+class SimpleEntityManagerTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
@@ -51,7 +51,7 @@ class SimpleEntityMangerTest {
         EntityMetaCache entityMetaCache = new EntityMetaCache();
         entityPersister = new EntityPersister(database, entityMetaCache);
         entityLoader = new EntityLoader(database, entityMetaCache);
-        entityManager = new SimpleEntityManger(entityPersister, entityLoader);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
 
         Dialect dialect = new H2Dialect();
         Table table = new Table(Person3.class);
@@ -79,7 +79,7 @@ class SimpleEntityMangerTest {
         String dropQuery = ddlQueryBuilder.buildDropQuery();
         jdbcTemplate.execute(dropQuery);
 
-        entityManager = new SimpleEntityManger(entityPersister, entityLoader);
+        entityManager = new SimpleEntityManager(entityPersister, entityLoader);
     }
 
     private Stream<Person3> createPersons() {
