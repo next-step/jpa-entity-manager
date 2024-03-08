@@ -20,13 +20,13 @@ public class SimpleEntityManger implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        Object cachedEntity = persistenceContext.getEntity((Long) id);
+        T cachedEntity = persistenceContext.getEntity(clazz, id);
         if (cachedEntity != null) {
-            return (T) cachedEntity;
+            return cachedEntity;
         }
 
         T findEntity = loader.read(clazz, id);
-        persistenceContext.addEntity((Long) id, findEntity);
+        persistenceContext.addEntity(id, findEntity);
         return findEntity;
     }
 
@@ -36,20 +36,20 @@ public class SimpleEntityManger implements EntityManager {
             throw new EntityExistsException();
         }
         Object id = persister.create(entity);
-        persistenceContext.addEntity((Long) id, entity);
+        persistenceContext.addEntity(id, entity);
     }
 
     @Override
     public void merge(Object entity) {
         if (!isExist(entity)) {
             Object id = persister.create(entity);
-            persistenceContext.addEntity((Long) id, entity);
+            persistenceContext.addEntity(id, entity);
             return;
         }
 
         if (isDirty(entity)) {
             Object id = persister.update(entity);
-            persistenceContext.addEntity((Long) id, entity);
+            persistenceContext.addEntity(id, entity);
         }
     }
 
@@ -62,7 +62,7 @@ public class SimpleEntityManger implements EntityManager {
         Table table = new Table(clazz);
 
         Object id = getEntityId(entity);
-        Object snapshot = persistenceContext.getDatabaseSnapshot((Long) id, entity);
+        Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
         if (snapshot == null) {
             snapshot = find(clazz, id);
         }

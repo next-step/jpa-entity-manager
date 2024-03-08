@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class SimplePersistenceContext implements PersistenceContext {
 
-    private final Map<Long, Object> cache;
-    private final Map<Long, Object> snapshot;
+    private final Map<EntityKey, Object> cache;
+    private final Map<EntityKey, Object> snapshot;
 
     public SimplePersistenceContext() {
         this.cache = new HashMap<>();
@@ -17,41 +17,23 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getEntity(Long id) {
-        return cache.get(id);
+    public <T> T getEntity(Class<T> clazz, Object id) {
+        EntityKey key = new EntityKey(clazz, id);
+        return (T) cache.get(key);
     }
 
     @Override
-    public void addEntity(Long id, Object entity) {
+    public void addEntity(Object id, Object entity) {
         bindEntityId(entity, id);
-        cache.put(id, entity);
-        snapshot.put(id, entity);
+
+        EntityKey key = createEntityKey(entity, id);
+        cache.put(key, entity);
+        snapshot.put(key, entity);
     }
 
-    @Override
-    public void removeEntity(Object entity) {
-        Long id = getEntityId(entity);
-        cache.remove(id);
-    }
-
-    @Override
-    public boolean isCached(Object entity) {
-        Long entityId = getEntityId(entity);
-        Object cachedEntity = getEntity(entityId);
-        return cachedEntity != null;
-    }
-
-    private Long getEntityId(Object entity) {
-        Table table = new Table(entity.getClass());
-
-        EntityBinder entityBinder = new EntityBinder(entity);
-
-        PKColumn pkColumn = table.getPKColumn();
-        return (Long) entityBinder.getValue(pkColumn);
-    }
-
-    private void bindEntityId(Object entity, Long id) {
-        Table table = new Table(entity.getClass());
+    private void bindEntityId(Object entity, Object id) {
+        Class<?> clazz = entity.getClass();
+        Table table = new Table(clazz);
 
         EntityBinder entityBinder = new EntityBinder(entity);
 
@@ -60,7 +42,41 @@ public class SimplePersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
-        return snapshot.get(id);
+    public void removeEntity(Object entity) {
+        EntityKey key = createEntityKey(entity);
+        cache.remove(key);
+    }
+
+    @Override
+    public boolean isCached(Object entity) {
+        EntityKey key = createEntityKey(entity);
+        return cache.containsKey(key);
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(Object id, Object entity) {
+        EntityKey key = createEntityKey(entity, id);
+        return snapshot.get(key);
+    }
+
+    private EntityKey createEntityKey(Object entity, Object id) {
+        Class<?> clazz = entity.getClass();
+        return new EntityKey(clazz, id);
+    }
+
+    private EntityKey createEntityKey(Object entity) {
+        Class<?> clazz = entity.getClass();
+        Object id = getEntityId(entity);
+        return new EntityKey(clazz, id);
+    }
+
+    private Object getEntityId(Object entity) {
+        Class<?> clazz = entity.getClass();
+        Table table = new Table(clazz);
+
+        EntityBinder entityBinder = new EntityBinder(entity);
+
+        PKColumn pkColumn = table.getPKColumn();
+        return entityBinder.getValue(pkColumn);
     }
 }

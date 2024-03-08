@@ -20,7 +20,7 @@ class SimplePersistenceContextTest {
     @DisplayName("1차 캐시에서 엔티티를 정상적으로 가져온다.")
     @Test
     void getEntity() {
-        Object result = persistenceContext.getEntity(1L);
+        Object result = persistenceContext.getEntity(Person3.class, 1L);
 
         assertThat(result).isEqualTo(person);
     }
@@ -32,7 +32,7 @@ class SimplePersistenceContextTest {
 
         persistenceContext.addEntity(2L, person);
 
-        Object result = persistenceContext.getEntity(2L);
+        Object result = persistenceContext.getEntity(Person3.class, 2L);
         assertThat(result).isEqualTo(person);
     }
 
@@ -41,7 +41,7 @@ class SimplePersistenceContextTest {
     void removeEntity() {
         persistenceContext.removeEntity(person);
 
-        Object result = persistenceContext.getEntity(1L);
+        Object result = persistenceContext.getEntity(Person3.class, 1L);
         assertThat(result).isNull();
     }
 
@@ -51,7 +51,7 @@ class SimplePersistenceContextTest {
         Person3 person = new Person3(2L, "qwer1", 123, "email1@email.com");
 
         persistenceContext.addEntity(2L, person);
-        Object result = persistenceContext.getEntity(2L);
+        Object result = persistenceContext.getEntity(Person3.class, 2L);
 
         assertThat(person == result).isTrue();
     }
