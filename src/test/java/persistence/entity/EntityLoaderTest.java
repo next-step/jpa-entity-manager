@@ -13,24 +13,23 @@ import persistence.sql.dml.InsertQueryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.*;
 
 class EntityLoaderTest extends H2DBTestSupport {
-    EntityLoader entityLoader = new EntityLoader(jdbcTemplate, new DynamicRowMapperFactory());
+    EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
 
-    private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
-    private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
     @BeforeEach
     public void setUp() {
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
         jdbcTemplate.execute(createQueryBuilder.build());
     }
 
     @AfterEach
     public void cleanUp() {
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
         jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
-    @DisplayName("find test")
+    @DisplayName("rowMapper 를 이용한 find 테스트")
     @Test
     void testFind() {
         Person person = new Person(null, "nick_name", 10, "email", null);

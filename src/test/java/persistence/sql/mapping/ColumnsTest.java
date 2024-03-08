@@ -43,7 +43,7 @@ class ColumnsTest {
     @Test
     @DisplayName("값 넣으면서 생성 테스트")
     void testCreateWithValueColumns() {
-        Columns columns = Columns.createColumnsWithValue(Person.class, person);
+        Columns columns = Columns.createColumnsWithValue(person);
 
         assertSoftly(softly -> {
             assertThat(columns.getValues()).isNotEmpty();
@@ -62,7 +62,7 @@ class ColumnsTest {
 
     @Test
     public void testGetValue() {
-        Columns columns = Columns.createColumnsWithValue(Person.class, person);
+        Columns columns = Columns.createColumnsWithValue(person);
 
         List<Object> names = columns.getValues();
 
@@ -90,7 +90,7 @@ class ColumnsTest {
 
     @Test
     public void testGetValuesMap() {
-        Columns columns = Columns.createColumnsWithValue(Person.class, person);
+        Columns columns = Columns.createColumnsWithValue(person);
 
         assertSoftly(softly -> {
             Map<String, Object> valuesMap = columns.getValuesMap();

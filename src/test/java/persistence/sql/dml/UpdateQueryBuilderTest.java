@@ -19,7 +19,7 @@ class UpdateQueryBuilderTest {
         );
         Class<?> clazz = Person.class;
         UpdateQueryBuilder updateQueryBuilder
-                = new UpdateQueryBuilder(TableData.from(clazz), Columns.createColumnsWithValue(clazz, person));
+                = new UpdateQueryBuilder(TableData.from(clazz), Columns.createColumnsWithValue(person));
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq("id", 1L));
 

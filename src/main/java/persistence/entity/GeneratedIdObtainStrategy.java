@@ -4,5 +4,5 @@ import jdbc.RowMapper;
 
 public interface GeneratedIdObtainStrategy {
     String getQueryString();
-    RowMapper<Long> getRowMapper();
+    RowMapper<Object> getRowMapper();
 }

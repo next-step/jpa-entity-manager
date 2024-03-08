@@ -35,7 +35,8 @@ public class Columns implements Iterable<ColumnData> {
         return new Columns(columns);
     }
 
-    public static Columns createColumnsWithValue(Class<?> clazz, Object entity) {
+    public static Columns createColumnsWithValue(Object entity) {
+        Class<?> clazz = entity.getClass();
         checkIsEntity(clazz);
         List<ColumnData> columns = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
