@@ -1,8 +1,7 @@
 package persistence.sql.dml;
 
 import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.simple.SimpleEntityMetaCreator;
-import persistence.sql.meta.simple.SimpleTable;
+import persistence.sql.meta.Table;
 
 public class DeleteQueryBuilder {
 
@@ -11,13 +10,12 @@ public class DeleteQueryBuilder {
     public DeleteQueryBuilder() {
     }
 
-    public String createDeleteQuery(Object object) {
-        final SimpleTable table = SimpleEntityMetaCreator.tableOfInstance(object);
+    public String createDeleteQuery(Table table) {
 
         return String.format(DELETE_DEFAULT_DML, table.name(), deleteWhere(table));
     }
 
-    private String deleteWhere(SimpleTable table) {
+    private String deleteWhere(Table table) {
         final PrimaryKey primaryKey = table.primaryKey();
         return String.format("%s = %s", primaryKey.name(), primaryKey.value());
     }

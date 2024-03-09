@@ -13,6 +13,8 @@ import persistence.sql.dml.domain.Person;
 import persistence.sql.entity.impl.EntityLoaderImpl;
 import persistence.sql.entity.impl.EntityManagerImpl;
 import persistence.sql.entity.impl.EntityPersisterImpl;
+import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,17 +32,18 @@ public class CustomJpaRepositoryTest {
         databaseServer.start();
         final Connection connection = databaseServer.getConnection();
         jdbcTemplate = new JdbcTemplate(connection);
+        final EntityMetaCreator entityMetaCreator = new SimpleEntityMetaCreator();
 
-        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder();
+        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(entityMetaCreator);
         final String dropSql = ddlDropQueryBuilder.dropDdl(Person.class);
         jdbcTemplate.execute(dropSql);
 
-        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(new H2Dialect());
+        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(new H2Dialect(), entityMetaCreator);
         final String createSql = ddlCreateQueryBuilder.createDdl(Person.class);
         jdbcTemplate.execute(createSql);
 
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate);
-        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate);
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
         entityManager = new EntityManagerImpl(entityPersister, entityLoader);
 
     }

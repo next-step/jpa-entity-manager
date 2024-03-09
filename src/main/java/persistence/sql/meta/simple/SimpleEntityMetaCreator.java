@@ -5,8 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
-import persistence.sql.dml.domain.Person;
 import persistence.sql.meta.Columns;
+import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
 
 import java.lang.reflect.Field;
@@ -14,16 +14,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SimpleEntityMetaCreator  {
+public class SimpleEntityMetaCreator implements EntityMetaCreator {
 
-    public static SimpleTable tableOfClass(Class<?> clazz) {
+    public SimpleTable createByClass(Class<?> clazz) {
         final String tableName = createTableName(clazz);
         final PrimaryKey primaryKey = createPrimaryKey(clazz);
         final Columns column = createColumn(clazz);
         return new SimpleTable(tableName, primaryKey, column);
     }
 
-    public static SimpleTable tableOfInstance(Object object) {
+    public SimpleTable createByInstance(Object object) {
         final String tableName = createTableName(object.getClass());
         final PrimaryKey primaryKeyValue = createPrimaryKeyValue(object);
         final Columns columnValues = createColumnValues(object);
@@ -55,20 +55,11 @@ public class SimpleEntityMetaCreator  {
         return new SimplePrimaryKey(simpleColumn);
     }
 
-    public static PrimaryKey createPrimaryKeyValue(Object object) {
+    private static PrimaryKey createPrimaryKeyValue(Object object) {
         final SimpleColumn simpleColumn = Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(SimpleEntityMetaCreator::isIdField)
                 .findFirst()
                 .map(field -> createColumnValue(field, object))
-                .orElseThrow(IllegalArgumentException::new);
-        return new SimplePrimaryKey(simpleColumn);
-    }
-
-    public static PrimaryKey createPrimaryKeyValue(Class<?> clazz, Long id) {
-        final SimpleColumn simpleColumn = Arrays.stream(clazz.getDeclaredFields())
-                .filter(SimpleEntityMetaCreator::isIdField)
-                .findFirst()
-                .map(field -> createColumnValueById(field, id))
                 .orElseThrow(IllegalArgumentException::new);
         return new SimplePrimaryKey(simpleColumn);
     }
@@ -105,7 +96,7 @@ public class SimpleEntityMetaCreator  {
         return !field.isAnnotationPresent(Transient.class);
     }
 
-    public static SimpleColumn createColumn(final Field field) {
+    private static SimpleColumn createColumn(final Field field) {
         return new SimpleColumn(getFieldName(field), isNullable(field), generateType(field), field.getType());
     }
 
@@ -113,19 +104,6 @@ public class SimpleEntityMetaCreator  {
         return new SimpleColumn(getFieldName(field), isNullable(field), generateType(field),
                 field.getType(), createSimpleValue(field, object));
     }
-    private static SimpleColumn createColumnValueById(final Field field, final Long id) {
-        Object value = null;
-        try {
-            field.setAccessible(true);
-            value = field.get(new Person(id));
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new SimpleColumn(getFieldName(field), isNullable(field), generateType(field),
-                field.getType(), value);
-    }
-
 
     private static Object createSimpleValue(Field field, Object object) {
         field.setAccessible(true);
@@ -147,7 +125,7 @@ public class SimpleEntityMetaCreator  {
         return String.valueOf(value);
     }
 
-    public static String getFieldName(final Field field) {
+    private static String getFieldName(final Field field) {
         if (isNotBlankOf(field)) {
             return field.getAnnotation(jakarta.persistence.Column.class).name();
         }
@@ -167,7 +145,7 @@ public class SimpleEntityMetaCreator  {
         return true;
     }
 
-    public static GenerationType generateType(final Field field) {
+    private static GenerationType generateType(final Field field) {
         if (field.isAnnotationPresent(GeneratedValue.class)) {
             return field.getAnnotation(GeneratedValue.class).strategy();
         }
