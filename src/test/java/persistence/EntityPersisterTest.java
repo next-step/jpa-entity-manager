@@ -76,4 +76,19 @@ class EntityPersisterTest {
         Person result = entityManager.find(Person.class, id);
         assertThat(result.getName()).isEqualTo(newName);
     }
+
+    @Test
+    @DisplayName("Person을 삭제한다.")
+    void delete() {
+        // given
+        Person person = new Person("name", 26, "email", 1);
+        entityPersister.insert(person);
+
+        // when
+        entityPersister.delete(entityManager.find(Person.class, 1L));
+
+        // then
+        Person result = entityManager.find(Person.class, 1L);
+        assertThat(result).isNull();
+    }
 }

@@ -25,5 +25,9 @@ public class EntityPersister {
         String sql = dmlGenerator.generateUpdateById(entity, id);
         return jdbcTemplate.executeUpdate(sql) == 1;
     }
+
+    public void delete(Object entity) {
+        jdbcTemplate.execute(dmlGenerator.generateDelete(entity));
+    }
 }
 

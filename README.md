@@ -7,6 +7,7 @@
 1. EntityPersister: insert 기능 구현
 2. DMLGenerator: update 쿼리 생성 구현
 3. EntityPersister: update 기능 구현
+4. EntityPersister: delete 기능 구현
 
 ### 요구사항 2 - EntityManager 의 책임 줄여주기
 
