@@ -50,11 +50,12 @@ class EntityManagerTest {
     @Test
     void find() {
         // given
-        Long personId = 1L;
-        Person expected = entityManager.persist(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
+        Person testFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(testFixture);
 
         // when
-        Person actual = entityManager.find(Person.class, personId);
+        Person actual = entityManager.find(Person.class, 1L);
 
         // then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -63,10 +64,13 @@ class EntityManagerTest {
     @Test
     void persist() {
         // given & when
-        Person actual = entityManager.persist(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
+        Person testsFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(testsFixture);
 
         // then
-        Assertions.assertThat(actual).isEqualTo(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11));
+        Person actual = entityManager.find(Person.class, 1L);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test

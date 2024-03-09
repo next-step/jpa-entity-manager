@@ -21,8 +21,8 @@ public class EntityManagerImpl<T> implements EntityManager{
     }
 
     @Override
-    public Object persist(Object entity) {
-        return entityPersister.insert(entity);
+    public void persist(Object entity) {
+        entityPersister.insert(entity);
     }
 
     @Override
