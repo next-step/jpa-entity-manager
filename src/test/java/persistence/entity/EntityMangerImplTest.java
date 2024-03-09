@@ -113,13 +113,13 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
     @Test
     @DisplayName("update db 저장 테스트")
-    void testPersistUpdate() {
+    void testMerge() {
         String newName = "new_nick_name";
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
-        jdbcTemplate.execute(insertQueryBuilder.build(person));
+        entityManger.persist(person);
         person.changeName(newName);
 
-        Object saved = entityManger.persist(person);
+        Object saved = entityManger.merge(person);
         Person savedPerson = (Person) saved;
 
         assertThat(savedPerson.getName()).isEqualTo(newName);
