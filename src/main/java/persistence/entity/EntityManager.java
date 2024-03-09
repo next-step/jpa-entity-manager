@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import java.util.Optional;
+
 public interface EntityManager {
     /**
      * 조회
@@ -7,7 +9,7 @@ public interface EntityManager {
      * @param id 식별자
      * @return 조회 결과
      */
-    <T> T find(Class<T> clazz, Long id);
+    <T> Optional<T> find(Class<T> clazz, Long id);
 
     /**
      * 저장

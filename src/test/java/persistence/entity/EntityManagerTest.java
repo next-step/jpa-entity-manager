@@ -31,7 +31,7 @@ class EntityManagerTest {
             server = new H2();
             server.start();
             jdbcTemplate = new JdbcTemplate(server.getConnection());
-            entityManager = new EntityManagerImpl<>(jdbcTemplate);
+            entityManager = new EntityManagerImpl(jdbcTemplate);
 
             jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
         } catch (Exception e) {
@@ -55,7 +55,7 @@ class EntityManagerTest {
         entityManager.persist(testFixture);
 
         // when
-        Person actual = entityManager.find(Person.class, 1L);
+        Person actual = entityManager.find(Person.class, 1L).get();
 
         // then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -69,7 +69,7 @@ class EntityManagerTest {
         entityManager.persist(testsFixture);
 
         // then
-        Person actual = entityManager.find(Person.class, 1L);
+        Person actual = entityManager.find(Person.class, 1L).get();
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 

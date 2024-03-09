@@ -4,7 +4,10 @@ import jdbc.JdbcTemplate;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.dml.SelectQueryBuilder;
 
-public class EntityManagerImpl<T> implements EntityManager{
+import java.util.List;
+import java.util.Optional;
+
+public class EntityManagerImpl implements EntityManager{
 
     private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
@@ -15,9 +18,17 @@ public class EntityManagerImpl<T> implements EntityManager{
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> Optional<T> find(Class<T> clazz, Long id) {
         String query = new SelectQueryBuilder(clazz).getFindById(id);
-        return jdbcTemplate.queryForObject(query, new DtoMapper<>(clazz));
+        List<T> selected = jdbcTemplate.query(query, new DtoMapper<>(clazz));
+        return getFoundResult(selected);
+    }
+
+    private <T> Optional<T> getFoundResult(List<T> selected) {
+        if (selected.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(selected.get(0));
     }
 
     @Override
