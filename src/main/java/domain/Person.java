@@ -26,18 +26,20 @@ public class Person {
 
     }
 
-    public Person(String name, Integer age, String email, Integer index) {
+    public Person(Long id, String name, Integer age, String email, Integer index) {
+        this.id = id;
         this.name = name;
         this.age = age;
         this.email = email;
         this.index = index;
     }
 
+    public Person(String name, Integer age, String email, Integer index) {
+        this(null, name, age, email, index);
+    }
+
     public Person(Long id, String name, Integer age, String email) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
-        this.email = email;
+        this(id, name, age, email, null);
     }
 
     public Long getId() {

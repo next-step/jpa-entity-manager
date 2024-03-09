@@ -50,4 +50,16 @@ class DMLGeneratorTest {
         // then
         assertThat(result).isEqualTo("DELETE FROM users where nick_name = 'name' AND old = 26 AND email = 'email';");
     }
+
+    @Test
+    void generateUpdateById() {
+        // given
+        Person person = new Person("name", 26, "email", 1);
+
+        // when
+        String result = dmlGenerator.generateUpdateById(person, 1L);
+
+        // then
+        assertThat(result).isEqualTo("UPDATE users SET nick_name = 'name' AND old = 26 AND email = 'email' WHERE id = 1;");
+    }
 }

@@ -9,6 +9,7 @@ public class DMLGenerator {
 
     private static final String INSERT_QUERY = "INSERT INTO %s (%s) VALUES (%s);";
     private static final String FIND_QUERY = "SELECT * FROM %s%s;";
+    private static final String UPDATE_QUERY = "UPDATE %s SET %s WHERE id = %d;";
     private static final String DELETE_QUERY = "DELETE FROM %s%s;";
 
     private final Class<?> entity;
@@ -32,10 +33,16 @@ public class DMLGenerator {
 
     public String generateFindById(Long id) {
         TableName tableName = TableName.from(entity);
-
         String whereClause = String.format(" where id = %d", id);
 
         return String.format(FIND_QUERY, tableName.getName(), whereClause);
+    }
+
+    public String generateUpdateById(Object entity, Long id) {
+        TableName tableName = TableName.from(this.entity);
+        WhereClause whereClause = new WhereClause(entity);
+
+        return String.format(UPDATE_QUERY, tableName.getName(), whereClause.getWhereClause(), id);
     }
 
     public String generateDelete(Object entity) {
