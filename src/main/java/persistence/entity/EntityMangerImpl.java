@@ -1,21 +1,27 @@
 package persistence.entity;
 
+import jakarta.persistence.EntityManagerFactory;
+
 public class EntityMangerImpl implements EntityManger {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
     private final PersistenceContext persistenceContext;
     private final EntityEntryContext entityEntryContext;
+    private final EntityEntryFactory entityEntryFactory;
+
 
     public EntityMangerImpl(
             EntityPersister entityPersister,
             EntityLoader entityLoader,
             PersistenceContext persistenceContext,
-            EntityEntryContext entityEntryContext
+            EntityEntryContext entityEntryContext,
+            EntityEntryFactory entityEntryFactory
     ) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
         this.persistenceContext = persistenceContext;
         this.entityEntryContext = entityEntryContext;
+        this.entityEntryFactory = entityEntryFactory;
     }
 
     @Override
@@ -41,7 +47,7 @@ public class EntityMangerImpl implements EntityManger {
         entityPersister.insert(entity);
         entityKey = EntityKey.fromEntity(entity);
         persistenceContext.addEntity(entityKey, entity);
-        EntityEntry entityEntry = new EntityEntry(entityPersister, entityLoader, Status.MANAGED);
+        EntityEntry entityEntry = entityEntryFactory.createEntityEntry(entityPersister, entityLoader, Status.MANAGED);
         entityEntryContext.addEntry(entityKey, entityEntry);
 
         return entity;

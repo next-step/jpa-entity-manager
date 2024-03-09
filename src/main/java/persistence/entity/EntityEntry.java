@@ -1,17 +1,11 @@
 package persistence.entity;
 
-public class EntityEntry {
-    private Status status;
-    final private EntityPersister entityPersister;
-    final private EntityLoader entityLoader;
+public interface EntityEntry {
+    Status getStatus();
 
-    public EntityEntry(EntityPersister entityPersister, EntityLoader entityLoader, Status status) {
-        this.entityPersister = entityPersister;
-        this.entityLoader = entityLoader;
-        this.status = status;
-    }
+    EntityPersister getEntityPersister();
 
-    public Status getStatus() {
-        return status;
-    }
+    void setSaving();
+
+    void setManaged();
 }
