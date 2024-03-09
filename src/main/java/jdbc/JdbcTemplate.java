@@ -21,6 +21,23 @@ public class JdbcTemplate {
         }
     }
 
+    public Long executeAndReturnKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                }
+            }
+
+            throw new RuntimeException();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public int executeUpdate(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             return statement.executeUpdate(sql);

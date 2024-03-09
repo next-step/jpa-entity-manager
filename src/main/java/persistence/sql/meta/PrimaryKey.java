@@ -4,7 +4,7 @@ import jakarta.persistence.GenerationType;
 
 public interface PrimaryKey {
     String name();
-    String value(final Object object);
+    Object value();
     Class<?> type();
     GenerationType strategy();
 

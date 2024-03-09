@@ -1,73 +1,82 @@
 package persistence.sql.meta.simple;
 
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import persistence.sql.meta.Column;
 
-import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class SimpleColumn implements Column {
 
-    private final Field field;
+    private final String name;
+    private final boolean isNullable;
+    private final GenerationType generationType;
+    private final Class<?> type;
+    private Object value;
 
-    public SimpleColumn(final Field field) {
-        this.field = field;
+
+    public SimpleColumn(final String name, final boolean isNullable, final GenerationType generationType,
+                        final Class<?> type) {
+        this.name = name;
+        this.isNullable = isNullable;
+        this.generationType = generationType;
+        this.type = type;
+    }
+
+    public SimpleColumn(final String name, final boolean isNullable, final GenerationType generationType,
+                        final Class<?> type, final Object value) {
+        this.name = name;
+        this.isNullable = isNullable;
+        this.generationType = generationType;
+        this.type = type;
+        this.value = value;
     }
 
     @Override
     public String getFieldName() {
-        if (isNotBlankOf(field)) {
-            return field.getAnnotation(jakarta.persistence.Column.class).name();
-        }
-
-        return field.getName();
+        return this.name;
     }
 
     @Override
-    public String value(Object object) {
-        this.field.setAccessible(true);
-        Object value;
-        try {
-            value = field.get(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (field.getType().equals(String.class)) {
-            return String.format("'%s'", value);
-        }
-
-        if (field.getType().equals(Long.class)) {
-            return String.format("%dL", value);
-        }
-
-        return String.valueOf(value);
+    public Object value() {
+        return this.value;
     }
 
     @Override
     public Class<?> type()  {
-        return this.field.getType();
+        return this.type;
     }
 
     @Override
     public GenerationType generateType() {
-        if (this.field.isAnnotationPresent(GeneratedValue.class)) {
-            return this.field.getAnnotation(GeneratedValue.class).strategy();
-        }
-
-        return GenerationType.AUTO;
+        return this.generationType;
     }
 
     @Override
     public boolean isNullable() {
-        if (this.field.isAnnotationPresent(jakarta.persistence.Column.class)) {
-            return this.field.getAnnotation(jakarta.persistence.Column.class).nullable();
-        }
-
-        return true;
+        return this.isNullable;
     }
 
-    private boolean isNotBlankOf(final Field field) {
-        return field.isAnnotationPresent(jakarta.persistence.Column.class) && !field.getAnnotation(jakarta.persistence.Column.class).name().isBlank();
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final SimpleColumn that = (SimpleColumn) object;
+        return isNullable == that.isNullable && Objects.equals(name, that.name) && generationType == that.generationType && Objects.equals(type, that.type) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, isNullable, generationType, type, value);
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleColumn{" +
+                "name='" + name + '\'' +
+                ", isNullable=" + isNullable +
+                ", generationType=" + generationType +
+                ", type=" + type +
+                ", value=" + value +
+                '}';
     }
 }

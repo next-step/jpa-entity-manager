@@ -1,7 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.Columns;
-import persistence.sql.meta.PrimaryKey;
+import persistence.sql.meta.Table;
 
 import java.util.stream.Collectors;
 
@@ -9,28 +8,22 @@ public class UpdateQueryBuilder {
 
     public static final String UPDATE_DEFAULT_DML = "update %s set %s where %s";
     private static final String KEY_VALUE_FORMAT = "%s=%s";
-    private final String tableName;
-    private final PrimaryKey primaryKey;
-    private final Columns columns;
 
-    public UpdateQueryBuilder(String tableName, PrimaryKey primaryKey, Columns columns) {
-        this.tableName = tableName;
-        this.primaryKey = primaryKey;
-        this.columns = columns;
+    public UpdateQueryBuilder() {
     }
 
-    public String createUpdateQuery(Object object) {
-        return String.format(UPDATE_DEFAULT_DML, tableName, setClause(object), whereClause(object));
+    public String createUpdateQuery(Table table) {
+        return String.format(UPDATE_DEFAULT_DML, table.name(), setClause(table), whereClause(table));
     }
 
-    private String setClause(Object object) {
-        return this.columns.getColumns().stream()
-                .map(e -> setColumnSetting(e.getFieldName(), e.value(object)))
+    private String setClause(Table table) {
+        return table.columns().getColumns().stream()
+                .map(e -> setColumnSetting(e.getFieldName(), String.valueOf(e.value())))
                 .collect(Collectors.joining(", "));
     }
 
-    private String whereClause(Object object) {
-        return setColumnSetting(this.primaryKey.name(), this.primaryKey.value(object));
+    private String whereClause(Table table) {
+        return setColumnSetting(table.primaryKey().name(), String.valueOf(table.primaryKey().value()));
     }
 
     private String setColumnSetting(String name, String value) {

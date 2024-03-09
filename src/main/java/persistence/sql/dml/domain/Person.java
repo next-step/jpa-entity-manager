@@ -1,6 +1,13 @@
 package persistence.sql.dml.domain;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 import java.util.Objects;
 
@@ -27,6 +34,10 @@ public class Person {
     public Person() {
     }
 
+    public Person(Long id) {
+        this.id = id;
+    }
+
     public Person(String name, Integer age, String email) {
         this.name = name;
         this.age = age;
@@ -38,6 +49,10 @@ public class Person {
         this.name = name;
         this.age = age;
         this.email = email;
+    }
+
+    public void setId(final Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -60,11 +75,16 @@ public class Person {
         return index;
     }
 
+
+    public void changeAge(final int age) {
+        this.age = age;
+    }
+
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final Person person = (Person) o;
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final Person person = (Person) object;
         return Objects.equals(id, person.id) && Objects.equals(name, person.name) && Objects.equals(age, person.age) && Objects.equals(email, person.email) && Objects.equals(index, person.index);
     }
 

@@ -1,35 +1,29 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.Columns;
 import persistence.sql.meta.PrimaryKey;
+import persistence.sql.meta.Table;
 
 public class SelectQueryBuilder {
 
     public static final String SELECT_FIND_ALL_DEFAULT_DML = "select %s from %s";
     public static final String SELECT_FIND_ID_DEFAULT_DML = "%s where %s";
-    private final String tableName;
-    private final PrimaryKey primaryKey;
-    private final Columns columns;
 
-    public SelectQueryBuilder(String tableName, PrimaryKey primaryKey, Columns columns) {
-        this.tableName = tableName;
-        this.primaryKey = primaryKey;
-        this.columns = columns;
+    public SelectQueryBuilder() {
     }
 
-    public String createFindAllQuery() {
-        return String.format(SELECT_FIND_ALL_DEFAULT_DML, select(), this.tableName);
+    public String createFindAllQuery(Table table) {
+        return String.format(SELECT_FIND_ALL_DEFAULT_DML, select(table), table.name());
     }
 
-    public String createFindByIdQuery(Long id) {
-        return String.format(SELECT_FIND_ID_DEFAULT_DML, createFindAllQuery(), selectWhere(id));
+    public String createFindByIdQuery(Table table, Long id) {
+        return String.format(SELECT_FIND_ID_DEFAULT_DML, createFindAllQuery(table), selectWhere(table.primaryKey(), id));
     }
 
-    private String select() {
-        return String.format("%s, %s", this.primaryKey.name(), String.join(", ", this.columns.names()));
+    private String select(Table table) {
+        return String.format("%s, %s", table.primaryKey().name(), String.join(", ", table.columns().names()));
     }
 
-    private String selectWhere(Long id) {
-        return String.format("%s = %dL", this.primaryKey.name(), id);
+    private String selectWhere(PrimaryKey primaryKey, Long id) {
+        return String.format("%s = %dL", primaryKey.name(), id);
     }
 }

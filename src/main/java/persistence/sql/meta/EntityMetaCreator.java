@@ -1,7 +1,7 @@
 package persistence.sql.meta;
 
 public interface EntityMetaCreator {
-    String createTableName();
-    PrimaryKey createPrimaryKey();
-    Columns createColumns();
+
+    Table createByClass(Class<?> clazz);
+    Table createByInstance(Object object);
 }

@@ -10,8 +10,12 @@ import persistence.sql.ddl.DdlCreateQueryBuilder;
 import persistence.sql.ddl.DdlDropQueryBuilder;
 import persistence.sql.dialect.h2.H2Dialect;
 import persistence.sql.dml.domain.Person;
-import persistence.sql.meta.Columns;
-import persistence.sql.meta.PrimaryKey;
+import persistence.sql.entity.impl.EntityLoaderImpl;
+import persistence.sql.entity.impl.EntityManagerImpl;
+import persistence.sql.entity.impl.EntityPersisterImpl;
+import persistence.sql.entity.impl.PersistenceContextImpl;
+import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.Table;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import java.sql.Connection;
@@ -21,10 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityManagerImplTest {
+
     private JdbcTemplate jdbcTemplate;
-    private String tableName;
-    private PrimaryKey primaryKey;
-    private Columns columns;
+    private EntityMetaCreator entityMetaCreator;
+    private PersistenceContext persistenceContext;
 
     @BeforeEach
     void init() throws SQLException {
@@ -33,27 +37,26 @@ class EntityManagerImplTest {
         final Connection connection = databaseServer.getConnection();
         jdbcTemplate = new JdbcTemplate(connection);
 
-        final SimpleEntityMetaCreator entityMetaCreator = SimpleEntityMetaCreator.of(Person.class);
-        tableName = entityMetaCreator.createTableName();
-        primaryKey = entityMetaCreator.createPrimaryKey();
-        columns = entityMetaCreator.createColumns();
-
-        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(tableName);
-        final String dropSql = ddlDropQueryBuilder.dropDdl();
+        entityMetaCreator = new SimpleEntityMetaCreator();
+        final Table table = entityMetaCreator.createByClass(Person.class);
+        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder();
+        final String dropSql = ddlDropQueryBuilder.dropDdl(table);
         jdbcTemplate.execute(dropSql);
 
-        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(tableName, primaryKey, columns, new H2Dialect());
-        final String createSql = ddlCreateQueryBuilder.createDdl();
+        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(new H2Dialect());
+        final String createSql = ddlCreateQueryBuilder.createDdl(table);
         jdbcTemplate.execute(createSql);
+
+        persistenceContext = new PersistenceContextImpl();
     }
 
     @DisplayName("EntityManagerImpl find를 호출하면 엔티티가 리턴된다.")
     @Test
     void findTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(tableName, primaryKey, columns, jdbcTemplate);
-        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(tableName, primaryKey, columns, jdbcTemplate);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
         entityManager.persist(person);
 
         final Person findPerson = entityManager.find(person.getClass(), 1L);
@@ -64,10 +67,10 @@ class EntityManagerImplTest {
     @DisplayName("EntityManagerImpl persist를 호출하면 엔티티를 저장한다.")
     @Test
     void persistTest() {
-        final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(tableName, primaryKey, columns, jdbcTemplate);
-        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(tableName, primaryKey, columns, jdbcTemplate);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        final Person person = new Person(1L, "simpson", 31, "simpson@naver.com");
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
 
         entityManager.persist(person);
 
@@ -79,9 +82,9 @@ class EntityManagerImplTest {
     @Test
     void removeTest() {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
-        EntityPersisterImpl entityPersister = new EntityPersisterImpl(tableName, primaryKey, columns, jdbcTemplate);
-        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(tableName, primaryKey, columns, jdbcTemplate);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
         entityManager.persist(person);
 
         entityManager.remove(person);
