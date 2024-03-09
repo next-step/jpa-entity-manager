@@ -63,14 +63,11 @@ public class PrimaryKeyClause {
 
 
         idField.setAccessible(true);
-        Long id;
         try {
-            id = (Long) idField.get(entity);
+            return (Long) idField.get(entity);
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
         }
-
-        return id;
     }
 
     public String name() {
