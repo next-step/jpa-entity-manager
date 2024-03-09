@@ -150,10 +150,10 @@ class EntityMangerImplTest extends H2DBTestSupport {
     @Test
     @DisplayName("delete 영속성 컨텍스트에서 삭제한다.")
     void removeFromPersistenceContextWhenDelete() {
-        Person person = new Person(1L, "nick_name", 10, "df", null);
-        entityManger.persist(person);
+        Person person = new Person(null, "nick_name", 10, "df", null);
+        Person saved = (Person) entityManger.persist(person);
 
-        entityManger.remove(person);
+        entityManger.remove(saved);
 
         assertThat(persistenceContext.getEntity(EntityKey.fromEntity(person))).isNull();
     }
