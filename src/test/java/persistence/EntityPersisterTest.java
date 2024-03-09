@@ -34,7 +34,7 @@ class EntityPersisterTest {
         jdbcTemplate.execute(ddlGenerator.generateCreate());
 
         entityPersister = new EntityPersister(jdbcTemplate, dmlGenerator);
-        entityManager = new DefaultEntityManager(jdbcTemplate, dmlGenerator);
+        entityManager = new DefaultEntityManager(jdbcTemplate, dmlGenerator, entityPersister);
     }
 
     @AfterEach

@@ -12,10 +12,12 @@ public class DefaultEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
     private final DMLGenerator dmlGenerator;
+    private final EntityPersister entityPersister;
 
-    public DefaultEntityManager(JdbcTemplate jdbcTemplate, DMLGenerator dmlGenerator) {
+    public DefaultEntityManager(JdbcTemplate jdbcTemplate, DMLGenerator dmlGenerator, EntityPersister entityPersister) {
         this.jdbcTemplate = jdbcTemplate;
         this.dmlGenerator = dmlGenerator;
+        this.entityPersister = entityPersister;
     }
 
     @Override
@@ -38,15 +40,14 @@ public class DefaultEntityManager implements EntityManager {
     public void persist(Object entity) {
         validEntity(entity);
 
-        String sql = dmlGenerator.generateInsert(entity);
-        jdbcTemplate.execute(sql);
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
         validEntity(entity);
 
-        jdbcTemplate.execute(dmlGenerator.generateDelete(entity));
+        entityPersister.delete(entity);
     }
 
     private static void validEntity(Object entity) {

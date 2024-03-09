@@ -11,3 +11,4 @@
 
 ### 요구사항 2 - EntityManager 의 책임 줄여주기
 
+1. EntityManager의 insert, delete 책임 줄여주기
