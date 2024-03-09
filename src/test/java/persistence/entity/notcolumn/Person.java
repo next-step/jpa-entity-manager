@@ -58,15 +58,15 @@ public class Person {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return Objects.equals(id, person.id) && Objects.equals(name, person.name) && Objects.equals(age, person.age) && Objects.equals(email, person.email) && Objects.equals(index, person.index);
+    public boolean equals(Object entity) {
+        if (this == entity) return true;
+        if (entity == null || getClass() != entity.getClass()) return false;
+        Person person = (Person) entity;
+        return Objects.equals(id, person.id) && Objects.equals(name, person.name) && Objects.equals(age, person.age) && Objects.equals(email, person.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, age, email, index);
+        return Objects.hash(id, name, age, email);
     }
 }

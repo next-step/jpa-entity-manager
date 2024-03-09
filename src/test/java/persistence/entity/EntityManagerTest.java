@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.notcolumn.Person;
+import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
@@ -48,39 +50,44 @@ class EntityManagerTest {
     @Test
     void find() {
         // given
-        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        entityManager.persist(person);
+        Person testFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(testFixture);
+
         // when
-        Person actual = entityManager.find(Person.class, 1L);
+        Person actual = entityManager.find(Person.class, 1L).get();
 
         // then
-        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", null);
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void persist() {
         // given & when
-        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        Person actual = (Person) entityManager.persist(person);
+        Person testsFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(testsFixture);
 
         // then
-        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", null);
+        Person actual = entityManager.find(Person.class, 1L).get();
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void remove() {
         // given
-        Person person_철수 = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        Person person_영희 = new Person("김영희", 15, "younghee.kim@gmail.com", 11);
-        Person person_짱구 = new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11);
-        Stream.of(person_철수, person_영희, person_짱구).forEach(person -> entityManager.persist(person));
+        List.of(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
+                        new Person("김영희", 15, "younghee.kim@gmail.com", 11),
+                        new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11))
+                .forEach(person -> entityManager.persist(person));
 
         // when
-        Person person_철수_Id1 = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", null);
-        entityManager.remove(person_철수_Id1);
+        entityManager.remove(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11));
 
-        Assertions.assertThatThrownBy(() -> entityManager.find(Person.class, 1L)).isInstanceOf(RuntimeException.class);
+        // then
+        String query = new SelectQueryBuilder(Person.class).getFindAllQuery();
+        List<Person> actual = jdbcTemplate.query(query, new DtoMapper<>(Person.class));
+        Assertions.assertThat(actual.get(0)).isEqualTo(new Person(2L, "김영희", 15, "younghee.kim@gmail.com", 11));
+        Assertions.assertThat(actual.get(1)).isEqualTo(new Person(3L, "신짱구", 15, "jjangoo.sin@gmail.com", 11));
     }
 }

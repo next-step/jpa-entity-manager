@@ -37,7 +37,7 @@ public class PrimaryKeyClause {
     private final GenerationType generationType;
 
     public PrimaryKeyClause(Field field) {
-        if (!field.isAnnotationPresent(jakarta.persistence.Id.class)) {
+        if (!field.isAnnotationPresent(Id.class)) {
             throw new NotIdException();
         }
         this.name = field.getName();
@@ -51,9 +51,7 @@ public class PrimaryKeyClause {
                 .findAny()
                 .orElseThrow(InvalidPrimaryKeyException::new);
 
-
         idField.setAccessible(true);
-
         try {
             return (Long) idField.get(entity);
         } catch (IllegalAccessException e) {

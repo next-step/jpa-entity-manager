@@ -1,8 +1,5 @@
 package persistence.sql.ddl;
 
-import jakarta.persistence.Entity;
-import persistence.sql.exception.InvalidEntityException;
-
 import static persistence.sql.common.SqlConstant.*;
 
 public class CreateQueryBuilder {
@@ -10,9 +7,6 @@ public class CreateQueryBuilder {
     private final TableClause tableClause;
 
     public CreateQueryBuilder(Class<?> entity) {
-        if (!entity.isAnnotationPresent(Entity.class)) {
-            throw new InvalidEntityException();
-        }
         this.tableClause = new TableClause(entity);
     }
 

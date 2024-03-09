@@ -1,16 +1,12 @@
 package persistence.sql.dml;
 
-import jakarta.persistence.Entity;
 import persistence.sql.ddl.TableClause;
 import persistence.sql.ddl.value.ValueClauses;
-import persistence.sql.exception.InvalidEntityException;
 import persistence.sql.exception.InvalidValueClausesException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static persistence.sql.common.SqlConstant.CLOSING_PARENTHESIS;
 import static persistence.sql.common.SqlConstant.COMMA;
@@ -19,25 +15,17 @@ public class InsertQueryBuilder {
     public static final String INSERT_QUERY_START = "INSERT INTO %s (";
     public static final String VALUES = " VALUES (";
     private final TableClause tableClause;
-    private final Class<?> entity;
 
     public InsertQueryBuilder(Class<?> entity) {
-        if (!entity.isAnnotationPresent(Entity.class)) {
-            throw new InvalidEntityException();
-        }
         this.tableClause = new TableClause(entity);
-        this.entity = entity;
     }
 
     public String getInsertQuery(Object entity) {
-
-        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
-
         return String.format(INSERT_QUERY_START, tableClause.name()) +
                 String.join(COMMA, tableClause.columnNames()) +
                 CLOSING_PARENTHESIS +
                 VALUES +
-                String.join(COMMA, new ValueClauses(fields, entity).getQueries()) +
+                String.join(COMMA, new ValueClauses(entity).getQueries()) +
                 CLOSING_PARENTHESIS;
     }
 
@@ -61,13 +49,13 @@ public class InsertQueryBuilder {
     private Object initInstance(List<String> columnNames, List<Object> columValues)
             throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
             NoSuchFieldException {
-        Object instance = tableClause.newInstance();
+        Object entity = tableClause.newInstance();
 
         for (int i = 0; i < columnNames.size(); i++) {
-            Field field = instance.getClass().getDeclaredField(columnNames.get(i));
+            Field field = entity.getClass().getDeclaredField(columnNames.get(i));
             field.setAccessible(true);
-            field.set(instance, columValues.get(i));
+            field.set(entity, columValues.get(i));
         }
-        return instance;
+        return entity;
     }
 }

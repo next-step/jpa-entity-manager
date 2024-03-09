@@ -13,6 +13,14 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
+    public int executeUpdate(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            return statement.executeUpdate(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
