@@ -16,7 +16,15 @@ public class Length {
         if (field.isAnnotationPresent(jakarta.persistence.Column.class)) {
             return field.getAnnotation(jakarta.persistence.Column.class).length();
         }
-        return 255;
+        return getColumnDefaultLength();
+    }
+
+    private int getColumnDefaultLength() {
+        try {
+            return (int) jakarta.persistence.Column.class.getMethod("length").getDefaultValue();
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getLengthString(Type type) {

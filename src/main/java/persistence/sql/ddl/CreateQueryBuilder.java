@@ -39,7 +39,7 @@ public class CreateQueryBuilder implements QueryBuilder {
         return Stream.of(column.getName(),
                         generateColumnType(column),
                         generateColumnAttribute(column))
-                .filter(s -> !s.isEmpty())
+                .filter(columnPiece -> !columnPiece.isEmpty())
                 .collect(Collectors.joining(SPACE));
     }
 
@@ -54,7 +54,7 @@ public class CreateQueryBuilder implements QueryBuilder {
                         DIALECT.getPrimaryKeyString(defaultColumn),
                         DIALECT.getGenerationTypeString(defaultColumn),
                         DIALECT.getConstraintString(defaultColumn))
-                .filter(s -> !s.isEmpty())
+                .filter(attributePiece -> !attributePiece.isEmpty())
                 .collect(Collectors.joining(SPACE));
     }
 

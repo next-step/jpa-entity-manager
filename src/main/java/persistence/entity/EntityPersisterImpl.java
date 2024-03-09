@@ -20,9 +20,9 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public void insert(Object entity) {
+    public Object insert(Object entity) {
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
-        jdbcTemplate.execute(insertQueryBuilder.build());
+        return jdbcTemplate.executeInsertQuery(insertQueryBuilder.build());
     }
 
     @Override

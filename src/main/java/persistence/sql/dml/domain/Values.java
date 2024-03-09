@@ -16,29 +16,29 @@ public class Values {
         this.values = List.of(value);
     }
 
-    public Values(Columns columns, Object object) {
-        this.values = createValues(columns, object);
+    public Values(Columns columns, Object entity) {
+        this.values = createValues(columns, entity);
     }
 
-    public Values(Class<?> clazz, List<String> whereColumns, List<Object> whereValues) {
-        this.values = createValues(clazz, whereColumns, whereValues);
+    public Values(Class<?> clazz, List<String> whereColumnNames, List<Object> whereValues) {
+        this.values = createValues(clazz, whereColumnNames, whereValues);
     }
 
-    private List<Value> createValues(Columns columns, Object object) {
+    private List<Value> createValues(Columns columns, Object entity) {
         return columns.getColumns().stream()
-                .map(column -> new Value(column, object))
+                .map(column -> new Value(column, entity))
                 .collect(Collectors.toList());
     }
 
-    private List<Value> createValues(Class<?> clazz, List<String> whereColumns, List<Object> whereValues) {
-        return IntStream.range(0, whereColumns.size())
-                .mapToObj(index -> createValue(clazz, whereColumns.get(index), whereValues.get(index)))
+    private List<Value> createValues(Class<?> clazz, List<String> whereColumnNames, List<Object> whereValues) {
+        return IntStream.range(0, whereColumnNames.size())
+                .mapToObj(index -> createValue(clazz, whereColumnNames.get(index), whereValues.get(index)))
                 .collect(Collectors.toList());
     }
 
-    private Value createValue(Class<?> clazz, String column, Object value) {
+    private Value createValue(Class<?> clazz, String columnName, Object value) {
         try {
-            Field field = clazz.getDeclaredField(column);
+            Field field = clazz.getDeclaredField(columnName);
             return new Value(Column.from(field), field.getType(), value);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);

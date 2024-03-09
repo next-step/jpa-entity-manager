@@ -37,4 +37,8 @@ public class Columns {
                 .orElseThrow(() -> new IllegalArgumentException("Primary key not found."));
     }
 
+    public void setPkValue(Object entity, Object id) {
+        getPrimaryKeyColumn().setFieldValue(entity, id);
+    }
+
 }

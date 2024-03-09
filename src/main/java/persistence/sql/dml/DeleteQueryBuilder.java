@@ -12,15 +12,15 @@ public class DeleteQueryBuilder implements QueryBuilder {
     private final Table table;
     private final WhereQueryBuilder whereQueryBuilder;
 
-    public DeleteQueryBuilder(Class<?> clazz, List<String> whereColumns, List<Object> whereValues) {
+    public DeleteQueryBuilder(Class<?> clazz, List<String> whereColumnNames, List<Object> whereValues) {
         this.table = new Table(clazz);
-        this.whereQueryBuilder = new WhereQueryBuilder(clazz, whereColumns, whereValues);
+        this.whereQueryBuilder = new WhereQueryBuilder(clazz, whereColumnNames, whereValues);
     }
 
-    public DeleteQueryBuilder(Object object) {
-        Class<?> clazz = object.getClass();
+    public DeleteQueryBuilder(Object entity) {
+        Class<?> clazz = entity.getClass();
         this.table = new Table(clazz);
-        this.whereQueryBuilder = new WhereQueryBuilder(object);
+        this.whereQueryBuilder = new WhereQueryBuilder(entity);
     }
 
     @Override

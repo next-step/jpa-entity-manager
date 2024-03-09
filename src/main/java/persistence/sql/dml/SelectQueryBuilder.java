@@ -16,10 +16,10 @@ public class SelectQueryBuilder implements QueryBuilder {
     private final Columns columns;
     private final WhereQueryBuilder whereQueryBuilder;
 
-    public SelectQueryBuilder(Class<?> clazz, List<String> whereColumns, List<Object> whereValues) {
+    public SelectQueryBuilder(Class<?> clazz, List<String> whereColumnNames, List<Object> whereValues) {
         this.table = new Table(clazz);
         this.columns = new Columns(clazz);
-        this.whereQueryBuilder = new WhereQueryBuilder(clazz, whereColumns, whereValues);
+        this.whereQueryBuilder = new WhereQueryBuilder(clazz, whereColumnNames, whereValues);
     }
 
     public SelectQueryBuilder(Class<?> clazz, Object id) {
@@ -41,7 +41,7 @@ public class SelectQueryBuilder implements QueryBuilder {
     private String generateColumns() {
         return columns.getColumns().stream()
                 .map(Column::getName)
-                .filter(s -> !s.isEmpty())
+                .filter(name -> !name.isEmpty())
                 .collect(Collectors.joining(COMMA));
     }
 }

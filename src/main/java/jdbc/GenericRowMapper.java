@@ -1,15 +1,13 @@
 package jdbc;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
+import persistence.sql.ddl.domain.Column;
+import persistence.sql.ddl.domain.Columns;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class GenericRowMapper<T> implements RowMapper<T> {
+
     private final Class<T> clazz;
 
     public GenericRowMapper(Class<T> clazz) {
@@ -19,38 +17,22 @@ public class GenericRowMapper<T> implements RowMapper<T> {
     @Override
     public T mapRow(final ResultSet resultSet) {
         try {
-            final List<Field> fields = getFields();
-            return toInstance(resultSet, fields);
+            Columns columns = new Columns(clazz);
+            return toInstance(resultSet, columns);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<Field> getFields() {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(this::isNotTransientAnnotationPresent)
-                .collect(Collectors.toList());
-    }
-
-    private String getFieldName(final Field field) {
-        if (field.isAnnotationPresent(Column.class) && !field.getAnnotation(Column.class).name().isBlank()) {
-            return field.getAnnotation(Column.class).name();
-        }
-
-        return field.getName();
-    }
-
-    private T toInstance(ResultSet resultSet, List<Field> fields) throws Exception {
+    private T toInstance(ResultSet resultSet, Columns columns) throws Exception {
         T instance = clazz.getDeclaredConstructor().newInstance();
-        for (Field field : fields) {
+
+        for (Column column : columns.getColumns()) {
+            Field field = column.getField();
             field.setAccessible(true);
-            field.set(instance, resultSet.getObject(getFieldName(field)));
+            field.set(instance, resultSet.getObject(column.getName()));
         }
         return instance;
-    }
-
-    private boolean isNotTransientAnnotationPresent(final Field field) {
-        return !field.isAnnotationPresent(Transient.class);
     }
 
 }
