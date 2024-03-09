@@ -4,7 +4,7 @@ import jdbc.JdbcTemplate;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.dml.SelectQueryBuilder;
 
-public class EntityManagerImpl<T> implements EntityManager<T>{
+public class EntityManagerImpl<T> implements EntityManager{
 
     private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
@@ -15,7 +15,7 @@ public class EntityManagerImpl<T> implements EntityManager<T>{
     }
 
     @Override
-    public T find(Class<T> clazz, Long id) {
+    public <T> T find(Class<T> clazz, Long id) {
         String query = new SelectQueryBuilder(clazz).getFindById(id);
         return jdbcTemplate.queryForObject(query, new DtoMapper<>(clazz));
     }

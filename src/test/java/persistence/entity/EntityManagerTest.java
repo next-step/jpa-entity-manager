@@ -23,7 +23,7 @@ class EntityManagerTest {
     DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
 
-    EntityManager<Person> entityManager;
+    EntityManager entityManager;
 
     @BeforeEach
     void setUp() {

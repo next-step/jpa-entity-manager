@@ -1,24 +1,24 @@
 package persistence.entity;
 
-public interface EntityManager<T> {
+public interface EntityManager {
     /**
      * 조회
      * @param clazz 클래스 타입
      * @param id 식별자
      * @return 조회 결과
      */
-    T find(Class<T> clazz, Long id);
+    <T> T find(Class<T> clazz, Long id);
 
     /**
      * 저장
      * @param entity 저장 대상
      * @return 저장 결과
      */
-    T persist(T entity);
+    <T> T persist(T entity);
 
     /**
      * 제거
      * @param entity 삭제 대상
      */
-    void remove(T entity);
+    void remove(Object entity);
 }
