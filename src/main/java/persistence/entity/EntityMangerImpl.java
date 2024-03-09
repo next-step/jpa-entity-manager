@@ -49,6 +49,12 @@ public class EntityMangerImpl implements EntityManger {
 
     @Override
     public Object merge(Object entity) {
+        EntityKey entityKey = EntityKey.fromEntity(entity);
+        EntityEntry entityEntry = entityEntryContext.getEntry(entityKey);
+
+        if(entityEntry == null) {
+            throw new EntityNotExistsException(entityKey);
+        }
         entityPersister.update(entity);
         persistenceContext.addEntity(EntityKey.fromEntity(entity), entity);
 

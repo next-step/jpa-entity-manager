@@ -126,6 +126,16 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
+    @DisplayName("merge 시 관리하고있지 않은 엔티티는 에러")
+    void throwWhenEntityEntryNotExists() {
+        Person person = new Person(null, "nick_name", 10, "test@test.com", null);
+
+        assertThrows(EntityNotExistsException.class, () -> {
+            entityManger.merge(person);
+        });
+    }
+
+    @Test
     @DisplayName("요구사항3: delete")
     void testDelete() {
         Person person = new Person(1L, "nick_name", 10, "df", null);
