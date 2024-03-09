@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.context;
 
 import database.DatabaseServer;
 import database.H2;
@@ -12,20 +12,25 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.context.PersistenceContext;
-import persistence.context.SimplePersistenceContext;
+import persistence.entity.EntityLoader;
+import persistence.entity.EntityLoaderImpl;
+import persistence.entity.EntityPersister;
+import persistence.entity.EntityPersisterImpl;
+import persistence.entity.EntitySnapshot;
+import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 import pojo.EntityMetaData;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
 
 import java.sql.SQLException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class EntityPersisterImplTest {
+class SimplePersistenceContextTest {
 
     static Dialect dialect = new H2Dialect();
     static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
@@ -67,33 +72,18 @@ class EntityPersisterImplTest {
         server.stop();
     }
 
-    @DisplayName("insert 테스트")
+    @DisplayName("persist 후 조회 시 cachedSnapshot 과 일치 여부 확인")
     @Test
-    void insertTest() {
-        entityPersister.insert(person);
-        Person3 person3 = simpleEntityManager.find(person.getClass(), person.getId());
-        assertAll(
-                () -> assertThat(person3.getId()).isEqualTo(person.getId()),
-                () -> assertThat(person3.getName()).isEqualTo(person.getName()),
-                () -> assertThat(person3.getAge()).isEqualTo(person.getAge()),
-                () -> assertThat(person3.getEmail()).isEqualTo(person.getEmail())
-        );
-    }
-
-    @DisplayName("insert 후 update 테스트")
-    @Test
-    void updateTest() {
+    void addEntityAndGetCachedDatabaseSnapshotTest() {
         insertData();
-        boolean result = entityPersister.update(new Person3(person.getId(), "test", 35, "test@test.com"));
-        assertThat(result).isTrue();
-    }
+        simpleEntityManager.find(person.getClass(), person.getId());
 
-    @DisplayName("delete 후 조회하려고 할 때 exception 테스트")
-    @Test
-    void deleteTest() {
-        insertData();
-        entityPersister.delete(person);
-        assertThrows(RuntimeException.class, () -> entityLoader.findById(person.getClass(), person.getId()));
+        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(person.getId(), person);
+
+        FieldInfo idFieldData = new FieldInfos(person.getClass().getDeclaredFields()).getIdFieldData();
+        FieldName idFieldName = new FieldName(idFieldData.getField());
+
+        assertEquals(cachedDatabaseSnapshot.getMap().get(idFieldName.getName()), Long.toString(person.getId()));
     }
 
     private void createTable() {
