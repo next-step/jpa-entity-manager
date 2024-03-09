@@ -60,6 +60,6 @@ class DMLGeneratorTest {
         String result = dmlGenerator.generateUpdateById(person, 1L);
 
         // then
-        assertThat(result).isEqualTo("UPDATE users SET nick_name = 'name' AND old = 26 AND email = 'email' WHERE id = 1;");
+        assertThat(result).isEqualTo("UPDATE users SET nick_name = 'name', old = 26, email = 'email' WHERE id = 1;");
     }
 }

@@ -17,7 +17,7 @@ public class WhereClause {
         this.entity = entity;
     }
 
-    public String getWhereClause() {
+    public String getWhereClause(String delimiter) {
         return Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> {
@@ -25,7 +25,7 @@ public class WhereClause {
                     return Optional.ofNullable(getFieldValue(field)).isPresent();
                 })
                 .map(this::toWhereClause)
-                .collect(Collectors.joining(" AND "));
+                .collect(Collectors.joining(delimiter));
     }
 
     private String toWhereClause(Field field) {

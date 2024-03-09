@@ -57,4 +57,23 @@ class EntityPersisterTest {
         Person result = entityManager.find(Person.class, 1L);
         assertThat(result.getName()).isEqualTo(name);
     }
+
+    @Test
+    @DisplayName("Person 을 수정한다.")
+    void update() {
+        // given
+        long id = 1L;
+        entityPersister.insert(new Person("name", 26, "email", 1));
+        Person person = entityManager.find(Person.class, id);
+
+        String newName = "juri";
+        person.changeName(newName);
+
+        // when
+        entityPersister.update(person, id);
+
+        // then
+        Person result = entityManager.find(Person.class, id);
+        assertThat(result.getName()).isEqualTo(newName);
+    }
 }

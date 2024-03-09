@@ -20,5 +20,10 @@ public class EntityPersister {
         String sql = dmlGenerator.generateInsert(entity);
         jdbcTemplate.execute(sql);
     }
+
+    public boolean update(Object entity, Long id) {
+        String sql = dmlGenerator.generateUpdateById(entity, id);
+        return jdbcTemplate.executeUpdate(sql) == 1;
+    }
 }
 

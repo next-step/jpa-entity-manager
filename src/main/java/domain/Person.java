@@ -50,15 +50,7 @@ public class Person {
         return name;
     }
 
-    public Integer getAge() {
-        return age;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Integer getIndex() {
-        return index;
+    public void changeName(String newName) {
+        this.name = newName;
     }
 }

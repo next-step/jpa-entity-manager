@@ -16,7 +16,7 @@ class WhereClauseTest {
         WhereClause whereClause = new WhereClause(person);
 
         // when
-        String result = whereClause.getWhereClause();
+        String result = whereClause.getWhereClause(" AND ");
 
         // then
         assertThat(result).isEqualTo("nick_name = 'name' AND old = 26");

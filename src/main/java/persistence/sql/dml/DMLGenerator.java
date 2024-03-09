@@ -42,13 +42,13 @@ public class DMLGenerator {
         TableName tableName = TableName.from(this.entity);
         WhereClause whereClause = new WhereClause(entity);
 
-        return String.format(UPDATE_QUERY, tableName.getName(), whereClause.getWhereClause(), id);
+        return String.format(UPDATE_QUERY, tableName.getName(), whereClause.getWhereClause(", "), id);
     }
 
     public String generateDelete(Object entity) {
         TableName tableName = TableName.from(this.entity);
         WhereClause whereClause = new WhereClause(entity);
 
-        return String.format(DELETE_QUERY, tableName.getName(), " where " + whereClause.getWhereClause());
+        return String.format(DELETE_QUERY, tableName.getName(), " where " + whereClause.getWhereClause(" AND "));
     }
 }
