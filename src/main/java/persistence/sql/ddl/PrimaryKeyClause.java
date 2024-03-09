@@ -36,7 +36,7 @@ public class PrimaryKeyClause {
     private final String dataType;
     private final GenerationType generationType;
 
-    public PrimaryKeyClause(Class<?> entity, Field field) {
+    public PrimaryKeyClause(Field field) {
         if (!field.isAnnotationPresent(Id.class)) {
             throw new NotIdException();
         }

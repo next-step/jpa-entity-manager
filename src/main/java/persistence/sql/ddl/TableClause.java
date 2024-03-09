@@ -55,7 +55,7 @@ public class TableClause {
         return Stream.of(entity.getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findFirst()
-                .map(x-> new PrimaryKeyClause(entity, x))
+                .map(PrimaryKeyClause::new)
                 .orElseThrow(NotIdException::new);
     }
 
