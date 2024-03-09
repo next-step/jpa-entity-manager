@@ -1,8 +1,6 @@
 package persistence.sql.dml;
 
-import jakarta.persistence.Entity;
 import persistence.sql.ddl.TableClause;
-import persistence.sql.exception.InvalidEntityException;
 
 public class DeleteQueryBuilder {
     public static final String DELETE_ALL_QUERY = "DELETE FROM %s";
@@ -10,9 +8,6 @@ public class DeleteQueryBuilder {
     private final TableClause tableClause;
 
     public DeleteQueryBuilder(Class<?> entity) {
-        if (!entity.isAnnotationPresent(Entity.class)) {
-            throw new InvalidEntityException();
-        }
         this.tableClause = new TableClause(entity);
     }
 

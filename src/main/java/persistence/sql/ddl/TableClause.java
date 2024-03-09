@@ -1,8 +1,10 @@
 package persistence.sql.ddl;
 
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import persistence.sql.ddl.column.ColumnClauses;
+import persistence.sql.exception.InvalidEntityException;
 import persistence.sql.exception.NotIdException;
 
 import java.lang.reflect.Field;
@@ -19,6 +21,9 @@ public class TableClause {
     private final Object instanceOfTable;
 
     public TableClause(Class<?> entity) {
+        if (!entity.isAnnotationPresent(Entity.class)) {
+            throw new InvalidEntityException();
+        }
         this.name = getTableName(entity);
         this.primaryKeyClause = extractIdFrom(entity);
         this.columnClauses = extractColumnsFrom(entity);

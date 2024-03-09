@@ -1,9 +1,7 @@
 package persistence.sql.dml;
 
-import jakarta.persistence.Entity;
 import persistence.sql.ddl.TableClause;
 import persistence.sql.ddl.value.ValueClauses;
-import persistence.sql.exception.InvalidEntityException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,9 +18,6 @@ public class UpdateQueryBuilder {
     private final TableClause tableClause;
 
     public UpdateQueryBuilder(Class<?> entity) {
-        if (!entity.isAnnotationPresent(Entity.class)) {
-            throw new InvalidEntityException();
-        }
         this.tableClause = new TableClause(entity);
     }
 
