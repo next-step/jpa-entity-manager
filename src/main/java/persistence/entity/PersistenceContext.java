@@ -11,4 +11,8 @@ public interface PersistenceContext {
     boolean isCached(Object entity);
 
     Object getDatabaseSnapshot(EntityId id, Object entity);
+
+    EntityEntry getEntityEntry(Object entity);
+
+    EntityEntry getEntityEntry(Class<?> clazz, EntityId id);
 }

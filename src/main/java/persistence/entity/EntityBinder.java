@@ -17,8 +17,9 @@ public class EntityBinder {
     }
 
     private Table buildTable(Object entity) {
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
         Class<?> clazz = entity.getClass();
-        return new Table(clazz);
+        return entityMetaCache.getTable(clazz);
     }
 
     public EntityId getEntityId() {

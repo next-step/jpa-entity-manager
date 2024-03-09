@@ -8,11 +8,9 @@ import persistence.sql.model.Table;
 public class EntityPersister {
 
     private final Database database;
-    private final EntityMetaCache entityMetaCache;
 
-    public EntityPersister(Database database, EntityMetaCache entityMetaCache) {
+    public EntityPersister(Database database) {
         this.database = database;
-        this.entityMetaCache = entityMetaCache;
     }
 
     public EntityId create(Object entity) {
@@ -46,6 +44,7 @@ public class EntityPersister {
     }
 
     private Table createTable(Object entity) {
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
         Class<?> clazz = entity.getClass();
         return entityMetaCache.getTable(clazz);
     }

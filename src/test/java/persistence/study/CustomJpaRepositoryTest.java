@@ -38,9 +38,8 @@ public class CustomJpaRepositoryTest {
         jdbcTemplate = new JdbcTemplate(jdbcConnection);
         Database database = new SimpleDatabase(jdbcTemplate);
 
-        EntityMetaCache entityMetaCache = new EntityMetaCache();
-        entityPersister = new EntityPersister(database, entityMetaCache);
-        entityLoader = new EntityLoader(database, entityMetaCache);
+        entityPersister = new EntityPersister(database);
+        entityLoader = new EntityLoader(database);
         entityManager = new SimpleEntityManager(entityPersister, entityLoader);
 
         Dialect dialect = new H2Dialect();

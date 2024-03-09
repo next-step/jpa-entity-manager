@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import persistence.sql.model.Table;
 
 import java.util.Objects;
@@ -19,11 +20,25 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, EntityId id) {
-        T cachedEntity = persistenceContext.getEntity(clazz, id);
-        if (cachedEntity != null) {
-            return cachedEntity;
+        EntityEntry entry = persistenceContext.getEntityEntry(clazz, id);
+
+        if (entry == null) {
+            T findEntity = loader.read(clazz, id);
+            persistenceContext.addEntity(id, findEntity);
+            return findEntity;
         }
 
+        Status status = entry.status();
+
+        if (status == Status.GONE) {
+            throw new EntityNotFoundException();
+        }
+
+        if (status == Status.MANAGED) {
+            return persistenceContext.getEntity(clazz, id);
+        }
+
+        entry.loading();
         T findEntity = loader.read(clazz, id);
         persistenceContext.addEntity(id, findEntity);
         return findEntity;
@@ -46,7 +61,21 @@ public class SimpleEntityManager implements EntityManager {
             return;
         }
 
+        EntityEntry entry = persistenceContext.getEntityEntry(entity);
+        if (entry == null) {
+            EntityId id = persister.update(entity);
+            persistenceContext.addEntity(id, entity);
+            return;
+        }
+
+        Status status = entry.status();
+        if (status == Status.READ_ONLY) {
+            return;
+        }
+
         if (isDirty(entity)) {
+            entry.saving();
+
             EntityId id = persister.update(entity);
             persistenceContext.addEntity(id, entity);
         }
@@ -85,13 +114,17 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private Table createTable(Object entity) {
+        EntityMetaCache entityMetaCache = EntityMetaCache.INSTANCE;
         Class<?> clazz = entity.getClass();
-        return new Table(clazz);
+        return entityMetaCache.getTable(clazz);
     }
 
     @Override
     public void remove(Object entity) {
         persistenceContext.removeEntity(entity);
         persister.delete(entity);
+
+        EntityEntry entry = persistenceContext.getEntityEntry(entity);
+        entry.gone();
     }
 }
