@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.dml.BooleanExpression.eq;
 
 class EntityPersisterTest extends H2DBTestSupport {
-    private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
+    private final EntityPersister entityPersister = new EntityPersisterImpl(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
 
     @BeforeEach
     public void setUp() {
