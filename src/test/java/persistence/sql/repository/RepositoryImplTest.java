@@ -8,6 +8,7 @@ import persistence.repository.Repository;
 import persistence.repository.RepositoryImpl;
 import persistence.sql.db.H2Database;
 import persistence.sql.dml.exception.InvalidDeleteNullPointException;
+import persistence.sql.entity.exception.RemoveEntityException;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,9 +56,9 @@ class RepositoryImplTest extends H2Database {
     void deleteIdTest() {
         personRepository.deleteById(1L);
 
-        Optional<Person> person = personRepository.findById(1L);
-
-        assertThat(person.isPresent()).isFalse();
+        assertThatThrownBy(() -> personRepository.findById(1L))
+                .isInstanceOf(RemoveEntityException.class)
+                .hasMessage("삭제된 엔티티입니다.");
     }
 
     @DisplayName("디비에 없는값을 제거시 에러를 반환한다.")
