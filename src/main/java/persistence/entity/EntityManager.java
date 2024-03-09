@@ -17,13 +17,6 @@ public interface EntityManager<T> {
     T persist(T entity);
 
     /**
-     * 업데이트
-     * @param entity 업데이트 대상
-     * @return 업데이트 결과
-     */
-    boolean update(T entity);
-
-    /**
      * 제거
      * @param entity 삭제 대상
      */

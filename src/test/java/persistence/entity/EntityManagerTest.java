@@ -53,13 +53,14 @@ class EntityManagerTest {
     @Test
     void find() {
         // given
+        Long personId = 1L;
         jdbcTemplate.execute(new InsertQueryBuilder(Person.class).getInsertQuery(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11)));
 
         // when
-        Person actual = entityManager.find(Person.class, 1L);
+        Person actual = entityManager.find(Person.class, personId);
 
         // then
-        Assertions.assertThat(actual).isEqualTo(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
+        Assertions.assertThat(actual).isEqualTo(new Person(personId, "김철수", 21, "chulsoo.kim@gmail.com", 11));
     }
 
     @Test
@@ -68,7 +69,7 @@ class EntityManagerTest {
         Person actual = entityManager.persist(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
 
         // then
-        Assertions.assertThat(actual).isEqualTo(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
+        Assertions.assertThat(actual).isEqualTo(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11));
     }
 
     @Test
@@ -89,22 +90,7 @@ class EntityManagerTest {
         // then
         String query = new SelectQueryBuilder(Person.class).getFindAllQuery();
         List<Person> actual = jdbcTemplate.query(query, new DtoMapper<>(Person.class));
-        Assertions.assertThat(actual.get(0)).isEqualTo(new Person("김영희", 15, "younghee.kim@gmail.com", 11));
-        Assertions.assertThat(actual.get(1)).isEqualTo(new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11));
-    }
-
-    @Test
-    void update() {
-        // given
-        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).getInsertQuery(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11)));
-
-        // when
-        Assertions.assertThat(entityManager.update(new Person("김영희", 15, "younghee.kim@gmail.com", 11))).isEqualTo(true);
-
-        List<Person> result = jdbcTemplate.query(new SelectQueryBuilder(Person.class).getFindAllQuery(), new DtoMapper<>(Person.class));
-
-        // then
-        Assertions.assertThat(result.size()).isEqualTo(1L);
-        Assertions.assertThat(result.get(0)).isEqualTo(new Person("김영희", 15, "younghee.kim@gmail.com", 11));
+        Assertions.assertThat(actual.get(0)).isEqualTo(new Person(2L, "김영희", 15, "younghee.kim@gmail.com", 11));
+        Assertions.assertThat(actual.get(1)).isEqualTo(new Person(3L, "신짱구", 15, "jjangoo.sin@gmail.com", 11));
     }
 }

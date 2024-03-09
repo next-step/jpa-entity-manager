@@ -26,11 +26,6 @@ public class EntityManagerImpl<T> implements EntityManager<T>{
     }
 
     @Override
-    public boolean update(Object entity) {
-        return entityPersister.update(entity);
-    }
-
-    @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
     }
