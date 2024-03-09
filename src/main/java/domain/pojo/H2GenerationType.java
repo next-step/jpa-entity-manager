@@ -1,4 +1,4 @@
-package domain;
+package domain.pojo;
 
 import jakarta.persistence.GenerationType;
 

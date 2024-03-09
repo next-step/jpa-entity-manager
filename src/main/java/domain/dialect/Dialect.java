@@ -31,4 +31,6 @@ public abstract class Dialect {
     public abstract String getTypeToStr(Class<?> clazz);
 
     public abstract void checkJavaType(Integer typeCode);
+
+    public abstract boolean isVarcharType(Class<?> type);
 }

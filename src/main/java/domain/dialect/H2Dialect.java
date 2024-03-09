@@ -31,4 +31,9 @@ public class H2Dialect extends Dialect {
             throw new IllegalStateException("지원하는 javaType 이 아닙니다.");
         }
     }
+
+    @Override
+    public boolean isVarcharType(Class<?> type) {
+        return getJavaTypeByClass(type).equals(Types.VARCHAR);
+    }
 }

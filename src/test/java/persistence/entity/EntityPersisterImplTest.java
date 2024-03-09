@@ -2,10 +2,10 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
-import domain.EntityMetaData;
-import domain.Person3;
 import domain.dialect.Dialect;
 import domain.dialect.H2Dialect;
+import domain.entity.Person3;
+import domain.pojo.EntityMetaData;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

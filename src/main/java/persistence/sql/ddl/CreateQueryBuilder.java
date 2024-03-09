@@ -1,22 +1,21 @@
 package persistence.sql.ddl;
 
-import domain.EntityMetaData;
-import domain.H2GenerationType;
 import domain.dialect.Dialect;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
+import domain.pojo.EntityMetaData;
+import domain.pojo.FieldInfo;
+import domain.pojo.FieldInfos;
+import domain.pojo.FieldName;
 
 import java.lang.reflect.Field;
-import java.sql.Types;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static domain.Constraints.NOT_NULL;
-import static domain.Constraints.NULL;
-import static domain.Constraints.PRIMARY_KEY;
 import static domain.constants.CommonConstants.COMMA;
+import static domain.constants.CommonConstants.SPACE;
+import static domain.pojo.Constraints.NOT_NULL;
+import static domain.pojo.Constraints.PRIMARY_KEY;
 
 public class CreateQueryBuilder {
 
@@ -31,77 +30,32 @@ public class CreateQueryBuilder {
     }
 
     public String createTable(Object object) {
-        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableName(), createClause(entityMetaData.getIdAndColumnFields(object)));
+        FieldInfos fieldInfos = new FieldInfos(object.getClass().getDeclaredFields());
+        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableInfo().getName(), createClause(fieldInfos.getFieldDataList()));
     }
 
-    private String createClause(List<Field> fields) {
-        return fields.stream()
+    private String createClause(List<FieldInfo> fieldInfoList) {
+        return fieldInfoList.stream()
                 .map(this::getFieldInfo)
                 .collect(Collectors.joining(COMMA))
                 .replaceAll(",[\\s,]*$", "");
     }
 
-    private String getFieldInfo(Field field) {
-        if (entityMetaData.isIdField(field)) {
-            return Stream.of(
-                            entityMetaData.getFieldName(field), getFieldType(field),
-                            NOT_NULL.getName(), PRIMARY_KEY.getName(), getGenerationType(field))
+    private String getFieldInfo(FieldInfo fieldInfo) {
+        Field field = fieldInfo.getField();
+        String fieldName = new FieldName(field).getName();
+        boolean varcharType = dialect.isVarcharType(field.getType());
+
+        if (fieldInfo.isIdField()) {
+            return Stream.of(fieldName, dialect.getTypeToStr(field.getType()), NOT_NULL.getName(),
+                            PRIMARY_KEY.getName(), fieldInfo.getGenerationTypeStrategy())
                     .filter(Objects::nonNull)
-                    .collect(Collectors.joining(" "));
+                    .collect(Collectors.joining(SPACE));
         }
 
-        return Stream.of(
-                        entityMetaData.getFieldName(field), getFieldType(field),
-                        getFieldLength(field), getColumnNullConstraint(field))
+        return Stream.of(fieldName, dialect.getTypeToStr(field.getType()),
+                        fieldInfo.getFieldLength(varcharType), fieldInfo.getColumnNullConstraint())
                 .filter(Objects::nonNull)
-                .collect(Collectors.joining(" "));
-    }
-
-    public String getFieldType(Field field) {
-        return dialect.getTypeToStr(field.getType());
-    }
-
-    public String getFieldLength(Field field) {
-        return Objects.nonNull(getColumnLength(field)) ? "(" + getColumnLength(field) + ")" : null;
-    }
-
-    public String getGenerationType(Field field) {
-        if (field.isAnnotationPresent(GeneratedValue.class)) {
-            return H2GenerationType.from(field.getAnnotation(GeneratedValue.class).strategy()).getStrategy();
-        }
-        return null;
-    }
-
-    public String getColumnNullConstraint(Field field) {
-        if (!isColumnField(field) || field.getAnnotation(Column.class).nullable()) {
-            return NULL.getName();
-        }
-        return NOT_NULL.getName();
-    }
-
-    private boolean isColumnField(Field field) {
-        return field.isAnnotationPresent(Column.class);
-    }
-
-    private String getColumnLength(Field field) {
-        if (isColumnField(field) && isVarcharType(field)) {
-            return String.valueOf(field.getAnnotation(Column.class).length());
-        }
-
-        if (isColumnField(field) && !isVarcharType(field)) {
-            return getLengthOrDefaultValue(field, 255);
-        }
-
-        return null;
-    }
-
-    private boolean isVarcharType(Field field) {
-        Integer javaTypeByClass = dialect.getJavaTypeByClass(field.getType());
-        return javaTypeByClass.equals(Types.VARCHAR);
-    }
-
-    private String getLengthOrDefaultValue(Field field, int defaultLengthValue) {
-        return field.getAnnotation(Column.class).length() == defaultLengthValue ? null
-                : String.valueOf(field.getAnnotation(Column.class).length());
+                .collect(Collectors.joining(SPACE));
     }
 }
