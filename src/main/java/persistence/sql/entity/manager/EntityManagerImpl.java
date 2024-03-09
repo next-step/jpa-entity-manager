@@ -3,6 +3,8 @@ package persistence.sql.entity.manager;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.context.PersistenceContext;
 import persistence.sql.entity.context.PersistenceContextImpl;
+import persistence.sql.entity.exception.ReadOnlyException;
+import persistence.sql.entity.exception.RemoveEntityException;
 import persistence.sql.entity.loader.EntityLoader;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.persister.EntityPersister;
@@ -31,23 +33,53 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
         T persistenceEntity = persistenceContext.getEntity(clazz, id);
+        if(persistenceContext.isGone(clazz,id)) {
+            throw new RemoveEntityException();
+        }
+
         if(persistenceEntity != null) {
+            persistenceContext.loading(persistenceEntity, id);
             return persistenceEntity;
         }
 
+        if(persistenceContext.isGone(clazz,id)) {
+            throw new RemoveEntityException();
+        }
+
         T entity = entityLoader.find(clazz, id);
-        insertEntityLoader(entity, id);
+        if(entity != null) {
+            insertEntityLoader(entity, id);
+            persistenceContext.loading(entity, id);
+        }
         return entity;
     }
 
-    private void insertEntityLoader(final Object entity, final Object id) {
-        if(entity != null) {
-            persistenceContext.addEntity(entity, id);
+    @Override
+    public <T> T findOfReadOnly(Class<T> clazz, Object id) {
+        T persistenceEntity = persistenceContext.getEntity(clazz, id);
+        if(persistenceEntity != null) {
+            persistenceContext.readOnly(persistenceEntity, id);
+            return persistenceEntity;
         }
+
+        if(persistenceContext.isGone(clazz,id)) {
+            throw new RemoveEntityException();
+        }
+
+        T entity = entityLoader.find(clazz, id);
+        if(entity != null) {
+            insertEntityLoader(entity, id);
+            persistenceContext.readOnly(entity, id);
+        }
+        return entity;
     }
 
     @Override
     public void persist(final Object entity) {
+        if(persistenceContext.isReadOnly(entity)) {
+            throw new ReadOnlyException();
+        }
+
         final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
         final DomainType pkDomainType = entityMappingTable.getPkDomainTypes();
         final Object key = pkDomainType.getValue();
@@ -60,6 +92,13 @@ public class EntityManagerImpl implements EntityManager {
         final Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), key);
         if(!entity.equals(snapshotEntity)) {
             updateEntity(entity, key);
+            persistenceContext.saving(entity);
+        }
+    }
+
+    private void insertEntityLoader(final Object entity, final Object id) {
+        if(entity != null) {
+            persistenceContext.addEntity(entity, id);
         }
     }
 
@@ -75,8 +114,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(final Object entity) {
-        entityPersister.delete(entity);
+        if(persistenceContext.isReadOnly(entity)) {
+            throw new ReadOnlyException();
+        }
+
         persistenceContext.removeEntity(entity);
+        entityPersister.delete(entity);
+        persistenceContext.goneEntity(entity);
     }
 
     @Override
