@@ -14,6 +14,7 @@ import persistence.sql.entity.impl.EntityLoaderImpl;
 import persistence.sql.entity.impl.EntityManagerImpl;
 import persistence.sql.entity.impl.EntityPersisterImpl;
 import persistence.sql.meta.EntityMetaCreator;
+import persistence.sql.meta.Table;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import java.sql.Connection;
@@ -35,12 +36,13 @@ class EntityManagerImplTest {
         jdbcTemplate = new JdbcTemplate(connection);
 
         entityMetaCreator = new SimpleEntityMetaCreator();
-        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder(entityMetaCreator);
-        final String dropSql = ddlDropQueryBuilder.dropDdl(Person.class);
+        final Table table = entityMetaCreator.createByClass(Person.class);
+        final DdlDropQueryBuilder ddlDropQueryBuilder = new DdlDropQueryBuilder();
+        final String dropSql = ddlDropQueryBuilder.dropDdl(table);
         jdbcTemplate.execute(dropSql);
 
-        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(new H2Dialect(), entityMetaCreator);
-        final String createSql = ddlCreateQueryBuilder.createDdl(Person.class);
+        final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(new H2Dialect());
+        final String createSql = ddlCreateQueryBuilder.createDdl(table);
         jdbcTemplate.execute(createSql);
     }
 

@@ -3,7 +3,6 @@ package persistence.sql.ddl;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Columns;
-import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.PrimaryKey;
 import persistence.sql.meta.Table;
 
@@ -16,15 +15,12 @@ public class DdlCreateQueryBuilder {
     private static final String CREATE_DEFAULT_DDL = "create table %s (%s)";
     public static final String COMMA = ", ";
     private final Dialect dialect;
-    private final EntityMetaCreator entityMetaCreator;
 
-    public DdlCreateQueryBuilder(final Dialect dialect, final EntityMetaCreator entityMetaCreator) {
+    public DdlCreateQueryBuilder(final Dialect dialect) {
         this.dialect = dialect;
-        this.entityMetaCreator = entityMetaCreator;
     }
 
-    public String createDdl(Class<?> clazz) {
-        final Table table = entityMetaCreator.createByClass(clazz);
+    public String createDdl(Table table) {
         return String.format(CREATE_DEFAULT_DDL, table.name(), createColumns(table));
     }
 
