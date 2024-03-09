@@ -3,11 +3,8 @@ package persistence.sql.dml;
 import persistence.sql.ddl.TableClause;
 import persistence.sql.ddl.value.ValueClauses;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static persistence.sql.common.SqlConstant.COMMA;
 
@@ -29,9 +26,7 @@ public class UpdateQueryBuilder {
     public String getQuery(Object entity, Long id) {
 
         List<String> columnNames = this.tableClause.columnNames();
-
-        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
-        List<String> values = new ValueClauses(fields, entity).values();
+        List<String> values = new ValueClauses(entity).values();
 
         List<String> setClauses = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
