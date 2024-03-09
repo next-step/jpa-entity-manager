@@ -19,8 +19,9 @@ class EntityMangerImplTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersister(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
     private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
     private final PersistenceContext persistenceContext = new PersistenceContextImpl();
+    private final EntityEntryContext entityEntryContext = new EntityEntryContext();
     private final EntityManger entityManger =
-            new EntityMangerImpl(entityPersister, entityLoader, persistenceContext);
+            new EntityMangerImpl(entityPersister, entityLoader, persistenceContext, entityEntryContext);
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
 
@@ -86,6 +87,17 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         Person findEntity = (Person) persistenceContext.getEntity(EntityKey.fromEntity(saved));
         assertThat(findEntity.getId()).isEqualTo(person.getId());
+    }
+
+    @Test
+    @DisplayName("persist 시 entiryEntryContext에 managed 상태로 저장된다.")
+    void testManagedStatusEntryAddedAtPersist() {
+        Person person = new Person(null, "nick_name", 10, "df", null);
+
+        Person saved = (Person) entityManger.persist(person);
+
+        EntityEntry entityEntry = entityEntryContext.getEntry(EntityKey.fromEntity(saved));
+        assertThat(entityEntry.getStatus()).isEqualTo(Status.MANAGED);
     }
 
     @Test

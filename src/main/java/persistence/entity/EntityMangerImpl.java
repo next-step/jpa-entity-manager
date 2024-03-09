@@ -4,15 +4,18 @@ public class EntityMangerImpl implements EntityManger {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
     private final PersistenceContext persistenceContext;
+    private final EntityEntryContext entityEntryContext;
 
     public EntityMangerImpl(
             EntityPersister entityPersister,
             EntityLoader entityLoader,
-            PersistenceContext persistenceContext
+            PersistenceContext persistenceContext,
+            EntityEntryContext entityEntryContext
     ) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
         this.persistenceContext = persistenceContext;
+        this.entityEntryContext = entityEntryContext;
     }
 
     @Override
@@ -31,7 +34,10 @@ public class EntityMangerImpl implements EntityManger {
     @Override
     public Object persist(Object entity) {
         entityPersister.insert(entity);
-        persistenceContext.addEntity(EntityKey.fromEntity(entity), entity);
+        EntityKey entityKey = EntityKey.fromEntity(entity);
+        persistenceContext.addEntity(entityKey, entity);
+        EntityEntry entityEntry = new EntityEntry(entityPersister, entityLoader, Status.MANAGED);
+        entityEntryContext.addEntry(entityKey, entityEntry);
 
         return entity;
     }
