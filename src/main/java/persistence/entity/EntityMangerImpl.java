@@ -33,8 +33,13 @@ public class EntityMangerImpl implements EntityManger {
 
     @Override
     public Object persist(Object entity) {
-        entityPersister.insert(entity);
         EntityKey entityKey = EntityKey.fromEntity(entity);
+        if(entityKey.hasId()) {
+            throw new EntityAlreadyExistsException(entityKey);
+        }
+
+        entityPersister.insert(entity);
+        entityKey = EntityKey.fromEntity(entity);
         persistenceContext.addEntity(entityKey, entity);
         EntityEntry entityEntry = new EntityEntry(entityPersister, entityLoader, Status.MANAGED);
         entityEntryContext.addEntry(entityKey, entityEntry);

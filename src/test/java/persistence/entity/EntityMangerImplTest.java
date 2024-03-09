@@ -101,6 +101,17 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
+    @DisplayName("persist 이미 관리하고 있을시 에러")
+    void throwWhenEntityAlreadyExist() {
+        Person person = new Person(null, "nick_name", 10, "df", null);
+        Person saved = (Person) entityManger.persist(person);
+
+        assertThrows(EntityAlreadyExistsException.class, () -> {
+            entityManger.persist(saved);
+        });
+    }
+
+    @Test
     @DisplayName("update db 저장 테스트")
     void testPersistUpdate() {
         String newName = "new_nick_name";
