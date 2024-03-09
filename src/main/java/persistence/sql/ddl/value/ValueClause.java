@@ -15,7 +15,7 @@ public class ValueClause {
         try {
             value = field.get(entity);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("value 생성에 실패하였습니다.");
+            throw new RuntimeException("value 생성에 실패하였습니다.", e);
         }
         if (String.class.isAssignableFrom(field.getType()) && value != null) {
             return APOSTROPHE + value + APOSTROPHE;

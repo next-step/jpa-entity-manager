@@ -45,21 +45,18 @@ public class PrimaryKeyClause {
         this.generationType = getType(field);
     }
 
-    private static Long getValue(Class<?> entity, Field field) {
-        try {
-            field.setAccessible(true);
-            return (Long) field.get(entity);
-        } catch (IllegalAccessException e) {
-            return null;
-        }
-    }
-
-    public static Long primaryKeyValue(Object entity) {
+    public static Long primaryKeyValue(Object entity ) {
         Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findAny()
                 .orElseThrow(InvalidPrimaryKeyException::new);
-        return getValue(entity.getClass(), idField);
+
+        idField.setAccessible(true);
+        try {
+            return (Long) idField.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new InvalidPrimaryKeyException();
+        }
     }
 
     public String name() {
