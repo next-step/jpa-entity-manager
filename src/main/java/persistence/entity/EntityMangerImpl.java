@@ -44,6 +44,8 @@ public class EntityMangerImpl implements EntityManger {
             throw new EntityAlreadyExistsException(entityKey);
         }
 
+        // TODO: entityEntry 에 SAVING 상태로 등록. id 가 없는데 어떻게?
+
         entityPersister.insert(entity);
         entityKey = EntityKey.fromEntity(entity);
         persistenceContext.addEntity(entityKey, entity);
@@ -61,8 +63,11 @@ public class EntityMangerImpl implements EntityManger {
         if(entityEntry == null || persistenceContext.getEntity(entityKey) == null) {
             throw new EntityNotExistsException(entityKey);
         }
-        entityPersister.update(entity);
-        persistenceContext.addEntity(EntityKey.fromEntity(entity), entity);
+
+        entityEntry.setSaving();
+        entityEntry.getEntityPersister().update(entity);
+        persistenceContext.addEntity(entityKey, entity);
+        entityEntry.setManaged();
 
         return entity;
     }

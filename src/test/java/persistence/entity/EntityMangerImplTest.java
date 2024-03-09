@@ -20,20 +20,26 @@ class EntityMangerImplTest extends H2DBTestSupport {
     private final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
     private final PersistenceContext persistenceContext = new PersistenceContextImpl();
     private final EntityEntryContext entityEntryContext = new EntityEntryContext();
-    private final EntityManger entityManger =
-            new EntityMangerImpl(entityPersister, entityLoader, persistenceContext, entityEntryContext);
+    private final EntityEntryFactory entityEntryFactory = new DefaultEntityEntryFactory();
+    private final EntityManger entityManger = new EntityMangerImpl(
+            entityPersister,
+            entityLoader,
+            persistenceContext,
+            entityEntryContext,
+            entityEntryFactory
+    );
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
 
     @BeforeEach
     public void setUp() {
-        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);
         jdbcTemplate.execute(createQueryBuilder.build());
     }
 
     @AfterEach
     public void cleanUp() {
-        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);;
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
         jdbcTemplate.execute(dropQueryBuilder.build());
     }
 
@@ -140,12 +146,36 @@ class EntityMangerImplTest extends H2DBTestSupport {
     void throwWhenEntityNotExistInPersistenceContext() {
         Person person = new Person(1L, "nick_name", 10, "test@test.com", null);
         EntityKey entityKey = EntityKey.fromEntity(person);
-        entityEntryContext.addEntry(entityKey, new EntityEntry(entityPersister, entityLoader, Status.MANAGED));
+        entityEntryContext.addEntry(entityKey, new EntityEntryImpl(entityPersister, entityLoader, Status.MANAGED));
 
         assertThrows(EntityNotExistsException.class, () -> {
             entityManger.merge(person);
         });
     }
+
+    @Test
+    @DisplayName("update 시 entityEntry 의 상태를 saving->managed 순서로 변경.")
+    void testStatusChangeToManagedWhenMerge() {
+        EntityManger sut = new EntityMangerImpl(
+                entityPersister,
+                entityLoader,
+                persistenceContext,
+                entityEntryContext,
+                new EntityEntryCountProxyFactory()
+        );
+        Person person = new Person(null, "nick_name", 10, "test@test.com", null);
+        sut.persist(person);
+        EntityKey entityKey = EntityKey.fromEntity(person);
+
+        sut.merge(person);
+
+        EntityEntryCountProxy entry = (EntityEntryCountProxy) entityEntryContext.getEntry(entityKey);
+        assertSoftly(softly -> {
+            softly.assertThat(entry.invokedCount.get(Status.SAVING)).isEqualTo(1);
+            softly.assertThat(entry.getStatus()).isEqualTo(Status.MANAGED);
+        });
+    }
+
     @Test
     @DisplayName("요구사항3: delete")
     void testDelete() {
