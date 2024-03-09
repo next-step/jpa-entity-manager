@@ -7,14 +7,14 @@ import static persistence.sql.constant.SqlFormat.DELETE;
 
 public class DeleteQueryBuilder {
 
+    private static DeleteQueryBuilder instance;
+
     private DeleteQueryBuilder() {}
-
-    private static class DeleteQuerySingleton {
-        private static final DeleteQueryBuilder DELETE_QUERY_BUILDER = new DeleteQueryBuilder();
-    }
-
     public static DeleteQueryBuilder getInstance() {
-        return DeleteQuerySingleton.DELETE_QUERY_BUILDER;
+        if(instance == null) {
+            instance = new DeleteQueryBuilder();
+        }
+        return instance;
     }
 
     public String toSql(final TableName tableName,

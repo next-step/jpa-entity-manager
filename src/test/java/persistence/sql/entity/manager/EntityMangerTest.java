@@ -18,7 +18,7 @@ class EntityMangerTest extends H2Database {
     void setUp() {
         this.person = new Person(1L, "박재성", 10, "jason");
 
-        entityManager.remove(person);
+        entityManager.removeAll(Person.class);
         entityManager.persist(person);
     }
 
