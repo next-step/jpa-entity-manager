@@ -13,10 +13,10 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityLoader entityLoader;
     private final PersistenceContext persistenceContext;
 
-    public EntityManagerImpl(final EntityPersister entityPersister, EntityLoader entityLoader) {
+    public EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader, PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
-        this.persistenceContext = new PersistenceContextImpl();
+        this.persistenceContext = persistenceContext;
     }
 
     @Override

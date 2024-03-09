@@ -13,6 +13,7 @@ import persistence.sql.dml.domain.Person;
 import persistence.sql.entity.impl.EntityLoaderImpl;
 import persistence.sql.entity.impl.EntityManagerImpl;
 import persistence.sql.entity.impl.EntityPersisterImpl;
+import persistence.sql.entity.impl.PersistenceContextImpl;
 import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.Table;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
@@ -27,6 +28,7 @@ class EntityManagerImplTest {
 
     private JdbcTemplate jdbcTemplate;
     private EntityMetaCreator entityMetaCreator;
+    private PersistenceContext persistenceContext;
 
     @BeforeEach
     void init() throws SQLException {
@@ -44,6 +46,8 @@ class EntityManagerImplTest {
         final DdlCreateQueryBuilder ddlCreateQueryBuilder = new DdlCreateQueryBuilder(new H2Dialect());
         final String createSql = ddlCreateQueryBuilder.createDdl(table);
         jdbcTemplate.execute(createSql);
+
+        persistenceContext = new PersistenceContextImpl();
     }
 
     @DisplayName("EntityManagerImpl find를 호출하면 엔티티가 리턴된다.")
@@ -52,7 +56,7 @@ class EntityManagerImplTest {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
         entityManager.persist(person);
 
         final Person findPerson = entityManager.find(person.getClass(), 1L);
@@ -66,7 +70,7 @@ class EntityManagerImplTest {
         final Person person = new Person(1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
 
         entityManager.persist(person);
 
@@ -80,7 +84,7 @@ class EntityManagerImplTest {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
-        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
         entityManager.persist(person);
 
         entityManager.remove(person);

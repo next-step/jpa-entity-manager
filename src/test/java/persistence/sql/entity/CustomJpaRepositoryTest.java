@@ -13,6 +13,7 @@ import persistence.sql.dml.domain.Person;
 import persistence.sql.entity.impl.EntityLoaderImpl;
 import persistence.sql.entity.impl.EntityManagerImpl;
 import persistence.sql.entity.impl.EntityPersisterImpl;
+import persistence.sql.entity.impl.PersistenceContextImpl;
 import persistence.sql.meta.EntityMetaCreator;
 import persistence.sql.meta.Table;
 import persistence.sql.meta.simple.SimpleEntityMetaCreator;
@@ -46,7 +47,7 @@ public class CustomJpaRepositoryTest {
 
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
-        entityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        entityManager = new EntityManagerImpl(entityPersister, entityLoader, new PersistenceContextImpl());
 
     }
     @Test
