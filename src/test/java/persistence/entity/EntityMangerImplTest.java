@@ -67,7 +67,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
 
     @Test
-    @DisplayName("요구사항2: persist insert 로 나가는 경우")
+    @DisplayName("persist db 저장 테스트")
     void testPersistInsert() {
         Person person = new Person(null, "nick_name", 10, "df", null);
 
@@ -75,20 +75,6 @@ class EntityMangerImplTest extends H2DBTestSupport {
         Person savedPerson = (Person) saved;
 
         assertThat(savedPerson.getId()).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("요구사항2: persist update 로 나가는 경우")
-    void testPersistUpdate() {
-        String newName = "new_nick_name";
-        Person person = new Person(null, "nick_name", 10, "test@test.com", null);
-        jdbcTemplate.execute(insertQueryBuilder.build(person));
-        person.changeName(newName);
-
-        Object saved = entityManger.persist(person);
-        Person savedPerson = (Person) saved;
-
-        assertThat(savedPerson.getName()).isEqualTo(newName);
     }
 
     @Test
@@ -100,6 +86,20 @@ class EntityMangerImplTest extends H2DBTestSupport {
 
         Person findEntity = (Person) persistenceContext.getEntity(EntityKey.fromEntity(saved));
         assertThat(findEntity.getId()).isEqualTo(person.getId());
+    }
+
+    @Test
+    @DisplayName("update db 저장 테스트")
+    void testPersistUpdate() {
+        String newName = "new_nick_name";
+        Person person = new Person(null, "nick_name", 10, "test@test.com", null);
+        jdbcTemplate.execute(insertQueryBuilder.build(person));
+        person.changeName(newName);
+
+        Object saved = entityManger.persist(person);
+        Person savedPerson = (Person) saved;
+
+        assertThat(savedPerson.getName()).isEqualTo(newName);
     }
 
     @Test

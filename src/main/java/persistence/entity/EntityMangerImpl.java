@@ -30,11 +30,15 @@ public class EntityMangerImpl implements EntityManger {
 
     @Override
     public Object persist(Object entity) {
-        boolean isEntityUpdated = entityPersister.update(entity);
-        if (!isEntityUpdated) {
-            entityPersister.insert(entity);
-        }
+        entityPersister.insert(entity);
+        persistenceContext.addEntity(EntityKey.fromEntity(entity), entity);
 
+        return entity;
+    }
+
+    @Override
+    public Object merge(Object entity) {
+        entityPersister.update(entity);
         persistenceContext.addEntity(EntityKey.fromEntity(entity), entity);
 
         return entity;

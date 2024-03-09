@@ -5,5 +5,7 @@ public interface EntityManger {
 
     Object persist(Object entity);
 
+    Object merge(Object entity);
+
     void remove(Object entity);
 }
