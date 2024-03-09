@@ -6,19 +6,21 @@ public class ValueClause {
     public static final String APOSTROPHE = "'";
     private final String value;
     public ValueClause(Field field, Object entity) {
-        try {
-            field.setAccessible(true);
-            this.value = getValue(field, entity);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("value 생성에 실패하였습니다.", e);
-        }
+        this.value = getValue(field, entity);
     }
 
-    private static String getValue(Field field, Object entity) throws IllegalAccessException {
-        if (String.class.isAssignableFrom(field.getType()) && field.get(entity) != null) {
-            return APOSTROPHE + field.get(entity) + APOSTROPHE;
+    private static String getValue(Field field, Object entity) {
+        field.setAccessible(true);
+        Object value;
+        try {
+            value = field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("value 생성에 실패하였습니다.");
         }
-        return String.valueOf(field.get(entity));
+        if (String.class.isAssignableFrom(field.getType()) && value != null) {
+            return APOSTROPHE + value + APOSTROPHE;
+        }
+        return String.valueOf(value);
     }
 
     public String value() {
