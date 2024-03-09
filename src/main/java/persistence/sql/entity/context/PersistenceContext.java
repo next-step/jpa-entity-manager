@@ -8,7 +8,19 @@ public interface PersistenceContext {
 
     void removeEntity(Object entity);
 
+    void goneEntity(Object entity);
+
+    void saving(Object entity);
+
+    void loading(Object entity, Object id);
+
+    void readOnly(Object entity, Object id);
+
     void removeAll();
 
     <T> T getDatabaseSnapshot(Class<?> clazz, Object id);
+
+    boolean isGone(Class<?> clazz, Object id);
+
+    boolean isReadOnly(Object entity);
 }
