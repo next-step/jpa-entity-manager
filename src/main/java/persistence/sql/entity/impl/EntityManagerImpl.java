@@ -4,12 +4,8 @@ import persistence.sql.entity.EntityLoader;
 import persistence.sql.entity.EntityManager;
 import persistence.sql.entity.EntityPersister;
 import persistence.sql.entity.PersistenceContext;
-import persistence.sql.meta.PrimaryKey;
-import persistence.sql.meta.simple.SimpleEntityMetaCreator;
 
 import java.util.Objects;
-
-import static persistence.sql.meta.simple.SimpleEntityMetaCreator.createPrimaryKeyValue;
 
 public class EntityManagerImpl implements EntityManager {
 
@@ -25,7 +21,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(final Class<T> clazz, final Long id) {
-        final PrimaryKey key = SimpleEntityMetaCreator.createPrimaryKeyValue(clazz, id);
+        final EntityKey key = EntityKey.fromNameAndValue(clazz.getName(), id);
 
         if (Objects.isNull(persistenceContext.getEntity(key))) {
             final T instance = entityLoader.findById(clazz, id);
@@ -39,7 +35,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public Object persist(final Object entity) {
         final Long id = entityPersister.insert(entity);
-        final PrimaryKey key = SimpleEntityMetaCreator.createPrimaryKeyValue(entity.getClass(), id);
+        final EntityKey key = EntityKey.fromNameAndValue(entity.getClass().getName(), id);
 
         persistenceContext.addEntity(key, entity);
 
@@ -48,7 +44,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object merge(final Object entity) {
-        final PrimaryKey key = createPrimaryKeyValue(entity);
+        final EntityKey key = EntityKey.fromEntity(entity);
 
         if (persistenceContext.isDirty(key, entity)) {
             entityPersister.update(entity);
@@ -63,13 +59,14 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(final Object entity) {
-        final PrimaryKey key = createPrimaryKeyValue(entity);
+        final EntityKey key = EntityKey.fromEntity(entity);
+
         persistenceContext.removeEntity(key);
         entityPersister.delete(entity);
     }
 
     public boolean isDirty(Object entity) {
-        final PrimaryKey key = createPrimaryKeyValue(entity);
+        final EntityKey key = EntityKey.fromEntity(entity);
 
         return persistenceContext.isDirty(key, entity);
     }

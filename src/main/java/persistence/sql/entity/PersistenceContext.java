@@ -1,15 +1,15 @@
 package persistence.sql.entity;
 
-import persistence.sql.meta.PrimaryKey;
+import persistence.sql.entity.impl.EntityKey;
 
 public interface PersistenceContext {
-    Object getEntity(PrimaryKey id);
+    Object getEntity(EntityKey id);
 
-    void addEntity(PrimaryKey id, Object entity);
+    void addEntity(EntityKey id, Object entity);
 
-    void removeEntity(PrimaryKey id);
+    void removeEntity(EntityKey id);
 
 //    Object getDatabaseSnapshot(Long id, Object entity);
 
-    boolean isDirty(PrimaryKey id, Object entity);
+    boolean isDirty(EntityKey id, Object entity);
 }

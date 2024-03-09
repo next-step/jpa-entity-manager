@@ -105,7 +105,7 @@ public class SimpleEntityMetaCreator  {
         return !field.isAnnotationPresent(Transient.class);
     }
 
-    private static SimpleColumn createColumn(final Field field) {
+    public static SimpleColumn createColumn(final Field field) {
         return new SimpleColumn(getFieldName(field), isNullable(field), generateType(field), field.getType());
     }
 
