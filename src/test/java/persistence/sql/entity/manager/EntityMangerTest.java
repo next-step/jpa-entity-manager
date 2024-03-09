@@ -5,10 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.db.H2Database;
-
-import java.util.Optional;
+import persistence.sql.entity.exception.ReadOnlyException;
+import persistence.sql.entity.exception.RemoveEntityException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityMangerTest extends H2Database {
 
@@ -30,6 +31,16 @@ class EntityMangerTest extends H2Database {
         assertThat(person).isEqualTo(actual);
     }
 
+    @DisplayName("디비를 삭제후, 조회를 하면 에러를 반환한다.")
+    @Test
+    void isGoneFindTest() {
+        entityManager.remove(person);
+
+        assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))
+                .isInstanceOf(RemoveEntityException.class)
+                .hasMessage("삭제된 엔티티입니다.");
+    }
+
     @DisplayName("디비에 데이터가 저장이된다.")
     @Test
     void insertTest() {
@@ -38,6 +49,16 @@ class EntityMangerTest extends H2Database {
 
         Person findPerson = entityManager.find(Person.class, 2L);
         assertThat(findPerson).isEqualTo(newPerson);
+    }
+
+    @DisplayName("readOnly로 조회할시, 업데이트시 에러를 반환한다.")
+    @Test
+    void readOnlyUpdateTest() {
+        Person readOnlyPerson = entityManager.findOfReadOnly(Person.class, person.getId());
+
+        assertThatThrownBy(() -> entityManager.persist(readOnlyPerson))
+                .isInstanceOf(ReadOnlyException.class)
+                .hasMessage("읽기전용은 수정 및 삭제가 불가능 합니다.");
     }
 
     @DisplayName("디비 데이터가 업데이트가 된다.")
@@ -55,9 +76,18 @@ class EntityMangerTest extends H2Database {
     void deleteTest() {
         entityManager.remove(person);
 
-        Optional<Person> optionalPerson = Optional.ofNullable(entityManager.find(Person.class, person.getId()));
-
-        assertThat(optionalPerson.isPresent()).isFalse();
+        assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))
+                .isInstanceOf(RemoveEntityException.class)
+                .hasMessage("삭제된 엔티티입니다.");
     }
 
+    @DisplayName("readOnly로 조회된 값은 삭제시 에러를 반환한다.")
+    @Test
+    void readOnlyRemoveTest() {
+        Person readOnlyPerson = entityManager.findOfReadOnly(Person.class, person.getId());
+
+        assertThatThrownBy(() -> entityManager.persist(readOnlyPerson))
+                .isInstanceOf(ReadOnlyException.class)
+                .hasMessage("읽기전용은 수정 및 삭제가 불가능 합니다.");
+    }
 }
