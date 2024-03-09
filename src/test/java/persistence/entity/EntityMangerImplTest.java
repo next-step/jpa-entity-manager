@@ -126,7 +126,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
-    @DisplayName("merge 시 관리하고있지 않은 엔티티는 에러")
+    @DisplayName("merge 시 entry 관리하고있지 않은 엔티티는 에러")
     void throwWhenEntityEntryNotExists() {
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
 
@@ -135,6 +135,17 @@ class EntityMangerImplTest extends H2DBTestSupport {
         });
     }
 
+    @Test
+    @DisplayName("merge 시 영속성컨텍스트 관리하고있지 않은 엔티티는 에러")
+    void throwWhenEntityNotExistInPersistenceContext() {
+        Person person = new Person(1L, "nick_name", 10, "test@test.com", null);
+        EntityKey entityKey = EntityKey.fromEntity(person);
+        entityEntryContext.addEntry(entityKey, new EntityEntry(entityPersister, entityLoader, Status.MANAGED));
+
+        assertThrows(EntityNotExistsException.class, () -> {
+            entityManger.merge(person);
+        });
+    }
     @Test
     @DisplayName("요구사항3: delete")
     void testDelete() {

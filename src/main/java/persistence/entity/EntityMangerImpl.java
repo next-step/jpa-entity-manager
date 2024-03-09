@@ -52,7 +52,7 @@ public class EntityMangerImpl implements EntityManger {
         EntityKey entityKey = EntityKey.fromEntity(entity);
         EntityEntry entityEntry = entityEntryContext.getEntry(entityKey);
 
-        if(entityEntry == null) {
+        if(entityEntry == null || persistenceContext.getEntity(entityKey) == null) {
             throw new EntityNotExistsException(entityKey);
         }
         entityPersister.update(entity);
