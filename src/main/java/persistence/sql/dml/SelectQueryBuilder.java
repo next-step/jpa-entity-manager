@@ -5,7 +5,6 @@ import persistence.sql.ddl.TableClause;
 public class SelectQueryBuilder {
     public static final String SELECT_ALL_QUERY = "SELECT * FROM %s";
     public static final String SELECT_BY_ID_QUERY = "SELECT * FROM %s WHERE %s = %d";
-    public static final String SELECT_LATEST_ROW_QUERY = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1";
     private final TableClause tableClause;
 
     public SelectQueryBuilder(Class<?> entity) {
