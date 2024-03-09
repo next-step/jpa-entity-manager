@@ -33,7 +33,6 @@ public class PrimaryKeyClause {
     );
 
     private final String name;
-    private final Long value;
     private final String dataType;
     private final GenerationType generationType;
 
@@ -42,7 +41,6 @@ public class PrimaryKeyClause {
             throw new NotIdException();
         }
         this.name = field.getName();
-        this.value = getValue(entity, field);
         this.dataType = field.getType().getSimpleName();
         this.generationType = getType(field);
     }
@@ -72,10 +70,6 @@ public class PrimaryKeyClause {
 
     public String name() {
         return this.name;
-    }
-
-    public Long value() {
-        return this.value;
     }
 
     private static GenerationType getType(Field field) {

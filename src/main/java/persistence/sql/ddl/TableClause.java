@@ -76,10 +76,6 @@ public class TableClause {
         return primaryKeyClause.name();
     }
 
-    public Long primaryKeyValue() {
-        return primaryKeyClause.value();
-    }
-
     public List<String> columnQueries() {
         return columnClauses.getQueries();
     }

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import static persistence.sql.common.SqlConstant.COMMA;
 
 public class UpdateQueryBuilder {
-    public static final String UPDATE_QUERY = "UPDATE %s SET %s WHERE %s";
+    public static final String UPDATE_QUERY = "UPDATE %s SET %s WHERE %s = %d";
     public static final String UPDATE_QUERY_WITHOUT_WHERE = "UPDATE %s SET %s";
     public static final String EQUALS = "=";
     private final TableClause tableClause;
@@ -26,7 +26,12 @@ public class UpdateQueryBuilder {
         this.tableClause = new TableClause(entity);
     }
 
-    public String getQuery(Object entity) {
+    /**
+     * update 쿼리를 리턴한다.
+     * @param entity update 될 최신 정보
+     * @return update 쿼리
+     */
+    public String getQuery(Object entity, Long id) {
 
         List<String> columnNames = this.tableClause.columnNames();
 
@@ -38,9 +43,8 @@ public class UpdateQueryBuilder {
             setClauses.add(columnNames.get(i) + EQUALS + values.get(i));
         }
 
-        if (tableClause.primaryKeyValue() != null) {
-            String whereClause = String.format("WHERE %s = %d", tableClause.primaryKeyName(), tableClause.primaryKeyValue());
-            return String.format(UPDATE_QUERY, tableClause.name(), String.join(COMMA, setClauses), whereClause);
+        if (id != null) {
+            return String.format(UPDATE_QUERY, tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
         }
 
         return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), String.join(COMMA, setClauses));
