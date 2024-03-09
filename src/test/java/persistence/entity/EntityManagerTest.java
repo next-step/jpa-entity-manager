@@ -12,12 +12,9 @@ import org.slf4j.LoggerFactory;
 import persistence.entity.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
@@ -54,13 +51,13 @@ class EntityManagerTest {
     void find() {
         // given
         Long personId = 1L;
-        jdbcTemplate.execute(new InsertQueryBuilder(Person.class).getInsertQuery(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11)));
+        Person expected = entityManager.persist(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
 
         // when
         Person actual = entityManager.find(Person.class, personId);
 
         // then
-        Assertions.assertThat(actual).isEqualTo(new Person(personId, "김철수", 21, "chulsoo.kim@gmail.com", 11));
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -75,14 +72,10 @@ class EntityManagerTest {
     @Test
     void remove() {
         // given
-        List<String> insertQueries = Stream.of(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
+        List.of(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),
                         new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11))
-                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).collect(Collectors.toList());
-
-        for (String query : insertQueries) {
-            jdbcTemplate.execute(query);
-        }
+                .forEach(person -> entityManager.persist(person));
 
         // when
         entityManager.remove(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11));
