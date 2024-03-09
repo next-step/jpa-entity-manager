@@ -1,11 +1,11 @@
 package persistence.sql.dml;
 
-import domain.dialect.Dialect;
-import domain.pojo.EntityMetaData;
-import domain.pojo.FieldInfo;
-import domain.pojo.FieldInfos;
-import domain.pojo.FieldName;
-import domain.pojo.FieldValue;
+import dialect.Dialect;
+import pojo.EntityMetaData;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
+import pojo.FieldValue;
 
 import java.lang.reflect.Field;
 

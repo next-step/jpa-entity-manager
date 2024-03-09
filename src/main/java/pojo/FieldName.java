@@ -1,10 +1,9 @@
-package domain.pojo;
+package pojo;
 
 import jakarta.persistence.Column;
+import utils.StringUtils;
 
 import java.lang.reflect.Field;
-
-import static domain.utils.StringUtils.isBlankOrEmpty;
 
 /**
  * 필드명
@@ -24,7 +23,7 @@ public class FieldName {
     private String getFieldName(Field field) {
         FieldInfo fieldInfo = new FieldInfo(field);
         if (fieldInfo.isColumnField()) {
-            return isBlankOrEmpty(field.getAnnotation(Column.class).name()) ? field.getName()
+            return StringUtils.isBlankOrEmpty(field.getAnnotation(Column.class).name()) ? field.getName()
                     : field.getAnnotation(Column.class).name();
         }
         return field.getName();

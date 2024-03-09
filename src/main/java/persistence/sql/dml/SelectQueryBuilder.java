@@ -1,9 +1,9 @@
 package persistence.sql.dml;
 
-import domain.pojo.EntityMetaData;
-import domain.pojo.FieldInfo;
-import domain.pojo.FieldInfos;
-import domain.pojo.FieldName;
+import pojo.EntityMetaData;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
 
 public class SelectQueryBuilder {
 

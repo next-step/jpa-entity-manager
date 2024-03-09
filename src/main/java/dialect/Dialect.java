@@ -1,4 +1,4 @@
-package domain.dialect;
+package dialect;
 
 import java.util.HashMap;
 import java.util.Map;

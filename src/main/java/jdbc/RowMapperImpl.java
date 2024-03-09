@@ -1,8 +1,8 @@
 package jdbc;
 
-import domain.pojo.FieldInfo;
-import domain.pojo.FieldInfos;
-import domain.pojo.FieldName;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;

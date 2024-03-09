@@ -1,6 +1,6 @@
-package domain.pojo;
+package pojo;
 
-import domain.dialect.Dialect;
+import dialect.Dialect;
 
 import java.lang.reflect.Field;
 import java.util.Objects;

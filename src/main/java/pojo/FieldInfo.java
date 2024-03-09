@@ -1,4 +1,4 @@
-package domain.pojo;
+package pojo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -7,9 +7,6 @@ import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-
-import static domain.pojo.Constraints.NOT_NULL;
-import static domain.pojo.Constraints.NULL;
 
 public class FieldInfo {
 
@@ -49,9 +46,9 @@ public class FieldInfo {
 
     public String getColumnNullConstraint() {
         if (!isColumnField() || field.getAnnotation(Column.class).nullable()) {
-            return NULL.getName();
+            return Constraints.NULL.getName();
         }
-        return NOT_NULL.getName();
+        return Constraints.NOT_NULL.getName();
     }
 
     public boolean isValidIdField() {

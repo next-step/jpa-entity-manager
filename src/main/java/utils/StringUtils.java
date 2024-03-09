@@ -1,4 +1,4 @@
-package domain.utils;
+package utils;
 
 public class StringUtils {
 

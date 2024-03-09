@@ -1,4 +1,4 @@
-package domain.pojo;
+package pojo;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

@@ -1,18 +1,18 @@
 package persistence.sql.dml;
 
-import domain.dialect.Dialect;
-import domain.pojo.EntityMetaData;
-import domain.pojo.FieldInfo;
-import domain.pojo.FieldInfos;
-import domain.pojo.FieldName;
-import domain.pojo.FieldNameAndValue;
-import domain.pojo.FieldValue;
+import dialect.Dialect;
+import pojo.EntityMetaData;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
+import pojo.FieldNameAndValue;
+import pojo.FieldValue;
 
 import java.util.List;
 
-import static domain.constants.CommonConstants.AND;
-import static domain.constants.CommonConstants.COMMA;
-import static domain.constants.CommonConstants.EQUAL;
+import static constants.CommonConstants.AND;
+import static constants.CommonConstants.COMMA;
+import static constants.CommonConstants.EQUAL;
 
 public class UpdateQueryBuilder {
 

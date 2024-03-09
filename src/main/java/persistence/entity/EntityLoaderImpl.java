@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import domain.pojo.EntityMetaData;
+import pojo.EntityMetaData;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
 import persistence.sql.dml.SelectQueryBuilder;

@@ -1,4 +1,4 @@
-package domain.constants;
+package constants;
 
 public class CommonConstants {
 

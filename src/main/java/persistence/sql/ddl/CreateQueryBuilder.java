@@ -1,10 +1,10 @@
 package persistence.sql.ddl;
 
-import domain.dialect.Dialect;
-import domain.pojo.EntityMetaData;
-import domain.pojo.FieldInfo;
-import domain.pojo.FieldInfos;
-import domain.pojo.FieldName;
+import dialect.Dialect;
+import pojo.EntityMetaData;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static domain.constants.CommonConstants.COMMA;
-import static domain.constants.CommonConstants.SPACE;
-import static domain.pojo.Constraints.NOT_NULL;
-import static domain.pojo.Constraints.PRIMARY_KEY;
+import static constants.CommonConstants.COMMA;
+import static constants.CommonConstants.SPACE;
+import static pojo.Constraints.NOT_NULL;
+import static pojo.Constraints.PRIMARY_KEY;
 
 public class CreateQueryBuilder {
 

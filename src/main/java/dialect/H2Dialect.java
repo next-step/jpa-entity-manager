@@ -1,4 +1,4 @@
-package domain.dialect;
+package dialect;
 
 import java.sql.Types;
 import java.util.HashMap;

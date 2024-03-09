@@ -1,7 +1,7 @@
 package persistence.entity;
 
-import domain.dialect.Dialect;
-import domain.pojo.EntityMetaData;
+import dialect.Dialect;
+import pojo.EntityMetaData;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;

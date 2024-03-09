@@ -1,6 +1,6 @@
 package persistence.sql.ddl;
 
-import domain.pojo.EntityMetaData;
+import pojo.EntityMetaData;
 
 public class DropQueryBuilder {
 
