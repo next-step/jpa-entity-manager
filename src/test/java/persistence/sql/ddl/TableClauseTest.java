@@ -12,29 +12,6 @@ import persistence.entity.annotated.Person;
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE;
 
 class TableClauseTest {
-    private static final Logger logger = LoggerFactory.getLogger(TableClauseTest.class);
-    private static DatabaseServer server;
-    private static JdbcTemplate jdbcTemplate;
-
-    @BeforeAll
-    static void setUpOnce() {
-        try {
-            server = new H2();
-            server.start();
-            jdbcTemplate = new JdbcTemplate(server.getConnection());
-        } catch (Exception e) {
-            logger.error("Error occurred", e);
-        } finally {
-            logger.info("Application finished");
-        }
-    }
-
-    @AfterAll
-    static void tearDownOnce() {
-        jdbcTemplate.execute(DROP_TABLE);
-        server.stop();
-    }
-
     @Test
     @DisplayName("[요구사항 2] @ColumnClause 애노테이션이 있는 Person 엔티티를 이용하여 create 쿼리 만든다.")
     void 요구사항2_test() {
