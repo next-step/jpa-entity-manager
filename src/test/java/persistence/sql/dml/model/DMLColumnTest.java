@@ -21,18 +21,11 @@ class DMLColumnTest {
     void fieldsTest() {
         final var expected = "id, nick_name, old, email";
 
-        final var actual = column.fields();
+        final var actual = column.getAllColumnClause();
 
         assertThat(actual).isEqualTo(expected);
     }
 
-    @Test
-    @DisplayName("Value 객체가 가지는 Entity 의 값들을 조회한다.")
-    void valuesTest() {
-        final var expected = "1, 'name', 10, 'a@a.com'";
+    // TODO: 3/10/24 getAllFields(), getIdColumnName() 테스트
 
-        final var actual = column.values();
-
-        assertThat(actual).isEqualTo(expected);
-    }
 }
