@@ -28,11 +28,12 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 
         if (!idType.isPrimitive()) {
             return id == null;
-        } else if (id instanceof Number) {
-            return ((Number) id).longValue() == 0L;
-        } else {
-            throw new IllegalArgumentException(String.format("Unsupported primitive id type %s", idType));
         }
+        if (id instanceof Number) {
+            return ((Number) id).longValue() == 0L;
+        }
+
+        throw new IllegalArgumentException(String.format("Unsupported primitive id type %s", idType));
     }
 
 }

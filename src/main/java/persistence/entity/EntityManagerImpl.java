@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.entity.domain.EntitySnapshot;
+import persistence.entity.domain.EntityStatus;
 import persistence.entity.persistence.PersistenceContext;
 import persistence.entity.persistence.PersistenceContextImpl;
 import persistence.sql.ddl.domain.Columns;
@@ -34,6 +35,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
+        persistenceContext.addEntityEntry(entity, EntityStatus.SAVING);
         Object id = entityPersister.insert(entity);
         Columns columns = new Columns(entity.getClass());
         columns.setPkValue(entity, id);
