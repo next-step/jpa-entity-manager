@@ -21,7 +21,7 @@ class ValueTest {
     void getEntityValueClauseTest() {
         final var expected = "1, 'name', 10, 'a@a.com'";
 
-        final var actual = value.getEntityValueClause();
+        final var actual = value.getValueClause();
 
         assertThat(actual).isEqualTo(expected);
     }

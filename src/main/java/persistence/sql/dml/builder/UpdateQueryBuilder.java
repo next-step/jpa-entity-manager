@@ -8,37 +8,39 @@ import persistence.sql.model.Table;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class DeleteQueryBuilder {
+public class UpdateQueryBuilder {
 
-    private static final String DELETE_QUERY_FORMAT = "DELETE FROM %s WHERE %s;";
+    private static final String UPDATE_QUERY_FORMAT = "UPDATE %s SET %s WHERE %s = %s;";
 
     private final Table table;
     private final DMLColumn column;
     private final Value value;
 
-    public DeleteQueryBuilder(Object entity) {
+    public UpdateQueryBuilder(Object entity) {
         this(new Table(entity.getClass()), new DMLColumn(entity), new Value(entity));
     }
 
-    public DeleteQueryBuilder(Table table, DMLColumn column, Value value) {
+    public UpdateQueryBuilder(Table table, DMLColumn column, Value value) {
         this.table = table;
         this.column = column;
         this.value = value;
     }
 
-    public String build() {
+    public String build(Object id) {
         return String.format(
-                DELETE_QUERY_FORMAT,
+                UPDATE_QUERY_FORMAT,
                 table.name(),
-                createWhereClauseQuery()
+                createSetClauseQuery(),
+                column.getIdColumnName(),
+                id
         );
     }
 
-    private String createWhereClauseQuery() {
+    private String createSetClauseQuery() {
         return Arrays.stream(column.getAllFields())
                 .filter(column::includeDatabaseColumn)
                 .filter(column::excludeIdColumn)
                 .map(field -> ColumnUtils.name(field) + " = " + value.getDatabaseValue(field))
-                .collect(Collectors.joining(" AND "));
+                .collect(Collectors.joining(", "));
     }
 }

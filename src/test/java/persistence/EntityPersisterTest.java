@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence;
 
 import database.DatabaseServer;
 import database.H2;
@@ -8,8 +8,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.DummyPerson;
-import persistence.EntityPersister;
+import persistence.entity.EntityManager;
+import persistence.entity.EntityManagerImpl;
 import persistence.sql.ddl.converter.H2TypeConverter;
 import persistence.sql.ddl.mapping.DDLQueryBuilder;
 import persistence.sql.ddl.mapping.H2PrimaryKeyGenerationType;
@@ -23,11 +23,11 @@ import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class EntityManagerImplTest {
+class EntityPersisterTest {
 
-    private DatabaseServer server;
-    private EntityManager entityManager;
     private EntityPersister entityPersister;
+    private EntityManager entityManager;
+    private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
     private QueryBuilder queryBuilder;
     private Person expected;
@@ -39,12 +39,12 @@ class EntityManagerImplTest {
         expected = DummyPerson.of();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersister(jdbcTemplate);
-        entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
         queryBuilder = new DDLQueryBuilder(
                 new Table(expected.getClass()),
                 new DDLColumn(new H2TypeConverter(), new H2PrimaryKeyGenerationType())
         );
+        entityPersister = new EntityPersister(jdbcTemplate);
+        entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
 
         final String createQuery = queryBuilder.create(Person.class);
         jdbcTemplate.execute(createQuery);
@@ -59,38 +59,42 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("Entity 를 정상적으로 조회한다.")
-    void findTest() {
-        insertDummyPerson();
+    @DisplayName("EntityPersister 를 통해 Object 를 Insert 한다.")
+    void entityPersisterInsertTest() {
+        entityPersister.insert(expected);
 
-        final Person actual = entityManager.find(Person.class, 1L);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Entity 를 정상적으로 저장한다.")
-    void persistTest() {
-        entityManager.persist(expected);
-
-        final Person actual = entityManager.find(Person.class, 1L);
+        final var actual = entityManager.find(Person.class, 1L);
 
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    @DisplayName("Entity 를 제거한 후 조회하면 RuntimeException 예외가 발생한다.")
-    void removeTest() {
+    @DisplayName("EntityPersister 를 통해 id 에 해당하는 Object 를 Delete 한다.")
+    void entityPersisterDeleteTest() {
         insertDummyPerson();
 
-        entityManager.remove(expected);
+        entityPersister.delete(expected);
 
-        assertThrows(RuntimeException.class, () -> entityManager.find(Person.class, 1L));
+        assertThrows(
+                RuntimeException.class,
+                () -> entityManager.find(Person.class, 1L)
+        );
+    }
+
+    @Test
+    @DisplayName("EntityPersister 를 통해 id 에 해당하는 Object 를 Update 한다.")
+    void test() {
+        insertDummyPerson();
+        expected = new Person("updateName", 30, "b@b.com");
+
+        final var actual = entityPersister.update(expected, 1L);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     private void insertDummyPerson() {
-        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(expected);
-        final String insertQuery = queryBuilder.build();
+        final var queryBuilder = new InsertQueryBuilder(expected);
+        final var insertQuery = queryBuilder.build();
 
         jdbcTemplate.execute(insertQuery);
     }

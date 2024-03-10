@@ -2,18 +2,18 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
-import persistence.sql.dml.builder.DeleteQueryBuilder;
-import persistence.sql.dml.builder.InsertQueryBuilder;
+import persistence.EntityPersister;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 import persistence.sql.dml.model.DMLColumn;
-import persistence.sql.dml.model.Where;
 import persistence.sql.model.Table;
 
 public class EntityManagerImpl implements EntityManager {
 
+    private final EntityPersister entityPersister;
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
+    public EntityManagerImpl(EntityPersister entityPersister, JdbcTemplate jdbcTemplate) {
+        this.entityPersister = entityPersister;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -26,7 +26,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private <T> String findQuery(Class<T> clazz, Long id) {
         final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(
-                new Table(clazz), new DMLColumn(clazz), new Where(clazz)
+                new Table(clazz), new DMLColumn(clazz)
         );
 
         return queryBuilder.findById(id).build();
@@ -34,32 +34,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final String query = persistQuery(entity);
-
-        jdbcTemplate.execute(query);
-    }
-
-    private String persistQuery(Object entity) {
-        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(
-                new Table(entity.getClass()), new DMLColumn(entity)
-        );
-
-        return queryBuilder.build();
+        entityPersister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        final String query = removeQuery(entity);
-
-        jdbcTemplate.execute(query);
-    }
-
-    private String removeQuery(Object entity) {
-        final DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(
-                new Table(entity.getClass()), new DMLColumn(entity), new Where(entity)
-        );
-
-        return queryBuilder.build();
+        entityPersister.delete(entity);
     }
 
 }

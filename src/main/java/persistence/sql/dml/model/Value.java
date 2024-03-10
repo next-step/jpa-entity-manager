@@ -16,26 +16,16 @@ public class Value {
         this.entity = entity;
     }
 
-    public String getEntityValueClause() {
+    public String getValueClause() {
         final Class<?> clz = entity.getClass();
 
         return Arrays.stream(clz.getDeclaredFields())
                 .filter(ColumnUtils::includeColumn)
-                .map(this::value)
+                .map(this::getDatabaseValue)
                 .collect(Collectors.joining(SEPARATOR));
     }
 
-    public String clause(Field field) {
-        final String value = value(field);
-
-        if (value.equals("null")) {
-            return null;
-        }
-
-        return ColumnUtils.name(field) + " = " + value;
-    }
-
-    private String value(Field field) {
+    public String getDatabaseValue(Field field) {
         Object value;
 
         field.setAccessible(true);

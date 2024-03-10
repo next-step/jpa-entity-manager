@@ -7,22 +7,22 @@ import persistence.DummyPerson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InsertQueryBuilderTest {
+class UpdateQueryBuilderTest {
 
-    private InsertQueryBuilder queryBuilder;
+    private UpdateQueryBuilder queryBuilder;
     private Person person;
 
     @BeforeEach
     void setUp() {
-        person = DummyPerson.ofNullId();
-        queryBuilder = new InsertQueryBuilder(person);
+        person = DummyPerson.of();
+        queryBuilder = new UpdateQueryBuilder(person);
     }
 
     @Test
-    void insertQueryTest() {
-        final var expected = "INSERT INTO users (id, nick_name, old, email) VALUES (null, 'name', 10, 'a@a.com');";
+    void updateQueryByObjectTest() {
+        final var expected = "UPDATE users SET nick_name = 'name', old = 10, email = 'a@a.com' WHERE id = 1;";
 
-        final var actual = queryBuilder.build();
+        final var actual = queryBuilder.build(1L);
 
         assertThat(actual).isEqualTo(expected);
     }
