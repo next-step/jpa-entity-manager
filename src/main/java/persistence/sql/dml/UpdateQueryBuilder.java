@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import persistence.sql.ddl.TableClause;
+import persistence.sql.dml.clause.SetClauses;
 import persistence.sql.dml.value.ValueClauses;
 
 import java.util.ArrayList;
@@ -25,21 +26,9 @@ public class UpdateQueryBuilder {
      * @return update 쿼리
      */
     public String getQuery(Object entity, Long id) {
-
-        List<String> setClauses = getSetClauses(entity);
-
-        return String.format(UPDATE_QUERY, tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
-    }
-
-    private List<String> getSetClauses(Object entity) {
-        List<String> columnNames = this.tableClause.columnNames();
-        List<String> values = new ValueClauses(entity).values();
-
-        List<String> setClauses = new ArrayList<>();
-        for (int i = 0; i < columnNames.size(); i++) {
-            setClauses.add(columnNames.get(i) + EQUALS + values.get(i));
-        }
-        return setClauses;
+        var setClauses = new SetClauses(entity.getClass()).query();
+        return String.format(UPDATE_QUERY,
+                tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
     }
 
     /**
@@ -48,9 +37,7 @@ public class UpdateQueryBuilder {
      * @return update 쿼리
      */
     public String getQuery(Object entity) {
-
-        List<String> setClauses = getSetClauses(entity);
-
+        var setClauses = new SetClauses(entity.getClass()).query();
         return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), String.join(COMMA, setClauses));
     }
 }
