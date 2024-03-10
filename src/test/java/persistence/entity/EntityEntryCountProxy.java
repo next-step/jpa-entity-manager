@@ -17,10 +17,6 @@ public class EntityEntryCountProxy implements EntityEntry {
         return target.getStatus();
     }
 
-    @Override
-    public EntityPersister getEntityPersister() {
-        return target.getEntityPersister();
-    }
 
     @Override
     public void setSaving() {

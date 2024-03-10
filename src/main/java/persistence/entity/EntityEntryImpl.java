@@ -2,24 +2,14 @@ package persistence.entity;
 
 public class EntityEntryImpl implements EntityEntry {
     private Status status;
-    final private EntityPersister entityPersister;
-    final private EntityLoader entityLoader;
 
-
-    public EntityEntryImpl(EntityPersister entityPersister, EntityLoader entityLoader, Status status) {
-        this.entityPersister = entityPersister;
-        this.entityLoader = entityLoader;
+    public EntityEntryImpl(Status status) {
         this.status = status;
     }
 
     @Override
     public Status getStatus() {
         return status;
-    }
-
-    @Override
-    public EntityPersister getEntityPersister() {
-        return entityPersister;
     }
 
     @Override

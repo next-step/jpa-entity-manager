@@ -31,7 +31,7 @@ public class EntityMangerImpl implements EntityManger {
             return (T) cachedEntity;
         }
 
-        EntityEntry entityEntry = entityEntryFactory.createEntityEntry(entityPersister, entityLoader, Status.LOADING);
+        EntityEntry entityEntry = entityEntryFactory.createEntityEntry(Status.LOADING);
         entityEntryContext.addEntry(entityKey, entityEntry);
 
         T foundEntity = entityLoader.find(clazz, id);
@@ -54,7 +54,7 @@ public class EntityMangerImpl implements EntityManger {
         entityPersister.insert(entity);
         entityKey = EntityKey.fromEntity(entity);
         persistenceContext.addEntity(entityKey, entity);
-        EntityEntry entityEntry = entityEntryFactory.createEntityEntry(entityPersister, entityLoader, Status.MANAGED);
+        EntityEntry entityEntry = entityEntryFactory.createEntityEntry(Status.MANAGED);
         entityEntryContext.addEntry(entityKey, entityEntry);
 
         return entity;
@@ -74,7 +74,7 @@ public class EntityMangerImpl implements EntityManger {
         }
 
         entityEntry.setSaving();
-        entityEntry.getEntityPersister().update(entity);
+        entityPersister.update(entity);
         persistenceContext.addEntity(entityKey, entity);
         entityEntry.setManaged();
 

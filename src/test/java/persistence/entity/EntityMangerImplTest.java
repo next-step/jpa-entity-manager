@@ -147,7 +147,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
     void throwWhenEntityNotExistInPersistenceContext() {
         Person person = new Person(1L, "nick_name", 10, "test@test.com", null);
         EntityKey entityKey = EntityKey.fromEntity(person);
-        entityEntryContext.addEntry(entityKey, new EntityEntryImpl(entityPersister, entityLoader, Status.MANAGED));
+        entityEntryContext.addEntry(entityKey, new EntityEntryImpl(Status.MANAGED));
 
         assertThrows(EntityNotExistsException.class, () -> {
             entityManger.merge(person);
@@ -159,7 +159,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
         Person person = new Person(1L, "nick_name", 10, "test@test.com", null);
         EntityKey entityKey = EntityKey.fromEntity(person);
         persistenceContext.addEntity(entityKey, person);
-        entityEntryContext.addEntry(entityKey, new EntityEntryImpl(entityPersister, entityLoader, Status.READ_ONLY));
+        entityEntryContext.addEntry(entityKey, new EntityEntryImpl(Status.READ_ONLY));
 
         assertThrows(EntityReadOnlyException.class, () -> {
             entityManger.merge(person);
