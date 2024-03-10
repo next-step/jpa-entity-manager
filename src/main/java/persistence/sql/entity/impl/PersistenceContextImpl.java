@@ -11,6 +11,7 @@ import static persistence.sql.meta.simple.SimpleEntityMetaCreator.createColumnVa
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> entitiesByKey = new HashMap<>();
     private final Map<EntityKey, Columns> entitySnapshotsByKey = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityEntryByKey = new HashMap<>();
 
     @Override
     public Object getEntity(final EntityKey id) {
