@@ -79,7 +79,12 @@ public class EntityMangerImpl implements EntityManger {
 
     @Override
     public void remove(Object entity) {
+        EntityKey entityKey = EntityKey.fromEntity(entity);
+        EntityEntry entityEntry = entityEntryContext.getEntry(entityKey);
+
+        entityEntry.setDeleted();
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
+        entityEntry.setGone();
     }
 }

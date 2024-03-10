@@ -36,4 +36,14 @@ public class EntityEntryImpl implements EntityEntry {
     public void setLoading() {
         status = Status.LOADING;
     }
+
+    @Override
+    public void setDeleted() {
+        status = Status.DELETED;
+    }
+
+    @Override
+    public void setGone() {
+        status = Status.GONE;
+    }
 }

@@ -180,7 +180,8 @@ class EntityMangerImplTest extends H2DBTestSupport {
     @Test
     @DisplayName("요구사항3: delete")
     void testDelete() {
-        Person person = new Person(1L, "nick_name", 10, "df", null);
+        Person person = new Person(null, "nick_name", 10, "df", null);
+        entityManger.persist(person);
 
         entityManger.remove(person);
 
@@ -198,5 +199,16 @@ class EntityMangerImplTest extends H2DBTestSupport {
         entityManger.remove(saved);
 
         assertThat(persistenceContext.getEntity(EntityKey.fromEntity(person))).isNull();
+    }
+
+    @Test
+    @DisplayName("delete 시 entityEntry 의 상태를 DELETED->GONE 변경")
+    void changeEntityEntryStatusGoneWhenDelete() {
+        Person person = new Person(null, "nick_name", 10, "df", null);
+        Person saved = (Person) entityManger.persist(person);
+
+        entityManger.remove(saved);
+
+        assertThat(entityEntryContext.getEntry(EntityKey.fromEntity(person)).getStatus()).isEqualTo(Status.GONE);
     }
 }

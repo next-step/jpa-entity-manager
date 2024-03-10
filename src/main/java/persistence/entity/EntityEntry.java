@@ -10,4 +10,8 @@ public interface EntityEntry {
     void setManaged();
 
     void setLoading();
+
+    void setDeleted();
+
+    void setGone();
 }
