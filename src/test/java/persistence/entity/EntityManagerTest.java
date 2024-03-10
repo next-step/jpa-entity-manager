@@ -34,7 +34,8 @@ class EntityManagerTest {
             jdbcTemplate = new JdbcTemplate(server.getConnection());
             entityManager = new EntityManagerImpl(jdbcTemplate);
 
-            jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
+            String query = new CreateQueryBuilder(Person.class).getQuery();
+            jdbcTemplate.execute(query);
         } catch (Exception e) {
             logger.error("Error occurred", e);
         } finally {

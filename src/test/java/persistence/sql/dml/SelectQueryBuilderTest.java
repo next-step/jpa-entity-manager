@@ -36,6 +36,9 @@ class SelectQueryBuilderTest {
         } finally {
             logger.info("Application finished");
         }
+
+        String query = new CreateQueryBuilder(Person.class).getQuery();
+        jdbcTemplate.execute(query);
     }
 
     @AfterEach
@@ -48,8 +51,6 @@ class SelectQueryBuilderTest {
     @Test
     void 요구사항2_test() {
         // given
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
-
         List<String> insertQueries = Stream.of(
                 new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),
@@ -64,7 +65,7 @@ class SelectQueryBuilderTest {
         String findAllQuery = new SelectQueryBuilder(Person.class).getFindAllQuery();
         List<Person> persons = jdbcTemplate.query(findAllQuery, new DtoMapper<>(Person.class));
 
-
+        System.out.println(persons.size());
         // then
         Assertions.assertThat(persons).hasSize(3);
     }
@@ -73,8 +74,6 @@ class SelectQueryBuilderTest {
     @Test
     void 요구사항3_test() {
         // given
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
-
         List<String> insertQueries = Stream.of(
                 new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),
