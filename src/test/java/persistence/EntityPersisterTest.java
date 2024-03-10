@@ -43,8 +43,8 @@ class EntityPersisterTest {
                 new Table(expected.getClass()),
                 new DDLColumn(new H2TypeConverter(), new H2PrimaryKeyGenerationType())
         );
-        entityManager = new EntityManagerImpl(jdbcTemplate);
         entityPersister = new EntityPersister(jdbcTemplate);
+        entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
 
         final String createQuery = queryBuilder.create(Person.class);
         jdbcTemplate.execute(createQuery);

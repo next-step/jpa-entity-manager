@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.DummyPerson;
+import persistence.EntityPersister;
 import persistence.sql.ddl.converter.H2TypeConverter;
 import persistence.sql.ddl.mapping.DDLQueryBuilder;
 import persistence.sql.ddl.mapping.H2PrimaryKeyGenerationType;
@@ -26,6 +27,7 @@ class EntityManagerImplTest {
 
     private DatabaseServer server;
     private EntityManager entityManager;
+    private EntityPersister entityPersister;
     private JdbcTemplate jdbcTemplate;
     private QueryBuilder queryBuilder;
     private Person expected;
@@ -37,7 +39,8 @@ class EntityManagerImplTest {
         expected = DummyPerson.of();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new EntityManagerImpl(jdbcTemplate);
+        entityPersister = new EntityPersister(jdbcTemplate);
+        entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
         queryBuilder = new DDLQueryBuilder(
                 new Table(expected.getClass()),
                 new DDLColumn(new H2TypeConverter(), new H2PrimaryKeyGenerationType())
