@@ -5,38 +5,38 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityEntryContext {
 
-    private Map<EntityKey, EntityEntry> entityStatusMap;
+    private Map<Object, EntityEntry> entityStatusMap;
 
     public EntityEntryContext() {
         this.entityStatusMap = new ConcurrentHashMap<>();
     }
 
-    public EntityEntry getEntityEntry(final EntityKey entityKey) {
-        return entityStatusMap.get(entityKey);
+    public EntityEntry getEntityEntry(final Object entity) {
+        return entityStatusMap.get(entity);
     }
 
-    public void delete(final EntityKey entityKey) {
-        getEntityEntry(entityKey).deleted();
+    public void delete(final Object entity) {
+        getEntityEntry(entity).deleted();
     }
 
-    public void managed(final EntityKey entityKey) {
-        entityStatusMap.put(entityKey, new EntityEntry(EntityStatus.MANAGED));
+    public void managed(final Object entity) {
+        entityStatusMap.put(entity, new EntityEntry(EntityStatus.MANAGED));
     }
 
-    public void gone(final EntityKey entityKey) {
-        getEntityEntry(entityKey).gone();
+    public void gone(final Object entity) {
+        getEntityEntry(entity).gone();
     }
 
-    public void saving(final EntityKey entityKey) {
-        getEntityEntry(entityKey).saving();
+    public void saving(final Object entity) {
+        getEntityEntry(entity).saving();
     }
 
-    public void loading(final EntityKey entityKey) {
-        getEntityEntry(entityKey).loading();
+    public void loading(final Object entity) {
+        getEntityEntry(entity).loading();
     }
 
-    public void readOnly(final EntityKey entityKey) {
-        getEntityEntry(entityKey).readOnly();
+    public void readOnly(final Object entity) {
+        getEntityEntry(entity).readOnly();
     }
 
     public void clear() {
