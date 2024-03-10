@@ -9,32 +9,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class EntityManagerImpl implements EntityManager{
-
-    public static final int VALID_ROW_COUNT_FOR_FIND_METHOD = 1;
-    public static final int VALID_ROW_INDEX = 0;
-    private final JdbcTemplate jdbcTemplate;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
         this.entityPersister = new EntityPersister(jdbcTemplate);
+        this.entityLoader = new EntityLoader(jdbcTemplate);
     }
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-        String query = new SelectQueryBuilder(clazz).getFindById(id);
-        List<T> selected = jdbcTemplate.query(query, new DtoMapper<>(clazz));
-        return getFoundResult(selected, id);
-    }
-
-    private <T> Optional<T> getFoundResult(List<T> selected, Long id) {
-        if (selected.isEmpty()) {
-            return Optional.empty();
-        }
-        if (selected.size() > VALID_ROW_COUNT_FOR_FIND_METHOD) {
-            throw new NotUniqueDataException(id);
-        }
-        return Optional.of(selected.get(VALID_ROW_INDEX));
+        return entityLoader.find(clazz, id);
     }
 
     @Override
