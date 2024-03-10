@@ -21,12 +21,20 @@ public class JdbcTemplate {
         }
     }
 
-    public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
-        final List<T> results = query(sql, rowMapper);
-        if (results.size() != 1) {
-            throw new RuntimeException("Expected 1 result, got " + results.size());
+    public int executeUpdate(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            return statement.executeUpdate(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return results.get(0);
+    }
+
+    public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            return rowMapper.mapRow(resultSet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
