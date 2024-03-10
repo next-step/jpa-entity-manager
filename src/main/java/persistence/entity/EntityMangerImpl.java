@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import jakarta.persistence.EntityManagerFactory;
-
 public class EntityMangerImpl implements EntityManger {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
@@ -28,11 +26,18 @@ public class EntityMangerImpl implements EntityManger {
     public <T> T find(Class<T> clazz, Object id) {
         EntityKey entityKey = new EntityKey(clazz, id);
         Object cachedEntity = persistenceContext.getEntity(entityKey);
+
         if(cachedEntity != null) {
             return (T) cachedEntity;
         }
+
+        EntityEntry entityEntry = entityEntryFactory.createEntityEntry(entityPersister, entityLoader, Status.LOADING);
+        entityEntryContext.addEntry(entityKey, entityEntry);
+
         T foundEntity = entityLoader.find(clazz, id);
         persistenceContext.addEntity(entityKey, foundEntity);
+
+        entityEntry.setManaged();
 
         return foundEntity;
     }

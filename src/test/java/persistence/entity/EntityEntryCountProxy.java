@@ -32,4 +32,9 @@ public class EntityEntryCountProxy implements EntityEntry {
     public void setManaged() {
         target.setManaged();
     }
+
+    @Override
+    public void setLoading() {
+        target.setLoading();
+    }
 }

@@ -44,7 +44,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
-    @DisplayName("find 시 영속성 컨텍스트에 없으면 쿼리하고 컨텍스트에 저장한다.")
+    @DisplayName("find 시 영속성 컨텍스트에 없으면 쿼리하고 영속성 컨텍스트, 엔트리 컨텍스트에 저장한다.")
     void testFind() {
         Long id = 1L;
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
@@ -56,6 +56,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
         assertSoftly(softly -> {
             softly.assertThat(findPerson).isNotNull();
             softly.assertThat(persistenceContext.getEntity(entityKey)).isNotNull();
+            softly.assertThat(entityEntryContext.getEntry(entityKey)).isNotNull();
         });
     }
 

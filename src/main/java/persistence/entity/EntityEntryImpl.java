@@ -31,4 +31,9 @@ public class EntityEntryImpl implements EntityEntry {
     public void setManaged() {
         status = Status.MANAGED;
     }
+
+    @Override
+    public void setLoading() {
+        status = Status.LOADING;
+    }
 }

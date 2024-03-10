@@ -8,4 +8,6 @@ public interface EntityEntry {
     void setSaving();
 
     void setManaged();
+
+    void setLoading();
 }
