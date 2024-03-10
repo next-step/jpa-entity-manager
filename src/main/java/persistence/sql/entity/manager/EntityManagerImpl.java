@@ -1,5 +1,7 @@
 package persistence.sql.entity.manager;
 
+import jakarta.persistence.Id;
+import persistence.sql.dml.exception.FieldSetValueException;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.context.PersistenceContext;
 import persistence.sql.entity.context.PersistenceContextImpl;
@@ -9,6 +11,8 @@ import persistence.sql.entity.loader.EntityLoader;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.persister.EntityPersister;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
@@ -33,17 +37,13 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
         T persistenceEntity = persistenceContext.getEntity(clazz, id);
-        if(persistenceContext.isGone(clazz,id)) {
+        if(persistenceEntity != null && persistenceContext.isGone(persistenceEntity)) {
             throw new RemoveEntityException();
         }
 
         if(persistenceEntity != null) {
             persistenceContext.loading(persistenceEntity, id);
             return persistenceEntity;
-        }
-
-        if(persistenceContext.isGone(clazz,id)) {
-            throw new RemoveEntityException();
         }
 
         T entity = entityLoader.find(clazz, id);
@@ -60,10 +60,6 @@ public class EntityManagerImpl implements EntityManager {
         if(persistenceEntity != null) {
             persistenceContext.readOnly(persistenceEntity, id);
             return persistenceEntity;
-        }
-
-        if(persistenceContext.isGone(clazz,id)) {
-            throw new RemoveEntityException();
         }
 
         T entity = entityLoader.find(clazz, id);
@@ -90,9 +86,35 @@ public class EntityManagerImpl implements EntityManager {
         }
 
         final Object snapshotEntity = persistenceContext.getDatabaseSnapshot(entity.getClass(), key);
-        if(!entity.equals(snapshotEntity)) {
+        if(key != null && !entity.equals(snapshotEntity)) {
             updateEntity(entity, key);
             persistenceContext.saving(entity);
+        }
+    }
+
+    private void insertEntity(final Object entity) {
+        Object newKey = entityPersister.insertWithPk(entity);
+        newInstance(entity, newKey);
+        insertEntityLoader(entity, newKey);
+    }
+
+    private void updateEntity(final Object entity, final Object key) {
+        entityPersister.update(entity);
+        insertEntityLoader(entity, key);
+    }
+
+    private void newInstance(Object entity, Object id) {
+        Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .forEach(field -> setField(entity, field, id));
+    }
+
+    private void setField(final Object entity, final Field field, final Object id) {
+        try {
+            field.setAccessible(true);
+            field.set(entity, id);
+        } catch (Exception e) {
+            throw new FieldSetValueException();
         }
     }
 
@@ -100,16 +122,6 @@ public class EntityManagerImpl implements EntityManager {
         if(entity != null) {
             persistenceContext.addEntity(entity, id);
         }
-    }
-
-    private void insertEntity(final Object entity) {
-        Object newKey = entityPersister.insertWithPk(entity);
-        insertEntityLoader(entity, newKey);
-    }
-
-    private void updateEntity(final Object entity, final Object key) {
-        entityPersister.update(entity);
-        insertEntityLoader(entity, key);
     }
 
     @Override
