@@ -14,4 +14,8 @@ public interface EntityEntry {
     void setDeleted();
 
     void setGone();
+
+    void setReadOnly();
+
+    boolean isReadOnly();
 }

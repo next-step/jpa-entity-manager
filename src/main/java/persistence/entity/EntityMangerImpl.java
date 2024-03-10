@@ -69,6 +69,10 @@ public class EntityMangerImpl implements EntityManger {
             throw new EntityNotExistsException(entityKey);
         }
 
+        if(entityEntry.isReadOnly()){
+            throw new EntityReadOnlyException(entityKey);
+        }
+
         entityEntry.setSaving();
         entityEntry.getEntityPersister().update(entity);
         persistenceContext.addEntity(entityKey, entity);

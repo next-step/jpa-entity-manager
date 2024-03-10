@@ -46,4 +46,14 @@ public class EntityEntryImpl implements EntityEntry {
     public void setGone() {
         status = Status.GONE;
     }
+
+    @Override
+    public void setReadOnly() {
+        status = Status.READ_ONLY;
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        return status == Status.READ_ONLY;
+    }
 }

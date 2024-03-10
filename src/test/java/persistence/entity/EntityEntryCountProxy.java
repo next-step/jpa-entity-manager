@@ -47,4 +47,14 @@ public class EntityEntryCountProxy implements EntityEntry {
     public void setGone() {
         target.setGone();
     }
+
+    @Override
+    public void setReadOnly() {
+        target.setReadOnly();
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        return target.isReadOnly();
+    }
 }

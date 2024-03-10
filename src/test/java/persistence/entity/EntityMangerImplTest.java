@@ -153,6 +153,18 @@ class EntityMangerImplTest extends H2DBTestSupport {
             entityManger.merge(person);
         });
     }
+    @Test
+    @DisplayName("merge 시 read only 상태인 엔티티는 에러")
+    void throwWhenEntityIsReadOnly() {
+        Person person = new Person(1L, "nick_name", 10, "test@test.com", null);
+        EntityKey entityKey = EntityKey.fromEntity(person);
+        persistenceContext.addEntity(entityKey, person);
+        entityEntryContext.addEntry(entityKey, new EntityEntryImpl(entityPersister, entityLoader, Status.READ_ONLY));
+
+        assertThrows(EntityReadOnlyException.class, () -> {
+            entityManger.merge(person);
+        });
+    }
 
     @Test
     @DisplayName("update 시 entityEntry 의 상태를 saving->managed 순서로 변경.")
