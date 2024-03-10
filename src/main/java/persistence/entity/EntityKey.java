@@ -31,10 +31,19 @@ public class EntityKey {
         return Objects.equals(id, entityKey.id);
     }
 
+    public boolean hasId() {
+        return id != null;
+    }
+
     @Override
     public int hashCode() {
         int result = entityType != null ? entityType.hashCode() : 0;
         result = 31 * result + (id != null ? id.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EntityKey(%s, %s)", entityType.getSimpleName(), id);
     }
 }

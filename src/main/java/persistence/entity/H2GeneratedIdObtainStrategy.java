@@ -13,6 +13,6 @@ public class H2GeneratedIdObtainStrategy implements GeneratedIdObtainStrategy {
 
     @Override
     public RowMapper<Object> getRowMapper() {
-        return rs -> rs.getObject(1);
+        return rs -> rs.getObject("IDENTITY()");
     }
 }
