@@ -4,10 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.notcolumn.Person;
@@ -22,11 +19,11 @@ import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE;
 
 class SelectQueryBuilderTest {
     private static final Logger logger = LoggerFactory.getLogger(SelectQueryBuilderTest.class);
-    DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setUpOnce() {
         try {
             server = new H2();
             server.start();
@@ -40,9 +37,8 @@ class SelectQueryBuilderTest {
         String query = new CreateQueryBuilder(Person.class).getQuery();
         jdbcTemplate.execute(query);
     }
-
-    @AfterEach
-    void tearDown() {
+    @AfterAll
+    static void tearDownOnce() {
         jdbcTemplate.execute(DROP_TABLE);
         server.stop();
     }

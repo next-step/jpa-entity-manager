@@ -26,7 +26,7 @@ public class UpdateQueryBuilder {
      * @return update 쿼리
      */
     public String getQuery(Object entity, Long id) {
-        var setClauses = new SetClauses(entity.getClass()).query();
+        var setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
         return String.format(UPDATE_QUERY,
                 tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
     }
@@ -37,7 +37,7 @@ public class UpdateQueryBuilder {
      * @return update 쿼리
      */
     public String getQuery(Object entity) {
-        var setClauses = new SetClauses(entity.getClass()).query();
+        var setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
         return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), String.join(COMMA, setClauses));
     }
 }

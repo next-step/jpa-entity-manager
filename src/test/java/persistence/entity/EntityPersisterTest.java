@@ -1,38 +1,53 @@
 package persistence.entity;
 
+import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 
+import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
+
 class EntityPersisterTest {
     private static final Logger logger = LoggerFactory.getLogger(EntityPersisterTest.class);
-    EntityPersister entityPersister;
-    EntityManager entityManager;
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
+    private static EntityPersister entityPersister;
+    private static EntityManager entityManager;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setupOnce() {
         try {
-            var server = new H2();
+            server = new H2();
             server.start();
-            var jdbcTemplate = new JdbcTemplate(server.getConnection());
-
-            entityManager = new EntityManagerImpl(jdbcTemplate);
-            entityPersister = new EntityPersister(jdbcTemplate);
-
-            String query = new CreateQueryBuilder(Person.class).getQuery();
-            jdbcTemplate.execute(query);
+            jdbcTemplate = new JdbcTemplate(server.getConnection());
         } catch (Exception e) {
             logger.error("Error occurred", e);
         } finally {
             logger.info("Application finished");
         }
+    }
+    @BeforeEach
+    void setUp() {
+        String query = new CreateQueryBuilder(Person.class).getQuery();
+        jdbcTemplate.execute(query);
+
+        entityManager = new EntityManagerImpl(jdbcTemplate);
+        entityPersister = new EntityPersister(jdbcTemplate);
+    }
+
+    @AfterEach
+    void tearDown() {
+        jdbcTemplate.execute(DROP_TABLE_USERS);
+    }
+
+    @AfterAll
+    static void tearDownOnce() {
+        server.stop();
     }
 
     @Test

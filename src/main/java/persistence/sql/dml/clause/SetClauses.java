@@ -8,10 +8,8 @@ import java.util.List;
 
 public class SetClauses {
     public static final String EQUALS = "=";
-    List<String> setClauses = List.of();
-    public SetClauses(Class<?> entity) {
-        var columnNames = new TableClause(entity).columnNames();
-        var values = new ValueClauses(entity).values();
+    List<String> setClauses = new ArrayList<>();
+    public SetClauses(List<String> columnNames, List<String> values) {
         for (int i = 0; i < columnNames.size(); i++) {
             setClauses.add(columnNames.get(i) + EQUALS + values.get(i));
         }
