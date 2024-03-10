@@ -18,11 +18,11 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object Id) {
-        T entity = (T) persistenceContext.getEntity((Long) Id);
+    public <T> T find(Class<T> clazz, Object id) {
+        T entity = (T) persistenceContext.getEntity(clazz, (Long) id);
         if (entity != null) {
-            entity = entityLoader.find(clazz, (Long) Id);
-            persistenceContext.addEntity((Long) Id, entity);
+            entity = entityLoader.find(clazz, (Long) id);
+            persistenceContext.persist((Long) id, entity);
         }
         return entity;
     }
@@ -31,13 +31,24 @@ public class EntityManagerImpl implements EntityManager {
     public void persist(Object entity) {
         Long id = entityPersister.insert(entity);
         entityPersister.setIdentifier(entity, id);
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.persist(id, entity);
     }
 
     @Override
     public void remove(Object entity) {
         persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
+    }
+
+    /**
+     *TODO
+     * - 모든 엔티티와 스냡샷 비교
+     * - 변경된 Entity 찾음
+     * 수정 쿼리 생성
+      */
+    @Override
+    public void flush() {
+
     }
 
 }

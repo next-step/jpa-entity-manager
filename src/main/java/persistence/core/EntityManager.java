@@ -8,4 +8,6 @@ public interface EntityManager {
 
     void remove(Object entity);
 
+    public void flush();
+
 }

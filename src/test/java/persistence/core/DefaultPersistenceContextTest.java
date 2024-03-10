@@ -14,7 +14,7 @@ class DefaultPersistenceContextTest {
         Person person = new Person();
         defaultPersistenceContext.addEntity(1L, person);
 
-        assertEquals(person, defaultPersistenceContext.getEntity(1L));
+        assertEquals(person, defaultPersistenceContext.getEntity(person.getClass(), 1L));
     }
 
     @Test
@@ -22,7 +22,7 @@ class DefaultPersistenceContextTest {
         Person person = new Person();
         defaultPersistenceContext.removeEntity(person);
 
-        assertNull(defaultPersistenceContext.getEntity(1L));
+        assertNull(defaultPersistenceContext.getEntity(person.getClass(), 1L));
     }
 
 }
