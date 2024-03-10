@@ -17,10 +17,14 @@ public class ValueClause {
         } catch (IllegalAccessException e) {
             throw new RuntimeException("value 생성에 실패하였습니다.", e);
         }
-        if (String.class.isAssignableFrom(field.getType()) && value != null) {
+        if (isString(field, value)) {
             return APOSTROPHE + value + APOSTROPHE;
         }
         return String.valueOf(value);
+    }
+
+    private static boolean isString(Field field, Object value) {
+        return String.class.isAssignableFrom(field.getType()) && value != null;
     }
 
     public String value() {
