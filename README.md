@@ -1,6 +1,8 @@
 # jpa-entity-manager
 
 ## 2단계
+- [x] 요구사항 1 - RowMapper 리팩터링
+- [x] 요구사항 2 - EntityManager 의 구현체에서 find 에 대한 책임을 EntityLoader 로 옮겨주자
 - [x] 1단계 피드백 반영
   - [x] find에서 2개 이상 데이터 조회될 경우 예외를 던져라
   - [x] query를 별도 변수로 분리하라.
