@@ -4,8 +4,6 @@ import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.DummyPerson;
-import persistence.sql.dml.model.DMLColumn;
-import persistence.sql.model.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,9 +15,7 @@ class InsertQueryBuilderTest {
     @BeforeEach
     void setUp() {
         person = DummyPerson.ofNullId();
-        final Table table = new Table(person.getClass());
-        final DMLColumn column = new DMLColumn(person);
-        queryBuilder = new InsertQueryBuilder(table, column);
+        queryBuilder = new InsertQueryBuilder(person);
     }
 
     @Test

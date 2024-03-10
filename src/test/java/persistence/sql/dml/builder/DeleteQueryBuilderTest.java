@@ -4,9 +4,6 @@ import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.DummyPerson;
-import persistence.sql.dml.model.DMLColumn;
-import persistence.sql.dml.model.Where;
-import persistence.sql.model.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,10 +15,7 @@ class DeleteQueryBuilderTest {
     @BeforeEach
     void setUp() {
         person = DummyPerson.ofNullId();
-        final Table table = new Table(person.getClass());
-        final DMLColumn column = new DMLColumn(person);
-        final Where where = new Where(person);
-        queryBuilder = new DeleteQueryBuilder(table, column, where);
+        queryBuilder = new DeleteQueryBuilder(person);
     }
 
     @Test

@@ -15,7 +15,6 @@ import persistence.sql.ddl.mapping.H2PrimaryKeyGenerationType;
 import persistence.sql.ddl.mapping.QueryBuilder;
 import persistence.sql.ddl.model.DDLColumn;
 import persistence.sql.dml.builder.InsertQueryBuilder;
-import persistence.sql.dml.model.DMLColumn;
 import persistence.sql.model.Table;
 
 import java.sql.SQLException;
@@ -87,10 +86,7 @@ class EntityManagerImplTest {
     }
 
     private void insertDummyPerson() {
-        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(
-                new Table(expected.getClass()),
-                new DMLColumn(expected)
-        );
+        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(expected);
         final String insertQuery = queryBuilder.build();
 
         jdbcTemplate.execute(insertQuery);

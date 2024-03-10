@@ -4,7 +4,6 @@ import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dml.model.DMLColumn;
-import persistence.sql.dml.model.Where;
 import persistence.sql.model.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,8 +16,7 @@ class SelectQueryBuilderTest {
     void setUp() {
         final Table table = new Table(Person.class);
         final DMLColumn column = new DMLColumn(Person.class);
-        final Where where = new Where(Person.class);
-        queryBuilder = new SelectQueryBuilder(table, column, where);
+        queryBuilder = new SelectQueryBuilder(table, column);
     }
 
     @Test

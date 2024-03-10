@@ -6,7 +6,6 @@ import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 import persistence.sql.dml.model.DMLColumn;
-import persistence.sql.dml.model.Where;
 import persistence.sql.model.Table;
 
 public class EntityManagerImpl implements EntityManager {
@@ -26,7 +25,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private <T> String findQuery(Class<T> clazz, Long id) {
         final SelectQueryBuilder queryBuilder = new SelectQueryBuilder(
-                new Table(clazz), new DMLColumn(clazz), new Where(clazz)
+                new Table(clazz), new DMLColumn(clazz)
         );
 
         return queryBuilder.findById(id).build();
@@ -40,9 +39,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private String persistQuery(Object entity) {
-        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(
-                new Table(entity.getClass()), new DMLColumn(entity)
-        );
+        final InsertQueryBuilder queryBuilder = new InsertQueryBuilder(entity);
 
         return queryBuilder.build();
     }
@@ -55,9 +52,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private String removeQuery(Object entity) {
-        final DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(
-                new Table(entity.getClass()), new DMLColumn(entity), new Where(entity)
-        );
+        final DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(entity);
 
         return queryBuilder.build();
     }
