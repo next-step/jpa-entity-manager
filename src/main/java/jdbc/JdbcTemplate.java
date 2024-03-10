@@ -21,6 +21,21 @@ public class JdbcTemplate {
         }
     }
 
+    public long executeWithGeneratedKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                }
+
+                throw new RuntimeException();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         final List<T> results = query(sql, rowMapper);
         if (results.size() != 1) {
