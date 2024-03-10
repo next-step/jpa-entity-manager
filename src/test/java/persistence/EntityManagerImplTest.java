@@ -68,5 +68,19 @@ class EntityManagerImplTest {
         assertThat(savedPerson).isNotNull();
     }
 
+    @Test
+    @DisplayName("entity 데이터 변경후 dirtyChecking에의한 update 실행")
+    public void dirtyCheckFlushTest() {
+        final Person person = new Person();
+        person.setName("jinny");
+        person.setAge(30);
+        person.setEmail("test@gmail.com");
+
+        entityManager.persist(person);
+        Person savedPerson = entityManager.find(Person.class, 1L);
+        savedPerson.setAge(33);
+
+        entityManager.flush();
+    }
 
 }

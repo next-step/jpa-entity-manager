@@ -44,21 +44,18 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        persistenceContext.getEntity(entity.getClass(), 1L);
+        if (entityPersister.update(entity)) {
+            persistenceContext.getDatabaseSnapshot(1L, entity);
+            return entity;
+        }
+
         return null;
     }
 
-    /**
-     *TODO
-     * - 모든 엔티티와 스냡샷 비교
-     * - 변경된 Entity 찾음
-     * 수정 쿼리 생성
-      */
     @Override
     public void flush() {
-//        persistenceContext.dirtyCheck();
-
-
+        persistenceContext.dirtyCheck()
+                .forEach(this::merge);
     }
 
 }

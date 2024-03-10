@@ -10,8 +10,6 @@ public interface EntityManager {
 
     public <T> T merge(T entity);
 
-    public void flush();
-
-
+    void flush();
 
 }
