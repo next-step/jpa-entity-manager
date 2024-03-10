@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 public class Length {
 
     private static final String EMPTY_STRING = "";
+    private static final String LENGTH_METHOD_NAME = "length";
 
     private final int length;
 
@@ -21,7 +22,7 @@ public class Length {
 
     private int getColumnDefaultLength() {
         try {
-            return (int) jakarta.persistence.Column.class.getMethod("length").getDefaultValue();
+            return (int) jakarta.persistence.Column.class.getMethod(LENGTH_METHOD_NAME).getDefaultValue();
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,7 @@
 package persistence.sql.ddl.domain;
 
 import jakarta.persistence.Transient;
+import persistence.sql.dml.domain.Value;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -35,6 +36,10 @@ public class Columns {
                 .filter(Column::isPrimaryKey)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Primary key not found."));
+    }
+
+    public Object getOriginValue(Object entity) {
+        return new Value(getPrimaryKeyColumn(), entity).getOriginValue();
     }
 
     public void setPkValue(Object entity, Object id) {
