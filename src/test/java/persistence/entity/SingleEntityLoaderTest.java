@@ -3,6 +3,8 @@ package persistence.entity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.JdbcServerDmlQueryTestSupport;
+import persistence.entity.loader.EntityLoader;
+import persistence.entity.loader.SingleEntityLoader;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
