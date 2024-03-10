@@ -1,7 +1,8 @@
 package persistence.sql.dml;
 
 import persistence.sql.ddl.TableClause;
-import persistence.sql.ddl.value.ValueClauses;
+import persistence.sql.dml.clause.SetClauses;
+import persistence.sql.dml.value.ValueClauses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,24 +20,24 @@ public class UpdateQueryBuilder {
     }
 
     /**
-     * update 쿼리를 리턴한다.
+     * 테이블의 특정 row만 업데이트하는 쿼리를 리턴한다.
      * @param entity update 될 최신 정보
+     * @param id row의 primary key
      * @return update 쿼리
      */
     public String getQuery(Object entity, Long id) {
+        var setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
+        return String.format(UPDATE_QUERY,
+                tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
+    }
 
-        List<String> columnNames = this.tableClause.columnNames();
-        List<String> values = new ValueClauses(entity).values();
-
-        List<String> setClauses = new ArrayList<>();
-        for (int i = 0; i < columnNames.size(); i++) {
-            setClauses.add(columnNames.get(i) + EQUALS + values.get(i));
-        }
-
-        if (id != null) {
-            return String.format(UPDATE_QUERY, tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
-        }
-
+    /**
+     * 테이블의 전체 row를 업데이트하는 쿼리를 리턴한다.
+     * @param entity update 될 최신 정보
+     * @return update 쿼리
+     */
+    public String getQuery(Object entity) {
+        var setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
         return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), String.join(COMMA, setClauses));
     }
 }

@@ -4,10 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.notcolumn.Person;
@@ -22,11 +19,11 @@ import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE;
 
 class SelectQueryBuilderTest {
     private static final Logger logger = LoggerFactory.getLogger(SelectQueryBuilderTest.class);
-    DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setUpOnce() {
         try {
             server = new H2();
             server.start();
@@ -36,10 +33,12 @@ class SelectQueryBuilderTest {
         } finally {
             logger.info("Application finished");
         }
-    }
 
-    @AfterEach
-    void tearDown() {
+        String query = new CreateQueryBuilder(Person.class).getQuery();
+        jdbcTemplate.execute(query);
+    }
+    @AfterAll
+    static void tearDownOnce() {
         jdbcTemplate.execute(DROP_TABLE);
         server.stop();
     }
@@ -48,8 +47,6 @@ class SelectQueryBuilderTest {
     @Test
     void 요구사항2_test() {
         // given
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
-
         List<String> insertQueries = Stream.of(
                 new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),
@@ -64,7 +61,7 @@ class SelectQueryBuilderTest {
         String findAllQuery = new SelectQueryBuilder(Person.class).getFindAllQuery();
         List<Person> persons = jdbcTemplate.query(findAllQuery, new DtoMapper<>(Person.class));
 
-
+        System.out.println(persons.size());
         // then
         Assertions.assertThat(persons).hasSize(3);
     }
@@ -73,8 +70,6 @@ class SelectQueryBuilderTest {
     @Test
     void 요구사항3_test() {
         // given
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
-
         List<String> insertQueries = Stream.of(
                 new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
                         new Person("김영희", 15, "younghee.kim@gmail.com", 11),

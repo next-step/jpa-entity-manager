@@ -14,7 +14,8 @@ public class EntityPersister {
     }
 
     public boolean update(Object entity, Long id) {
-        int result = jdbcTemplate.executeUpdate(new UpdateQueryBuilder(entity.getClass()).getQuery(entity, id));
+        String query = new UpdateQueryBuilder(entity.getClass()).getQuery(entity, id);
+        int result = jdbcTemplate.executeUpdate(query);
         return result == 1;
     }
 

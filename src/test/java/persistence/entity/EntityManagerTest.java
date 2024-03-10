@@ -4,11 +4,10 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.exception.NotUniqueDataException;
 import persistence.entity.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
@@ -20,30 +19,38 @@ import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
 class EntityManagerTest {
     private static final Logger logger = LoggerFactory.getLogger(EntityManagerTest.class);
-    DatabaseServer server;
-    private JdbcTemplate jdbcTemplate;
+    private static DatabaseServer server;
+    private static JdbcTemplate jdbcTemplate;
 
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setupOnce() {
         try {
             server = new H2();
             server.start();
             jdbcTemplate = new JdbcTemplate(server.getConnection());
-            entityManager = new EntityManagerImpl(jdbcTemplate);
-
-            jdbcTemplate.execute(new CreateQueryBuilder(Person.class).getQuery());
         } catch (Exception e) {
             logger.error("Error occurred", e);
         } finally {
             logger.info("Application finished");
         }
     }
+    @BeforeEach
+    void setUp() {
+        String query = new CreateQueryBuilder(Person.class).getQuery();
+        jdbcTemplate.execute(query);
+
+        entityManager = new EntityManagerImpl(jdbcTemplate);
+    }
 
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(DROP_TABLE_USERS);
+    }
+
+    @AfterAll
+    static void tearDownOnce() {
         server.stop();
     }
 

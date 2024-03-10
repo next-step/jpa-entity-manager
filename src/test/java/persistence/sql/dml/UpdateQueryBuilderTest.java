@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.notcolumn.Person;
 
 class UpdateQueryBuilderTest {
-
     @Test
     @DisplayName("update 쿼리 빌더는 update 쿼리를 정상 리턴한다.")
     void getQueryTest() {
