@@ -70,7 +70,7 @@ class PersistenceContextTest {
         persistenceContext.removeEntity(person);
         persistenceContext.goneEntity(person);
 
-        boolean isGone = persistenceContext.isGone(Person.class, person.getId());
+        boolean isGone = persistenceContext.isGone(person);
 
         assertThat(isGone).isTrue();
     }
