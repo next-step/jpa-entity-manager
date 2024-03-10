@@ -1,8 +1,5 @@
 package persistence.sql.entity.context;
 
-import persistence.sql.entity.EntityMappingTable;
-import persistence.sql.entity.model.PrimaryDomainType;
-
 public class PersistenceContextImpl implements PersistenceContext {
 
     private final FirstLevelCache firstLevelCache;
@@ -17,6 +14,10 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> T getEntity(final Class<T> clazz, final Object id) {
+        if(id == null) {
+            return null;
+        }
+
         final EntityKey entityKey = new EntityKey(clazz.getSimpleName(), id);
 
         return (T) firstLevelCache.get(entityKey);
@@ -28,46 +29,32 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         firstLevelCache.put(entityKey, entity);
         snapshot.put(entityKey, entity);
-        entityEntryContext.managed(entityKey);
+        entityEntryContext.managed(entity);
     }
 
     @Override
     public void removeEntity(final Object entity) {
-        PrimaryDomainType pkDomainTypes = EntityMappingTable.of(entity.getClass(), entity)
-                .getPkDomainTypes();
-        EntityKey entityKey = new EntityKey(entity.getClass().getSimpleName(), pkDomainTypes.getValue());
-
-        entityEntryContext.delete(entityKey);
+        entityEntryContext.delete(entity);
     }
 
     @Override
     public void goneEntity(Object entity) {
-        PrimaryDomainType pkDomainTypes = EntityMappingTable.of(entity.getClass(), entity)
-                .getPkDomainTypes();
-        EntityKey entityKey = new EntityKey(entity.getClass().getSimpleName(), pkDomainTypes.getValue());
-
-        entityEntryContext.gone(entityKey);
+        entityEntryContext.gone(entity);
     }
 
     @Override
     public void saving(Object entity) {
-        PrimaryDomainType pkDomainTypes = EntityMappingTable.of(entity.getClass(), entity)
-                .getPkDomainTypes();
-        EntityKey entityKey = new EntityKey(entity.getClass().getSimpleName(), pkDomainTypes.getValue());
-
-        entityEntryContext.saving(entityKey);
+        entityEntryContext.saving(entity);
     }
 
     @Override
     public void loading(Object entity, Object id) {
-        EntityKey entityKey = new EntityKey(entity.getClass().getSimpleName(), id);
-        entityEntryContext.loading(entityKey);
+        entityEntryContext.loading(entity);
     }
 
     @Override
     public void readOnly(Object entity, Object id) {
-        EntityKey entityKey = new EntityKey(entity.getClass().getSimpleName(), id);
-        entityEntryContext.readOnly(entityKey);
+        entityEntryContext.readOnly(entity);
     }
 
     @Override
@@ -79,31 +66,30 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> T getDatabaseSnapshot(Class<?> clazz, Object id) {
+        if(id == null) {
+            return null;
+        }
+
         final EntityKey entityKey = new EntityKey(clazz.getSimpleName(), id);
 
         return (T) snapshot.get(entityKey);
     }
 
     @Override
-    public boolean isGone(Class<?> clazz, Object id) {
-        EntityKey entityKey = new EntityKey(clazz.getSimpleName(), id);
+    public boolean isGone(Object entity) {
+        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entity);
 
-        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
         if(entityEntry == null) {
             return false;
         }
 
-        return entityEntryContext.getEntityEntry(entityKey)
+        return entityEntryContext.getEntityEntry(entity)
                 .isGone();
     }
 
     @Override
     public boolean isReadOnly(Object entity) {
-        PrimaryDomainType pkDomainTypes = EntityMappingTable.of(entity.getClass(), entity)
-                .getPkDomainTypes();
-        EntityKey entityKey = new EntityKey(entity.getClass().getSimpleName(), pkDomainTypes.getValue());
-
-        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
+        EntityEntry entityEntry = entityEntryContext.getEntityEntry(entity);
         if(entityEntry == null) {
             return false;
         }
