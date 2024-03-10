@@ -1,6 +1,6 @@
 package persistence.sql.ddl;
 
-import domain.EntityMetaData;
+import pojo.EntityMetaData;
 
 public class DropQueryBuilder {
 
@@ -13,6 +13,6 @@ public class DropQueryBuilder {
     }
 
     public String dropTable() {
-        return String.format(DROP_TABLE_QUERY, entityMetaData.getTableName());
+        return String.format(DROP_TABLE_QUERY, entityMetaData.getTableInfo().getName());
     }
 }

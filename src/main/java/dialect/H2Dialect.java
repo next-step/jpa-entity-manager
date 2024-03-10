@@ -1,4 +1,4 @@
-package domain.dialect;
+package dialect;
 
 import java.sql.Types;
 import java.util.HashMap;
@@ -30,5 +30,10 @@ public class H2Dialect extends Dialect {
         if (!super.containsJavaType(typeCode)) {
             throw new IllegalStateException("지원하는 javaType 이 아닙니다.");
         }
+    }
+
+    @Override
+    public boolean isVarcharType(Class<?> type) {
+        return getJavaTypeByClass(type).equals(Types.VARCHAR);
     }
 }

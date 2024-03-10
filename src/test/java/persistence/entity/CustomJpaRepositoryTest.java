@@ -16,16 +16,14 @@ import persistence.context.PersistenceContext;
 import persistence.context.SimplePersistenceContext;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
 import pojo.EntityMetaData;
 
 import java.sql.SQLException;
+import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class EntityPersisterImplTest {
+class CustomJpaRepositoryTest {
 
     static Dialect dialect = new H2Dialect();
     static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
@@ -36,6 +34,7 @@ class EntityPersisterImplTest {
     static EntityLoader entityLoader;
     static SimpleEntityManager simpleEntityManager;
     static PersistenceContext persistenceContext;
+    static JpaRepository jpaRepository;
 
     Person3 person;
 
@@ -49,6 +48,7 @@ class EntityPersisterImplTest {
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
         simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
+        jpaRepository = new CustomJpaRepository(dialect, simpleEntityManager);
     }
 
     @BeforeEach
@@ -67,43 +67,26 @@ class EntityPersisterImplTest {
         server.stop();
     }
 
-    @DisplayName("insert 테스트")
-    @Test
-    void insertTest() {
-        entityPersister.insert(person);
-        Person3 person3 = simpleEntityManager.find(person.getClass(), person.getId());
-        assertAll(
-                () -> assertThat(person3.getId()).isEqualTo(person.getId()),
-                () -> assertThat(person3.getName()).isEqualTo(person.getName()),
-                () -> assertThat(person3.getAge()).isEqualTo(person.getAge()),
-                () -> assertThat(person3.getEmail()).isEqualTo(person.getEmail())
-        );
-    }
 
-    @DisplayName("insert 후 update 테스트")
+    @DisplayName("save 시 dirty checking 로직 구현")
     @Test
-    void updateTest() {
-        insertData();
-        boolean result = entityPersister.update(new Person3(person.getId(), "test", 35, "test@test.com"));
-        assertThat(result).isTrue();
-    }
+    void saveWithDirtyTest() {
+        jpaRepository.save(person);
 
-    @DisplayName("delete 후 조회하려고 할 때 exception 테스트")
-    @Test
-    void deleteTest() {
-        insertData();
-        entityPersister.delete(person);
-        assertThrows(RuntimeException.class, () -> entityLoader.findById(person.getClass(), person.getId()));
+        Person3 updatedPerson = new Person3(person.getId(), "test2", 30, "test2@test.com");
+        jpaRepository.save(updatedPerson);
+
+        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(person.getId(), person);
+        Map<String, Object> map = cachedDatabaseSnapshot.getMap();
+
+        assertEquals(Long.valueOf(String.valueOf(map.get("id"))), updatedPerson.getId());
+
+        simpleEntityManager.remove(person);
     }
 
     private void createTable() {
         CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(dialect, entityMetaData);
         jdbcTemplate.execute(createQueryBuilder.createTable(person));
-    }
-
-    private void insertData() {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
-        jdbcTemplate.execute(updateQueryBuilder.insertQuery(person));
     }
 
     private void dropTable() {

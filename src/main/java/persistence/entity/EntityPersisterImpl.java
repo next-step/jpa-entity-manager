@@ -1,7 +1,7 @@
 package persistence.entity;
 
-import domain.EntityMetaData;
-import domain.dialect.Dialect;
+import dialect.Dialect;
+import pojo.EntityMetaData;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
@@ -38,7 +38,7 @@ public class EntityPersisterImpl implements EntityPersister {
 
     @Override
     public void delete(Object object) {
-        DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(entityMetaData);
+        DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(dialect, entityMetaData);
         jdbcTemplate.execute(queryBuilder.deleteByIdQuery(object));
     }
 }

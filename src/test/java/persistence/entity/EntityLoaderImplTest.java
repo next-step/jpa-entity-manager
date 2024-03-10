@@ -2,21 +2,21 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
-import domain.EntityMetaData;
-import domain.Person3;
-import domain.dialect.Dialect;
-import domain.dialect.H2Dialect;
+import dialect.Dialect;
+import dialect.H2Dialect;
+import entity.Person3;
 import jdbc.JdbcTemplate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.context.PersistenceContext;
+import persistence.context.SimplePersistenceContext;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
+import pojo.EntityMetaData;
 
 import java.sql.SQLException;
 
@@ -33,6 +33,7 @@ class EntityLoaderImplTest {
     static EntityPersister entityPersister;
     static EntityLoader entityLoader;
     static SimpleEntityManager simpleEntityManager;
+    static PersistenceContext persistenceContext;
 
     Person3 person;
 
@@ -44,7 +45,8 @@ class EntityLoaderImplTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
-        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader);
+        persistenceContext = new SimplePersistenceContext();
+        simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
     }
 
     @BeforeEach

@@ -1,4 +1,4 @@
-package domain.utils;
+package utils;
 
 public class StringUtils {
 
@@ -7,6 +7,6 @@ public class StringUtils {
     }
 
     public static boolean isBlankOrEmpty(String target) {
-        return target.isBlank() || target.isEmpty();
+        return target == null || target.isBlank() || target.isEmpty();
     }
 }

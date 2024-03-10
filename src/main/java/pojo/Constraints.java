@@ -1,4 +1,4 @@
-package domain;
+package pojo;
 
 public enum Constraints {
 

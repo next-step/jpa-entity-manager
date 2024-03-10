@@ -1,6 +1,9 @@
 package persistence.sql.dml;
 
-import domain.EntityMetaData;
+import pojo.EntityMetaData;
+import pojo.FieldInfo;
+import pojo.FieldInfos;
+import pojo.FieldName;
 
 public class SelectQueryBuilder {
 
@@ -14,10 +17,12 @@ public class SelectQueryBuilder {
     }
 
     public String findAllQuery() {
-        return String.format(FIND_ALL_QUERY, entityMetaData.getTableName());
+        return String.format(FIND_ALL_QUERY, entityMetaData.getTableInfo().getName());
     }
 
-    public String findByIdQuery(Object condition) {
-        return String.format(FIND_BY_ID_QUERY, entityMetaData.getTableName(), entityMetaData.getIdField(), condition);
+    public String findByIdQuery(Class<?> clazz, Object condition) {
+        FieldInfo idFieldInfo = new FieldInfos(clazz.getDeclaredFields()).getIdFieldData();
+        return String.format(FIND_BY_ID_QUERY, entityMetaData.getTableInfo().getName(),
+                new FieldName(idFieldInfo.getField()).getName(), condition);
     }
 }
