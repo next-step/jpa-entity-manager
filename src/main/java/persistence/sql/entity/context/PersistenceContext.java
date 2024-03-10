@@ -20,7 +20,7 @@ public interface PersistenceContext {
 
     <T> T getDatabaseSnapshot(Class<?> clazz, Object id);
 
-    boolean isGone(Class<?> clazz, Object id);
+    boolean isGone(Object entity);
 
     boolean isReadOnly(Object entity);
 }
