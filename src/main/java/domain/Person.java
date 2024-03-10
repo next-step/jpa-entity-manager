@@ -60,4 +60,16 @@ public class Person {
     public int hashCode() {
         return Objects.hash(id, name, age, email);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 }
