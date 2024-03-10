@@ -1,7 +1,6 @@
 package persistence.core;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DefaultPersistenceContext implements PersistenceContext {
     private EntityKeyManager entityKeyManager;
@@ -35,17 +34,36 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public void getDatabaseSnapshot(Long id, Object entity) {
-        EntityKey entityKey = entityKeyManager.createKey(entity.getClass(), id);
-        snapshotEntities.put(entityKey, new Snapshot(entity));
+        EntityKey entityKey = entityKeyManager.from(entity.getClass(), id);
+        snapshotEntities.put(entityKey, new Snapshot(managedEntities.get(entityKey)));
     }
 
-    @Override
-    public void persist(Long id, Object entity) {
-        EntityKey entityKey = entityKeyManager.createKey(entity.getClass(), id);
-        addEntity(id, entity);
-        managedEntities.put(entityKey, entity);
-        snapshotEntities.put(entityKey, new Snapshot(entity));
+    public Snapshot getSnapshot(Class<?> clazz, Long id) {
+        EntityKey entityKey = entityKeyManager.from(clazz, id);
+        return snapshotEntities.get(entityKey);
+    }
 
+    public <T> List<T> dirtyCheck() {
+        return findDirtyEntity();
+    }
+
+    private <T> List<T> findDirtyEntity() {
+        List<T> dirtyEntities = new ArrayList<>();
+        managedEntities.forEach((key, entity) -> {
+            if (isDirty(snapshotEntities.get(key), entity)) {
+                dirtyEntities.add((T) entity);
+            }
+        });
+
+        return dirtyEntities;
+    }
+
+    private boolean isDirty(Snapshot snapshot, Object entity) {
+        Map<String, Object> entitySnapshot = snapshot.get();
+        Snapshot snapshot1 = new Snapshot(entity);
+        Map<String, Object> stringObjectMap = snapshot1.get();
+
+        return !entitySnapshot.equals(stringObjectMap);
     }
 
 }

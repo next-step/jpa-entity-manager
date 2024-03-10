@@ -18,11 +18,12 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object id) {
-        T entity = (T) persistenceContext.getEntity(clazz, (Long) id);
+    public <T> T find(Class<T> clazz, Long id) {
+        T entity = (T) persistenceContext.getEntity(clazz, id);
         if (entity != null) {
-            entity = entityLoader.find(clazz, (Long) id);
-            persistenceContext.persist((Long) id, entity);
+            entity = entityLoader.find(clazz, id);
+            persistenceContext.addEntity(id, entity);
+            persistenceContext.getDatabaseSnapshot(id, entity);
         }
         return entity;
     }
@@ -31,13 +32,20 @@ public class EntityManagerImpl implements EntityManager {
     public void persist(Object entity) {
         Long id = entityPersister.insert(entity);
         entityPersister.setIdentifier(entity, id);
-        persistenceContext.persist(id, entity);
+        persistenceContext.addEntity(id, entity);
+        persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
     @Override
     public void remove(Object entity) {
         persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        persistenceContext.getEntity(entity.getClass(), 1L);
+        return null;
     }
 
     /**
@@ -48,6 +56,8 @@ public class EntityManagerImpl implements EntityManager {
       */
     @Override
     public void flush() {
+//        persistenceContext.dirtyCheck();
+
 
     }
 

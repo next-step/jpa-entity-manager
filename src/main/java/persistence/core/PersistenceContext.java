@@ -1,7 +1,5 @@
 package persistence.core;
 
-import java.util.Map;
-
 public interface PersistenceContext {
     Object getEntity(Class<?> entity, Long id);
 
@@ -11,6 +9,5 @@ public interface PersistenceContext {
 
     void getDatabaseSnapshot(Long id, Object entity);
 
-    void persist(Long id, Object entity);
 
 }

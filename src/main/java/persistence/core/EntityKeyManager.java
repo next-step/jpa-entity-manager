@@ -1,10 +1,15 @@
 package persistence.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EntityKeyManager {
     private Map<String, EntityKey> keys;
+
+    public EntityKeyManager() {
+        this.keys = new HashMap<>();
+    }
 
     public EntityKey createKey(Class<?> clazz, Long id) {
         EntityKey entityKey = new EntityKey(clazz, id);
