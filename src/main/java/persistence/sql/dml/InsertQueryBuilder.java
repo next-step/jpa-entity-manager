@@ -1,7 +1,7 @@
 package persistence.sql.dml;
 
 import persistence.sql.ddl.TableClause;
-import persistence.sql.ddl.value.ValueClauses;
+import persistence.sql.dml.value.ValueClauses;
 import persistence.sql.exception.InvalidValueClausesException;
 
 import java.lang.reflect.Field;

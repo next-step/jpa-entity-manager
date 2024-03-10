@@ -1,4 +1,4 @@
-package persistence.sql.ddl.value;
+package persistence.sql.dml.value;
 
 import java.lang.reflect.Field;
 
