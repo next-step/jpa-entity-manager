@@ -51,6 +51,16 @@ class EntityMangerTest extends H2Database {
         assertThat(findPerson).isEqualTo(newPerson);
     }
 
+    @DisplayName("아이디가 없는값도 저장이 된다.")
+    @Test
+    void notExistsIdSave() {
+        Person newPerson = new Person(null, "김성주", 14, "jpa");
+
+        entityManager.persist(newPerson);
+
+        assertThat(entityManager.findAll(Person.class)).hasSize(2);
+    }
+
     @DisplayName("readOnly로 조회할시, 업데이트시 에러를 반환한다.")
     @Test
     void readOnlyUpdateTest() {
