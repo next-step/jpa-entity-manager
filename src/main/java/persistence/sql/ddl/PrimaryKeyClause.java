@@ -4,6 +4,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import persistence.entity.exception.InvalidPrimaryKeyException;
+import persistence.entity.exception.PrimaryKeyEditingNotAllowedException;
 import persistence.sql.exception.NotIdException;
 
 import java.lang.reflect.Field;
@@ -31,7 +32,7 @@ public class PrimaryKeyClause {
         this.generationType = getType(field);
     }
 
-    public static Long primaryKeyValue(Object entity ) {
+    public static Long primaryKeyValue(Object entity) {
         Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findAny()
@@ -42,6 +43,21 @@ public class PrimaryKeyClause {
             return (Long) idField.get(entity);
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
+        }
+    }
+
+    public static Object initPrimaryKey(Object entity) {
+        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(x -> x.isAnnotationPresent(Id.class))
+                .findAny()
+                .orElseThrow(InvalidPrimaryKeyException::new);
+
+        idField.setAccessible(true);
+        try {
+            idField.set(entity, idField.get(entity));
+            return entity;
+        } catch (IllegalAccessException e) {
+            throw new PrimaryKeyEditingNotAllowedException();
         }
     }
 

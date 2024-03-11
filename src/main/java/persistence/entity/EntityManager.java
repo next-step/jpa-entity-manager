@@ -16,7 +16,7 @@ public interface EntityManager {
      * @param entity 저장 대상
      * @return 저장 결과
      */
-    void persist(Object entity);
+    Object persist(Object entity);
 
     /**
      * 제거

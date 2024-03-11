@@ -49,11 +49,27 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(Object entity) {
-        entityPersister.insert(entity);
+    public Object addEntity(Object entity) {
+        var insertedEntity = entityPersister.insert(entity);
 
-        var key = getEntityKey(entity);
-        snapshot.put(key, entity);
+        var key = getEntityKey(insertedEntity);
+
+        entityCache.put(key, insertedEntity);
+        snapshot.put(key, insertedEntity);
+
+        return insertedEntity;
+    }
+
+
+    @Override
+    public Object updateEntity(Object entity, Long id) {
+        var updatedEntity = entityPersister.update(entity, id);
+
+        var key = getEntityKey(updatedEntity);
+        entityCache.put(key, updatedEntity);
+        snapshot.put(key, updatedEntity);
+
+        return updatedEntity;
     }
 
     @Override
@@ -70,11 +86,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     private EntityKey getEntityKey(Long id, Object entity) {
-        return new EntityKey(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity));
+        return new EntityKey(entity.getClass(), id);
     }
 
     @Override
-    public Object getDatabaseSnapshot(Object entity, Long id) {
+    public Optional<Object> getDatabaseSnapshot(Object entity, Long id) {
         return Optional.of(snapshot.get(getEntityKey(id, entity)));
     }
 }

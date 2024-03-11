@@ -57,6 +57,16 @@ public class Person {
         return email;
     }
 
+    public Person changeEmail(String email) {
+        var person = new Person();
+        person.id = id;
+        person.name = name;
+        person.age = age;
+        person.email = email;
+        person.index = index;
+        return person;
+    }
+
     @Override
     public boolean equals(Object entity) {
         if (this == entity) return true;

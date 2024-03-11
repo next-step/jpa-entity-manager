@@ -3,11 +3,11 @@ package persistence.entity.persistencecontext;
 import java.util.Objects;
 
 public class EntityKey {
-    private final Class<?> clazz;
+    private final String clasName;
     private final Long id;
 
     public EntityKey(Class<?> clazz, Long id) {
-        this.clazz = clazz;
+        this.clasName = clazz.getSimpleName();
         this.id = id;
     }
 
@@ -15,12 +15,12 @@ public class EntityKey {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EntityKey that = (EntityKey) o;
-        return Objects.equals(clazz, that.clazz) && Objects.equals(id, that.id);
+        EntityKey key = (EntityKey) o;
+        return Objects.equals(clasName, key.clasName) && Objects.equals(id, key.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clazz, id);
+        return Objects.hash(clasName, id);
     }
 }

@@ -16,8 +16,8 @@ class EntityPersisterTest {
     private static final Logger logger = LoggerFactory.getLogger(EntityPersisterTest.class);
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private static EntityPersister entityPersister;
-    private static EntityManager entityManager;
+    private EntityPersister entityPersister;
+    private EntityManager entityManager;
 
     @BeforeAll
     static void setupOnce() {
@@ -73,10 +73,10 @@ class EntityPersisterTest {
         entityPersister.insert(testFixture);
 
         // when
-        boolean isUpdated = entityPersister.update(testFixture, 1L);
+        var actual = entityPersister.update(testFixture, 1L);
 
         // then
-        Assertions.assertThat(isUpdated).isTrue();
+        Assertions.assertThat(actual).isEqualTo(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11));
     }
 
     @Test
