@@ -1,6 +1,7 @@
 package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.exception.FailedPersistException;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.sql.ddl.PrimaryKeyClause;
@@ -25,7 +26,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object persist(Object entity) {
-        // TODO: getEntity parameters 단순화하기
         var primaryKey = PrimaryKeyClause.primaryKeyValue(entity);
         var searchedEntity = persistenceContext.getEntity(entity.getClass(), primaryKey);
 
@@ -38,7 +38,7 @@ public class EntityManagerImpl implements EntityManager {
         if (snapshot != entity) {
             return persistenceContext.updateEntity(entity, primaryKey);
         }
-        throw new IllegalStateException("persist시 insert 혹은 update가 실행되어야합니다.");
+        throw new FailedPersistException();
     }
 
     @Override
