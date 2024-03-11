@@ -1,4 +1,4 @@
-package persistence.entity.annotated;
+package persistence.entity.testfixture.annotated;
 
 import jakarta.persistence.*;
 

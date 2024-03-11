@@ -1,8 +1,8 @@
 package persistence.repository;
 
 import jdbc.JdbcTemplate;
-import persistence.entity.EntityManager;
-import persistence.entity.EntityManagerImpl;
+import persistence.entity.manager.EntityManager;
+import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persistencecontext.PersistenceContext;
 
 public class CustomJpaRepository {

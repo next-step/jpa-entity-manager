@@ -7,9 +7,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.notcolumn.Person;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
+import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;

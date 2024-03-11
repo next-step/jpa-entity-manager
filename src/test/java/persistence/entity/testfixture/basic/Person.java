@@ -1,4 +1,4 @@
-package persistence.entity.basic;
+package persistence.entity.testfixture.basic;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

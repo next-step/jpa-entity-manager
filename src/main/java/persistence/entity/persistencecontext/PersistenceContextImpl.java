@@ -1,8 +1,8 @@
 package persistence.entity.persistencecontext;
 
 import jdbc.JdbcTemplate;
-import persistence.entity.EntityLoader;
-import persistence.entity.EntityPersister;
+import persistence.entity.loader.EntityLoader;
+import persistence.entity.persister.EntityPersister;
 import persistence.sql.ddl.PrimaryKeyClause;
 
 import java.util.HashMap;

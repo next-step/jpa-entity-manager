@@ -7,8 +7,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.basic.Dog;
-import persistence.entity.notcolumn.Person;
+import persistence.entity.testfixture.basic.Dog;
+import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 
 import java.util.Optional;

@@ -3,6 +3,7 @@ package persistence.sql.ddl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.testfixture.notcolumn.Person;
 
 class DropQueryBuilderTest {
     @Test
@@ -12,7 +13,7 @@ class DropQueryBuilderTest {
         String expectedQuery = "DROP TABLE IF EXISTS users";
 
         // when
-        String actualQuery = new DropQueryBuilder(persistence.entity.notcolumn.Person.class).getQuery();
+        String actualQuery = new DropQueryBuilder(Person.class).getQuery();
 
         // then
         Assertions.assertThat(actualQuery).isEqualTo(expectedQuery);

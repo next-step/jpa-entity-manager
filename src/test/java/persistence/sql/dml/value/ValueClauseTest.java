@@ -3,7 +3,7 @@ package persistence.sql.dml.value;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.notcolumn.Person;
+import persistence.entity.testfixture.notcolumn.Person;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.manager;
 
 import java.util.Optional;
 

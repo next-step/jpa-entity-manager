@@ -4,10 +4,13 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.notcolumn.Person;
+import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
 

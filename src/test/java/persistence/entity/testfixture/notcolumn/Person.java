@@ -1,4 +1,4 @@
-package persistence.entity.notcolumn;
+package persistence.entity.testfixture.notcolumn;
 
 import jakarta.persistence.*;
 

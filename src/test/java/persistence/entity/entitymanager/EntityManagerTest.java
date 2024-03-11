@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import database.DatabaseServer;
 import database.H2;
@@ -7,8 +7,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.exception.NotUniqueDataException;
-import persistence.entity.notcolumn.Person;
+import persistence.entity.manager.EntityManager;
+import persistence.entity.manager.EntityManagerImpl;
+import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;

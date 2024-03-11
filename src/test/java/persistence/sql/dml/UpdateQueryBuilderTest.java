@@ -3,7 +3,7 @@ package persistence.sql.dml;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.notcolumn.Person;
+import persistence.entity.testfixture.notcolumn.Person;
 
 class UpdateQueryBuilderTest {
     @Test

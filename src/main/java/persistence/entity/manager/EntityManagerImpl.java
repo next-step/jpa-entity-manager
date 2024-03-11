@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
 import persistence.entity.persistencecontext.PersistenceContext;

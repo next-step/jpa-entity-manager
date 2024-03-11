@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.common.DtoMapper;
