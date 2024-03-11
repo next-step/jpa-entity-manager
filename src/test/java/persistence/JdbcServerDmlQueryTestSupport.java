@@ -38,17 +38,6 @@ public abstract class JdbcServerDmlQueryTestSupport {
         }
     }
 
-    protected PersonV3 generatePersonV3Stub(final Long id) {
-        final String name = "name";
-        final int age = 20;
-        final String email = "email@domain.com";
-        return new PersonV3(id, name, age, email, 1);
-    }
-
-    protected PersonV3 generatePersonV3Stub() {
-        return generatePersonV3Stub(0L);
-    }
-
     protected String generateUserTableStubInsertQuery(final PersonV3 person) {
         return  "insert\n" +
                 "into\n" +
