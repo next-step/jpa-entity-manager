@@ -2,11 +2,11 @@ package persistence.entity.persistencecontext;
 
 import java.util.Objects;
 
-public class EntityCacheKey {
+public class EntityKey {
     private final Class<?> clazz;
     private final Long id;
 
-    public EntityCacheKey(Class<?> clazz, Long id) {
+    public EntityKey(Class<?> clazz, Long id) {
         this.clazz = clazz;
         this.id = id;
     }
@@ -15,7 +15,7 @@ public class EntityCacheKey {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EntityCacheKey that = (EntityCacheKey) o;
+        EntityKey that = (EntityKey) o;
         return Objects.equals(clazz, that.clazz) && Objects.equals(id, that.id);
     }
 

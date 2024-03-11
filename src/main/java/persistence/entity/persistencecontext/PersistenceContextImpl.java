@@ -11,12 +11,14 @@ import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
-    private final Map<EntityCacheKey, Object> entityCache;
+    private final Map<EntityKey, Object> entityCache;
+    private final Map<EntityKey, Object> snapshot;
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
 
     public PersistenceContextImpl(JdbcTemplate jdbcTemplate) {
         this.entityCache = new HashMap<>();
+        this.snapshot = new HashMap<>();
         this.entityLoader = new EntityLoader(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
@@ -27,16 +29,18 @@ public class PersistenceContextImpl implements PersistenceContext {
         if (cachedEntity != null) {
             return Optional.of((T) cachedEntity);
         }
+
         var searchedEntity = entityLoader.find(clazz, id);
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        entityCache.put(new EntityCacheKey(clazz, id), searchedEntity.get());
+        entityCache.put(new EntityKey(clazz, id), searchedEntity.get());
+        snapshot.put(new EntityKey(clazz, id), searchedEntity.get());
         return searchedEntity;
     }
 
     private Object getCachedEntity(Class<?> clazz, Long id) {
-        var key = new EntityCacheKey(clazz, id);
+        var key = new EntityKey(clazz, id);
         var cachedEntity = entityCache.get(key);
         if (cachedEntity == null) {
             return null;
@@ -47,16 +51,30 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void addEntity(Object entity) {
         entityPersister.insert(entity);
+
+        var key = getEntityKey(entity);
+        snapshot.put(key, entity);
     }
 
     @Override
     public void removeEntity(Object entity) {
         entityPersister.delete(entity);
-        var key = getEntityCacheKey(entity);
+        var key = getEntityKey(entity);
+
         entityCache.remove(key);
+        snapshot.remove(key);
     }
 
-    private EntityCacheKey getEntityCacheKey(Object entity) {
-        return new EntityCacheKey(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity));
+    private EntityKey getEntityKey(Object entity) {
+        return new EntityKey(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity));
+    }
+
+    private EntityKey getEntityKey(Long id, Object entity) {
+        return new EntityKey(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity));
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(Object entity, Long id) {
+        return Optional.of(snapshot.get(getEntityKey(id, entity)));
     }
 }

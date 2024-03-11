@@ -2,6 +2,7 @@
 
 ## 3단계
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라
+- [x] 요구사항 2 - snapshot을 구현하여라
 - [x] 2단계 피드백 반영
   - [x] EOL 반영하라
   - [x] SetClause의 접근제어자 수정하라
