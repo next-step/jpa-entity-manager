@@ -1,5 +1,6 @@
 package persistence.sql.entity;
 
+import persistence.sql.entity.impl.EntityEntry;
 import persistence.sql.entity.impl.EntityKey;
 
 public interface PersistenceContext {
@@ -9,7 +10,7 @@ public interface PersistenceContext {
 
     void removeEntity(EntityKey id);
 
-//    Object getDatabaseSnapshot(Long id, Object entity);
-
     boolean isDirty(EntityKey id, Object entity);
+
+    EntityEntry getEntityEntry(EntityKey id);
 }

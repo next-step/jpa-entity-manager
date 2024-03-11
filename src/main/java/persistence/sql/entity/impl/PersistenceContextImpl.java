@@ -41,4 +41,9 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         return false;
     }
+
+    @Override
+    public EntityEntry getEntityEntry(final EntityKey id) {
+        return entityEntryByKey.get(id);
+    }
 }

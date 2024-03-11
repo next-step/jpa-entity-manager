@@ -36,7 +36,6 @@ public class EntityManagerImpl implements EntityManager {
     public Object persist(final Object entity) {
         final Long id = entityPersister.insert(entity);
         final EntityKey key = EntityKey.fromNameAndValue(entity.getClass().getName(), id);
-
         persistenceContext.addEntity(key, entity);
 
         return entity;
