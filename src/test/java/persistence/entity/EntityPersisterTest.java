@@ -16,6 +16,7 @@ import persistence.sql.dialect.H2Dialect;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityPersisterTest {
     private final Dialect DIALECT = new H2Dialect();
@@ -54,7 +55,7 @@ class EntityPersisterTest {
 
     @Test
     @DisplayName("Update query builder 동작 테스트")
-    void EntityPersister_업데이트_테스트() {
+    void 업데이트_테스트() {
         // given
         final String name = "joel";
         final Integer age = 30;
@@ -67,5 +68,35 @@ class EntityPersisterTest {
 
         // then
         assertThat(entityManager.find(Person.class, 1L)).isEqualTo(findPerson);
+    }
+
+    @Test
+    @DisplayName("Insert query builder 동작 테스트")
+    void 인서트_테스트() {
+        // given
+        final String name = "crong";
+        final Integer age = 35;
+        final String email = "test@gmail.com";
+        final Person person = Person.of(1L, name, age, email);
+
+        // when
+        entityPersister.insert(person);
+
+        // then
+        assertThat(entityManager.find(Person.class, 1L)).isEqualTo(person);
+    }
+
+    @Test
+    @DisplayName("")
+    void 딜리트_테스트() {
+        // given
+        final Person person = Person.of(1L, "crong", 35, "test@gmail.com");
+        entityManager.persist(person);
+
+        // when
+        entityPersister.delete(person);
+
+        // then
+        assertThatThrownBy(() -> entityManager.find(Person.class, 1L)).isInstanceOf(RuntimeException.class);
     }
 }

@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dialect.Dialect;
+import persistence.sql.dml.DeleteQueryBuilder;
+import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 import persistence.sql.dml.WhereQueryBuilder;
 
@@ -25,9 +27,21 @@ public class EntityPersister {
         jdbcTemplate.execute(updateQueryBuilder.generateQuery());
     }
 
-    public void insert() {
+    public void insert(Object entity) {
+        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.builder()
+                .dialect(dialect)
+                .entity(entity)
+                .build();
+
+        jdbcTemplate.execute(insertQueryBuilder.generateQuery());
     }
 
-    public void delete() {
+    public void delete(Object entity) {
+        DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.builder()
+                .dialect(dialect)
+                .entity(entity.getClass())
+                .build();
+
+        jdbcTemplate.execute(deleteQueryBuilder.generateQuery());
     }
 }
