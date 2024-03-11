@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DDLGenerator;
+import persistence.sql.ddl.table.Table;
 import persistence.sql.dml.DMLGenerator;
 
 import java.sql.SQLException;
@@ -26,7 +27,7 @@ class DefaultEntityManagerTest {
     private EntityPersister entityPersister;
 
     DDLGenerator ddlGenerator = new DDLGenerator(Person.class);
-    DMLGenerator dmlGenerator = new DMLGenerator(Person.class);
+    DMLGenerator dmlGenerator = new DMLGenerator(Table.from(Person.class));
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -109,7 +110,7 @@ class DefaultEntityManagerTest {
     @DisplayName("persist 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void persist_2() {
         // given
-        entityManager = new DefaultEntityManager(jdbcTemplate, new DMLGenerator(NotEntity.class), entityPersister);
+        entityManager = new DefaultEntityManager(jdbcTemplate, new DMLGenerator(Table.from(NotEntity.class)), entityPersister);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.persist(new NotEntity(1L)));
@@ -141,7 +142,7 @@ class DefaultEntityManagerTest {
     @DisplayName("remove 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void remove_2() {
         // given
-        entityManager = new DefaultEntityManager(jdbcTemplate, new DMLGenerator(NotEntity.class), entityPersister);
+        entityManager = new DefaultEntityManager(jdbcTemplate, new DMLGenerator(Table.from(NotEntity.class)), entityPersister);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.remove(new NotEntity(1L)));
