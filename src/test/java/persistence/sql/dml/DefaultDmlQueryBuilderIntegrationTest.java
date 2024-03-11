@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import org.junit.jupiter.api.*;
 import persistence.JdbcServerDmlQueryTestSupport;
+import persistence.PersonV3FixtureFactory;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -51,7 +52,7 @@ public class DefaultDmlQueryBuilderIntegrationTest extends JdbcServerDmlQueryTes
     @Test
     public void findAll() throws Exception {
         // given
-        final PersonV3 person = generatePersonV3Stub();
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
         final Table table = tableBinder.createTable(person.getClass());
         final String insertQuery = generateUserTableStubInsertQuery(person);
         jdbcTemplate.execute(insertQuery);
@@ -73,7 +74,7 @@ public class DefaultDmlQueryBuilderIntegrationTest extends JdbcServerDmlQueryTes
     @Order(0)
     public void findById() throws Exception {
         // given
-        final PersonV3 person = generatePersonV3Stub(1L);
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub(1L);
         final Table table = tableBinder.createTable(person);
         final String insertQuery = generateUserTableStubInsertQuery(person);
         jdbcTemplate.execute(insertQuery);

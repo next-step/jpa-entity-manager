@@ -3,6 +3,7 @@ package persistence.entity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.JdbcServerDmlQueryTestSupport;
+import persistence.PersonV3FixtureFactory;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.SingleEntityLoader;
 import persistence.sql.ddl.PersonV3;
@@ -27,7 +28,7 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
         // given
         final Class<PersonV3> clazz = PersonV3.class;
         final long key = 1L;
-        final PersonV3 person = generatePersonV3Stub();
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
         final String insertQuery = generateUserTableStubInsertQuery(person);
 
         jdbcTemplate.execute(insertQuery);
