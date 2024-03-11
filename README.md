@@ -1,5 +1,10 @@
 # jpa-entity-manager
 
+## 3단계
+- [ ] 2단계 피드백 반영
+  - [x] EOL 반영하라
+  - [x] SetClause의 접근제어자 수정하라
+
 ## 2단계
 - [x] 요구사항 1 - RowMapper 리팩터링
 - [x] 요구사항 2 - EntityManager 의 구현체에서 find 에 대한 책임을 EntityLoader 로 옮겨주자
