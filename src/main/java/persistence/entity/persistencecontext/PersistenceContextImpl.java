@@ -3,6 +3,7 @@ package persistence.entity.persistencecontext;
 import jdbc.JdbcTemplate;
 import persistence.entity.EntityLoader;
 import persistence.entity.EntityPersister;
+import persistence.sql.ddl.PrimaryKeyClause;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
-    private final Map<Long, Object> entityCache;
+    private final Map<EntityCacheKey, Object> entityCache;
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
 
@@ -22,16 +23,25 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> Optional<T> getEntity(Class<T> clazz, Long id) {
-        Object cachedEntity = entityCache.get(id);
+        var cachedEntity = getCachedEntity(clazz, id);
         if (cachedEntity != null) {
             return Optional.of((T) cachedEntity);
         }
-        Optional<T> searchedEntity = entityLoader.find(clazz, id);
+        var searchedEntity = entityLoader.find(clazz, id);
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        entityCache.put(id, searchedEntity.get());
+        entityCache.put(new EntityCacheKey(clazz, id), searchedEntity.get());
         return searchedEntity;
+    }
+
+    private Object getCachedEntity(Class<?> clazz, Long id) {
+        var key = new EntityCacheKey(clazz, id);
+        var cachedEntity = entityCache.get(key);
+        if (cachedEntity == null) {
+            return null;
+        }
+        return entityCache.get(key);
     }
 
     @Override
@@ -41,7 +51,12 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void removeEntity(Object entity) {
-        Long deletedEntityId = entityPersister.delete(entity);
-        entityCache.remove(deletedEntityId);
+        entityPersister.delete(entity);
+        var key = getEntityCacheKey(entity);
+        entityCache.remove(key);
+    }
+
+    private EntityCacheKey getEntityCacheKey(Object entity) {
+        return new EntityCacheKey(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity));
     }
 }

@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.basic.Dog;
 import persistence.entity.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 
@@ -35,10 +36,12 @@ class PersistenceContextImplTest {
     }
     @BeforeEach
     void setUp() {
-        String query = new CreateQueryBuilder(Person.class).getQuery();
-        jdbcTemplate.execute(query);
-
         persistenceContext = new PersistenceContextImpl(jdbcTemplate);
+
+        String queryPerson = new CreateQueryBuilder(Person.class).getQuery();
+        jdbcTemplate.execute(queryPerson);
+        String queryDog = new CreateQueryBuilder(Dog.class).getQuery();
+        jdbcTemplate.execute(queryDog);
     }
 
     @AfterEach
@@ -51,19 +54,41 @@ class PersistenceContextImplTest {
         server.stop();
     }
 
+    @DisplayName("2번 저장후 getEntity실행시 2개의 객체가 조회된다.")
     @Test
-    void getEntity() {
+    void getEntityTwoResults() {
+        // given
+        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        var dog = new Dog("바둑이");
+        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(dog);
+
+        // when
+        var actualPerson = persistenceContext.getEntity(Person.class, 1L).get();
+        var actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
+
+        // then
+        var expectedPerson = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", null);
+        Assertions.assertThat(actualPerson).isEqualTo(expectedPerson);
+
+        Dog expectedDog = new Dog(1L, "바둑이");
+        Assertions.assertThat(actualDog).isEqualTo(expectedDog);
+    }
+
+    @DisplayName("존재하지 않는 값을 조회시, 리턴 객체는 빈값이다.")
+    @Test
+    void addEntityEmptyResult() {
         // given
         var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
         persistenceContext.addEntity(person);
 
         // when
-        Person actual = persistenceContext.getEntity(Person.class, 1L).get();
+        var actual = persistenceContext.getEntity(Person.class, 2L);
 
         // then
-        Person expected = Person.copyOf(person, 1L);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        Assertions.assertThat(actual).isEqualTo(Optional.empty());
     }
+
 
     @DisplayName("addEntity 실행시 1건이 정상 저장된다.")
     @Test
@@ -75,15 +100,17 @@ class PersistenceContextImplTest {
         persistenceContext.addEntity(person);
 
         // then
-        Person actual = persistenceContext.getEntity(Person.class, 1L).get();
-        Assertions.assertThat(actual).isEqualTo(Person.copyOf(person, 1L));
+        var actual = persistenceContext.getEntity(Person.class, 1L).get();
+        var expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
+    @DisplayName("remove 메서드로 객체가 지워질 경우 조회 결과는 0이다.")
     @Test
     void removeEntity() {
         // given
         var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var person_id있음 = Person.copyOf(person, 1L);
+        var person_id있음 = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
         persistenceContext.addEntity(person);
 
         // when
