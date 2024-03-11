@@ -3,8 +3,8 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
+import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;
-import jdbc.PersonRowMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -100,7 +100,7 @@ class DefaultEntityManagerTest {
         entityManager.persist(person);
 
         // then
-        List<Person> people = jdbcTemplate.query(dmlGenerator.generateFindAll(), new PersonRowMapper());
+        List<Person> people = jdbcTemplate.query(dmlGenerator.generateFindAll(), new DefaultRowMapper<>(Person.class));
 
         assertThat(people).hasSize(1);
         assertThat(people.get(0).getName()).isEqualTo(name);

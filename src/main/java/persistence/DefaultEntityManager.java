@@ -2,8 +2,8 @@ package persistence;
 
 import domain.Person;
 import jakarta.persistence.Entity;
+import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;
-import jdbc.PersonRowMapper;
 import persistence.sql.dml.DMLGenerator;
 
 public class DefaultEntityManager implements EntityManager {
@@ -25,7 +25,7 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         String sql = dmlGenerator.generateFindById(id);
-        return jdbcTemplate.queryForObject(sql, new PersonRowMapper());
+        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(Person.class));
     }
 
     @Override
