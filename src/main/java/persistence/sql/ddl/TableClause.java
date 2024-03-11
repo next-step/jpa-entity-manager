@@ -40,6 +40,15 @@ public class TableClause {
         }
     }
 
+    private String getTableName(Class<?> entity) {
+        if (!entity.isAnnotationPresent(jakarta.persistence.Table.class)) {
+            return entity.getSimpleName();
+        }
+        if (entity.getAnnotation(jakarta.persistence.Table.class).name().isEmpty()) {
+            return entity.getSimpleName();
+        }
+        return entity.getAnnotation(jakarta.persistence.Table.class).name();
+    }
 
     private static ColumnClauses extractColumnsFrom(Class<?> entity) {
         return new ColumnClauses(getColumnsFrom(entity));
@@ -61,16 +70,6 @@ public class TableClause {
 
     public String name() {
         return name;
-    }
-
-    private String getTableName(Class<?> entity) {
-        if (!entity.isAnnotationPresent(jakarta.persistence.Table.class)) {
-            return entity.getSimpleName();
-        }
-        if (entity.getAnnotation(jakarta.persistence.Table.class).name().isEmpty()) {
-            return entity.getSimpleName();
-        }
-        return entity.getAnnotation(jakarta.persistence.Table.class).name();
     }
 
     public String createQuery() {

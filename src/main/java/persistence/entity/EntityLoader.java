@@ -11,12 +11,11 @@ import java.util.Optional;
 public class EntityLoader {
     public static final int VALID_ROW_COUNT_FOR_FIND_METHOD = 1;
     public static final int VALID_ROW_INDEX = 0;
+    private final JdbcTemplate jdbcTemplate;
 
     public EntityLoader(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
-    private final JdbcTemplate jdbcTemplate;
 
     public <T> Optional<T> find(Class<T> clazz, Long id) {
         String query = new SelectQueryBuilder(clazz).getFindById(id);
