@@ -6,8 +6,6 @@ import jdbc.JdbcTemplate;
 import jdbc.PersonRowMapper;
 import persistence.sql.dml.DMLGenerator;
 
-import java.util.List;
-
 public class DefaultEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
@@ -27,13 +25,7 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         String sql = dmlGenerator.generateFindById(id);
-        List<Person> people = jdbcTemplate.query(sql, new PersonRowMapper());
-
-        if (people.isEmpty()) {
-            return null;
-        }
-
-        return people.get(0);
+        return jdbcTemplate.queryForObject(sql, new PersonRowMapper());
     }
 
     @Override
