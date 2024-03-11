@@ -40,6 +40,11 @@ public class SingleTableEntityPersister implements EntityPersister {
                 .orElseThrow(() -> new MetaDataModelMappingException("id field not found"));
     }
 
+    // TODO 추후 4주차 미션에서 컴포넌트 스캔 단계 작업 시 컴포넌트 스캔으로 해결할 예정
+    public String getTargetEntityName() {
+        return this.name;
+    }
+
     @Override
     public boolean update(final Object entity) {
         final Table table = tableBinder.createTable(entity);
@@ -68,13 +73,7 @@ public class SingleTableEntityPersister implements EntityPersister {
             jdbcTemplate.execute(insertQuery);
         }
 
-        setIdentifier(entity, key);
-
         return key;
-    }
-
-    private void setIdentifier(final Object entity, final Object generatedKey) {
-        identifierMapping.setIdentifier(entity, generatedKey);
     }
 
     @Override
