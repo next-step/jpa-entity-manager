@@ -1,18 +1,21 @@
 package persistence.sql.entity.context;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EntityEntryContext {
 
-    private Map<Object, EntityEntry> entityStatusMap;
+    private List<EntityEntry> entities;
 
     public EntityEntryContext() {
-        this.entityStatusMap = new ConcurrentHashMap<>();
+        this.entities = new CopyOnWriteArrayList<>();
     }
 
     public EntityEntry getEntityEntry(final Object entity) {
-        return entityStatusMap.get(entity);
+        return entities.stream()
+                .filter(entityEntry -> entityEntry.isEquals(entity))
+                .findFirst()
+                .orElseGet(() -> null);
     }
 
     public void delete(final Object entity) {
@@ -20,7 +23,7 @@ public class EntityEntryContext {
     }
 
     public void managed(final Object entity) {
-        entityStatusMap.put(entity, new EntityEntry(entity, EntityStatus.MANAGED));
+        entities.add(new EntityEntry(entity, EntityStatus.MANAGED));
     }
 
     public void gone(final Object entity) {
@@ -28,8 +31,8 @@ public class EntityEntryContext {
     }
 
     public void saving(final Object entity) {
-        if(getEntityEntry(entity) == null) {
-            entityStatusMap.put(entity, new EntityEntry(entity, EntityStatus.SAVING));
+        if (getEntityEntry(entity) == null) {
+            entities.add(new EntityEntry(entity, EntityStatus.SAVING));
             return;
         }
         getEntityEntry(entity).saving();
@@ -44,7 +47,7 @@ public class EntityEntryContext {
     }
 
     public void clear() {
-        entityStatusMap.clear();
+        entities.clear();
     }
 
 }

@@ -11,6 +11,10 @@ public class EntityEntry {
         this.status = status;
     }
 
+    public boolean isEquals(final Object entity) {
+        return this.entity.equals(entity);
+    }
+
     public void readOnly() {
         this.status = EntityStatus.READ_ONLY;
     }
