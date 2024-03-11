@@ -2,9 +2,12 @@ package persistence.sql.entity.context;
 
 public class EntityEntry {
 
+    private Object entity;
     private EntityStatus status;
 
-    public EntityEntry(final EntityStatus status) {
+    public EntityEntry(final Object entity,
+                       final EntityStatus status) {
+        this.entity = entity;
         this.status = status;
     }
 
