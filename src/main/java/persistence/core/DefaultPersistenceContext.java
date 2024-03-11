@@ -44,10 +44,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     public <T> List<T> dirtyCheck() {
-        return findDirtyEntity();
-    }
-
-    private <T> List<T> findDirtyEntity() {
         List<T> dirtyEntities = new ArrayList<>();
         managedEntities.forEach((key, entity) -> {
             if (isDirty(snapshotEntities.get(key), entity)) {
@@ -59,11 +55,11 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     private boolean isDirty(Snapshot snapshot, Object entity) {
-        Map<String, Object> entitySnapshot = snapshot.get();
-        Snapshot snapshot1 = new Snapshot(entity);
-        Map<String, Object> stringObjectMap = snapshot1.get();
+        Map<String, Object> snapshotEntity = snapshot.get();
+        Snapshot currentEntity = new Snapshot(entity);
+        Map<String, Object> stringObjectMap = currentEntity.get();
 
-        return !entitySnapshot.equals(stringObjectMap);
+        return !snapshotEntity.equals(stringObjectMap);
     }
 
 }
