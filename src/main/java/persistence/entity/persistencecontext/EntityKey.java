@@ -1,14 +1,21 @@
 package persistence.entity.persistencecontext;
 
+import persistence.sql.ddl.PrimaryKeyClause;
+
 import java.util.Objects;
 
 public class EntityKey {
-    private final String clasName;
+    private final String className;
     private final Long id;
 
     public EntityKey(Class<?> clazz, Long id) {
-        this.clasName = clazz.getSimpleName();
+        this.className = clazz.getSimpleName();
         this.id = id;
+    }
+
+    public EntityKey (Object entity) {
+        this.className = entity.getClass().getSimpleName();
+        this.id = PrimaryKeyClause.primaryKeyValue(entity);
     }
 
     @Override
@@ -16,11 +23,11 @@ public class EntityKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EntityKey key = (EntityKey) o;
-        return Objects.equals(clasName, key.clasName) && Objects.equals(id, key.id);
+        return Objects.equals(className, key.className) && Objects.equals(id, key.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clasName, id);
+        return Objects.hash(className, id);
     }
 }
