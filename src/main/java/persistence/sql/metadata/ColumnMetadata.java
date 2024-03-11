@@ -74,7 +74,11 @@ public class ColumnMetadata {
         return value;
     }
 
-    public static String convertCamelCaseToSnakeCase(String input) {
+    public boolean isNotNull() {
+        return Objects.nonNull(value);
+    }
+
+    private static String convertCamelCaseToSnakeCase(String input) {
         String regex = "([a-z])([A-Z]+)";
         String replacement = "$1_$2";
 

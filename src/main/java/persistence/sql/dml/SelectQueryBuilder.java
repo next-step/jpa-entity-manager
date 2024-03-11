@@ -14,6 +14,7 @@ public class SelectQueryBuilder {
 
     public static final String SELECT_TEMPLATE = "SELECT %s FROM %s";
     public static final String DELIMITER = ", ";
+    public static final String WHERE_DELIMITER = " ";
     private final Dialect dialect;
     private final EntityMetadata entity;
     private final WhereQueryBuilder whereQueryBuilder;
@@ -68,6 +69,6 @@ public class SelectQueryBuilder {
 
     public String generateQuery() {
         return String.format(SELECT_TEMPLATE, columnsClause(entity.getColumns()),
-                Objects.isNull(whereQueryBuilder) ? entity.getName() : String.join(" ", entity.getName(), whereQueryBuilder.generateWhereClausesQuery()));
+                Objects.isNull(whereQueryBuilder) ? entity.getName() : String.join(WHERE_DELIMITER, entity.getName(), whereQueryBuilder.generateWhereClausesQuery()));
     }
 }
