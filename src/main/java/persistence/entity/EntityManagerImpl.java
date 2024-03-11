@@ -9,16 +9,9 @@ import java.util.Optional;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
-    private final EntityPersister entityPersister;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.persistenceContext = new PersistenceContextImpl(jdbcTemplate);
-        this.entityPersister = new EntityPersister(jdbcTemplate);
-    }
-
-    public EntityManagerImpl(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate) {
-        this.persistenceContext = persistenceContext;
-        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override

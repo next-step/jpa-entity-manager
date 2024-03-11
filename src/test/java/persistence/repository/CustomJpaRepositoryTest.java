@@ -7,8 +7,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.EntityManager;
-import persistence.entity.EntityManagerImpl;
 import persistence.entity.notcolumn.Person;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
@@ -22,7 +20,6 @@ class CustomJpaRepositoryTest {
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
     private PersistenceContext persistenceContext;
-    private EntityManager entityManager;
     private CustomJpaRepository repository;
 
     @BeforeAll
@@ -43,8 +40,7 @@ class CustomJpaRepositoryTest {
         jdbcTemplate.execute(query);
 
         persistenceContext = new PersistenceContextImpl(jdbcTemplate);
-        entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
-        repository = new CustomJpaRepository(entityManager);
+        repository = new CustomJpaRepository(jdbcTemplate);
     }
 
     @AfterEach
