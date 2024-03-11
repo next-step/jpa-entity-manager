@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import persistence.entity.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 
-import java.util.Optional;
-
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
 class EntityLoaderTest {
@@ -54,7 +52,6 @@ class EntityLoaderTest {
         server.stop();
     }
 
-
     @Test
     void findTest() {
         var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
@@ -64,5 +61,4 @@ class EntityLoaderTest {
         var actual = entityLoader.find(Person.class, 1L).get();
         Assertions.assertThat(actual).isEqualTo(expected);
     }
-
 }

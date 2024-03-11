@@ -14,5 +14,4 @@ class UpdateQueryBuilderTest {
 
         Assertions.assertEquals("UPDATE users SET nick_name='김철수',old=21,email='chulsoo.kim@gmail.com' WHERE id = 1" , query);
     }
-
 }

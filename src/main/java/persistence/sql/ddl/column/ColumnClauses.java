@@ -22,7 +22,6 @@ public class ColumnClauses {
         return this.columnClauses.stream().map(ColumnClause::getQuery).collect(Collectors.toList());
     }
 
-
     public List<String> getNames() {
         return this.columnClauses.stream().map(ColumnClause::name).collect(Collectors.toList());
     }

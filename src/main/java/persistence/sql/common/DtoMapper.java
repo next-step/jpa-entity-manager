@@ -44,5 +44,4 @@ public class DtoMapper<T> implements RowMapper<T> {
         }
         return dto;
     }
-
 }
