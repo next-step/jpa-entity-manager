@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PersistenceContextTest {
 
-
     private PersistenceContext persistenceContext;
     private Person person;
 
@@ -69,14 +68,11 @@ class PersistenceContextTest {
     @Test
     void removeEntityTest() {
         persistenceContext.removeEntity(person);
+        persistenceContext.goneEntity(person);
 
-        Person cacheEntity = persistenceContext.getEntity(Person.class, person.getId());
-        Person snapshotEntity = persistenceContext.getDatabaseSnapshot(Person.class, person.getId());
+        boolean isGone = persistenceContext.isGone(person);
 
-        assertAll(
-                () -> assertThat(cacheEntity).isNull(),
-                () -> assertThat(snapshotEntity).isNull()
-        );
+        assertThat(isGone).isTrue();
     }
 
     @DisplayName("캐시와 스냅샷 데이터를 삭제한다.")
