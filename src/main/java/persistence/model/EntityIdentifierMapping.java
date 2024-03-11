@@ -11,8 +11,8 @@ public class EntityIdentifierMapping {
         this.containerClass = containerClass;
         this.propertyName = propertyName;
         this.field = field;
+        this.field.setAccessible(true);
     }
-
 
     public Object getIdentifier(Object entity) {
         try {
@@ -25,11 +25,4 @@ public class EntityIdentifierMapping {
         }
     }
 
-    public void setIdentifier(Object entity, Object id) {
-        try {
-            this.field.set(entity, id);
-        } catch (IllegalAccessException e) {
-            throw new MetaDataModelMappingException("Null value was assigned to a property [" + containerClass + "." + propertyName + "] of primitive type");
-        }
-    }
 }
