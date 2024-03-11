@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DDLGenerator;
+import persistence.sql.ddl.table.Table;
 import persistence.sql.dml.DMLGenerator;
 
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ class EntityPersisterTest {
     private EntityManager entityManager;
 
     DDLGenerator ddlGenerator = new DDLGenerator(Person.class);
-    DMLGenerator dmlGenerator = new DMLGenerator(Person.class);
+    DMLGenerator dmlGenerator = new DMLGenerator(Table.from(Person.class));
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -34,7 +35,8 @@ class EntityPersisterTest {
         jdbcTemplate.execute(ddlGenerator.generateCreate());
 
         entityPersister = new EntityPersister(jdbcTemplate, dmlGenerator);
-        entityManager = new DefaultEntityManager(jdbcTemplate, dmlGenerator, entityPersister);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dmlGenerator);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
     }
 
     @AfterEach

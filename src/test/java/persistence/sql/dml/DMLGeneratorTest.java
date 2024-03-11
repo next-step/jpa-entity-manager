@@ -2,12 +2,13 @@ package persistence.sql.dml;
 
 import domain.Person;
 import org.junit.jupiter.api.Test;
+import persistence.sql.ddl.table.Table;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class DMLGeneratorTest {
 
-    DMLGenerator dmlGenerator = new DMLGenerator(Person.class);
+    DMLGenerator dmlGenerator = new DMLGenerator(Table.from(Person.class));
 
     @Test
     void insert() {

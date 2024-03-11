@@ -1,39 +1,24 @@
 package persistence;
 
-import domain.Person;
 import jakarta.persistence.Entity;
-import jdbc.JdbcTemplate;
-import jdbc.PersonRowMapper;
-import persistence.sql.dml.DMLGenerator;
-
-import java.util.List;
 
 public class DefaultEntityManager implements EntityManager {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final DMLGenerator dmlGenerator;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
-    public DefaultEntityManager(JdbcTemplate jdbcTemplate, DMLGenerator dmlGenerator, EntityPersister entityPersister) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.dmlGenerator = dmlGenerator;
+    public DefaultEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
         this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
 
     @Override
-    public Person find(Class<Person> clazz, Long id) {
+    public <T> T find(Class<T> clazz, Long id) {
         if (id == null) {
             throw new IllegalArgumentException("[EntityManager] find: id is null");
         }
 
-        String sql = dmlGenerator.generateFindById(id);
-        List<Person> people = jdbcTemplate.query(sql, new PersonRowMapper());
-
-        if (people.isEmpty()) {
-            return null;
-        }
-
-        return people.get(0);
+        return entityLoader.load(clazz, id);
     }
 
     @Override

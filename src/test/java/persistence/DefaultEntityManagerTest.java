@@ -3,13 +3,14 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
+import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;
-import jdbc.PersonRowMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DDLGenerator;
+import persistence.sql.ddl.table.Table;
 import persistence.sql.dml.DMLGenerator;
 
 import java.sql.SQLException;
@@ -22,11 +23,12 @@ class DefaultEntityManagerTest {
 
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
-    private EntityManager entityManager;
     private EntityPersister entityPersister;
+    private EntityLoader entityLoader;
+    private EntityManager entityManager;
 
     DDLGenerator ddlGenerator = new DDLGenerator(Person.class);
-    DMLGenerator dmlGenerator = new DMLGenerator(Person.class);
+    DMLGenerator dmlGenerator = new DMLGenerator(Table.from(Person.class));
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -37,7 +39,8 @@ class DefaultEntityManagerTest {
         jdbcTemplate.execute(ddlGenerator.generateCreate());
 
         entityPersister = new EntityPersister(jdbcTemplate, dmlGenerator);
-        entityManager = new DefaultEntityManager(jdbcTemplate, dmlGenerator, entityPersister);
+        entityLoader = new EntityLoader(jdbcTemplate, dmlGenerator);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
     }
 
     @AfterEach
@@ -99,7 +102,7 @@ class DefaultEntityManagerTest {
         entityManager.persist(person);
 
         // then
-        List<Person> people = jdbcTemplate.query(dmlGenerator.generateFindAll(), new PersonRowMapper());
+        List<Person> people = jdbcTemplate.query(dmlGenerator.generateFindAll(), new DefaultRowMapper<>(Person.class));
 
         assertThat(people).hasSize(1);
         assertThat(people.get(0).getName()).isEqualTo(name);
@@ -109,7 +112,7 @@ class DefaultEntityManagerTest {
     @DisplayName("persist 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void persist_2() {
         // given
-        entityManager = new DefaultEntityManager(jdbcTemplate, new DMLGenerator(NotEntity.class), entityPersister);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.persist(new NotEntity(1L)));
@@ -141,7 +144,7 @@ class DefaultEntityManagerTest {
     @DisplayName("remove 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void remove_2() {
         // given
-        entityManager = new DefaultEntityManager(jdbcTemplate, new DMLGenerator(NotEntity.class), entityPersister);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.remove(new NotEntity(1L)));
