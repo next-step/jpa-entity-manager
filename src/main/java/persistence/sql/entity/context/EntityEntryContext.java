@@ -20,7 +20,7 @@ public class EntityEntryContext {
     }
 
     public void managed(final Object entity) {
-        entityStatusMap.put(entity, new EntityEntry(EntityStatus.MANAGED));
+        entityStatusMap.put(entity, new EntityEntry(entity, EntityStatus.MANAGED));
     }
 
     public void gone(final Object entity) {
@@ -28,6 +28,10 @@ public class EntityEntryContext {
     }
 
     public void saving(final Object entity) {
+        if(getEntityEntry(entity) == null) {
+            entityStatusMap.put(entity, new EntityEntry(entity, EntityStatus.SAVING));
+            return;
+        }
         getEntityEntry(entity).saving();
     }
 
