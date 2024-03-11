@@ -62,10 +62,10 @@ class CustomJpaRepositoryTest {
     void saveWithDirty() {
         // given
         var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-
-        // when
         var person_ID있음 = repository.save(person);
         var firstSnapshot = persistenceContext.getDatabaseSnapshot(person, 1L);
+
+        // when
         Person updatedPerson = person_ID있음.changeEmail("soo@gmail.com");
         repository.save(updatedPerson);
         var secondSnapshot = persistenceContext.getDatabaseSnapshot(person, 1L);
