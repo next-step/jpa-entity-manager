@@ -40,7 +40,7 @@ class CustomJpaRepositoryTest {
         jdbcTemplate.execute(query);
 
         persistenceContext = new PersistenceContextImpl(jdbcTemplate);
-        repository = new CustomJpaRepository(jdbcTemplate);
+        repository = new CustomJpaRepository(persistenceContext);
     }
 
     @AfterEach
