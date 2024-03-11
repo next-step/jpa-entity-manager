@@ -41,6 +41,22 @@ public class Person {
         this.index = index;
     }
 
+    /**
+     * id 만 다른 객체를 만든다.
+     * @param person 인스턴스
+     * @param id 아이디
+     * @return id 만 다른 객체
+     */
+    public static Person copyOf(Person person, Long id) {
+        var newPerson = new Person();
+        newPerson.id = id;
+        newPerson.name = person.name;
+        newPerson.age = person.age;
+        newPerson.email = person.email;
+        newPerson.index = person.index;
+        return newPerson;
+    }
+
     public Long getId() {
         return id;
     }

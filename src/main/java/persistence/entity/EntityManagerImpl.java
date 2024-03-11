@@ -1,34 +1,30 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.entity.exception.NotUniqueDataException;
-import persistence.sql.common.DtoMapper;
-import persistence.sql.dml.SelectQueryBuilder;
+import persistence.entity.persistencecontext.PersistenceContext;
+import persistence.entity.persistencecontext.PersistenceContextImpl;
 
-import java.util.List;
 import java.util.Optional;
 
 public class EntityManagerImpl implements EntityManager{
-    private final EntityPersister entityPersister;
-    private final EntityLoader entityLoader;
+    private final PersistenceContext persistenceContext;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
-        this.entityPersister = new EntityPersister(jdbcTemplate);
-        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.persistenceContext = new PersistenceContextImpl(jdbcTemplate);
     }
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-        return entityLoader.find(clazz, id);
+        return persistenceContext.getEntity(clazz, id);
     }
 
     @Override
     public void persist(Object entity) {
-        entityPersister.insert(entity);
+        persistenceContext.addEntity(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 }

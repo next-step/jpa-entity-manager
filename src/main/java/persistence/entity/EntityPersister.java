@@ -25,9 +25,10 @@ public class EntityPersister {
         jdbcTemplate.execute(queryToInsert);
     }
 
-    public void delete(Object entity) {
+    public Long delete(Object entity) {
         Long id = PrimaryKeyClause.primaryKeyValue(entity);
         String query = new DeleteQueryBuilder(entity.getClass()).deleteById(id);
         jdbcTemplate.execute(query);
+        return id;
     }
 }
