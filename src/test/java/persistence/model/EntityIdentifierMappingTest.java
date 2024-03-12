@@ -7,7 +7,7 @@ import persistence.sql.ddl.PersonV3;
 
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityIdentifierMappingTest {
 
@@ -29,16 +29,20 @@ class EntityIdentifierMappingTest {
         final Object personIdentifier = identifierMapping.getIdentifier(person);
 
         // then
-        assertEquals(personIdentifier, person.getId());
+        assertThat(personIdentifier).isEqualTo(person.getId());
     }
 
-    @DisplayName("엔티티의 식별키를 ")
+    @DisplayName("엔티티에 식별키 값을 주입한다")
     @Test
     public void setIdentifier() throws Exception {
         // given
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub(null);
+        final long id = 1L;
 
         // when
+        identifierMapping.setIdentifierValue(person, id);
 
         // then
+        assertThat(person.getId()).isEqualTo(id);
     }
 }
