@@ -3,6 +3,7 @@ package persistence.entity.persister;
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.model.EntityIdentifierMapping;
+import persistence.model.EntityMetaDataMapping;
 import persistence.model.MetaDataModelMappingException;
 import persistence.sql.dml.Delete;
 import persistence.sql.dml.DmlQueryBuilder;
@@ -12,7 +13,6 @@ import persistence.sql.mapping.Table;
 import persistence.sql.mapping.TableBinder;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class SingleTableEntityPersister implements EntityPersister {
 
@@ -28,13 +28,15 @@ public class SingleTableEntityPersister implements EntityPersister {
         this.dmlQueryBuilder = dmlQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
         // TODO 추후 4주차 미션에서 컴포넌트 스캔 단계 작업 시 컴포넌트 스캔으로 해결할 예정
-        final Field idField = getIdField(clazz);
+        final Field idField = getIdField();
         this.identifierMapping = new EntityIdentifierMapping(clazz, idField.getName(), idField);
     }
 
     // TODO 추후 4주차 미션에서 컴포넌트 스캔 단계 작업 시 컴포넌트 스캔으로 해결할 예정
-    private Field getIdField(final Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
+    private Field getIdField() {
+        return EntityMetaDataMapping.getMetaData(this.name)
+                .getFields()
+                .stream()
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow(() -> new MetaDataModelMappingException("id field not found"));
@@ -88,5 +90,10 @@ public class SingleTableEntityPersister implements EntityPersister {
     @Override
     public Object getIdentifier(final Object entity) {
         return identifierMapping.getIdentifier(entity);
+    }
+
+    @Override
+    public void setIdentifier(final Object entity, final Object value) {
+        identifierMapping.setIdentifierValue(entity, value);
     }
 }

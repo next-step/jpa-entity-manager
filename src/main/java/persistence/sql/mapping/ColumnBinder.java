@@ -3,6 +3,8 @@ package persistence.sql.mapping;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import persistence.model.EntityMetaData;
+import persistence.model.EntityMetaDataMapping;
 import persistence.sql.QueryException;
 
 import java.lang.reflect.Field;
@@ -19,27 +21,21 @@ public class ColumnBinder {
         this.columnTypeMapper = columnTypeMapper;
     }
 
-    public List<Column> createColumns(final Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
+    public List<Column> createColumns(final EntityMetaData metaData) {
+        return metaData.getFields()
+                .stream()
                 .map(this::createColumn)
-                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    public List<Column> createColumns(final Object object) {
-        final Class<?> clazz = object.getClass();
-
-        return Arrays.stream(clazz.getDeclaredFields())
+    public List<Column> createColumns(final EntityMetaData metaData, final Object object) {
+        return metaData.getFields()
+                .stream()
                 .map(field -> createColumn(field, object))
-                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     public Column createColumn(final Field field) {
-        if (field.isAnnotationPresent(Transient.class)) {
-            return null;
-        }
-
         final String columnName = toColumnName(field);
         final int sqlType = columnTypeMapper.toSqlType(field.getType());
 
@@ -77,10 +73,6 @@ public class ColumnBinder {
 
     private Column createColumn(final Field field, final Object object) {
         final Column column = createColumn(field);
-
-        if (Objects.isNull(column)) {
-            return null;
-        }
 
         setColumnValue(column, field, object);
 

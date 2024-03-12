@@ -3,6 +3,7 @@ package persistence.entity;
 import jakarta.persistence.Entity;
 import jdbc.RowMapper;
 import persistence.ReflectionUtils;
+import persistence.model.EntityMetaDataMapping;
 import persistence.sql.QueryException;
 import persistence.sql.mapping.ColumnBinder;
 
@@ -55,7 +56,8 @@ public class EntityRowMapper<T> implements RowMapper<T> {
     }
 
     private void extractFields(final Class<T> clazz) {
-        Arrays.stream(clazz.getDeclaredFields())
+        EntityMetaDataMapping.getMetaData(clazz.getName())
+                .getFields()
                 .forEach(field -> fields.put(ColumnBinder.toColumnName(field), field));
     }
 
