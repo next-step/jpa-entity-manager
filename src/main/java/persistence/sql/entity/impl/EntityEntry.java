@@ -13,9 +13,8 @@ public class EntityEntry {
         return new EntityEntry(status);
     }
 
-    public EntityEntry updateStatus(Status status) {
+    public void updateStatus(Status status) {
         this.status = status;
-        return this;
     }
 
     @Override

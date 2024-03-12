@@ -4,6 +4,7 @@ import persistence.sql.entity.EntityLoader;
 import persistence.sql.entity.EntityManager;
 import persistence.sql.entity.EntityPersister;
 import persistence.sql.entity.PersistenceContext;
+import persistence.sql.entity.exception.MergeFailureException;
 import persistence.sql.entity.exception.PersistFailureException;
 
 import java.util.Objects;
@@ -47,7 +48,8 @@ public class EntityManagerImpl implements EntityManager {
 
         final Long id = entityPersister.insert(entity);
         final EntityKey key = EntityKey.fromNameAndValue(entity.getClass().getName(), id);
-        persistenceContext.addEntity(key, entity, entityEntry.updateStatus(Status.MANAGED));
+        entityEntry.updateStatus(Status.MANAGED);
+        persistenceContext.addEntity(key, entity, entityEntry);
 
         return entity;
     }
@@ -55,6 +57,14 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public Object merge(final Object entity) {
         final EntityKey key = EntityKey.fromEntity(entity);
+        final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
+
+        if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
+            throw new MergeFailureException();
+        }
+
+        final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
+        persistenceContext.addEntityEntry(key, entityEntry);
 
         if (persistenceContext.isDirty(key, entity)) {
             entityPersister.update(entity);
@@ -62,7 +72,8 @@ public class EntityManagerImpl implements EntityManager {
             entityPersister.insert(entity);
         }
 
-        persistenceContext.addEntity(key, entity);
+        entityEntry.updateStatus(Status.MANAGED);
+        persistenceContext.addEntity(key, entity, entityEntry);
         return entityLoader.findById(entity.getClass(), (Long) key.value());
     }
 
