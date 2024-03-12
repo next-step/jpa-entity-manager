@@ -11,6 +11,7 @@ import java.util.Objects;
 public class DeleteQueryBuilder {
 
     public static final String DELETE_TEMPLATE = "DELETE FROM %s";
+    public static final String WHERE_DELIMITER = " ";
     private final Dialect dialect;
     private final EntityMetadata entity;
     private final WhereQueryBuilder whereQueryBuilder;
@@ -48,7 +49,9 @@ public class DeleteQueryBuilder {
                 throw new IllegalStateException("Entity must be set before setting where clause");
             }
 
-            this.whereQueryBuilder = new WhereQueryBuilder(entity.getColumns(), whereRecords);
+            this.whereQueryBuilder = WhereQueryBuilder.builder()
+                    .whereConditions(entity.getColumns(), whereRecords)
+                    .build();
             return this;
         }
 
@@ -58,6 +61,6 @@ public class DeleteQueryBuilder {
     }
 
     public String generateQuery() {
-        return String.format(DELETE_TEMPLATE, Objects.isNull(whereQueryBuilder) ? entity.getName() : String.join(" ", entity.getName(), whereQueryBuilder.generateWhereClausesQuery()));
+        return String.format(DELETE_TEMPLATE, Objects.isNull(whereQueryBuilder) ? entity.getName() : String.join(WHERE_DELIMITER, entity.getName(), whereQueryBuilder.generateWhereClausesQuery()));
     }
 }

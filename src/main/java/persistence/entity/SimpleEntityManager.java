@@ -3,21 +3,20 @@ package persistence.entity;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dialect.Dialect;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.conditions.WhereRecord;
 
 import java.util.List;
 
 public class SimpleEntityManager implements EntityManager {
-
     private final JdbcTemplate jdbcTemplate;
     private final Dialect dialect;
+    private final EntityPersister entityPersister;
 
     public SimpleEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
+        this.entityPersister = new EntityPersister(jdbcTemplate, dialect);
     }
 
     @Override
@@ -33,22 +32,12 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public Object persist(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.builder()
-                .dialect(dialect)
-                .entity(entity)
-                .build();
-
-        jdbcTemplate.execute(insertQueryBuilder.generateQuery());
-
+        entityPersister.insert(entity);
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        jdbcTemplate.execute(DeleteQueryBuilder.builder()
-                .dialect(dialect)
-                .entity(entity.getClass())
-                .build()
-                .generateQuery());
+        entityPersister.delete(entity);
     }
 }
