@@ -24,8 +24,11 @@ public class EntityManagerImpl implements EntityManager {
         final EntityKey key = EntityKey.fromNameAndValue(clazz.getName(), id);
 
         if (Objects.isNull(persistenceContext.getEntity(key))) {
+            final EntityEntry entityEntry = EntityEntry.of(Status.LOADING);
             final T instance = entityLoader.findById(clazz, id);
-            persistenceContext.addEntity(key, instance);
+
+            entityEntry.updateStatus(Status.MANAGED);
+            persistenceContext.addEntity(key, instance, entityEntry);
             return instance;
         }
 

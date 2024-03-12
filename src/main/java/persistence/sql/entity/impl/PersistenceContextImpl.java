@@ -19,7 +19,12 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(final EntityKey key, final Object entity) {
+    public void addEntity(final EntityKey key, final Object entity, final EntityEntry entityEntry) {
+        addEntity(key, entity);
+        addEntityEntry(key, entityEntry);
+    }
+
+    private void addEntity(final EntityKey key, final Object entity) {
         entitiesByKey.put(key, entity);
 
         final Columns columnValues = createColumnValues(entity);
@@ -27,21 +32,14 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(final EntityKey key, final Object entity, final EntityEntry entityEntry) {
-        addEntity(key, entity);
-        addEntityEntry(key, entityEntry);
-    }
-
-    @Override
-    public void removeEntity(final EntityKey key) {
-        entitiesByKey.remove(key);
-        entitySnapshotsByKey.remove(key);
-    }
-
-    @Override
     public void removeEntity(final EntityKey key, final EntityEntry entityEntry) {
         removeEntity(key);
         addEntityEntry(key, entityEntry);
+    }
+
+    private void removeEntity(final EntityKey key) {
+        entitiesByKey.remove(key);
+        entitySnapshotsByKey.remove(key);
     }
 
     @Override
