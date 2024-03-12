@@ -17,6 +17,7 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class SimpleEntityManagerTest {
     private final Dialect DIALECT = new H2Dialect();
@@ -72,6 +73,23 @@ class SimpleEntityManagerTest {
         // when
         // then
         assertThat(entityManager.persist(person)).isEqualTo(person);
+    }
+
+    @Test
+    @DisplayName("persist - update")
+    void update() {
+        // given
+        entityManager.persist(person);
+        Person newPerson = Person.of(1L, "test12", 12, "test12@gmail.com");
+
+        // when
+        Person updatePerson = (Person) entityManager.persist(newPerson);
+
+        // then
+        assertAll(
+                () -> assertThat(updatePerson).isNotEqualTo(person),
+                () -> assertThat(updatePerson).isEqualTo(newPerson)
+        );
     }
 
     @Test
