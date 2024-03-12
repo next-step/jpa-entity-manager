@@ -7,4 +7,6 @@ public interface PersistenceContext {
     void addEntity(final Object key, final Object entity);
 
     void removeEntity(final Object key, final Object entity);
+
+    boolean checkDirty(final Object key, final Object entity);
 }
