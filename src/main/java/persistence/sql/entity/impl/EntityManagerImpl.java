@@ -20,8 +20,13 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(final Class<T> clazz, final Long id) {
+    public <T> T find(final Class<T> clazz, final Long id) throws IllegalAccessException {
         final EntityKey key = EntityKey.fromNameAndValue(clazz.getName(), id);
+        final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
+
+        if (existEntityEntry != null && existEntityEntry.isGone()) {
+            throw new IllegalAccessException();
+        }
 
         if (Objects.isNull(persistenceContext.getEntity(key))) {
             final EntityEntry entityEntry = EntityEntry.of(Status.LOADING);

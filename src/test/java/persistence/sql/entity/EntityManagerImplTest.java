@@ -90,6 +90,6 @@ class EntityManagerImplTest {
         entityManager.remove(person);
 
         assertThatThrownBy(() -> entityManager.find(person.getClass(), 1L))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalAccessException.class);
     }
 }
