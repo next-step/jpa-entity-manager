@@ -33,13 +33,31 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     @Override
-    public void persist(final Object entity) {
+    public <T> T persist(final T entity) {
         final String entityName = entity.getClass().getName();
         final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entityName);
 
         final Object key = persister.insert(entity);
+        persister.setIdentifier(entity, key);
 
         persistenceContext.addEntity(key, entity);
+
+        return entity;
+    }
+
+    @Override
+    public <T> T merge(final T entity) {
+        final String entityName = entity.getClass().getName();
+        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entityName);
+
+        final Object identifier = persister.getIdentifier(entity);
+        final boolean isDirty = persistenceContext.checkDirty(identifier, entity);
+
+        if (isDirty) {
+            persister.update(entity);
+        }
+
+        return entity;
     }
 
     @Override
