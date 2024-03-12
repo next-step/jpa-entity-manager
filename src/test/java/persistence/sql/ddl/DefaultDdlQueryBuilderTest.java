@@ -2,6 +2,7 @@ package persistence.sql.ddl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.EntityMetaDataTestSupport;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
 import persistence.sql.mapping.ColumnBinder;
@@ -11,7 +12,7 @@ import persistence.sql.mapping.TableBinder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DefaultDdlQueryBuilderTest {
+class DefaultDdlQueryBuilderTest extends EntityMetaDataTestSupport {
 
     private final TableBinder tableBinder = new TableBinder();
 

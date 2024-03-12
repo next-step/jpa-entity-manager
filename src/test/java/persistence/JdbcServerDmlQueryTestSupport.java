@@ -10,7 +10,7 @@ import persistence.sql.ddl.PersonV3;
 import java.util.List;
 
 @JdbcServerTest
-public abstract class JdbcServerDmlQueryTestSupport {
+public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSupport {
 
     protected static JdbcTemplate jdbcTemplate;
 
