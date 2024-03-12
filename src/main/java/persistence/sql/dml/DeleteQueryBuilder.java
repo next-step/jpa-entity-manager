@@ -49,7 +49,9 @@ public class DeleteQueryBuilder {
                 throw new IllegalStateException("Entity must be set before setting where clause");
             }
 
-            this.whereQueryBuilder = new WhereQueryBuilder(entity.getColumns(), whereRecords);
+            this.whereQueryBuilder = WhereQueryBuilder.builder()
+                    .whereConditions(entity.getColumns(), whereRecords)
+                    .build();
             return this;
         }
 

@@ -37,9 +37,9 @@ class EntityPersisterTest {
 
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
         entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT);
-        entityPersister = new EntityPersister(jdbcTemplate, DIALECT, null);
-        jdbcTemplate.execute(createQueryBuilder.generateQuery());
+        entityPersister = new EntityPersister(jdbcTemplate, DIALECT);
 
+        jdbcTemplate.execute(createQueryBuilder.generateQuery());
     }
 
     @AfterEach
@@ -55,12 +55,12 @@ class EntityPersisterTest {
 
     @Test
     @DisplayName("Update query builder 동작 테스트")
-    void 업데이트_테스트() {
+    void update() {
         // given
         final String name = "joel";
         final Integer age = 30;
         final Person person = Person.of(1L, "crong", 35, "test@gmail.com");
-        entityManager.persist(person);
+        entityPersister.insert(person);
 
         // when
         Person findPerson = Person.of(1L, name, age, "test@gmail.com");
@@ -72,7 +72,7 @@ class EntityPersisterTest {
 
     @Test
     @DisplayName("Insert query builder 동작 테스트")
-    void 인서트_테스트() {
+    void insert() {
         // given
         final String name = "crong";
         final Integer age = 35;
@@ -87,8 +87,8 @@ class EntityPersisterTest {
     }
 
     @Test
-    @DisplayName("")
-    void 딜리트_테스트() {
+    @DisplayName("Delete query builder 동작 테스트")
+    void delete() {
         // given
         final Person person = Person.of(1L, "crong", 35, "test@gmail.com");
         entityManager.persist(person);
