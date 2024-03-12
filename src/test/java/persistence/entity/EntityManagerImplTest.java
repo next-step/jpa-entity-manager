@@ -26,8 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EntityManagerImplTest {
 
     private DatabaseServer server;
-    private EntityManager entityManager;
+    private EntityLoader entityLoader;
     private EntityPersister entityPersister;
+    private EntityManager entityManager;
     private JdbcTemplate jdbcTemplate;
     private QueryBuilder queryBuilder;
     private Person expected;
@@ -39,8 +40,9 @@ class EntityManagerImplTest {
         expected = DummyPerson.of();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+        entityLoader = new EntityLoader(jdbcTemplate);
         entityPersister = new EntityPersister(jdbcTemplate);
-        entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
+        entityManager = new EntityManagerImpl(entityLoader, entityPersister);
         queryBuilder = new DDLQueryBuilder(
                 new Table(expected.getClass()),
                 new DDLColumn(new H2TypeConverter(), new H2PrimaryKeyGenerationType())

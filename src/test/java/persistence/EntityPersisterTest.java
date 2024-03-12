@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityLoader;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
 import persistence.sql.ddl.converter.H2TypeConverter;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityPersisterTest {
 
+    private EntityLoader entityLoader;
     private EntityPersister entityPersister;
     private EntityManager entityManager;
     private DatabaseServer server;
@@ -43,8 +45,9 @@ class EntityPersisterTest {
                 new Table(expected.getClass()),
                 new DDLColumn(new H2TypeConverter(), new H2PrimaryKeyGenerationType())
         );
+        entityLoader = new EntityLoader(jdbcTemplate);
         entityPersister = new EntityPersister(jdbcTemplate);
-        entityManager = new EntityManagerImpl(entityPersister, jdbcTemplate);
+        entityManager = new EntityManagerImpl(entityLoader, entityPersister);
 
         final String createQuery = queryBuilder.create(Person.class);
         jdbcTemplate.execute(createQuery);
