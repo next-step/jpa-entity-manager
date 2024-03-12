@@ -8,6 +8,8 @@ public interface EntityPersister {
 
     void delete(final Object entity);
 
-    Object getIdentifier(Object entity);
+    Object getIdentifier(final Object entity);
+
+    void setIdentifier(final Object entity, final Object value);
 
 }

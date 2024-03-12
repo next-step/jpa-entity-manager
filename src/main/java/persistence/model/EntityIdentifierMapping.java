@@ -14,9 +14,20 @@ public class EntityIdentifierMapping {
         this.field.setAccessible(true);
     }
 
-    public Object getIdentifier(Object entity) {
+    public Object getIdentifier(final Object entity) {
         try {
             return this.field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new MetaDataModelMappingException(
+                    "Error accessing field " + field.toGenericString() +
+                            " by reflection for persistent property " + containerClass.getName() +
+                            " : " + propertyName);
+        }
+    }
+
+    public void setIdentifierValue(final Object entity, final Object value) {
+        try {
+            this.field.set(entity, value);
         } catch (IllegalAccessException e) {
             throw new MetaDataModelMappingException(
                     "Error accessing field " + field.toGenericString() +
