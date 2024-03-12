@@ -19,7 +19,7 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
         return entityManager.merge(entity);
     }
 
-    public boolean isNew(T entity) {
+    private boolean isNew(T entity) {
         Columns columns = new Columns(entity.getClass());
         Column primaryKeyColumn = columns.getPrimaryKeyColumn();
 

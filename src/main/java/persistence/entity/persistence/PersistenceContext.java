@@ -1,7 +1,7 @@
 package persistence.entity.persistence;
 
+import persistence.entity.domain.EntityEntry;
 import persistence.entity.domain.EntitySnapshot;
-import persistence.entity.domain.EntityStatus;
 
 public interface PersistenceContext {
 
@@ -15,6 +15,8 @@ public interface PersistenceContext {
 
     EntitySnapshot getCachedDatabaseSnapshot(Object id, Object entity);
 
-    void addEntityEntry(Object entity, EntityStatus entityStatus);
+    void addEntityEntry(Object entity, EntityEntry entityEntry);
+
+    EntityEntry getEntityEntry(Object entity);
 
 }
