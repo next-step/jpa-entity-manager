@@ -26,7 +26,9 @@ class DefaultPersistenceContextTest {
     @DisplayName("persistenceContext에 entity제거 테스트")
     public void removeEntityTest() {
         Person person = new Person();
-        defaultPersistenceContext.removeEntity(person);
+        person.setId(1L);
+
+        defaultPersistenceContext.removeEntity(1L, person);
 
         assertNull(defaultPersistenceContext.getEntity(person.getClass(), 1L));
     }

@@ -20,7 +20,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         T entity = (T) persistenceContext.getEntity(clazz, id);
-        if (entity != null) {
+        if (entity == null) {
             entity = entityLoader.find(clazz, id);
             persistenceContext.addEntity(id, entity);
             persistenceContext.getDatabaseSnapshot(id, entity);
@@ -38,7 +38,8 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        persistenceContext.removeEntity(entity);
+        Long id = entityPersister.getIdentifier(entity);
+        persistenceContext.removeEntity(id, entity);
         entityPersister.delete(entity);
     }
 

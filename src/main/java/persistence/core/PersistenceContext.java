@@ -7,7 +7,7 @@ public interface PersistenceContext {
 
     void addEntity(Long id, Object entity);
 
-    void removeEntity(Object entity);
+    void removeEntity(Long id, Object entity);
 
     void getDatabaseSnapshot(Long id, Object entity);
 

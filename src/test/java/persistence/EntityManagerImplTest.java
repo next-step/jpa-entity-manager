@@ -17,6 +17,7 @@ import persistence.entity.Person;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntityManagerImplTest {
 
@@ -81,6 +82,25 @@ class EntityManagerImplTest {
         savedPerson.setAge(33);
 
         entityManager.flush();
+
+        Person updatedPerson = entityManager.find(Person.class, 1L);
+        assertThat(updatedPerson.getAge()).isEqualTo(33);
     }
 
+    @Test
+    @DisplayName("entity 삭제")
+    public void removeTest() {
+        final Person person = new Person();
+        person.setName("jinny");
+        person.setAge(30);
+        person.setEmail("");
+
+        entityManager.persist(person);
+
+        entityManager.remove(person);
+
+        assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Entity not found");
+    }
 }

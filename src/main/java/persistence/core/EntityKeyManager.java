@@ -1,7 +1,6 @@
 package persistence.core;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class EntityKeyManager {
@@ -26,7 +25,5 @@ public class EntityKeyManager {
 
         return keys.computeIfAbsent(keyString, k -> new EntityKey(clazz, id));
     }
-
-
 
 }
