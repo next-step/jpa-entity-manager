@@ -4,6 +4,7 @@ import persistence.sql.entity.EntityLoader;
 import persistence.sql.entity.EntityManager;
 import persistence.sql.entity.EntityPersister;
 import persistence.sql.entity.PersistenceContext;
+import persistence.sql.entity.exception.PersistFailureException;
 
 import java.util.Objects;
 
@@ -34,8 +35,14 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object persist(final Object entity) {
-        final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
         final EntityKey entityKey = EntityKey.fromEntity(entity);
+        final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(entityKey);
+
+        if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
+            throw new PersistFailureException();
+        }
+
+        final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
         persistenceContext.addEntityEntry(entityKey, entityEntry);
 
         final Long id = entityPersister.insert(entity);

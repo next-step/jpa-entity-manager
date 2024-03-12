@@ -7,7 +7,7 @@ public interface PersistenceContext {
     Object getEntity(EntityKey key);
 
     void addEntity(EntityKey key, Object entity);
-    
+
     void addEntity(EntityKey key, Object entity, EntityEntry entityEntry);
 
     void removeEntity(EntityKey key);

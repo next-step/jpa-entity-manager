@@ -30,4 +30,8 @@ public class EntityEntry {
     public int hashCode() {
         return Objects.hash(status);
     }
+
+    public boolean isReadOnly() {
+        return this.status.equals(Status.READ_ONLY);
+    }
 }
