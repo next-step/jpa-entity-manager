@@ -39,6 +39,12 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
+    public void removeEntity(final EntityKey key, final EntityEntry entityEntry) {
+        removeEntity(key);
+        addEntityEntry(key, entityEntry);
+    }
+
+    @Override
     public boolean isDirty(final EntityKey key, final Object entity) {
         if (entitySnapshotsByKey.containsKey(key)) {
             final Columns columnValues = createColumnValues(entity);
@@ -53,8 +59,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         return entityEntryByKey.get(key);
     }
 
-    @Override
-    public void addEntityEntry(final EntityKey key, final EntityEntry entityEntry) {
+    private void addEntityEntry(final EntityKey key, final EntityEntry entityEntry) {
         entityEntryByKey.put(key, entityEntry);
     }
 }

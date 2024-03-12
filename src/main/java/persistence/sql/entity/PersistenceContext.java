@@ -11,10 +11,10 @@ public interface PersistenceContext {
     void addEntity(EntityKey key, Object entity, EntityEntry entityEntry);
 
     void removeEntity(EntityKey key);
+    void removeEntity(EntityKey key, EntityEntry entityEntry);
 
     boolean isDirty(EntityKey key, Object entity);
 
     EntityEntry getEntityEntry(EntityKey key);
 
-    void addEntityEntry(EntityKey key, EntityEntry entityEntry);
 }

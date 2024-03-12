@@ -4,8 +4,6 @@ import persistence.sql.entity.EntityLoader;
 import persistence.sql.entity.EntityManager;
 import persistence.sql.entity.EntityPersister;
 import persistence.sql.entity.PersistenceContext;
-import persistence.sql.entity.exception.MergeFailureException;
-import persistence.sql.entity.exception.PersistFailureException;
 
 import java.util.Objects;
 
@@ -35,16 +33,15 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public Object persist(final Object entity) {
+    public Object persist(final Object entity) throws IllegalAccessException {
         final EntityKey entityKey = EntityKey.fromEntity(entity);
         final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(entityKey);
 
         if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
-            throw new PersistFailureException();
+            throw new IllegalAccessException();
         }
 
         final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
-        persistenceContext.addEntityEntry(entityKey, entityEntry);
 
         final Long id = entityPersister.insert(entity);
         final EntityKey key = EntityKey.fromNameAndValue(entity.getClass().getName(), id);
@@ -55,16 +52,15 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public Object merge(final Object entity) {
+    public Object merge(final Object entity) throws IllegalAccessException {
         final EntityKey key = EntityKey.fromEntity(entity);
         final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
 
         if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
-            throw new MergeFailureException();
+            throw new IllegalAccessException();
         }
 
         final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
-        persistenceContext.addEntityEntry(key, entityEntry);
 
         if (persistenceContext.isDirty(key, entity)) {
             entityPersister.update(entity);
@@ -79,10 +75,18 @@ public class EntityManagerImpl implements EntityManager {
 
 
     @Override
-    public void remove(final Object entity) {
+    public void remove(final Object entity) throws IllegalAccessException {
         final EntityKey key = EntityKey.fromEntity(entity);
+        final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
 
-        persistenceContext.removeEntity(key);
+        if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
+            throw new IllegalAccessException();
+        }
+
+        final EntityEntry entityEntry = EntityEntry.of(Status.DELETED);
+
+        entityEntry.updateStatus(Status.GONE);
+        persistenceContext.removeEntity(key, entityEntry);
         entityPersister.delete(entity);
     }
 

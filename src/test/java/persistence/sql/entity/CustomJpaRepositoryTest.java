@@ -52,7 +52,7 @@ public class CustomJpaRepositoryTest {
     }
     @Test
     @DisplayName("save 시 dirty checking 로직 구현")
-    void saveWithDirty() {
+    void saveWithDirty() throws IllegalAccessException {
         final Person person = (Person) entityManager.persist(new Person( 1L, "simpson", 31, "simpson@naver.com"));
 
         assertThat(entityManager.isDirty(person)).isFalse();

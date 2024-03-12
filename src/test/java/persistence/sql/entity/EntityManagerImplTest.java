@@ -52,7 +52,7 @@ class EntityManagerImplTest {
 
     @DisplayName("EntityManagerImpl find를 호출하면 엔티티가 리턴된다.")
     @Test
-    void findTest() {
+    void findTest() throws IllegalAccessException {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
@@ -66,7 +66,7 @@ class EntityManagerImplTest {
 
     @DisplayName("EntityManagerImpl persist를 호출하면 엔티티를 저장한다.")
     @Test
-    void persistTest() {
+    void persistTest() throws IllegalAccessException {
         final Person person = new Person(1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
@@ -80,7 +80,7 @@ class EntityManagerImplTest {
 
     @DisplayName("EntityManagerImpl delete를 호출하면 엔티티를 삭제한다.")
     @Test
-    void removeTest() {
+    void removeTest() throws IllegalAccessException {
         final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
