@@ -14,8 +14,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, EntityEntry> entityEntryByKey = new HashMap<>();
 
     @Override
-    public Object getEntity(final EntityKey id) {
-        return entitiesByKey.get(id);
+    public Object getEntity(final EntityKey key) {
+        return entitiesByKey.get(key);
     }
 
     @Override
@@ -24,6 +24,12 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         final Columns columnValues = createColumnValues(entity);
         entitySnapshotsByKey.put(key, columnValues);
+    }
+
+    @Override
+    public void addEntity(final EntityKey key, final Object entity, final EntityEntry entityEntry) {
+        addEntity(key, entity);
+        addEntityEntry(key, entityEntry);
     }
 
     @Override
@@ -43,7 +49,12 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public EntityEntry getEntityEntry(final EntityKey id) {
-        return entityEntryByKey.get(id);
+    public EntityEntry getEntityEntry(final EntityKey key) {
+        return entityEntryByKey.get(key);
+    }
+
+    @Override
+    public void addEntityEntry(final EntityKey key, final EntityEntry entityEntry) {
+        entityEntryByKey.put(key, entityEntry);
     }
 }

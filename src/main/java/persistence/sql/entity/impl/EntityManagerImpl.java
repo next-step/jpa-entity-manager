@@ -34,9 +34,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object persist(final Object entity) {
+        final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
+        final EntityKey entityKey = EntityKey.fromEntity(entity);
+        persistenceContext.addEntityEntry(entityKey, entityEntry);
+
         final Long id = entityPersister.insert(entity);
         final EntityKey key = EntityKey.fromNameAndValue(entity.getClass().getName(), id);
-        persistenceContext.addEntity(key, entity);
+        persistenceContext.addEntity(key, entity, entityEntry.updateStatus(Status.MANAGED));
 
         return entity;
     }

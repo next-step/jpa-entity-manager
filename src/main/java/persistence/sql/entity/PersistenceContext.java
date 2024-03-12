@@ -4,13 +4,17 @@ import persistence.sql.entity.impl.EntityEntry;
 import persistence.sql.entity.impl.EntityKey;
 
 public interface PersistenceContext {
-    Object getEntity(EntityKey id);
+    Object getEntity(EntityKey key);
 
-    void addEntity(EntityKey id, Object entity);
+    void addEntity(EntityKey key, Object entity);
+    
+    void addEntity(EntityKey key, Object entity, EntityEntry entityEntry);
 
-    void removeEntity(EntityKey id);
+    void removeEntity(EntityKey key);
 
-    boolean isDirty(EntityKey id, Object entity);
+    boolean isDirty(EntityKey key, Object entity);
 
-    EntityEntry getEntityEntry(EntityKey id);
+    EntityEntry getEntityEntry(EntityKey key);
+
+    void addEntityEntry(EntityKey key, EntityEntry entityEntry);
 }
