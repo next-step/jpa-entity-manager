@@ -1,17 +1,15 @@
 package persistence.entity.manager;
 
-import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.entity.exception.EntityExistsException;
-import persistence.entity.exception.UnableToChangeIdException;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
-import persistence.sql.ddl.PrimaryKeyClause;
 
-import java.util.Arrays;
 import java.util.Optional;
+
+import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -54,7 +52,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private void validate(Object entity) {
-        var primaryKey = PrimaryKeyClause.primaryKeyValue(entity);
+        var primaryKey = primaryKeyValue(entity);
         var searchedEntity = persistenceContext.getEntity(entity.getClass(), primaryKey);
 
         if (searchedEntity.isPresent()) {
@@ -64,7 +62,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public Object merge(Object entity) {
-        var primaryKey = PrimaryKeyClause.primaryKeyValue(entity);
+        var primaryKey = primaryKeyValue(entity);
         var snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
 
         if (snapshot != entity) {

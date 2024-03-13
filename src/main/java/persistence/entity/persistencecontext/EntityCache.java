@@ -1,10 +1,10 @@
 package persistence.entity.persistencecontext;
 
-import persistence.sql.ddl.PrimaryKeyClause;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
 
 public class EntityCache {
     private final Map<EntityKey, Object> entityCache;
@@ -15,7 +15,7 @@ public class EntityCache {
 
     public void put(Object entity) {
         var clazz = entity.getClass();
-        entityCache.put(new EntityKey(clazz, PrimaryKeyClause.primaryKeyValue(entity)), entity);
+        entityCache.put(new EntityKey(clazz, primaryKeyValue(entity)), entity);
     }
 
     public Optional<Object> get(Class<?> clazz, Long key) {

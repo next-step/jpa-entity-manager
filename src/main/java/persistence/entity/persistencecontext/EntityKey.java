@@ -1,8 +1,8 @@
 package persistence.entity.persistencecontext;
 
-import persistence.sql.ddl.PrimaryKeyClause;
-
 import java.util.Objects;
+
+import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
 
 public class EntityKey {
     private final String className;
@@ -15,7 +15,7 @@ public class EntityKey {
 
     public EntityKey (Object entity) {
         this.className = entity.getClass().getName();
-        this.id = PrimaryKeyClause.primaryKeyValue(entity);
+        this.id = primaryKeyValue(entity);
     }
 
     @Override

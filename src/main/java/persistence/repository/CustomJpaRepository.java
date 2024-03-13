@@ -3,10 +3,10 @@ package persistence.repository;
 import jdbc.JdbcTemplate;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
-import persistence.entity.persistencecontext.PersistenceContext;
-import persistence.sql.ddl.PrimaryKeyClause;
 
 import java.util.Optional;
+
+import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
 
 public class CustomJpaRepository {
     private final EntityManager entityManager;
@@ -15,7 +15,7 @@ public class CustomJpaRepository {
     }
 
     <T> T save (T entity) {
-        var isInEntityManger = entityManager.find(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity)).isPresent();
+        var isInEntityManger = entityManager.find(entity.getClass(), primaryKeyValue(entity)).isPresent();
 
         if (isInEntityManger) {
            return (T) entityManager.merge(entity);

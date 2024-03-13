@@ -3,14 +3,13 @@ package persistence.entity.persister;
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.entity.exception.UnableToChangeIdException;
-import persistence.sql.common.DtoMapper;
-import persistence.sql.ddl.PrimaryKeyClause;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.util.Arrays;
+
+import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
@@ -43,7 +42,7 @@ public class EntityPersister {
         }
     }
     public void delete(Object entity) {
-        Long id = PrimaryKeyClause.primaryKeyValue(entity);
+        Long id = primaryKeyValue(entity);
         String query = new DeleteQueryBuilder(entity.getClass()).deleteById(id);
         jdbcTemplate.execute(query);
     }
