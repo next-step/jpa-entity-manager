@@ -22,7 +22,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> Optional<T> getEntity(Class<T> clazz, Long id) {
-        var cachedEntity = getCachedEntity(clazz, id);
+        var cachedEntity = entityCache.get(clazz, id);
         if (cachedEntity != null) {
             return Optional.of((T) cachedEntity);
         }
@@ -34,10 +34,6 @@ public class PersistenceContextImpl implements PersistenceContext {
         entityCache.put(id, searchedEntity.get());
         snapshot.put(id, searchedEntity.get());
         return searchedEntity;
-    }
-
-    private Object getCachedEntity(Class<?> clazz, Long id) {
-        return entityCache.get(clazz, id);
     }
 
     @Override
