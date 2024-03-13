@@ -3,6 +3,8 @@ package persistence.model;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.EntityMetaDataTestSupport;
+import persistence.PersonV3FixtureFactory;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.persister.SingleTableEntityPersister;
 import persistence.sql.ddl.PersonV3;
@@ -13,7 +15,7 @@ import persistence.sql.mapping.TableBinder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MappingMetaModelTest {
+class MappingMetaModelTest extends EntityMetaDataTestSupport {
 
     private final Class<?> clazz = PersonV3.class;
     private final TableBinder tableBinder = new TableBinder();
@@ -29,7 +31,8 @@ class MappingMetaModelTest {
     @Test
     public void getEntityDescriptor() throws Exception {
         // when
-        final EntityPersister result = mappingMetaModel.getEntityDescriptor(clazz.getName());
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
+        final EntityPersister result = mappingMetaModel.getEntityDescriptor(person);
 
         // then
         assertEquals(result, entityPersister);
