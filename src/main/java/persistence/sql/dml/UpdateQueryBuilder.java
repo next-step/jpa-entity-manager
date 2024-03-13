@@ -23,11 +23,7 @@ public class UpdateQueryBuilder {
     }
 
     public String insertQuery(Object entity) {
-        String format = String.format(INSERT_DATA_QUERY, entityMetaData.getTableInfo().getName(), columnsClause(entity), valuesClause(entity));
-
-        System.out.println("format = " + format);
-
-        return format;
+        return String.format(INSERT_DATA_QUERY, entityMetaData.getTableInfo().getName(), columnsClause(entity), valuesClause(entity));
     }
 
     public String updateQuery(Object entity) {
