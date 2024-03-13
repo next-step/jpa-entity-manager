@@ -19,14 +19,16 @@ public class EntityLoader {
         this.dialect = dialect;
     }
 
-    public <T> T find(Class<T> clazz, Object Id) {
+    public <T> T find(EntityId entityId) {
+        Class<?> clazz = entityId.getClazz();
+
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.builder()
                 .dialect(dialect)
                 .entity(clazz)
-                .where(List.of(WhereRecord.of("id", "=", Id)))
+                .where(List.of(WhereRecord.of(String.valueOf(entityId.getName()), "=", entityId.getValue())))
                 .build();
 
-        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> new EntityRowMapper<>(clazz).mapRow(resultSet));
+        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> (T) new EntityRowMapper<>(clazz).mapRow(resultSet));
     }
 
     public <T> T findByEntity(T entity) {

@@ -13,8 +13,8 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long Id) {
-        return entityLoader.find(clazz, Id);
+    public <T> T find(Class<T> clazz, Long id) {
+        return entityLoader.find(new EntityId(clazz, id));
     }
 
     @Override
