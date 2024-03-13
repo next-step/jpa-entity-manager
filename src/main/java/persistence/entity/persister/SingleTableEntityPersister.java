@@ -27,12 +27,10 @@ public class SingleTableEntityPersister implements EntityPersister {
         this.tableBinder = tableBinder;
         this.dmlQueryBuilder = dmlQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
-        // TODO 추후 4주차 미션에서 컴포넌트 스캔 단계 작업 시 컴포넌트 스캔으로 해결할 예정
         final Field idField = getIdField();
         this.identifierMapping = new EntityIdentifierMapping(clazz, idField.getName(), idField);
     }
 
-    // TODO 추후 4주차 미션에서 컴포넌트 스캔 단계 작업 시 컴포넌트 스캔으로 해결할 예정
     private Field getIdField() {
         return EntityMetaDataMapping.getMetaData(this.name)
                 .getFields()
@@ -42,7 +40,6 @@ public class SingleTableEntityPersister implements EntityPersister {
                 .orElseThrow(() -> new MetaDataModelMappingException("id field not found"));
     }
 
-    // TODO 추후 4주차 미션에서 컴포넌트 스캔 단계 작업 시 컴포넌트 스캔으로 해결할 예정
     public String getTargetEntityName() {
         return this.name;
     }
