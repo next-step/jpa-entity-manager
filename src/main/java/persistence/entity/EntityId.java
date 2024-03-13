@@ -7,7 +7,7 @@ public class EntityId {
     private final Object id;
 
     private EntityId(Class<?> clazz, Object id) {
-        this.entityMetadata = EntityMetadata.of(clazz);
+        this.entityMetadata = EntityMetadata.from(clazz);
         this.id = id;
     }
 

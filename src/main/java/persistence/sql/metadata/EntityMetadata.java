@@ -25,7 +25,7 @@ public class EntityMetadata {
         this.primaryKey = primaryKey;
     }
 
-    public static EntityMetadata of(Class<?> clazz) {
+    public static EntityMetadata from(Class<?> clazz) {
         return new EntityMetadata(clazz, generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, null)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, null)));
     }
 

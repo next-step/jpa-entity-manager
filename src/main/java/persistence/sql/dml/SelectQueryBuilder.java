@@ -43,7 +43,7 @@ public class SelectQueryBuilder {
         }
 
         public Builder entity(Class<?> clazz) {
-            this.entity = EntityMetadata.of(clazz);
+            this.entity = EntityMetadata.from(clazz);
             return this;
         }
 

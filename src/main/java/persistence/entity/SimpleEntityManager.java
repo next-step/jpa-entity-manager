@@ -1,9 +1,11 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.context.EntitySnapshot;
 import persistence.context.PersistenceContext;
 import persistence.context.SimplePersistenceContext;
 import persistence.sql.dialect.Dialect;
+import persistence.sql.metadata.EntityMetadata;
 
 import java.util.Objects;
 
@@ -32,13 +34,17 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public Object persist(Object entity) {
-        try {
-            Object findEntity = entityLoader.findByEntity(entity);
-            if (!entity.equals(findEntity)) {
-                entityPersister.update(entity);
-            }
-        } catch (RuntimeException e) {
+        EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass(), entity);
+
+        Object findEntity = persistenceContext.getEntity(entity.getClass(), entityMetadata.getPrimaryKey().getValue());
+        if (Objects.isNull(findEntity)) {
             entityPersister.insert(entity);
+            persistenceContext.addEntity(entityMetadata.getPrimaryKey().getValue(), entity);
+        }
+
+        EntitySnapshot databaseSnapshot = persistenceContext.getDatabaseSnapshot(entityMetadata.getPrimaryKey().getValue(), entity);
+        if (databaseSnapshot.isNotEqualToSnapshot(entity)) {
+            entityPersister.update(entity);
         }
 
         return entity;
