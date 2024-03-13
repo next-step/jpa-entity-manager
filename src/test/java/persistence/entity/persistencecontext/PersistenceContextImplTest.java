@@ -101,7 +101,7 @@ class PersistenceContextImplTest {
 
         // then
         var actual = persistenceContext.getEntity(Person.class, 1L).get();
-        var expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        var expected = person.changeId(1L);
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 

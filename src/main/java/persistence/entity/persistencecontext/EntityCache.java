@@ -4,6 +4,7 @@ import persistence.sql.ddl.PrimaryKeyClause;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class EntityCache {
     private final Map<EntityKey, Object> entityCache;
@@ -17,13 +18,13 @@ public class EntityCache {
         entityCache.put(new EntityKey(clazz, PrimaryKeyClause.primaryKeyValue(entity)), entity);
     }
 
-    public Object get(Class<?> clazz, Long key) {
+    public Optional<Object> get(Class<?> clazz, Long key) {
         var entityKey = new EntityKey(clazz, key);
         var cachedEntity = entityCache.get(entityKey);
         if (cachedEntity == null) {
-            return null;
+            return Optional.empty();
         }
-        return entityCache.get(entityKey);
+        return Optional.of(entityCache.get(entityKey));
     }
 
     public void remove(Object entity) {

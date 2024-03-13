@@ -41,6 +41,11 @@ public class Person {
         this.index = index;
     }
 
+    public Person changeId(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public Long getId() {
         return id;
     }
