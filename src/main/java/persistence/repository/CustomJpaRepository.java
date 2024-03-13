@@ -14,10 +14,6 @@ public class CustomJpaRepository {
         this.entityManager = new EntityManagerImpl(jdbcTemplate);
     }
 
-    public CustomJpaRepository(PersistenceContext persistenceContext) {
-        this.entityManager = new EntityManagerImpl(persistenceContext);
-    }
-
     <T> T save (T entity) {
         var isInEntityManger = entityManager.find(entity.getClass(), PrimaryKeyClause.primaryKeyValue(entity)).isPresent();
 
@@ -25,5 +21,9 @@ public class CustomJpaRepository {
            return (T) entityManager.merge(entity);
         }
         return (T) entityManager.persist(entity);
+    }
+
+    <T> Optional<T> find(Class<T> clazz, Long id) {
+        return entityManager.find(clazz, id);
     }
 }

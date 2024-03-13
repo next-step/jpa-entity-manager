@@ -7,6 +7,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.manager.EntityManager;
+import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.testfixture.notcolumn.Person;
@@ -19,7 +21,6 @@ class CustomJpaRepositoryTest {
     private static final Logger logger = LoggerFactory.getLogger(CustomJpaRepositoryTest.class);
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
-    private PersistenceContext persistenceContext;
     private CustomJpaRepository repository;
 
     @BeforeAll
@@ -39,8 +40,7 @@ class CustomJpaRepositoryTest {
         String query = new CreateQueryBuilder(Person.class).getQuery();
         jdbcTemplate.execute(query);
 
-        persistenceContext = new PersistenceContextImpl(jdbcTemplate);
-        repository = new CustomJpaRepository(persistenceContext);
+        repository = new CustomJpaRepository(jdbcTemplate);
     }
 
     @AfterEach
@@ -54,21 +54,19 @@ class CustomJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("snapshot은 항상 최신의 DB 값을 유지한다.")
+    @DisplayName("JPA repository는 id가 이미 있는 entity를 저장시 update 한다.")
     void saveWithDirty() {
         // given
         var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var person_ID있음 = repository.save(person);
-        var firstSnapshot = persistenceContext.getDatabaseSnapshot(person, 1L);
+        var savedPerson = repository.save(person);
+        var personId = savedPerson.getId();
 
         // when
-        Person updatedPerson = person_ID있음.changeEmail("soo@gmail.com");
+        var updatedPerson = savedPerson.changeEmail("soo@gmail.com");
         repository.save(updatedPerson);
-        var secondSnapshot = persistenceContext.getDatabaseSnapshot(person, 1L);
 
         // then
-        Assertions.assertThat(firstSnapshot.get()).isEqualTo(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", null));
-        Assertions.assertThat(secondSnapshot.get()).isEqualTo(new Person(1L, "김철수", 21, "soo@gmail.com", null));
+        Assertions.assertThat(repository.find(Person.class, personId).get()).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
     }
 
 }
