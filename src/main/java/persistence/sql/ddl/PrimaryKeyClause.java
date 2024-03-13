@@ -46,21 +46,6 @@ public class PrimaryKeyClause {
         }
     }
 
-    public static Object initPrimaryKey(Object entity) {
-        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(x -> x.isAnnotationPresent(Id.class))
-                .findAny()
-                .orElseThrow(InvalidPrimaryKeyException::new);
-
-        idField.setAccessible(true);
-        try {
-            idField.set(entity, idField.get(entity));
-            return entity;
-        } catch (IllegalAccessException e) {
-            throw new PrimaryKeyEditingNotAllowedException();
-        }
-    }
-
     private static GenerationType getType(Field field) {
         if (field.isAnnotationPresent(GeneratedValue.class)) {
             return field.getAnnotation(GeneratedValue.class).strategy();
