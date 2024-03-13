@@ -2,69 +2,43 @@ package persistence.entity.impl;
 
 import java.util.List;
 import jdbc.JdbcTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import persistence.entity.EntityLoader;
 import persistence.entity.EntityManager;
-import persistence.entity.EntityRowMapperFactory;
-import persistence.sql.QueryBuilder;
+import persistence.entity.EntityPersister;
 
 public class EntityManagerImpl implements EntityManager {
-    private static final Logger log = LoggerFactory.getLogger(EntityManagerImpl.class);
+    private final EntityPersister entityPersister;
 
-    private final JdbcTemplate jdbcTemplate;
-
-    private final QueryBuilder queryBuilder;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
-        this(jdbcTemplate, new QueryBuilder());
+        this(new EntityPersisterImpl(jdbcTemplate), new EntityLoaderImpl(jdbcTemplate));
     }
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate, QueryBuilder queryBuilder) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.queryBuilder = queryBuilder;
+    public EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
+        this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
 
     @Override
     public <T> T find(Class<T> entityClass, Long id) {
-        String selectByIdQuery = queryBuilder.getSelectByIdQuery(entityClass, id);
-
-        log.info("SQL: {}", selectByIdQuery);
-
-        return jdbcTemplate.queryForObject(
-            selectByIdQuery,
-            EntityRowMapperFactory.getInstance().getRowMapper(entityClass)
-        );
+        return entityLoader.select(entityClass, id);
     }
 
     @Override
     public <T> List<T> findAll(Class<T> entityClass) {
-        String selectAllQuery = queryBuilder.getSelectAllQuery(entityClass);
-
-        log.info("SQL: {}", selectAllQuery);
-
-        return jdbcTemplate.query(
-            selectAllQuery,
-            EntityRowMapperFactory.getInstance().getRowMapper(entityClass)
-        );
+        return entityLoader.selectAll(entityClass);
     }
 
     @Override
     public Object persist(Object entity) {
-        String insertQuery = queryBuilder.getInsertQuery(entity);
-
-        log.info("SQL: {}", insertQuery);
-
-        jdbcTemplate.execute(insertQuery);
+        entityPersister.insert(entity);
 
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        String deleteQueryFromEntity = queryBuilder.getDeleteQueryFromEntity(entity);
-
-        log.info("SQL: {}", deleteQueryFromEntity);
-
-        jdbcTemplate.execute(deleteQueryFromEntity);
+        entityPersister.delete(entity);
     }
 }
