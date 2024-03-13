@@ -9,12 +9,12 @@ public class EntityKey {
     private final Long id;
 
     public EntityKey(Class<?> clazz, Long id) {
-        this.className = clazz.getSimpleName();
+        this.className = clazz.getName();
         this.id = id;
     }
 
     public EntityKey (Object entity) {
-        this.className = entity.getClass().getSimpleName();
+        this.className = entity.getClass().getName();
         this.id = PrimaryKeyClause.primaryKeyValue(entity);
     }
 
