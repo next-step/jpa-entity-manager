@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import persistence.sql.ddl.common.StringConstants;
 
 public class EntityColumns {
     private final List<EntityColumn> container;
@@ -18,8 +19,8 @@ public class EntityColumns {
             streamFrom(entityClass)
                 .collect(Collectors.toList())
         );
-
     }
+
     public EntityColumns(List<EntityColumn> container) {
         this.container = container;
     }
@@ -37,6 +38,13 @@ public class EntityColumns {
         return container.stream()
             .filter(column -> !column.isPrimary())
             .collect(Collectors.toList());
+    }
+
+    public String getUpdateQueryStringFrom(Object entity) {
+        return container.stream()
+            .filter(column -> !column.isPrimary())
+            .map(column -> String.format("%s = %s", column.getColumnName(), column.getEntityValueFrom(entity).queryString()))
+            .collect(Collectors.joining(StringConstants.COLUMN_DEFINITION_DELIMITER));
     }
 
     public static Stream<EntityColumn> streamFrom(Class<?> entityClass) {

@@ -166,4 +166,17 @@ class QueryBuilderTest {
         assertThat(deleteByIdQuery).isEqualTo("DELETE FROM users WHERE id = 1");
         assertThat(deleteQueryFromEntity).isEqualTo("DELETE FROM users WHERE id = 1");
     }
+
+    @Test
+    void getUpdateQuery() {
+        // given
+        Person givenEntity = new Person(1L, "홍길동", 20, "test@gmail.com");
+
+        // when
+        String updateQuery = queryBuilder.getUpdateQuery(givenEntity);
+
+        // then
+        assertThat(updateQuery).isEqualTo(
+            "UPDATE users SET nick_name = '홍길동', old = 20, email = 'test@gmail.com' WHERE id = 1");
+    }
 }

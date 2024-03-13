@@ -8,6 +8,7 @@ import persistence.sql.ddl.TableQueryBuilder;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 
 public class QueryBuilder extends AbstractQueryBuilder {
 
@@ -23,6 +24,8 @@ public class QueryBuilder extends AbstractQueryBuilder {
 
     private final CreateQueryBuilder createQueryBuilder;
 
+    private final UpdateQueryBuilder updateQueryBuilder;
+
     public QueryBuilder() {
         this(new TableQueryBuilder());
     }
@@ -34,6 +37,7 @@ public class QueryBuilder extends AbstractQueryBuilder {
         this.insertQueryTranslator = new InsertQueryBuilder(tableQueryBuilder);
         this.dropQueryBuilder = new DropQueryBuilder(tableQueryBuilder);
         this.createQueryBuilder = new CreateQueryBuilder(tableQueryBuilder);
+        this.updateQueryBuilder = new UpdateQueryBuilder(tableQueryBuilder);
     }
 
     public String getCreateTableQuery(final Class<?> entityClass) {
@@ -59,6 +63,9 @@ public class QueryBuilder extends AbstractQueryBuilder {
     public String getSelectCountQuery(Class<?> entityClass) {
         return selectQueryBuilder.getSelectCountQuery(entityClass);
     }
+    public String getUpdateQuery(Object entity) {
+        return updateQueryBuilder.getUpdateQuery(entity);
+    }
 
     public String getDeleteAllQuery(Class<?> entityClass) {
         return deleteQueryBuilder.getDeleteAllQuery(entityClass);
@@ -83,4 +90,6 @@ public class QueryBuilder extends AbstractQueryBuilder {
     public String getColumnDefinitionsFrom(Class<?> entityClass) {
         return createQueryBuilder.getColumnDefinitionsFrom(entityClass);
     }
+
+
 }
