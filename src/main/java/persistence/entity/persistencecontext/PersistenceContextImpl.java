@@ -15,14 +15,10 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     private final EntityCache entityCache;
     private final Snapshot snapshot;
-    private final EntityLoader entityLoader;
-    private final EntityPersister entityPersister;
 
-    public PersistenceContextImpl(JdbcTemplate jdbcTemplate) {
+    public PersistenceContextImpl() {
         this.entityCache = new EntityCache();
         this.snapshot = new Snapshot();
-        this.entityLoader = new EntityLoader(jdbcTemplate);
-        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
@@ -34,45 +30,18 @@ public class PersistenceContextImpl implements PersistenceContext {
         if (cachedEntity.isPresent()) {
             return (Optional<T>) cachedEntity;
         }
-
-        var searchedEntity = entityLoader.find(clazz, id);
-        if (searchedEntity.isEmpty()) {
-            return Optional.empty();
-        }
-        entityCache.put(searchedEntity.get());
-        snapshot.put(searchedEntity.get());
-        return searchedEntity;
+        return Optional.empty();
     }
 
     @Override
     public Object addEntity(Object entity) {
-        var insertedEntity = entityPersister.insert(entity);
-        initInsertedEntityId(entity, insertedEntity);
-
         entityCache.put(entity);
         snapshot.put(entity);
         return entity;
     }
 
-    private void initInsertedEntityId(Object entity,
-                                  Object insertedEntity) {
-        var insertedEntityId = PrimaryKeyClause.primaryKeyValue(insertedEntity);
-
-        var idField = Arrays.stream(entity.getClass().getDeclaredFields()).filter(x -> x.isAnnotationPresent(Id.class)).findAny().get();
-        idField.setAccessible(true);
-        try {
-            idField.set(entity, insertedEntityId);
-        } catch (IllegalAccessException e) {
-            throw new UnableToChangeIdException();
-        }
-    }
-
-
     @Override
     public Object updateEntity(Object entity, Long id) {
-        var updatedEntity = entityPersister.update(entity, id);
-        initInsertedEntityId(entity, updatedEntity);
-
         entityCache.put(entity);
         snapshot.put(entity);
         return entity;
@@ -80,7 +49,6 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void removeEntity(Object entity) {
-        entityPersister.delete(entity);
         entityCache.remove(entity);
         snapshot.remove(entity);
     }

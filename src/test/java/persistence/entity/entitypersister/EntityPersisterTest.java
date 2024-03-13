@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.loader.EntityLoader;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persister.EntityPersister;
@@ -20,7 +21,7 @@ class EntityPersisterTest {
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
     private EntityPersister entityPersister;
-    private EntityManager entityManager;
+    private EntityLoader entityLoader;
 
     @BeforeAll
     static void setupOnce() {
@@ -39,8 +40,8 @@ class EntityPersisterTest {
         String query = new CreateQueryBuilder(Person.class).getQuery();
         jdbcTemplate.execute(query);
 
-        entityManager = new EntityManagerImpl(jdbcTemplate);
         entityPersister = new EntityPersister(jdbcTemplate);
+        entityLoader = new EntityLoader(jdbcTemplate);
     }
 
     @AfterEach
@@ -63,7 +64,7 @@ class EntityPersisterTest {
         entityPersister.insert(testFixture);
 
         // then
-        Person actual = entityManager.find(Person.class, 1L).get();
+        Person actual = entityLoader.find(Person.class, 1L).get();
         Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
         Assertions.assertThat(actual).isEqualTo(expected);
     }
@@ -94,6 +95,6 @@ class EntityPersisterTest {
         entityPersister.delete(person_아이디있음);
 
         // then
-        Assertions.assertThat(entityManager.find(Person.class, 1L)).isEmpty();
+        Assertions.assertThat(entityLoader.find(Person.class, 1L)).isEmpty();
     }
 }

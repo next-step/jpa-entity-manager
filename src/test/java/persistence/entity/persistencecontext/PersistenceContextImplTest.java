@@ -36,7 +36,7 @@ class PersistenceContextImplTest {
     }
     @BeforeEach
     void setUp() {
-        persistenceContext = new PersistenceContextImpl(jdbcTemplate);
+        persistenceContext = new PersistenceContextImpl();
 
         String queryPerson = new CreateQueryBuilder(Person.class).getQuery();
         jdbcTemplate.execute(queryPerson);
@@ -58,8 +58,8 @@ class PersistenceContextImplTest {
     @Test
     void getEntityTwoResults() {
         // given
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var dog = new Dog("바둑이");
+        var person = new Person(1L,"김철수", 21, "chulsoo.kim@gmail.com", 11);
+        var dog = new Dog(1L, "바둑이");
         persistenceContext.addEntity(person);
         persistenceContext.addEntity(dog);
 
@@ -68,11 +68,8 @@ class PersistenceContextImplTest {
         var actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
 
         // then
-        var expectedPerson = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", null);
-        Assertions.assertThat(actualPerson).isEqualTo(expectedPerson);
-
-        Dog expectedDog = new Dog(1L, "바둑이");
-        Assertions.assertThat(actualDog).isEqualTo(expectedDog);
+        Assertions.assertThat(actualPerson).isSameAs(person);
+        Assertions.assertThat(actualDog).isSameAs(dog);
     }
 
     @DisplayName("존재하지 않는 값을 조회시, 리턴 객체는 빈값이다.")
@@ -86,7 +83,7 @@ class PersistenceContextImplTest {
         var actual = persistenceContext.getEntity(Person.class, 2L);
 
         // then
-        Assertions.assertThat(actual).isEqualTo(Optional.empty());
+        Assertions.assertThat(actual).isEmpty();
     }
 
 
@@ -94,7 +91,7 @@ class PersistenceContextImplTest {
     @Test
     void addEntity() {
         // given
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        var person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
 
         // when
         persistenceContext.addEntity(person);
@@ -109,17 +106,16 @@ class PersistenceContextImplTest {
     @Test
     void removeEntity() {
         // given
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var person_id있음 = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        var person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
         persistenceContext.addEntity(person);
 
         // when
         var entityBeforeDelete = persistenceContext.getEntity(Person.class, 1L);
-        persistenceContext.removeEntity(person_id있음);
+        persistenceContext.removeEntity(person);
         var entityAfterDelete = persistenceContext.getEntity(Person.class, 1L);
 
         // then
-        Assertions.assertThat(entityBeforeDelete.get()).isEqualTo(person_id있음);
+        Assertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
         Assertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
     }
 }
