@@ -1,6 +1,7 @@
 package persistence.sql.mapping;
 
 import jakarta.persistence.Entity;
+import persistence.model.EntityMetaDataMapping;
 import persistence.sql.QueryException;
 
 import java.util.List;
@@ -10,8 +11,9 @@ public class TableBinder {
     private final ColumnBinder columnBinder = new ColumnBinder(ColumnTypeMapper.getInstance());
 
     public Table createTable(final Object object) {
-        final Table table = new Table(toTableName(object.getClass()));
-        final List<Column> columns = columnBinder.createColumns(object);
+        final Class<?> entityClass = object.getClass();
+        final Table table = new Table(toTableName(entityClass));
+        final List<Column> columns = columnBinder.createColumns(EntityMetaDataMapping.getMetaData(entityClass.getName()), object);
         table.addColumns(columns);
 
         return table;
@@ -19,7 +21,7 @@ public class TableBinder {
 
     public Table createTable(final Class<?> clazz) {
         final Table table = new Table(toTableName(clazz));
-        final List<Column> columns = columnBinder.createColumns(clazz);
+        final List<Column> columns = columnBinder.createColumns(EntityMetaDataMapping.getMetaData(clazz.getName()));
         table.addColumns(columns);
 
         return table;

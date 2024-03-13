@@ -10,7 +10,7 @@ import persistence.sql.ddl.PersonV3;
 import java.util.List;
 
 @JdbcServerTest
-public abstract class JdbcServerDmlQueryTestSupport {
+public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSupport {
 
     protected static JdbcTemplate jdbcTemplate;
 
@@ -36,17 +36,6 @@ public abstract class JdbcServerDmlQueryTestSupport {
         for (String tableName : tableNames) {
             jdbcTemplate.execute("DROP TABLE IF EXISTS " + tableName + " CASCADE");
         }
-    }
-
-    protected PersonV3 generatePersonV3Stub(final Long id) {
-        final String name = "name";
-        final int age = 20;
-        final String email = "email@domain.com";
-        return new PersonV3(id, name, age, email, 1);
-    }
-
-    protected PersonV3 generatePersonV3Stub() {
-        return generatePersonV3Stub(0L);
     }
 
     protected String generateUserTableStubInsertQuery(final PersonV3 person) {

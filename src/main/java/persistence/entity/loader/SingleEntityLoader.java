@@ -1,6 +1,7 @@
-package persistence.entity;
+package persistence.entity.loader;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityRowMapper;
 import persistence.sql.QueryException;
 import persistence.sql.dml.*;
 import persistence.sql.mapping.*;

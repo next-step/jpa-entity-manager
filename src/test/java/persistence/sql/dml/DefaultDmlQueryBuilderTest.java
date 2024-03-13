@@ -1,8 +1,8 @@
 package persistence.sql.dml;
 
-import jakarta.persistence.GenerationType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.EntityMetaDataTestSupport;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DefaultDmlQueryBuilderTest {
+class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
 
     private final TableBinder tableBinder = new TableBinder();
     private final ColumnBinder columnBinder = new ColumnBinder(ColumnTypeMapper.getInstance());

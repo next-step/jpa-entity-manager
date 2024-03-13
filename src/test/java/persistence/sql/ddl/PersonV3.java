@@ -52,4 +52,24 @@ public class PersonV3 {
     public Integer getIndex() {
         return index;
     }
+
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setAge(final Integer age) {
+        this.age = age;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+
+    public void setIndex(final Integer index) {
+        this.index = index;
+    }
 }

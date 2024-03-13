@@ -3,6 +3,9 @@ package persistence.entity;
 import jdbc.RowMapper;
 import org.junit.jupiter.api.*;
 import persistence.JdbcServerDmlQueryTestSupport;
+import persistence.PersonV3FixtureFactory;
+import persistence.entity.persister.EntityPersister;
+import persistence.entity.persister.SingleTableEntityPersister;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -20,7 +23,8 @@ class SingleTableEntityPersisterTest extends JdbcServerDmlQueryTestSupport {
     private final TableBinder tableBinder = new TableBinder();
     private final Dialect dialect = new H2Dialect();
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
-    private final EntityPersister entityPersister = new SingleTableEntityPersister(tableBinder, dmlQueryBuilder, jdbcTemplate);
+    private final Class<PersonV3> personV3Class = PersonV3.class;
+    private final EntityPersister entityPersister = new SingleTableEntityPersister(personV3Class.getName(), tableBinder, dmlQueryBuilder, jdbcTemplate, personV3Class);
     private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersonV3.class);
 
     @AfterEach
@@ -33,7 +37,7 @@ class SingleTableEntityPersisterTest extends JdbcServerDmlQueryTestSupport {
     @Order(0)
     public void update() throws Exception {
         // given
-        final PersonV3 person = generatePersonV3Stub();
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
         final String insertQuery = generateUserTableStubInsertQuery(person);
         jdbcTemplate.execute(insertQuery);
 
@@ -72,7 +76,7 @@ class SingleTableEntityPersisterTest extends JdbcServerDmlQueryTestSupport {
     @Test
     public void delete() throws Exception {
         // given
-        final PersonV3 person = generatePersonV3Stub();
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
         final String insertQuery = generateUserTableStubInsertQuery(person);
         jdbcTemplate.execute(insertQuery);
 

@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.loader;
 
 public interface EntityLoader {
 

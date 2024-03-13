@@ -28,4 +28,9 @@ public class PrimaryKey {
     public void addColumn(final Column column) {
         this.columns.add(column);
     }
+
+    public boolean hasIdentifierKey() {
+        return this.columns.stream()
+                .anyMatch(Column::isIdentifierKey);
+    }
 }
