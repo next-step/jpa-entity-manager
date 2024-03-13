@@ -18,6 +18,8 @@ public interface EntityManager {
      */
     Object persist(Object entity);
 
+    Object merge(Object entity);
+
     /**
      * 제거
      * @param entity 삭제 대상

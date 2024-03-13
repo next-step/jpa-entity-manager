@@ -1,7 +1,7 @@
 package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
-import persistence.entity.exception.FailedPersistException;
+import persistence.entity.exception.EntityExistsException;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.sql.ddl.PrimaryKeyClause;
@@ -29,16 +29,21 @@ public class EntityManagerImpl implements EntityManager {
         var primaryKey = PrimaryKeyClause.primaryKeyValue(entity);
         var searchedEntity = persistenceContext.getEntity(entity.getClass(), primaryKey);
 
-        if (searchedEntity.isEmpty()) {
-            return persistenceContext.addEntity(entity);
+        if (searchedEntity.isPresent()) {
+            throw new EntityExistsException();
         }
+        return persistenceContext.addEntity(entity);
+    }
 
-       var snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
+    @Override
+    public Object merge(Object entity) {
+        var primaryKey = PrimaryKeyClause.primaryKeyValue(entity);
+        var snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
 
         if (snapshot != entity) {
             return persistenceContext.updateEntity(entity, primaryKey);
         }
-        throw new FailedPersistException();
+        return entity;
     }
 
     @Override
