@@ -28,8 +28,7 @@ public class EntityPersister {
     public Object insert(Object entity) {
         Class<?> clazz = entity.getClass();
         String queryToInsert = new InsertQueryBuilder(clazz).getInsertQuery(entity);
-        Long id = jdbcTemplate.execute(queryToInsert);
-
+        Long id = jdbcTemplate.executeUpdate(queryToInsert);
         initId(entity, id);
         return entity;
     }
