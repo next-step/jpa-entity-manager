@@ -1,38 +1,33 @@
 package persistence.entity;
 
-import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dialect.Dialect;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.conditions.WhereRecord;
-
-import java.util.List;
 
 public class SimpleEntityManager implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
-    private final Dialect dialect;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
     public SimpleEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.dialect = dialect;
         this.entityPersister = new EntityPersister(jdbcTemplate, dialect);
+        this.entityLoader = new EntityLoader(jdbcTemplate, dialect);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long Id) {
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.builder()
-                .dialect(dialect)
-                .entity(clazz)
-                .where(List.of(WhereRecord.of("id", "=", Id)))
-                .build();
-
-        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> new EntityRowMapper<>(clazz).mapRow(resultSet));
+        return entityLoader.find(clazz, Id);
     }
 
     @Override
     public Object persist(Object entity) {
-        entityPersister.insert(entity);
+        try {
+            Object findEntity = entityLoader.findByEntity(entity);
+            if (!entity.equals(findEntity)) {
+                entityPersister.update(entity);
+            }
+        } catch (RuntimeException e) {
+            entityPersister.insert(entity);
+        }
+
         return entity;
     }
 

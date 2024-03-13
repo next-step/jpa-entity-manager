@@ -25,11 +25,11 @@ public class EntityMetadata {
     }
 
     public static EntityMetadata of(Class<?> clazz) {
-        return new EntityMetadata(generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, null)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz)));
+        return new EntityMetadata(generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, null)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, null)));
     }
 
     public static EntityMetadata of(Class<?> clazz, Object object) {
-        return new EntityMetadata(generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, object)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz)));
+        return new EntityMetadata(generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, object)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, object)));
     }
 
     private static String generateTableName(Class<?> clazz) {
@@ -46,8 +46,8 @@ public class EntityMetadata {
         return convertCamelCaseToSnakeCase(clazz.getSimpleName());
     }
 
-    protected static ColumnMetadata generatePrimaryKey(Class<?> clazz) {
-        return createColumns(clazz, null).stream()
+    protected static ColumnMetadata generatePrimaryKey(Class<?> clazz, Object entity) {
+        return createColumns(clazz, entity).stream()
                 .filter(column -> column.getAnnotations().stream()
                         .anyMatch(annotation -> annotation.annotationType().equals(Id.class)))
                 .findFirst()
