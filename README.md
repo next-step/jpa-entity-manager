@@ -22,7 +22,7 @@
 ## 🚀 3단계 - First Level Cache, Dirty Check
 
 ### 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
-- 
+- entitiesByKey 에서 id로 엔티티 조회할 수 있도록 1차 캐싱 적용
 
 ### 요구사항2 - snapshot 만들기
 
