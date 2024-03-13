@@ -24,12 +24,7 @@ public class EntitySnapshot {
 
         final Map<String, Object> thatValues = entityMetaData.extractValues(entity);
 
-        for (final String fieldName : thatValues.keySet()) {
-            if (!Objects.deepEquals(thatValues.get(fieldName), values.get(fieldName))) {
-                return false;
-            }
-        }
-
-        return true;
+        return thatValues.keySet().stream()
+                .allMatch(fieldName -> Objects.deepEquals(thatValues.get(fieldName), values.get(fieldName)));
     }
 }
