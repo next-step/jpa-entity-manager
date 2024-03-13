@@ -19,9 +19,13 @@ public class DefaultEntityLoader implements EntityLoader {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(clazz);
-        String sql = dmlQueryBuilder.selectByIdQuery(entityMetadata.getTableName(), entityMetadata.getColumns(), id);
+        try {
+            EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(clazz);
+            String sql = dmlQueryBuilder.selectByIdQuery(entityMetadata.getTableName(), entityMetadata.getColumns(), id);
 
-        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
+            return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Entity not found", e);
+        }
     }
 }

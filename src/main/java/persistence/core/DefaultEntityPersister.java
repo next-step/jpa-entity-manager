@@ -45,4 +45,9 @@ public class DefaultEntityPersister implements EntityPersister {
         entityMetadata.setValue(entity, entityMetadata.getIdColumn().getColumnName(), id);
     }
 
+    public Long getIdentifier(Object entity) {
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(entity.getClass());
+        return (Long) entityMetadata.getIdColumn().getValue(entity);
+    }
+
 }

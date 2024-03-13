@@ -10,4 +10,6 @@ public interface EntityPersister {
 
     void setIdentifier(Object entity, Object id);
 
+    Long getIdentifier(Object entity);
+
 }
