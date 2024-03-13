@@ -18,6 +18,7 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 import pojo.EntityMetaData;
+import pojo.EntityStatus;
 
 import java.sql.SQLException;
 
@@ -36,6 +37,7 @@ class EntityPersisterImplTest {
     static EntityLoader entityLoader;
     static SimpleEntityManager simpleEntityManager;
     static PersistenceContext persistenceContext;
+    static EntityEntry entityEntry;
 
     Person3 person;
 
@@ -48,7 +50,8 @@ class EntityPersisterImplTest {
         entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
-        simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
+        entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
+        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
     }
 
     @BeforeEach

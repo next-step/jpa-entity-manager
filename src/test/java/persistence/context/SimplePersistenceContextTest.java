@@ -17,17 +17,20 @@ import persistence.entity.EntityLoaderImpl;
 import persistence.entity.EntityPersister;
 import persistence.entity.EntityPersisterImpl;
 import persistence.entity.EntitySnapshot;
+import persistence.entity.SimpleEntityEntry;
 import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
 import pojo.EntityMetaData;
+import pojo.EntityStatus;
 import pojo.FieldInfos;
 import pojo.IdField;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SimplePersistenceContextTest {
@@ -41,6 +44,7 @@ class SimplePersistenceContextTest {
     static EntityLoader entityLoader;
     static SimpleEntityManager simpleEntityManager;
     static PersistenceContext persistenceContext;
+    static SimpleEntityEntry entityEntry;
 
     Person3 person;
 
@@ -53,7 +57,8 @@ class SimplePersistenceContextTest {
         entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
-        simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
+        entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
+        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
     }
 
     @BeforeEach
@@ -76,7 +81,7 @@ class SimplePersistenceContextTest {
     @Test
     void addEntityAndGetCachedDatabaseSnapshotTest() {
         insertData();
-        simpleEntityManager.find(person, person.getClass(), person.getId());
+        findData();
 
         EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getDatabaseSnapshot(person.getId(), person);
 
@@ -86,14 +91,71 @@ class SimplePersistenceContextTest {
         assertEquals(cachedDatabaseSnapshot.getMap().get(idField.getFieldNameData()), Long.toString(person.getId()));
     }
 
+    @DisplayName("EntityStatus 확인 - save and find")
+    @Test
+    void saveAndFindEntityStatusTest() {
+        insertData();
+        assertThat(entityEntry.getEntityStatus()).isEqualTo(EntityStatus.MANAGED);
+
+        findData();
+        assertThat(entityEntry.getEntityStatus()).isEqualTo(EntityStatus.MANAGED);
+    }
+
+    @DisplayName("EntityStatus 확인 - gone 상태가 된 entity 조회 시 오류")
+    @Test
+    void removeAndFindEntityStatusExceptionTest() {
+        insertData();
+        removeData();
+
+        assertThatThrownBy(this::findData).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(this::findData).hasMessageContaining("object not found exception");
+    }
+
+    @DisplayName("EntityStatus 확인 - update")
+    @Test
+    void updateEntityStatusTest() {
+        insertData();
+        updateData(new Person3(person.getId(), "tester", 50, "tester@test.com"));
+        assertThat(entityEntry.getEntityStatus()).isEqualTo(EntityStatus.MANAGED);
+    }
+
+    @DisplayName("EntityStatus 확인 - readOnly 시 update 수행 오류")
+    @Test
+    void updateEntityStatusExceptionTest() {
+        insertData();
+        entityEntry.preReadOnly();
+        assertThatThrownBy(() -> updateData(new Person3(person.getId(), "tester", 50, "tester@test.com")))
+                .isInstanceOf(IllegalStateException.class);
+        entityEntry.preFind();
+    }
+
+    @DisplayName("EntityStatus 확인 - remove")
+    @Test
+    void removeEntityStatusTest() {
+        insertData();
+        removeData();
+        assertThat(entityEntry.getEntityStatus()).isEqualTo(EntityStatus.GONE);
+    }
+
     private void createTable() {
         CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(dialect, entityMetaData);
         jdbcTemplate.execute(createQueryBuilder.createTable(person));
     }
 
+    private Person3 findData() {
+        return simpleEntityManager.find(person, person.getClass(), person.getId());
+    }
+
     private void insertData() {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMetaData);
-        jdbcTemplate.execute(updateQueryBuilder.insertQuery(person));
+        simpleEntityManager.persist(person);
+    }
+
+    private void updateData(Person3 updatedPerson) {
+        simpleEntityManager.update(updatedPerson);
+    }
+
+    private void removeData() {
+        simpleEntityManager.remove(person);
     }
 
     private void dropTable() {
