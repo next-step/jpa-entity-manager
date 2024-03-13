@@ -1,7 +1,7 @@
 package persistence.entity;
 
+import persistence.sql.ddl.domain.Column;
 import persistence.sql.ddl.domain.Columns;
-import persistence.sql.dml.domain.Value;
 
 public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 
@@ -21,8 +21,19 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 
     private boolean isNew(T entity) {
         Columns columns = new Columns(entity.getClass());
-        Object id = new Value(columns.getPrimaryKeyColumn(), entity).getOriginValue();
-        return id == null;
+        Column primaryKeyColumn = columns.getPrimaryKeyColumn();
+
+        Object id = columns.getOriginValue(entity);
+        Class<?> idType = primaryKeyColumn.getField().getType();
+
+        if (!idType.isPrimitive()) {
+            return id == null;
+        }
+        if (id instanceof Number) {
+            return ((Number) id).longValue() == 0L;
+        }
+
+        throw new IllegalArgumentException(String.format("Unsupported primitive id type %s", idType));
     }
 
 }

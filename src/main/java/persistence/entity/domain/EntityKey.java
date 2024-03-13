@@ -1,5 +1,7 @@
 package persistence.entity.domain;
 
+import persistence.sql.ddl.domain.Columns;
+
 import java.util.Objects;
 
 public class EntityKey {
@@ -10,6 +12,12 @@ public class EntityKey {
     public EntityKey(Class<?> clazz, Object id) {
         this.clazz = clazz;
         this.id = id;
+    }
+
+    public EntityKey(Object entity) {
+        this.clazz = entity.getClass();
+        Columns columns = new Columns(entity.getClass());
+        this.id = columns.getOriginValue(entity);
     }
 
     @Override

@@ -41,17 +41,18 @@ class EntityManagerImplTest {
     @DisplayName("EntityManager 이용한 Person 조회 테스트")
     void entityManagerFindTest() {
         // given
-        jdbcTemplate.execute(new InsertQueryBuilder(new Person("jay", 30, "jay@gmail.com")).build());
+        Person expectedPerson = new Person("jay", 30, "jay@gmail.com");
+        entityManager.persist(expectedPerson);
 
         // when
-        Person person = entityManager.find(Person.class, 1L);
+        Person person = entityManager.find(Person.class, expectedPerson.getId());
 
         // then
         assertAll(
-                () -> assertThat(person.getId()).isEqualTo(1L),
-                () -> assertThat(person.getName()).isEqualTo("jay"),
-                () -> assertThat(person.getAge()).isEqualTo(30),
-                () -> assertThat(person.getEmail()).isEqualTo("jay@gmail.com")
+                () -> assertThat(person.getId()).isEqualTo(expectedPerson.getId()),
+                () -> assertThat(person.getName()).isEqualTo(expectedPerson.getName()),
+                () -> assertThat(person.getAge()).isEqualTo(expectedPerson.getAge()),
+                () -> assertThat(person.getEmail()).isEqualTo(expectedPerson.getEmail())
         );
     }
 
@@ -69,13 +70,14 @@ class EntityManagerImplTest {
     @DisplayName("EntityManager 이용한 Person 삭제 테스트")
     void entityManagerRemoveTest() {
         // given
-        jdbcTemplate.execute(new InsertQueryBuilder(new Person("jay", 30, "jay@gmail.com")).build());
+        Person person = new Person("jay", 30, "jay@gmail.com");
+        entityManager.persist(person);
 
         // when
-        entityManager.remove(new Person(1L, "jay", 30, "jay@gmail.com"));
+        entityManager.remove(person);
 
         // then
-        assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
+        assertThatThrownBy(() -> entityManager.find(Person.class, person.getId()))
                 .isInstanceOf(RuntimeException.class);
     }
 

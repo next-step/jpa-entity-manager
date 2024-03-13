@@ -1,7 +1,9 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.domain.EntityEntry;
 import persistence.entity.domain.EntitySnapshot;
+import persistence.entity.domain.EntityStatus;
 import persistence.entity.persistence.PersistenceContext;
 import persistence.entity.persistence.PersistenceContextImpl;
 import persistence.sql.ddl.domain.Columns;
@@ -26,7 +28,10 @@ public class EntityManagerImpl implements EntityManager {
         T entity = persistenceContext.getEntity(clazz, id);
         if (entity == null) {
             entity = entityLoader.find(clazz, id);
+            EntityEntry entityEntry = new EntityEntry(EntityStatus.LOADING);
+            persistenceContext.addEntityEntry(entity, entityEntry);
             createCache(entity, id);
+            entityEntry.updateStatus(EntityStatus.MANAGED);
             return entity;
         }
         return entity;
@@ -34,17 +39,23 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
+        EntityEntry entityEntry = new EntityEntry(EntityStatus.SAVING);
         Object id = entityPersister.insert(entity);
         Columns columns = new Columns(entity.getClass());
         columns.setPkValue(entity, id);
+        persistenceContext.addEntityEntry(entity, entityEntry);
         createCache(entity, id);
+        entityEntry.updateStatus(EntityStatus.MANAGED);
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        entityEntry.updateStatus(EntityStatus.DELETED);
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
+        entityEntry.updateStatus(EntityStatus.GONE);
     }
 
     @Override
@@ -57,6 +68,7 @@ public class EntityManagerImpl implements EntityManager {
         if (!Objects.equals(before.getSnapshot(), after.getSnapshot())) {
             entityPersister.update(entity);
             createCache(entity, id);
+            persistenceContext.addEntityEntry(entity, new EntityEntry(EntityStatus.MANAGED));
         }
         return entity;
     }

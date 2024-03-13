@@ -18,6 +18,7 @@ public interface Column {
         try {
             getField().setAccessible(true);
             getField().set(entity, value);
+            getField().setAccessible(false);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
