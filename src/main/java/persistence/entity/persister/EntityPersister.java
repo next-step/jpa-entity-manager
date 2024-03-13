@@ -43,15 +43,6 @@ public class EntityPersister {
             throw new UnableToChangeIdException();
         }
     }
-
-    private Object findInsertedRow(Class<?> clazz) {
-        String queryToFindAll = new SelectQueryBuilder(clazz).getFindAllQuery();
-
-        return jdbcTemplate.query(queryToFindAll, new DtoMapper<>(clazz))
-                .stream()
-                .reduce((first, second) -> second).get();
-    }
-
     public void delete(Object entity) {
         Long id = PrimaryKeyClause.primaryKeyValue(entity);
         String query = new DeleteQueryBuilder(entity.getClass()).deleteById(id);
