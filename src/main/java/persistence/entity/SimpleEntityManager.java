@@ -2,6 +2,7 @@ package persistence.entity;
 
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.StatefulPersistenceContext;
+import persistence.entity.context.cache.EntitySnapshot;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persister.EntityPersister;
 import persistence.model.MappingMetaModel;
@@ -34,8 +35,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T persist(final T entity) {
-        final String entityName = entity.getClass().getName();
-        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entityName);
+        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entity);
 
         final Object key = persister.insert(entity);
         persister.setIdentifier(entity, key);
@@ -47,14 +47,14 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T merge(final T entity) {
-        final String entityName = entity.getClass().getName();
-        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entityName);
+        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entity);
 
         final Object identifier = persister.getIdentifier(entity);
-        final boolean isDirty = persistenceContext.checkDirty(identifier, entity);
+        final EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(identifier, entity);
 
-        if (isDirty) {
+        if (snapshot.isSame(entity)) {
             persister.update(entity);
+            persistenceContext.addEntity(identifier, entity);
         }
 
         return entity;
@@ -62,8 +62,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void remove(final Object entity) {
-        final String entityName = entity.getClass().getName();
-        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entityName);
+        final EntityPersister persister = mappingMetaModel.getEntityDescriptor(entity);
 
         final Object identifier = persister.getIdentifier(entity);
         persistenceContext.removeEntity(identifier, entity);

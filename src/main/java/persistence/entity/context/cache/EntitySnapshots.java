@@ -11,6 +11,10 @@ public class EntitySnapshots {
         entitySnapshots.put(entityKey, new EntitySnapshot(entity));
     }
 
+    public EntitySnapshot get(final EntityKey<?> entityKey, final Object entity) {
+        return entitySnapshots.computeIfAbsent(entityKey, key -> new EntitySnapshot(entity));
+    }
+
     public void remove(final EntityKey<?> entityKey) {
         entitySnapshots.remove(entityKey);
     }

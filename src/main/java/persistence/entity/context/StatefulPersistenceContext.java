@@ -1,6 +1,7 @@
 package persistence.entity.context;
 
 import persistence.entity.context.cache.EntityKey;
+import persistence.entity.context.cache.EntitySnapshot;
 import persistence.entity.context.cache.EntitySnapshots;
 import persistence.entity.context.cache.PersistenceCache;
 
@@ -30,9 +31,9 @@ public class StatefulPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public boolean checkDirty(final Object key, final Object entity) {
-        final EntityKey<?> entityKey = generateEntityKey(key, entity.getClass().getName());
-        return !this.snapshots.compareWithSnapshot(entityKey, entity);
+    public EntitySnapshot getDatabaseSnapshot(final Object key, final Object entity) {
+        final EntityKey<Object> entityKey = generateEntityKey(key, entity.getClass().getName());
+        return this.snapshots.get(entityKey, entity);
     }
 
     private <T> EntityKey<T> generateEntityKey(final Object key, final String className) {
