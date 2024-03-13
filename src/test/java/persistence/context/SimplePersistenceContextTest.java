@@ -22,10 +22,10 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 import pojo.EntityMetaData;
-import pojo.FieldInfo;
 import pojo.FieldInfos;
-import pojo.FieldName;
+import pojo.IdField;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +50,7 @@ class SimplePersistenceContextTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect, entityMetaData);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
         simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
@@ -76,14 +76,14 @@ class SimplePersistenceContextTest {
     @Test
     void addEntityAndGetCachedDatabaseSnapshotTest() {
         insertData();
-        simpleEntityManager.find(person.getClass(), person.getId());
+        simpleEntityManager.find(person, person.getClass(), person.getId());
 
-        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(person.getId(), person);
+        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getDatabaseSnapshot(person.getId(), person);
 
-        FieldInfo idFieldData = new FieldInfos(person.getClass().getDeclaredFields()).getIdFieldData();
-        FieldName idFieldName = new FieldName(idFieldData.getField());
+        Field field = new FieldInfos(person.getClass().getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, person);
 
-        assertEquals(cachedDatabaseSnapshot.getMap().get(idFieldName.getName()), Long.toString(person.getId()));
+        assertEquals(cachedDatabaseSnapshot.getMap().get(idField.getFieldNameData()), Long.toString(person.getId()));
     }
 
     private void createTable() {
@@ -92,7 +92,7 @@ class SimplePersistenceContextTest {
     }
 
     private void insertData() {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMetaData);
         jdbcTemplate.execute(updateQueryBuilder.insertQuery(person));
     }
 

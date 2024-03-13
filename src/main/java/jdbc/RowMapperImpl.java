@@ -1,6 +1,5 @@
 package jdbc;
 
-import pojo.FieldInfo;
 import pojo.FieldInfos;
 import pojo.FieldName;
 
@@ -26,9 +25,7 @@ public class RowMapperImpl<T> implements RowMapper<T> {
             throw new IllegalStateException("클래스 인스턴스 생성 실패했습니다.", e);
         }
 
-        new FieldInfos(object.getClass().getDeclaredFields()).getIdAndColumnFieldsData()
-                .stream()
-                .map(FieldInfo::getField)
+        new FieldInfos(object.getClass().getDeclaredFields()).getIdAndColumnFields()
                 .forEach(field -> {
                     field.setAccessible(true);
                     try {

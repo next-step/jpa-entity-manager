@@ -44,11 +44,11 @@ class CustomJpaRepositoryTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect, entityMetaData);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
         simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
-        jpaRepository = new CustomJpaRepository(dialect, simpleEntityManager);
+        jpaRepository = new CustomJpaRepository(simpleEntityManager);
     }
 
     @BeforeEach
@@ -76,7 +76,7 @@ class CustomJpaRepositoryTest {
         Person3 updatedPerson = new Person3(person.getId(), "test2", 30, "test2@test.com");
         jpaRepository.save(updatedPerson);
 
-        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(person.getId(), person);
+        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getDatabaseSnapshot(person.getId(), person);
         Map<String, Object> map = cachedDatabaseSnapshot.getMap();
 
         assertEquals(Long.valueOf(String.valueOf(map.get("id"))), updatedPerson.getId());

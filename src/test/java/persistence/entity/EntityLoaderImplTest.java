@@ -43,7 +43,7 @@ class EntityLoaderImplTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect, entityMetaData);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
         simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
@@ -69,7 +69,7 @@ class EntityLoaderImplTest {
     @Test
     void findByIdTest() {
         entityPersister.insert(person);
-        Person3 person3 = entityLoader.findById(person.getClass(), person.getId());
+        Person3 person3 = entityLoader.findById(person.getClass(), person, person.getId());
         assertAll(
                 () -> assertThat(person3.getId()).isEqualTo(person.getId()),
                 () -> assertThat(person3.getName()).isEqualTo(person.getName()),

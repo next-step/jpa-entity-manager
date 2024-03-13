@@ -16,7 +16,7 @@ public abstract class Dialect {
         javaClassToTypeMap.put(clazz, code);
     }
 
-    public Class<?> getClassByType(Integer javaType) {
+    public Class<?> getClassByJavaType(Integer javaType) {
         return javaTypeToClassMap.get(javaType);
     }
 
@@ -31,6 +31,4 @@ public abstract class Dialect {
     public abstract String getTypeToStr(Class<?> clazz);
 
     public abstract void checkJavaType(Integer typeCode);
-
-    public abstract boolean isVarcharType(Class<?> type);
 }

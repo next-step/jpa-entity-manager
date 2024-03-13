@@ -45,7 +45,7 @@ class EntityPersisterImplTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, dialect, entityMetaData);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
         persistenceContext = new SimplePersistenceContext();
         simpleEntityManager = new SimpleEntityManager(dialect, entityPersister, entityLoader, persistenceContext);
@@ -71,7 +71,7 @@ class EntityPersisterImplTest {
     @Test
     void insertTest() {
         entityPersister.insert(person);
-        Person3 person3 = simpleEntityManager.find(person.getClass(), person.getId());
+        Person3 person3 = simpleEntityManager.find(person, person.getClass(), person.getId());
         assertAll(
                 () -> assertThat(person3.getId()).isEqualTo(person.getId()),
                 () -> assertThat(person3.getName()).isEqualTo(person.getName()),
@@ -93,7 +93,7 @@ class EntityPersisterImplTest {
     void deleteTest() {
         insertData();
         entityPersister.delete(person);
-        assertThrows(RuntimeException.class, () -> entityLoader.findById(person.getClass(), person.getId()));
+        assertThrows(RuntimeException.class, () -> entityLoader.findById(person.getClass(), person, person.getId()));
     }
 
     private void createTable() {
@@ -102,7 +102,7 @@ class EntityPersisterImplTest {
     }
 
     private void insertData() {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityMetaData);
         jdbcTemplate.execute(updateQueryBuilder.insertQuery(person));
     }
 

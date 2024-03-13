@@ -27,12 +27,12 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> T find(Object entity, Class<T> clazz, Long id) {
         T cachedEntity = persistenceContext.getEntity(clazz, id);
         if (Objects.nonNull(cachedEntity)) {
             return cachedEntity;
         }
-        T loadedEntity = entityLoader.findById(clazz, id);
+        T loadedEntity = entityLoader.findById(clazz, entity, id);
         persistenceContext.addEntity(id, loadedEntity);
         return loadedEntity;
     }
@@ -61,14 +61,13 @@ public class SimpleEntityManager implements EntityManager {
      */
     @Override
     public <T> T merge(T entity) {
-        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getCachedDatabaseSnapshot(entity);
-        EntitySnapshot entitySnapshot = new EntitySnapshot(dialect, entity);
+        EntitySnapshot cachedDatabaseSnapshot = persistenceContext.getDatabaseSnapshot(entity);
+        EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
 
         if (!Objects.equals(cachedDatabaseSnapshot, entitySnapshot)) {
             update(entity);
+            persistenceContext.addEntity(entity);
         }
-
-        persistenceContext.addEntity(entity);
         return entity;
     }
 }

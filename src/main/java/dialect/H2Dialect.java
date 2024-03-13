@@ -21,6 +21,7 @@ public class H2Dialect extends Dialect {
         map.put(Types.VARCHAR, "varchar");
     }
 
+    @Override
     public String getTypeToStr(Class<?> clazz) {
         return map.get(getJavaTypeByClass(clazz));
     }
@@ -30,10 +31,5 @@ public class H2Dialect extends Dialect {
         if (!super.containsJavaType(typeCode)) {
             throw new IllegalStateException("지원하는 javaType 이 아닙니다.");
         }
-    }
-
-    @Override
-    public boolean isVarcharType(Class<?> type) {
-        return getJavaTypeByClass(type).equals(Types.VARCHAR);
     }
 }
