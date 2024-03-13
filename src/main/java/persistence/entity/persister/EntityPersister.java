@@ -1,12 +1,16 @@
 package persistence.entity.persister;
 
+import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
+import persistence.entity.exception.UnableToChangeIdException;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.PrimaryKeyClause;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
+
+import java.util.Arrays;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
@@ -17,16 +21,27 @@ public class EntityPersister {
 
     public Object update(Object entity, Long id) {
         String query = new UpdateQueryBuilder(entity.getClass()).getQuery(entity, id);
-        int result = jdbcTemplate.executeUpdate(query);
-        return findInsertedRow(entity.getClass());
+        jdbcTemplate.executeUpdate(query);
+        return entity;
     }
 
     public Object insert(Object entity) {
         Class<?> clazz = entity.getClass();
         String queryToInsert = new InsertQueryBuilder(clazz).getInsertQuery(entity);
-        jdbcTemplate.execute(queryToInsert);
+        Long id = jdbcTemplate.execute(queryToInsert);
 
-        return findInsertedRow(clazz);
+        initId(entity, id);
+        return entity;
+    }
+
+    private void initId(Object entity, Long id) {
+        var idField = Arrays.stream(entity.getClass().getDeclaredFields()).filter(x -> x.isAnnotationPresent(Id.class)).findAny().get();
+        idField.setAccessible(true);
+        try {
+            idField.set(entity, id);
+        } catch (IllegalAccessException e) {
+            throw new UnableToChangeIdException();
+        }
     }
 
     private Object findInsertedRow(Class<?> clazz) {

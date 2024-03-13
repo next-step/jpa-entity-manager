@@ -2,6 +2,7 @@ package jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +22,20 @@ public class JdbcTemplate {
         }
     }
 
-    public void execute(final String sql) {
+    public Long execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
+            return getGeneratedKey(statement);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Long getGeneratedKey(Statement statement) throws SQLException {
+        if (!statement.getGeneratedKeys().next()) {
+            return null;
+        }
+        return statement.getGeneratedKeys().getLong(1);
     }
 
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
