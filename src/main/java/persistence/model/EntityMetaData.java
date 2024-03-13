@@ -21,10 +21,7 @@ public class EntityMetaData {
     private void extractFields(final Class<?> entityClass) {
         Arrays.stream(entityClass.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
-                .forEach(field -> {
-                    field.setAccessible(true);
-                    this.fields.put(field.getName(), field);
-                });
+                .forEach(field -> this.fields.put(field.getName(), field));
     }
 
     public String getEntityName() {
@@ -48,9 +45,12 @@ public class EntityMetaData {
 
         fields.forEach((fieldName, field) -> {
             try {
+                field.setAccessible(true);
                 values.put(fieldName, field.get(entity));
             } catch (IllegalAccessException e) {
                 throw new QueryException("can't get field " + field.getName() + " at " + entity.getClass().getName());
+            } finally {
+                field.setAccessible(false);
             }
         });
 
