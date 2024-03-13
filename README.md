@@ -28,7 +28,7 @@
 
 #### 요구사항
 
-* [ ] 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
+* [x] 요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자
     * > 엔티티를 어떻게 저장할지 잘 고려해보자
     * ```java
       public interface PersistenceContext {
