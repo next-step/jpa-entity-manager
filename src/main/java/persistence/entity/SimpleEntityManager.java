@@ -2,13 +2,15 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.context.PersistenceContext;
-import persistence.context.PersistenceContextImpl;
+import persistence.context.SimplePersistenceContext;
 import persistence.sql.dialect.Dialect;
+
+import java.util.Objects;
 
 public class SimpleEntityManager implements EntityManager {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
-    private final PersistenceContext persistenceContext = new PersistenceContextImpl();
+    private final PersistenceContext persistenceContext = new SimplePersistenceContext();
 
     public SimpleEntityManager(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.entityPersister = new EntityPersister(jdbcTemplate, dialect);
@@ -17,10 +19,15 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        EntityId entityId = new EntityId(clazz, id);
-        persistenceContext.getEntity(entityId);
+        T entity = persistenceContext.getEntity(clazz, id);
 
-        return entityLoader.find(entityId);
+        if (Objects.nonNull(entity)) {
+            return entity;
+        }
+
+        Object object = entityLoader.find(EntityId.of(clazz, id));
+        persistenceContext.addEntity(id, object);
+        return clazz.cast(object);
     }
 
     @Override

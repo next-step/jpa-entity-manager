@@ -105,4 +105,18 @@ class SimpleEntityManagerTest {
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
                 .isExactlyInstanceOf(RuntimeException.class);
     }
+
+    @Test
+    @DisplayName("요구사항1 - First Level Cache")
+    void find_WithFirstLevelCache() {
+        // given
+        entityManager.persist(person);
+
+        // when
+        Person nonCachingPerson = entityManager.find(Person.class, 1L);
+        Person cachingPerson = entityManager.find(Person.class, 1L);
+
+        // then
+        assertThat(nonCachingPerson).isEqualTo(cachingPerson);
+    }
 }

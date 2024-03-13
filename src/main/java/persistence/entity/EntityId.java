@@ -6,9 +6,13 @@ public class EntityId {
     private final EntityMetadata entityMetadata;
     private final Object id;
 
-    public EntityId(Class<?> clazz, Long id) {
+    private EntityId(Class<?> clazz, Object id) {
         this.entityMetadata = EntityMetadata.of(clazz);
         this.id = id;
+    }
+
+    public static EntityId of(Class<?> clazz, Object id) {
+        return new EntityId(clazz, id);
     }
 
     public Class<?> getClazz() {
