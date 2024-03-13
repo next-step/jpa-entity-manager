@@ -17,11 +17,6 @@ public class Snapshot {
         snapshot.put(new EntityKey(clazz, PrimaryKeyClause.primaryKeyValue(entity)), entity);
     }
 
-    public void put(Long key, Object entity) {
-        var clazz = entity.getClass();
-        snapshot.put(new EntityKey(clazz, key), entity);
-    }
-
     public void remove(Object entity) {
         var key = new EntityKey(entity);
         snapshot.remove(key);

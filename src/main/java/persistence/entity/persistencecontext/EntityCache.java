@@ -17,11 +17,6 @@ public class EntityCache {
         entityCache.put(new EntityKey(clazz, PrimaryKeyClause.primaryKeyValue(entity)), entity);
     }
 
-    public void put(Long key, Object entity) {
-        var clazz = entity.getClass();
-        entityCache.put(new EntityKey(clazz, key), entity);
-    }
-
     public Object get(Class<?> clazz, Long key) {
         var entityKey = new EntityKey(clazz, key);
         var cachedEntity = entityCache.get(entityKey);

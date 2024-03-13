@@ -31,8 +31,8 @@ public class PersistenceContextImpl implements PersistenceContext {
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        entityCache.put(id, searchedEntity.get());
-        snapshot.put(id, searchedEntity.get());
+        entityCache.put(searchedEntity.get());
+        snapshot.put(searchedEntity.get());
         return searchedEntity;
     }
 
@@ -48,8 +48,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public Object updateEntity(Object entity, Long id) {
         var updatedEntity = entityPersister.update(entity, id);
-        entityCache.put(id, updatedEntity);
-        snapshot.put(id, updatedEntity);
+        entityCache.put(updatedEntity);
+        snapshot.put(updatedEntity);
         return updatedEntity;
     }
 
