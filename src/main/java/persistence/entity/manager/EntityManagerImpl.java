@@ -15,10 +15,6 @@ public class EntityManagerImpl implements EntityManager {
         this.persistenceContext = new PersistenceContextImpl(jdbcTemplate);
     }
 
-    public EntityManagerImpl(PersistenceContext persistenceContext) {
-        this.persistenceContext = persistenceContext;
-    }
-
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
         return persistenceContext.getEntity(clazz, id);
