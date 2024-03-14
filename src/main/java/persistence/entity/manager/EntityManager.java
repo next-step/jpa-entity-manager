@@ -16,9 +16,9 @@ public interface EntityManager {
      * @param entity 저장 대상
      * @return 저장 결과
      */
-    Object persist(Object entity);
+    <T> T persist(T entity);
 
-    Object merge(Object entity);
+    <T> T merge(T entity);
 
     /**
      * 제거

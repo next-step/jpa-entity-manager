@@ -1,14 +1,5 @@
 package persistence.entity.persistencecontext;
 
-import jakarta.persistence.Id;
-import jdbc.JdbcTemplate;
-import persistence.entity.exception.UnableToChangeIdException;
-import persistence.entity.loader.EntityLoader;
-import persistence.entity.persister.EntityPersister;
-import persistence.sql.ddl.PrimaryKeyClause;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
@@ -34,14 +25,14 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public Object addEntity(Object entity) {
+    public <T> T addEntity(T entity) {
         entityCache.put(entity);
         snapshot.put(entity);
         return entity;
     }
 
     @Override
-    public Object updateEntity(Object entity, Long id) {
+    public <T> T updateEntity(T entity, Long id) {
         entityCache.put(entity);
         snapshot.put(entity);
         return entity;

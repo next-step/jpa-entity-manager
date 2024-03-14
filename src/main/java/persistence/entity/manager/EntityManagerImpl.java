@@ -45,10 +45,10 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public Object persist(Object entity) {
+    public <T> T persist(T entity) {
         validate(entity);
         var insertedEntity = entityPersister.insert(entity);
-        return persistenceContext.addEntity(insertedEntity);
+        return (T) persistenceContext.addEntity(insertedEntity);
     }
 
     private void validate(Object entity) {
@@ -61,13 +61,13 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public Object merge(Object entity) {
+    public <T> T merge(T entity) {
         var primaryKey = primaryKeyValue(entity);
         var snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
 
         if (snapshot != entity) {
             var updatedEntity = entityPersister.update(entity, primaryKey);
-            return persistenceContext.updateEntity(updatedEntity, primaryKey);
+            return (T) persistenceContext.updateEntity(updatedEntity, primaryKey);
         }
         return entity;
     }
