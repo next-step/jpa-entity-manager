@@ -11,4 +11,8 @@ public interface PersistenceContext {
     void removeEntity(final Object key, final Object entity);
 
     EntitySnapshot getDatabaseSnapshot(final Object key, final Object entity);
+
+    EntityEntry getEntityEntry(final Object key, final Class<?> entityClass);
+
+    EntityEntry getEntityEntry(final Object key, final Object entity);
 }

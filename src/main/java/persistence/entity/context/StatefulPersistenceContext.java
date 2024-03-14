@@ -9,6 +9,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     private final PersistenceCache cache = new PersistenceCache();
     private final EntitySnapshots snapshots = new EntitySnapshots();
+    private final EntityEntryContext entityEntryContext = new EntityEntryContext();
 
     @Override
     public <T> T getEntity(final Object key, final String className) {
@@ -21,6 +22,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
         final EntityKey entityKey = generateEntityKey(key, entity.getClass().getName());
         this.cache.add(entityKey, entity);
         this.snapshots.add(entityKey, entity);
+        this.entityEntryContext.add(entityKey);
     }
 
     @Override
@@ -34,6 +36,17 @@ public class StatefulPersistenceContext implements PersistenceContext {
     public EntitySnapshot getDatabaseSnapshot(final Object key, final Object entity) {
         final EntityKey entityKey = generateEntityKey(key, entity.getClass().getName());
         return this.snapshots.get(entityKey, entity);
+    }
+
+    @Override
+    public EntityEntry getEntityEntry(final Object key, final Class<?> entityClass) {
+        final EntityKey entityKey = generateEntityKey(key, entityClass.getName());
+        return this.entityEntryContext.get(entityKey);
+    }
+
+    @Override
+    public EntityEntry getEntityEntry(final Object key, final Object entity) {
+        return this.getEntityEntry(key, entity.getClass());
     }
 
     private <T> EntityKey generateEntityKey(final Object key, final String className) {
