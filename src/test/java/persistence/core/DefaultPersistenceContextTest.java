@@ -28,7 +28,7 @@ class DefaultPersistenceContextTest {
         Person person = new Person();
         person.setId(1L);
 
-        defaultPersistenceContext.removeEntity(1L, person);
+        defaultPersistenceContext.removeEntity(1L, person.getClass());
 
         assertNull(defaultPersistenceContext.getEntity(person.getClass(), 1L));
     }

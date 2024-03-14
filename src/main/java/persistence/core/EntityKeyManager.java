@@ -21,9 +21,10 @@ public class EntityKeyManager {
     }
 
     public EntityKey from(Class<?> clazz, Long id) {
+        System.out.println("keys : " + keys);
         String keyString = EntityKey.genEntityKey(clazz.getSimpleName(), id);
 
-        return keys.computeIfAbsent(keyString, k -> new EntityKey(clazz, id));
+        return keys.get(keyString);
     }
 
 }

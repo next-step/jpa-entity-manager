@@ -7,11 +7,15 @@ public interface PersistenceContext {
 
     void addEntity(Long id, Object entity);
 
-    void removeEntity(Long id, Object entity);
+    void removeEntity(Long id, Class<?> clazz);
 
     void getDatabaseSnapshot(Long id, Object entity);
 
     <T> List<T> dirtyCheck();
+
+    void addEntityEntry(Class<?> clazz, Long id, EntityEntry entityEntry);
+
+    EntityEntry getEntityEntry(Class<?> clazz, Long id);
 
 
 }
