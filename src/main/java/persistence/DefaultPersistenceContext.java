@@ -21,7 +21,11 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void removeEntity(Object entity) {
+    public Object removeEntity(Long id) {
+        if (entitiesByKey != null) {
+            return entitiesByKey.remove(id);
+        }
 
+        return null;
     }
 }

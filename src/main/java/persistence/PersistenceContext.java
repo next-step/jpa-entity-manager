@@ -6,5 +6,5 @@ public interface PersistenceContext {
 
     void addEntity(Long id, Object entity);
 
-    void removeEntity(Object entity);
+    Object removeEntity(Long id);
 }
