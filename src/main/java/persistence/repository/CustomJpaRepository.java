@@ -18,9 +18,9 @@ public class CustomJpaRepository {
         boolean isInEntityManger = entityManager.find(entity.getClass(), primaryKeyValue(entity)).isPresent();
 
         if (isInEntityManger) {
-           return (T) entityManager.merge(entity);
+           return entityManager.merge(entity);
         }
-        return (T) entityManager.persist(entity);
+        return entityManager.persist(entity);
     }
 
     <T> Optional<T> find(Class<T> clazz, Long id) {
