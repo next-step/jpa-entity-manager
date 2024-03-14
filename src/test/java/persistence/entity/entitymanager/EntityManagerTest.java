@@ -78,7 +78,7 @@ class EntityManagerTest {
         Person actual = entityManager.find(Person.class, 1L).get();
 
         // then
-        Optional<Person> expected = persistenceContext.getDatabaseSnapshot(person, person.getId());
+        Optional<Person> expected = persistenceContext.getEntity(Person.class, person.getId());
         Assertions.assertThat(actual).isSameAs(expected.get());
     }
 

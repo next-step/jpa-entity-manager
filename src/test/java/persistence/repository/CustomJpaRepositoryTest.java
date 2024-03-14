@@ -59,10 +59,21 @@ class CustomJpaRepositoryTest {
 
         // when
         Person updatedPerson = savedPerson.changeEmail("soo@gmail.com");
-        repository.save(updatedPerson);
+        Person actual = repository.save(updatedPerson);
 
         // then
-        Assertions.assertThat(repository.find(Person.class, personId).get()).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
+        Assertions.assertThat(actual).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
     }
 
+
+    @Test
+    @DisplayName("JPA repository는 find 실행시 기존에 저장된 값을 가져온다.")
+    void find() {
+        // given
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person expected = repository.save(person);
+
+        // then
+        Assertions.assertThat(repository.find(Person.class, person.getId()).get()).isEqualTo(expected);
+    }
 }
