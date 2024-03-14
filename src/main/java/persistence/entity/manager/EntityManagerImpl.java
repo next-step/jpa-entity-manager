@@ -47,12 +47,12 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         validate(entity);
         T insertedEntity = entityPersister.insert(entity);
-        return persistenceContext.addEntity(insertedEntity);
+        return persistenceContext.updateEntity(insertedEntity, primaryKeyValue(insertedEntity));
     }
 
     private void validate(Object entity) {
         Long primaryKey = primaryKeyValue(entity);
-        Optional<?> searchedEntity = persistenceContext.getEntity(entity.getClass(), primaryKey);
+        Optional<?> searchedEntity = this.find(entity.getClass(), primaryKey);
 
         if (searchedEntity.isPresent()) {
             throw new EntityExistsException();
@@ -62,13 +62,23 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T merge(T entity) {
         Long primaryKey = primaryKeyValue(entity);
-        Optional<Object> snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
+        Optional<Object> snapshot = getSnapShot(entity, primaryKey);
 
-        if (snapshot != entity) {
+        if (snapshot.get() != entity) {
             T updatedEntity = entityPersister.update(entity, primaryKey);
             return persistenceContext.updateEntity(updatedEntity, primaryKey);
         }
         return entity;
+    }
+
+    private <T> Optional<Object> getSnapShot(T entity, Long primaryKey) {
+        Optional<Object> snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
+
+        if (snapshot.isEmpty()) {
+            Optional<?> searchedEntity = entityLoader.find(entity.getClass(), primaryKey);
+            snapshot = Optional.of(persistenceContext.updateEntity(searchedEntity, primaryKey));
+        }
+        return snapshot;
     }
 
     @Override

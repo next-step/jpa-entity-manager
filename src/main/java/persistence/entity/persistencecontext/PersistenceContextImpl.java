@@ -27,13 +27,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T addEntity(T entity) {
         entityCache.put(entity);
-        snapshot.put(entity);
         return entity;
     }
 
     @Override
     public <T> T updateEntity(T entity, Long id) {
-        entityCache.put(entity);
         snapshot.put(entity);
         return entity;
     }
