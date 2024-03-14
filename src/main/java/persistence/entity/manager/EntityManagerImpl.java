@@ -9,7 +9,7 @@ import persistence.entity.persister.EntityPersister;
 
 import java.util.Optional;
 
-import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
+import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -47,11 +47,11 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         validate(entity);
         T insertedEntity = entityPersister.insert(entity);
-        return persistenceContext.updateEntity(insertedEntity, primaryKeyValue(insertedEntity));
+        return persistenceContext.updateEntity(insertedEntity, getPrimaryKeyValue(insertedEntity));
     }
 
     private void validate(Object entity) {
-        Long primaryKey = primaryKeyValue(entity);
+        Long primaryKey = getPrimaryKeyValue(entity);
         Optional<?> searchedEntity = this.find(entity.getClass(), primaryKey);
 
         if (searchedEntity.isPresent()) {
@@ -61,7 +61,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        Long primaryKey = primaryKeyValue(entity);
+        Long primaryKey = getPrimaryKeyValue(entity);
         Optional<Object> snapshot = getSnapShot(entity, primaryKey);
 
         if (entity.equals(snapshot.get())) {

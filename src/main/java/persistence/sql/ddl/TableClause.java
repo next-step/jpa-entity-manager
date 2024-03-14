@@ -5,14 +5,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import persistence.sql.ddl.column.ColumnClauses;
 import persistence.sql.exception.InvalidEntityException;
-import persistence.sql.exception.NotIdException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TableClause {
     private final String name;
@@ -20,19 +18,19 @@ public class TableClause {
     private final ColumnClauses columnClauses;
     private final Object instanceOfTable;
 
-    public TableClause(Class<?> entity) {
-        if (!entity.isAnnotationPresent(Entity.class)) {
+    public TableClause(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new InvalidEntityException();
         }
-        this.name = getTableName(entity);
-        this.primaryKeyClause = extractIdFrom(entity);
-        this.columnClauses = extractColumnsFrom(entity);
-        this.instanceOfTable = getInstanceOfTable(entity);
+        this.name = getTableName(clazz);
+        this.primaryKeyClause = new PrimaryKeyClause(clazz);
+        this.columnClauses = extractColumnsFrom(clazz);
+        this.instanceOfTable = getInstanceOfTable(clazz);
     }
 
-    private Object getInstanceOfTable(Class<?> entity) {
+    private Object getInstanceOfTable(Class<?> clazz) {
         try {
-            return Arrays.stream(entity.getDeclaredConstructors())
+            return Arrays.stream(clazz.getDeclaredConstructors())
                     .filter(x -> x.getParameterCount() == 0)
                     .findFirst().get().newInstance();
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e){
@@ -40,34 +38,25 @@ public class TableClause {
         }
     }
 
-    private String getTableName(Class<?> entity) {
-        if (!entity.isAnnotationPresent(jakarta.persistence.Table.class)) {
-            return entity.getSimpleName();
+    private String getTableName(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(jakarta.persistence.Table.class)) {
+            return clazz.getSimpleName();
         }
-        if (entity.getAnnotation(jakarta.persistence.Table.class).name().isEmpty()) {
-            return entity.getSimpleName();
+        if (clazz.getAnnotation(jakarta.persistence.Table.class).name().isEmpty()) {
+            return clazz.getSimpleName();
         }
-        return entity.getAnnotation(jakarta.persistence.Table.class).name();
+        return clazz.getAnnotation(jakarta.persistence.Table.class).name();
     }
 
-    private static ColumnClauses extractColumnsFrom(Class<?> entity) {
-        return new ColumnClauses(getColumnsFrom(entity));
+    private static ColumnClauses extractColumnsFrom(Class<?> clazz) {
+        return new ColumnClauses(getColumnsFrom(clazz));
     }
 
-    private static List<Field> getColumnsFrom(Class<?> entity) {
-        return Arrays.stream(entity.getDeclaredFields())
+    private static List<Field> getColumnsFrom(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
                 .filter(x -> !x.isAnnotationPresent(Id.class))
                 .collect(Collectors.toList());
     }
-
-    private static PrimaryKeyClause extractIdFrom(Class<?> entity) {
-        return Stream.of(entity.getDeclaredFields())
-                .filter(x -> x.isAnnotationPresent(Id.class))
-                .findFirst()
-                .map(PrimaryKeyClause::new)
-                .orElseThrow(NotIdException::new);
-    }
-
     public String name() {
         return name;
     }

@@ -6,8 +6,8 @@ public class CreateQueryBuilder {
     public static final String CREATE_TABLE_START = "CREATE TABLE IF NOT EXISTS %s ";
     private final TableClause tableClause;
 
-    public CreateQueryBuilder(Class<?> entity) {
-        this.tableClause = new TableClause(entity);
+    public CreateQueryBuilder(Class<?> clazz) {
+        this.tableClause = new TableClause(clazz);
     }
 
     public String getQuery() {

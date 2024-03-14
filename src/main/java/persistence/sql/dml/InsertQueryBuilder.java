@@ -16,8 +16,8 @@ public class InsertQueryBuilder {
     public static final String VALUES = " VALUES (";
     private final TableClause tableClause;
 
-    public InsertQueryBuilder(Class<?> entity) {
-        this.tableClause = new TableClause(entity);
+    public InsertQueryBuilder(Class<?> clazz) {
+        this.tableClause = new TableClause(clazz);
     }
 
     public String getInsertQuery(Object entity) {

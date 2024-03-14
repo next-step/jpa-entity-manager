@@ -7,8 +7,8 @@ public class SelectQueryBuilder {
     public static final String SELECT_BY_ID_QUERY = "SELECT * FROM %s WHERE %s = %d";
     private final TableClause tableClause;
 
-    public SelectQueryBuilder(Class<?> entity) {
-        this.tableClause = new TableClause(entity);
+    public SelectQueryBuilder(Class<?> clazz) {
+        this.tableClause = new TableClause(clazz);
     }
 
     public String getFindAllQuery() {

@@ -11,7 +11,7 @@ import persistence.sql.dml.UpdateQueryBuilder;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
+import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
@@ -46,7 +46,7 @@ public class EntityPersister {
         }
     }
     public void delete(Object entity) {
-        Long id = primaryKeyValue(entity);
+        Long id = getPrimaryKeyValue(entity);
         String query = new DeleteQueryBuilder(entity.getClass()).deleteById(id);
         jdbcTemplate.execute(query);
     }

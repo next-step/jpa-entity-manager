@@ -6,7 +6,7 @@ import persistence.entity.manager.EntityManagerImpl;
 
 import java.util.Optional;
 
-import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
+import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class CustomJpaRepository {
     private final EntityManager entityManager;
@@ -15,7 +15,7 @@ public class CustomJpaRepository {
     }
 
     <T> T save (T entity) {
-        boolean isInEntityManger = entityManager.find(entity.getClass(), primaryKeyValue(entity)).isPresent();
+        boolean isInEntityManger = entityManager.find(entity.getClass(), getPrimaryKeyValue(entity)).isPresent();
 
         if (isInEntityManger) {
            return entityManager.merge(entity);

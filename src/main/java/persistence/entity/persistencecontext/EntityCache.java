@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
+import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityCache {
     private final Map<EntityKey, Object> entityCache;
@@ -27,7 +27,7 @@ public class EntityCache {
 
     public void remove(Object entity) {
         Class<?> clazz = entity.getClass();
-        Long id = primaryKeyValue(entity);
+        Long id = getPrimaryKeyValue(entity);
         EntityKey key = new EntityKey(clazz, id);
         entityCache.remove(key);
     }

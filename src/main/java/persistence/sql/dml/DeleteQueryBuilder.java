@@ -7,8 +7,8 @@ public class DeleteQueryBuilder {
     public static final String DELETE_BY_ID_QUERY = "DELETE FROM %s where %s = %d";
     private final TableClause tableClause;
 
-    public DeleteQueryBuilder(Class<?> entity) {
-        this.tableClause = new TableClause(entity);
+    public DeleteQueryBuilder(Class<?> clazz) {
+        this.tableClause = new TableClause(clazz);
     }
 
     public String deleteAll() {

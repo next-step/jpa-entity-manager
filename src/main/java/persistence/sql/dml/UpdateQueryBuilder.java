@@ -11,11 +11,10 @@ import static persistence.sql.common.SqlConstant.COMMA;
 public class UpdateQueryBuilder {
     public static final String UPDATE_QUERY = "UPDATE %s SET %s WHERE %s = %d";
     public static final String UPDATE_QUERY_WITHOUT_WHERE = "UPDATE %s SET %s";
-    public static final String EQUALS = "=";
     private final TableClause tableClause;
 
-    public UpdateQueryBuilder(Class<?> entity) {
-        this.tableClause = new TableClause(entity);
+    public UpdateQueryBuilder(Class<?> clazz) {
+        this.tableClause = new TableClause(clazz);
     }
 
     /**

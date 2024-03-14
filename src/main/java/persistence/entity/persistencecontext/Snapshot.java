@@ -3,7 +3,7 @@ package persistence.entity.persistencecontext;
 import java.util.HashMap;
 import java.util.Map;
 
-import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
+import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class Snapshot {
     private final Map<EntityKey, Object> snapshot;
@@ -18,7 +18,7 @@ public class Snapshot {
 
     public void remove(Object entity) {
         Class<?> clazz = entity.getClass();
-        Long id = primaryKeyValue(entity);
+        Long id = getPrimaryKeyValue(entity);
         EntityKey key = new EntityKey(clazz, id);
         snapshot.remove(key);
     }
