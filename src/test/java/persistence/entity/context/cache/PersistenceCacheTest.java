@@ -16,7 +16,7 @@ class PersistenceCacheTest {
     public void add() throws Exception {
         // given
         final PersonV3 entity = PersonV3FixtureFactory.generatePersonV3Stub();
-        final EntityKey<PersonV3> entityKey = new EntityKey<>(entity.getId(), entity.getClass().getName());
+        final EntityKey entityKey = new EntityKey(entity.getId(), entity.getClass().getName());
 
         // when
         persistenceCache.add(entityKey, entity);
@@ -31,7 +31,7 @@ class PersistenceCacheTest {
     public void get() throws Exception {
         // given
         final PersonV3 entity = PersonV3FixtureFactory.generatePersonV3Stub();
-        final EntityKey<PersonV3> entityKey = new EntityKey<>(entity.getId(), entity.getClass().getName());
+        final EntityKey entityKey = new EntityKey(entity.getId(), entity.getClass().getName());
         persistenceCache.add(entityKey, entity);
 
         // when
@@ -46,7 +46,7 @@ class PersistenceCacheTest {
     public void remove() throws Exception {
         // given
         final PersonV3 entity = PersonV3FixtureFactory.generatePersonV3Stub();
-        final EntityKey<PersonV3> entityKey = new EntityKey<>(entity.getId(), entity.getClass().getName());
+        final EntityKey entityKey = new EntityKey(entity.getId(), entity.getClass().getName());
         persistenceCache.add(entityKey, entity);
 
         // when

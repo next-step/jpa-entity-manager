@@ -2,7 +2,7 @@ package persistence.entity.context.cache;
 
 import java.util.Objects;
 
-public class EntityKey<T> {
+public class EntityKey {
 
     private final Object identifier;
 
