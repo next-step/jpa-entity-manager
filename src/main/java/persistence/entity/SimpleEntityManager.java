@@ -113,6 +113,8 @@ public class SimpleEntityManager implements EntityManager {
 
         if (entityEntry == null) {
             throw new EntityNotFoundException();
+        } else if (entityEntry.is(Status.READ_ONLY)) {
+            return;
         }
 
         entityEntry.setStatus(Status.DELETED);
