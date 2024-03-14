@@ -8,7 +8,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public Object getEntity(Long id) {
-        return null;
+        return entitiesByKey == null ? null : entitiesByKey.get(id);
     }
 
     @Override
