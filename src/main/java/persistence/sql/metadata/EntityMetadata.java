@@ -70,7 +70,11 @@ public class EntityMetadata {
         return name;
     }
 
-    public ColumnsMetadata getColumns() {
+    public List<ColumnMetadata> getColumns() {
+        return columns.getColumns();
+    }
+
+    public ColumnsMetadata getColumnsMetadata() {
         return columns;
     }
 

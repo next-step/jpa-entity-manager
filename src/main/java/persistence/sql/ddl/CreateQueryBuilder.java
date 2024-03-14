@@ -47,7 +47,7 @@ public class CreateQueryBuilder {
     }
 
     private String generateColumnsQuery() {
-        return entity.getColumns().getColumns().stream()
+        return entity.getColumns().stream()
                 .map(this::generateColumnQuery)
                 .collect(Collectors.joining(DELIMITER));
     }

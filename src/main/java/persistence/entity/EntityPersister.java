@@ -30,7 +30,7 @@ public class EntityPersister {
         jdbcTemplate.execute(updateQuery);
     }
 
-    public void insert(Object entity) {
+    public Object insert(Object entity) {
         InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.builder()
                 .dialect(dialect)
                 .entity(entity)
@@ -39,7 +39,7 @@ public class EntityPersister {
         String insertQuery = insertQueryBuilder.generateQuery();
         logger.debug("insert query: {}", insertQuery);
 
-        jdbcTemplate.execute(insertQuery);
+        return jdbcTemplate.executeAndReturnObject(insertQuery);
     }
 
     public void delete(Object entity) {

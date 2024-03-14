@@ -55,7 +55,7 @@ public class UpdateQueryBuilder {
             }
 
             this.whereQueryBuilder = WhereQueryBuilder.builder()
-                    .whereConditions(entityMetadata.getColumns(), whereRecords)
+                    .whereConditions(entityMetadata.getColumnsMetadata(), whereRecords)
                     .build();
             return this;
         }
@@ -66,7 +66,7 @@ public class UpdateQueryBuilder {
     }
 
     private String setClause() {
-        return entityMetadata.getColumns().getColumns().stream()
+        return entityMetadata.getColumns().stream()
                 .filter(columnMetadata -> !entityMetadata.getPrimaryKey().getName().equals(columnMetadata.getName()))
                 .filter(ColumnMetadata::isNotNull)
                 .map(column -> column.getName() + " = " + generateColumnValue(column.getValue()))

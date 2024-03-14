@@ -2,9 +2,9 @@ package persistence.sql.dml;
 
 import persistence.sql.dialect.Dialect;
 import persistence.sql.metadata.ColumnMetadata;
-import persistence.sql.metadata.ColumnsMetadata;
 import persistence.sql.metadata.EntityMetadata;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class InsertQueryBuilder {
@@ -45,14 +45,14 @@ public class InsertQueryBuilder {
         }
     }
 
-    private String columnsClause(ColumnsMetadata columns) {
-        return columns.getColumns().stream()
+    private String columnsClause(List<ColumnMetadata> columns) {
+        return columns.stream()
                 .map(ColumnMetadata::getName)
                 .collect(Collectors.joining(DELIMITER));
     }
 
     private String valueClause() {
-        return entity.getColumns().getColumns().stream()
+        return entity.getColumns().stream()
                 .map(column -> entity.getPrimaryKey().getName().equals(column.getName()) ? "default" : generateColumnValue(column.getValue()))
                 .collect(Collectors.joining(DELIMITER));
     }

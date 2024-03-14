@@ -50,7 +50,7 @@ public class DeleteQueryBuilder {
             }
 
             this.whereQueryBuilder = WhereQueryBuilder.builder()
-                    .whereConditions(entity.getColumns(), whereRecords)
+                    .whereConditions(entity.getColumnsMetadata(), whereRecords)
                     .build();
             return this;
         }

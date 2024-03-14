@@ -15,12 +15,13 @@ public class EntitySnapshot {
 
     public static EntitySnapshot from(Object entity) {
         EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass(), entity);
-        return new EntitySnapshot(entityMetadata.getColumns().getColumns().stream()
+        return new EntitySnapshot(entityMetadata.getColumns().stream()
+                .filter(ColumnMetadata::isNonPrimaryKey)
                 .collect(Collectors.toMap(column -> column, ColumnMetadata::getValue)));
     }
 
     public boolean isNotEqualToSnapshot(Object entity) {
-        Map<ColumnMetadata, Object> entityState = EntityMetadata.of(entity.getClass(), entity).getColumns().getColumns().stream()
+        Map<ColumnMetadata, Object> entityState = EntityMetadata.of(entity.getClass(), entity).getColumns().stream()
                 .collect(Collectors.toMap(column -> column, ColumnMetadata::getValue));
 
         if (entityState.size() != snapShotColumns.size()) {

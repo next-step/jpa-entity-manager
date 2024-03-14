@@ -29,29 +29,39 @@ public class SimpleEntityManager implements EntityManager {
 
         Object object = entityLoader.find(EntityId.of(clazz, id));
         persistenceContext.addEntity(id, object);
+
         return clazz.cast(object);
     }
 
     @Override
     public Object persist(Object entity) {
-        EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass(), entity);
+        Object id = entityPersister.insert(entity);
 
-        Object findEntity = persistenceContext.getEntity(entity.getClass(), entityMetadata.getPrimaryKey().getValue());
-        if (Objects.isNull(findEntity)) {
-            entityPersister.insert(entity);
-            persistenceContext.addEntity(entityMetadata.getPrimaryKey().getValue(), entity);
-        }
-
-        EntitySnapshot databaseSnapshot = persistenceContext.getDatabaseSnapshot(entityMetadata.getPrimaryKey().getValue(), entity);
-        if (databaseSnapshot.isNotEqualToSnapshot(entity)) {
-            entityPersister.update(entity);
-        }
-
+        cachedEntity(id, entity);
         return entity;
+    }
+
+    private void cachedEntity(Object id, Object entity) {
+        persistenceContext.addEntity(id, entity);
+        persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass(), entity);
+        Object key = entityMetadata.getPrimaryKey().getValue();
+
+        EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(key, entity);
+        if (snapshot.isNotEqualToSnapshot(entity)) {
+            entityPersister.update(entity);
+            cachedEntity(key, entity);
+        }
+
+        return entity;
     }
 }

@@ -3,7 +3,6 @@ package persistence.sql.dml;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.conditions.WhereRecord;
 import persistence.sql.metadata.ColumnMetadata;
-import persistence.sql.metadata.ColumnsMetadata;
 import persistence.sql.metadata.EntityMetadata;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class SelectQueryBuilder {
             }
 
             this.whereQueryBuilder = WhereQueryBuilder.builder()
-                    .whereConditions(entity.getColumns(), whereRecords)
+                    .whereConditions(entity.getColumnsMetadata(), whereRecords)
                     .build();
             return this;
         }
@@ -63,8 +62,8 @@ public class SelectQueryBuilder {
         }
     }
 
-    private String columnsClause(ColumnsMetadata columns) {
-        return columns.getColumns().stream()
+    private String columnsClause(List<ColumnMetadata> columns) {
+        return columns.stream()
                 .map(ColumnMetadata::getName)
                 .collect(Collectors.joining(DELIMITER));
     }

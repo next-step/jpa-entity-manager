@@ -37,7 +37,7 @@ public class WhereQueryBuilder {
         }
 
         public Builder whereConditions(EntityMetadata entityMetadata) {
-            ColumnMetadata columnMetadata = entityMetadata.getColumns().getColumn(entityMetadata.getPrimaryKey().getName());
+            ColumnMetadata columnMetadata = entityMetadata.getColumnsMetadata().getColumn(entityMetadata.getPrimaryKey().getName());
             this.whereConditions = WhereConditions.of(List.of(WhereCondition.of(columnMetadata, "=", columnMetadata.getValue())));
             return this;
         }
