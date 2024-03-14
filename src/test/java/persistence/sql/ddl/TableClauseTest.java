@@ -1,15 +1,11 @@
 package persistence.sql.ddl;
 
-import database.DatabaseServer;
-import database.H2;
-import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import persistence.entity.annotated.Person;
-
-import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import persistence.entity.testfixture.annotated.Person;
+import persistence.sql.ddl.clause.table.TableClause;
+import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
 
 class TableClauseTest {
     @Test
@@ -33,7 +29,7 @@ class TableClauseTest {
         String expectedName = "users";
 
         // when
-        String actualName = new TableClause(persistence.entity.notcolumn.Person.class).name();
+        String actualName = new TableClause(persistence.entity.testfixture.notcolumn.Person.class).name();
 
         // then
         Assertions.assertThat(actualName).isEqualTo(expectedName);

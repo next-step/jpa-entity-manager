@@ -1,5 +1,24 @@
 # jpa-entity-manager
 
+## 3단계
+- [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라
+- [x] 요구사항 2 - snapshot을 구현하여라
+- [x] 요구사항 3 - dirty checking을 구현하여라.
+- [x] 2단계 피드백 반영
+  - [x] EOL 반영하라
+  - [x] SetClause의 접근제어자 수정하라
+  - [x] 클래스의 레이아웃을 수정하라
+    - ```
+      class A {
+        상수(static final) 또는 클래스 변수
+        인스턴스 변수
+        생성자
+        팩토리 메소드
+        메소드
+        기본 메소드 (equals, hashCode, toString)
+      }
+      ```
+
 ## 2단계
 - [x] 요구사항 1 - RowMapper 리팩터링
 - [x] 요구사항 2 - EntityManager 의 구현체에서 find 에 대한 책임을 EntityLoader 로 옮겨주자

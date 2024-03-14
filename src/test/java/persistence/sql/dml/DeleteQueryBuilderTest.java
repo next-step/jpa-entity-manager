@@ -3,7 +3,8 @@ package persistence.sql.dml;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.notcolumn.Person;
+import persistence.entity.testfixture.notcolumn.Person;
+import persistence.sql.dml.querybuilder.DeleteQueryBuilder;
 
 class DeleteQueryBuilderTest {
 

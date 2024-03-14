@@ -1,8 +1,12 @@
 package persistence.sql.ddl;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.testfixture.notcolumn.Person;
+import persistence.sql.ddl.clause.table.TableClause;
+import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
 
 import java.util.List;
 
@@ -14,7 +18,7 @@ class CreateQueryBuilderTest {
         String expectedQuery = "CREATE TABLE IF NOT EXISTS Person " +
                 "(id Long AUTO_INCREMENT PRIMARY KEY,name VARCHAR(30) NULL,age INT NULL)";
         // when
-        String actualQuery = new CreateQueryBuilder(persistence.entity.basic.Person.class).getQuery();
+        String actualQuery = new CreateQueryBuilder(persistence.entity.testfixture.basic.Person.class).getQuery();
 
         // then
         Assertions.assertThat(actualQuery).isEqualTo(expectedQuery);
@@ -29,10 +33,11 @@ class CreateQueryBuilderTest {
                 "email VARCHAR(30) NOT NULL");
 
         // when
-        List<String> actualColumnQueries = new TableClause(persistence.entity.notcolumn.Person.class).columnQueries();
+        List<String> actualColumnQueries = new TableClause(Person.class).columnQueries();
 
         // then
-        Assertions.assertThat(expectedColumnQueries.containsAll(actualColumnQueries)).isTrue();
-        Assertions.assertThat(actualColumnQueries).hasSize(3);
+        SoftAssertions softAssertions = new SoftAssertions();
+        softAssertions.assertThat(expectedColumnQueries.containsAll(actualColumnQueries)).isTrue();
+        softAssertions.assertThat(actualColumnQueries).hasSize(3);
     }
 }
