@@ -1,48 +1,44 @@
 package persistence.entity.impl;
 
+import java.util.List;
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityLoader;
 import persistence.entity.EntityManager;
-import persistence.entity.EntityRowMapperFactory;
-import persistence.sql.QueryBuilder;
+import persistence.entity.EntityPersister;
 
 public class EntityManagerImpl implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
 
-    private final QueryBuilder queryBuilder;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
-        this(jdbcTemplate, new QueryBuilder());
+        this(new EntityPersisterImpl(jdbcTemplate), new EntityLoaderImpl(jdbcTemplate));
     }
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate, QueryBuilder queryBuilder) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.queryBuilder = queryBuilder;
+    public EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
+        this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
     }
-
 
     @Override
     public <T> T find(Class<T> entityClass, Long id) {
-        String selectByIdQuery = queryBuilder.getSelectByIdQuery(entityClass, id);
+        return entityLoader.select(entityClass, id);
+    }
 
-        return jdbcTemplate.queryForObject(
-            selectByIdQuery,
-            EntityRowMapperFactory.getInstance().getRowMapper(entityClass)
-        );
+    @Override
+    public <T> List<T> findAll(Class<T> entityClass) {
+        return entityLoader.selectAll(entityClass);
     }
 
     @Override
     public Object persist(Object entity) {
-        String insertQuery = queryBuilder.getInsertQuery(entity);
-
-        jdbcTemplate.execute(insertQuery);
+        entityPersister.insert(entity);
 
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        String deleteQueryFromEntity = queryBuilder.getDeleteQueryFromEntity(entity);
-
-        jdbcTemplate.execute(deleteQueryFromEntity);
+        entityPersister.delete(entity);
     }
 }
