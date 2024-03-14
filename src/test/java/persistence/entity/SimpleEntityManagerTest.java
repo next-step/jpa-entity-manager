@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jdbc.RowMapper;
 import org.junit.jupiter.api.*;
 import persistence.JdbcServerDmlQueryTestSupport;
@@ -17,6 +19,7 @@ import persistence.sql.mapping.TableBinder;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -74,6 +77,18 @@ class SimpleEntityManagerTest extends JdbcServerDmlQueryTestSupport {
                 .contains(tuple(person.getName(), person.getAge(), person.getEmail(), null));
     }
 
+    @DisplayName("영속성 컨텍스트에서 관리중인 엔티티를 persist 하면 예외를 반환한다")
+    @Test
+    public void persistManagedEntity() throws Exception {
+        // given
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub(0L);
+        entityManager.persist(person);
+
+        // when then
+        assertThatThrownBy(() -> entityManager.persist(person))
+                .isInstanceOf(EntityExistsException.class);
+    }
+
     @DisplayName("더티 체킹 후 변한게 존재하면 업데이트를 한다")
     @Test
     public void mergeWithDirtyChecking() throws Exception {
@@ -124,8 +139,7 @@ class SimpleEntityManagerTest extends JdbcServerDmlQueryTestSupport {
     public void remove() throws Exception {
         // given
         final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
-        final String insertQuery = generateUserTableStubInsertQuery(person);
-        jdbcTemplate.execute(insertQuery);
+        entityManager.persist(person);
 
         // when
         entityManager.remove(person);
@@ -134,6 +148,19 @@ class SimpleEntityManagerTest extends JdbcServerDmlQueryTestSupport {
         final String select = "select * from users";
         final List<PersonV3> result = jdbcTemplate.query(select, rowMapper);
         assertThat(result).isEmpty();
+    }
+
+    @DisplayName("영속성 컨텍스트에서 관리되고 있지 않은 엔티티를 remove 하면 예외를 반환한다")
+    @Test
+    public void removeGoneEntity() throws Exception {
+        // given
+        final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
+        final String insertQuery = generateUserTableStubInsertQuery(person);
+        jdbcTemplate.execute(insertQuery);
+
+        // when then
+        assertThatThrownBy(() -> entityManager.remove(person))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
 }
