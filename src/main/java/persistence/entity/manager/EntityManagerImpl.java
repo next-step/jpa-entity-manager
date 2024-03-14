@@ -22,6 +22,11 @@ public class EntityManagerImpl implements EntityManager {
         this.entityLoader = new EntityLoader(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
+    public EntityManagerImpl(PersistenceContext persistenceContext, EntityLoader entityLoader, EntityPersister entityPersister) {
+        this.persistenceContext = persistenceContext;
+        this.entityLoader = entityLoader;
+        this.entityPersister = entityPersister;
+    }
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
@@ -34,15 +39,15 @@ public class EntityManagerImpl implements EntityManager {
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        persistenceContext.addEntity(searchedEntity);
-        return (Optional<T>) persistenceContext.getDatabaseSnapshot(searchedEntity, id);
+        T addedEntity = persistenceContext.addEntity(searchedEntity.get());
+        return Optional.of(addedEntity);
     }
 
     @Override
     public <T> T persist(T entity) {
         validate(entity);
-        Object insertedEntity = entityPersister.insert(entity);
-        return (T) persistenceContext.addEntity(insertedEntity);
+        T insertedEntity = entityPersister.insert(entity);
+        return persistenceContext.addEntity(insertedEntity);
     }
 
     private void validate(Object entity) {

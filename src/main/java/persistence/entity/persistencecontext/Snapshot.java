@@ -22,12 +22,12 @@ public class Snapshot {
         snapshot.remove(key);
     }
 
-    public Object get(Class<?> clazz, Long key) {
+    public <T> T get(Class<?> clazz, Long key) {
         EntityKey entityKey = new EntityKey(clazz, key);
         Object cachedEntity = snapshot.get(entityKey);
         if (cachedEntity == null) {
             return null;
         }
-        return snapshot.get(entityKey);
+        return (T) snapshot.get(entityKey);
     }
 }

@@ -2,6 +2,7 @@ package persistence.entity.persister;
 
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
+import persistence.entity.exception.OptionalForbiddenException;
 import persistence.entity.exception.UnableToChangeIdException;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
@@ -19,13 +20,15 @@ public class EntityPersister {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Object update(Object entity, Long id) {
+    public <T> T update(T entity, Long id) {
+        new OptionalForbiddenException().validate(entity);
         String query = new UpdateQueryBuilder(entity.getClass()).getQuery(entity, id);
         jdbcTemplate.executeUpdate(query);
         return entity;
     }
 
-    public Object insert(Object entity) {
+    public <T> T insert(T entity) {
+        new OptionalForbiddenException().validate(entity);
         Class<?> clazz = entity.getClass();
         String queryToInsert = new InsertQueryBuilder(clazz).getInsertQuery(entity);
         Long id = jdbcTemplate.executeUpdate(queryToInsert);

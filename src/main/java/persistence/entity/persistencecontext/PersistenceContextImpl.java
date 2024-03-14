@@ -14,8 +14,8 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public <T> Optional<T> getEntity(Class<T> clazz, Long id) {
-        if (id  == null) {
-           return Optional.empty();
+        if (id == null) {
+            return Optional.empty();
         }
         Optional<Object> cachedEntity = entityCache.get(clazz, id);
         if (cachedEntity.isPresent()) {
@@ -45,8 +45,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public Optional<Object> getDatabaseSnapshot(Object entity, Long id) {
-        Object result = snapshot.get(entity.getClass(), id);
-        return Optional.of(result);
+    public <T> Optional<T> getDatabaseSnapshot(T entity, Long id) {
+        Object o = snapshot.get(entity.getClass(), id);
+        if (o == null) {
+            return Optional.empty();
+        }
+        return Optional.of((T) o);
     }
 }
