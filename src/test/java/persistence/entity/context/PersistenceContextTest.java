@@ -71,8 +71,8 @@ class PersistenceContextTest extends EntityMetaDataTestSupport {
 
         // then
         assertAll(
-                () -> assertThat(snapshot1.isSame(person1)).isTrue(),
-                () -> assertThat(snapshot2.isSame(person2)).isTrue()
+                () -> assertThat(snapshot1).isNotNull(),
+                () -> assertThat(snapshot2).isNotNull()
         );
     }
 

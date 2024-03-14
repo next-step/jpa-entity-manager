@@ -52,7 +52,7 @@ public class SimpleEntityManager implements EntityManager {
         final Object identifier = persister.getIdentifier(entity);
         final EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(identifier, entity);
 
-        if (snapshot.isSame(entity)) {
+        if (snapshot.checkDirty(entity)) {
             persister.update(entity);
             persistenceContext.addEntity(identifier, entity);
         }
