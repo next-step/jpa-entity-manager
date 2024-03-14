@@ -59,17 +59,17 @@ class PersistenceContextImplTest {
     @Test
     void getEntityTwoResults() {
         // given
-        var person = new Person(1L,"김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var dog = new Dog(1L, "바둑이");
+        Person person = new Person(1L,"김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Dog dog = new Dog(1L, "바둑이");
         persistenceContext.addEntity(person);
         persistenceContext.addEntity(dog);
 
         // when
-        var actualPerson = persistenceContext.getEntity(Person.class, 1L).get();
-        var actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
+        Person actualPerson = persistenceContext.getEntity(Person.class, 1L).get();
+        Dog actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
 
         // then
-        var softAssertions = new SoftAssertions();
+        SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actualPerson).isSameAs(person);
         softAssertions.assertThat(actualDog).isSameAs(dog);
     }
@@ -78,11 +78,11 @@ class PersistenceContextImplTest {
     @Test
     void addEntityEmptyResult() {
         // given
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
         persistenceContext.addEntity(person);
 
         // when
-        var actual = persistenceContext.getEntity(Person.class, 2L);
+        Optional<Person> actual = persistenceContext.getEntity(Person.class, 2L);
 
         // then
         Assertions.assertThat(actual).isEmpty();
@@ -93,14 +93,14 @@ class PersistenceContextImplTest {
     @Test
     void addEntity() {
         // given
-        var person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
 
         // when
         persistenceContext.addEntity(person);
 
         // then
-        var actual = persistenceContext.getEntity(Person.class, 1L).get();
-        var expected = person.changeId(1L);
+        Person actual = persistenceContext.getEntity(Person.class, 1L).get();
+        Person expected = person.changeId(1L);
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
@@ -108,16 +108,16 @@ class PersistenceContextImplTest {
     @Test
     void removeEntity() {
         // given
-        var person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
         persistenceContext.addEntity(person);
 
         // when
-        var entityBeforeDelete = persistenceContext.getEntity(Person.class, 1L);
+        Optional<Person> entityBeforeDelete = persistenceContext.getEntity(Person.class, 1L);
         persistenceContext.removeEntity(person);
-        var entityAfterDelete = persistenceContext.getEntity(Person.class, 1L);
+        Optional<Person> entityAfterDelete = persistenceContext.getEntity(Person.class, 1L);
 
         // then
-        var softAssertions = new SoftAssertions();
+        SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
         softAssertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
     }

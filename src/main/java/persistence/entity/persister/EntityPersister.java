@@ -7,6 +7,7 @@ import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
@@ -33,7 +34,7 @@ public class EntityPersister {
     }
 
     private void initId(Object entity, Long id) {
-        var idField = Arrays.stream(entity.getClass().getDeclaredFields()).filter(x -> x.isAnnotationPresent(Id.class)).findAny().get();
+        Field idField = Arrays.stream(entity.getClass().getDeclaredFields()).filter(x -> x.isAnnotationPresent(Id.class)).findAny().get();
         idField.setAccessible(true);
         try {
             idField.set(entity, id);

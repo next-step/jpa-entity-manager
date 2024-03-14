@@ -13,18 +13,18 @@ public class Snapshot {
     }
 
     public void put(Object entity) {
-        var clazz = entity.getClass();
+        Class<?> clazz = entity.getClass();
         snapshot.put(new EntityKey(clazz, primaryKeyValue(entity)), entity);
     }
 
     public void remove(Object entity) {
-        var key = new EntityKey(entity);
+        EntityKey key = new EntityKey(entity);
         snapshot.remove(key);
     }
 
     public Object get(Class<?> clazz, Long key) {
-        var entityKey = new EntityKey(clazz, key);
-        var cachedEntity = snapshot.get(entityKey);
+        EntityKey entityKey = new EntityKey(clazz, key);
+        Object cachedEntity = snapshot.get(entityKey);
         if (cachedEntity == null) {
             return null;
         }

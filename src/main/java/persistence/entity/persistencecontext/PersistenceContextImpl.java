@@ -17,7 +17,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         if (id  == null) {
            return Optional.empty();
         }
-        var cachedEntity = entityCache.get(clazz, id);
+        Optional<Object> cachedEntity = entityCache.get(clazz, id);
         if (cachedEntity.isPresent()) {
             return (Optional<T>) cachedEntity;
         }
@@ -46,7 +46,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public Optional<Object> getDatabaseSnapshot(Object entity, Long id) {
-        var result = snapshot.get(entity.getClass(), id);
+        Object result = snapshot.get(entity.getClass(), id);
         return Optional.of(result);
     }
 }

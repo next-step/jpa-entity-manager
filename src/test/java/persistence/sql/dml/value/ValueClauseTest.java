@@ -13,18 +13,18 @@ class ValueClauseTest {
     @DisplayName("field가 String일 경우 작은따옴표를 값의 양쪽에 붙인다.")
     void stringTest() throws NoSuchFieldException {
 
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var field = getFieldByName(person, "name");
-        var value = new ValueClause(field, person).value();
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Field field = getFieldByName(person, "name");
+        String value = new ValueClause(field, person).value();
         Assertions.assertThat(value).isEqualTo("'김철수'");
     }
 
     @Test
     @DisplayName("field가 숫자일 경우 작은따옴표를 값의 양쪽에 붙이지 않는다.")
     void numberTest() throws NoSuchFieldException {
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var field = getFieldByName(person, "age");
-        var value = new ValueClause(field, person).value();
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Field field = getFieldByName(person, "age");
+        String value = new ValueClause(field, person).value();
         Assertions.assertThat(value).isEqualTo("21");
     }
 

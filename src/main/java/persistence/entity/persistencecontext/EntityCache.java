@@ -14,13 +14,13 @@ public class EntityCache {
     }
 
     public void put(Object entity) {
-        var clazz = entity.getClass();
+        Class<?> clazz = entity.getClass();
         entityCache.put(new EntityKey(clazz, primaryKeyValue(entity)), entity);
     }
 
     public Optional<Object> get(Class<?> clazz, Long key) {
-        var entityKey = new EntityKey(clazz, key);
-        var cachedEntity = entityCache.get(entityKey);
+        EntityKey entityKey = new EntityKey(clazz, key);
+        Object cachedEntity = entityCache.get(entityKey);
         if (cachedEntity == null) {
             return Optional.empty();
         }
@@ -28,7 +28,7 @@ public class EntityCache {
     }
 
     public void remove(Object entity) {
-        var key = new EntityKey(entity);
+        EntityKey key = new EntityKey(entity);
         entityCache.remove(key);
     }
 }

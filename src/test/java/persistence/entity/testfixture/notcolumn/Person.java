@@ -63,7 +63,7 @@ public class Person {
     }
 
     public Person changeEmail(String email) {
-        var person = new Person();
+        Person person = new Person();
         person.id = id;
         person.name = name;
         person.age = age;

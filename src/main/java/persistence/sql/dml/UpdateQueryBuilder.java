@@ -4,7 +4,6 @@ import persistence.sql.ddl.TableClause;
 import persistence.sql.dml.clause.SetClauses;
 import persistence.sql.dml.value.ValueClauses;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static persistence.sql.common.SqlConstant.COMMA;
@@ -26,7 +25,7 @@ public class UpdateQueryBuilder {
      * @return update 쿼리
      */
     public String getQuery(Object entity, Long id) {
-        var setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
+        List<String> setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
         return String.format(UPDATE_QUERY,
                 tableClause.name(), String.join(COMMA, setClauses), tableClause.primaryKeyName(), id);
     }
@@ -37,7 +36,7 @@ public class UpdateQueryBuilder {
      * @return update 쿼리
      */
     public String getQuery(Object entity) {
-        var setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
+        List<String> setClauses = new SetClauses(tableClause.columnNames(), new ValueClauses(entity).values()).query();
         return String.format(UPDATE_QUERY_WITHOUT_WHERE, tableClause.name(), String.join(COMMA, setClauses));
     }
 }

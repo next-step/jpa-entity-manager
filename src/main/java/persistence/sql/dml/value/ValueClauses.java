@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class ValueClauses {
     private final List<ValueClause> values;
     public ValueClauses(Object entity) {
-        var fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
+        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).collect(Collectors.toList());
         this.values = fields.stream()
                 .filter(ValueClauses::isColumn)
                 .map(field -> new ValueClause(field, entity)).collect(Collectors.toList());

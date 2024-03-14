@@ -7,10 +7,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.manager.EntityManager;
-import persistence.entity.manager.EntityManagerImpl;
-import persistence.entity.persistencecontext.PersistenceContext;
-import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 
@@ -57,12 +53,12 @@ class CustomJpaRepositoryTest {
     @DisplayName("JPA repository는 id가 이미 있는 entity를 저장시 update 한다.")
     void saveWithDirty() {
         // given
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var savedPerson = repository.save(person);
-        var personId = savedPerson.getId();
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person savedPerson = repository.save(person);
+        Long personId = savedPerson.getId();
 
         // when
-        var updatedPerson = savedPerson.changeEmail("soo@gmail.com");
+        Person updatedPerson = savedPerson.changeEmail("soo@gmail.com");
         repository.save(updatedPerson);
 
         // then

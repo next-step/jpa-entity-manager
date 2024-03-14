@@ -8,8 +8,6 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.loader.EntityLoader;
-import persistence.entity.manager.EntityManager;
-import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
@@ -58,7 +56,7 @@ class EntityPersisterTest {
     @DisplayName("insert 시 Person 1건 저장된다.")
     void persistTest() {
         // given
-        var testFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person testFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
 
         // when
         entityPersister.insert(testFixture);
@@ -73,11 +71,11 @@ class EntityPersisterTest {
     @DisplayName("update 성공시 true가 리턴된다.")
     void updateTest() {
         // given
-        var testFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person testFixture = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
         entityPersister.insert(testFixture);
 
         // when
-        var actual = entityPersister.update(testFixture, 1L);
+        Object actual = entityPersister.update(testFixture, 1L);
 
         // then
         Assertions.assertThat(actual).isEqualTo(new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11));
@@ -87,8 +85,8 @@ class EntityPersisterTest {
     @DisplayName("delete 성공시, 재조회시 데이터가 존재하지 않는다.")
     void deleteTest() {
         // given
-        var person_아이디없음 = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var person_아이디있음 = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person person_아이디없음 = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person person_아이디있음 = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
         entityPersister.insert(person_아이디없음);
 
         // when

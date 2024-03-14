@@ -25,12 +25,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-        var cachedEntity = persistenceContext.getEntity(clazz, id);
+        Optional<T> cachedEntity = persistenceContext.getEntity(clazz, id);
         if (cachedEntity.isPresent()) {
             return cachedEntity;
         }
 
-        var searchedEntity = entityLoader.find(clazz, id);
+        Optional<T> searchedEntity = entityLoader.find(clazz, id);
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
@@ -41,13 +41,13 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T persist(T entity) {
         validate(entity);
-        var insertedEntity = entityPersister.insert(entity);
+        Object insertedEntity = entityPersister.insert(entity);
         return (T) persistenceContext.addEntity(insertedEntity);
     }
 
     private void validate(Object entity) {
-        var primaryKey = primaryKeyValue(entity);
-        var searchedEntity = persistenceContext.getEntity(entity.getClass(), primaryKey);
+        Long primaryKey = primaryKeyValue(entity);
+        Optional<?> searchedEntity = persistenceContext.getEntity(entity.getClass(), primaryKey);
 
         if (searchedEntity.isPresent()) {
             throw new EntityExistsException();
@@ -56,11 +56,11 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        var primaryKey = primaryKeyValue(entity);
-        var snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
+        Long primaryKey = primaryKeyValue(entity);
+        Optional<Object> snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
 
         if (snapshot != entity) {
-            var updatedEntity = entityPersister.update(entity, primaryKey);
+            Object updatedEntity = entityPersister.update(entity, primaryKey);
             return (T) persistenceContext.updateEntity(updatedEntity, primaryKey);
         }
         return entity;

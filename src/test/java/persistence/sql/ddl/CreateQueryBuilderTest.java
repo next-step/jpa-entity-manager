@@ -34,7 +34,7 @@ class CreateQueryBuilderTest {
         List<String> actualColumnQueries = new TableClause(Person.class).columnQueries();
 
         // then
-        var softAssertions = new SoftAssertions();
+        SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(expectedColumnQueries.containsAll(actualColumnQueries)).isTrue();
         softAssertions.assertThat(actualColumnQueries).hasSize(3);
     }

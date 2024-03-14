@@ -57,11 +57,11 @@ class EntityLoaderTest {
 
     @Test
     void findTest() {
-        var person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
         entityManager.persist(person);
 
-        var expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
-        var actual = entityLoader.find(Person.class, 1L).get();
+        Person expected = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        Person actual = entityLoader.find(Person.class, 1L).get();
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 }
