@@ -13,19 +13,16 @@ public class EntityCache {
         this.entityCache = new HashMap<>();
     }
 
-    public void put(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Long id = primaryKeyValue(entity);
-        entityCache.put(new EntityKey(clazz, id), entity);
+    public void put(Object entity, EntityKey key) {
+        entityCache.put(key, entity);
     }
 
-    public Optional<Object> get(Class<?> clazz, Long key) {
-        EntityKey entityKey = new EntityKey(clazz, key);
-        Object cachedEntity = entityCache.get(entityKey);
+    public Optional<Object> get(EntityKey key) {
+        Object cachedEntity = entityCache.get(key);
         if (cachedEntity == null) {
             return Optional.empty();
         }
-        return Optional.of(entityCache.get(entityKey));
+        return Optional.of(entityCache.get(key));
     }
 
     public void remove(Object entity) {

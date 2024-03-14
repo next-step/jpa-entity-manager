@@ -12,9 +12,8 @@ public class Snapshot {
         this.snapshot = new HashMap<>();
     }
 
-    public void put(Object entity) {
-        Class<?> clazz = entity.getClass();
-        snapshot.put(new EntityKey(clazz, primaryKeyValue(entity)), entity);
+    public void put(Object entity, EntityKey key) {
+        snapshot.put(key, entity);
     }
 
     public void remove(Object entity) {
@@ -24,12 +23,11 @@ public class Snapshot {
         snapshot.remove(key);
     }
 
-    public <T> T get(Class<?> clazz, Long key) {
-        EntityKey entityKey = new EntityKey(clazz, key);
-        Object cachedEntity = snapshot.get(entityKey);
+    public <T> T get(EntityKey key) {
+        Object cachedEntity = snapshot.get(key);
         if (cachedEntity == null) {
             return null;
         }
-        return (T) snapshot.get(entityKey);
+        return (T) snapshot.get(key);
     }
 }
