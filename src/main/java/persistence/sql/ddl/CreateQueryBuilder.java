@@ -19,7 +19,7 @@ public class CreateQueryBuilder {
     }
 
     private String getIdQuery() {
-        return tableClause.createQuery() + COMMA;
+        return tableClause.createIdQuery() + COMMA;
     }
 
     private String getColumnQuery() {

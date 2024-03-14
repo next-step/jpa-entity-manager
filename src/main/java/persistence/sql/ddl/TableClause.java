@@ -61,7 +61,7 @@ public class TableClause {
         return name;
     }
 
-    public String createQuery() {
+    public String createIdQuery() {
         return primaryKeyClause.getQuery();
     }
 
