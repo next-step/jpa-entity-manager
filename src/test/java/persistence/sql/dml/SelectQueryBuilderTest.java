@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
-import persistence.sql.ddl.CreateQueryBuilder;
+import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
+import persistence.sql.dml.querybuilder.InsertQueryBuilder;
+import persistence.sql.dml.querybuilder.SelectQueryBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;

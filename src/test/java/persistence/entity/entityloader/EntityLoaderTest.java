@@ -11,7 +11,7 @@ import persistence.entity.loader.EntityLoader;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.testfixture.notcolumn.Person;
-import persistence.sql.ddl.CreateQueryBuilder;
+import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
 
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 

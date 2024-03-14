@@ -1,4 +1,4 @@
-package persistence.sql.ddl.column;
+package persistence.sql.ddl.clause;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -16,7 +16,7 @@ public class ColumnClause {
     private final NullClause nullClause;
 
     public ColumnClause(Field field) {
-        this.name = getNameFrom(field);
+        this.name = initName(field);
         this.type = field.getType();
         this.nullClause = new NullClause(field);
     }
@@ -25,7 +25,7 @@ public class ColumnClause {
         return typeToSqlConverter.get(type).apply(name) + " " + nullClause.getQuery();
     }
 
-    private String getNameFrom(Field field) {
+    private String initName(Field field) {
         jakarta.persistence.Column column = field.getAnnotation(jakarta.persistence.Column.class);
         if (column == null) {
             return field.getName();
@@ -36,7 +36,7 @@ public class ColumnClause {
         return column.name();
     }
 
-    public String name() {
+    public String nameQuery() {
         return this.name;
     }
 }

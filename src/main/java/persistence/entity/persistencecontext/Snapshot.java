@@ -3,7 +3,7 @@ package persistence.entity.persistencecontext;
 import java.util.HashMap;
 import java.util.Map;
 
-import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
+import static persistence.sql.dml.clause.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class Snapshot {
     private final Map<EntityKey, Object> snapshot;

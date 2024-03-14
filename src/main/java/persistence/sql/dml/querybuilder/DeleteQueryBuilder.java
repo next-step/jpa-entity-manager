@@ -1,6 +1,6 @@
-package persistence.sql.dml;
+package persistence.sql.dml.querybuilder;
 
-import persistence.sql.ddl.TableClause;
+import persistence.sql.ddl.clause.TableClause;
 
 public class DeleteQueryBuilder {
     public static final String DELETE_ALL_QUERY = "DELETE FROM %s";

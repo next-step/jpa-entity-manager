@@ -6,7 +6,7 @@ import persistence.entity.manager.EntityManagerImpl;
 
 import java.util.Optional;
 
-import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
+import static persistence.sql.dml.clause.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class CustomJpaRepository {
     private final EntityManager entityManager;

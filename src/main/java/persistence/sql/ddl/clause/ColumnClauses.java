@@ -1,4 +1,4 @@
-package persistence.sql.ddl.column;
+package persistence.sql.ddl.clause;
 
 import jakarta.persistence.Transient;
 
@@ -23,6 +23,6 @@ public class ColumnClauses {
     }
 
     public List<String> getNames() {
-        return this.columnClauses.stream().map(ColumnClause::name).collect(Collectors.toList());
+        return this.columnClauses.stream().map(ColumnClause::nameQuery).collect(Collectors.toList());
     }
 }

@@ -1,9 +1,10 @@
-package persistence.sql.dml.value;
+package persistence.sql.dml.querybuilder;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.testfixture.notcolumn.Person;
+import persistence.sql.dml.clause.ValueClause;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

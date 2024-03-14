@@ -3,7 +3,7 @@ package persistence.entity.loader;
 import jdbc.JdbcTemplate;
 import persistence.entity.exception.NotUniqueDataException;
 import persistence.sql.common.DtoMapper;
-import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.querybuilder.SelectQueryBuilder;
 
 import java.util.List;
 import java.util.Optional;

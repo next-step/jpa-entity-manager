@@ -1,6 +1,6 @@
-package persistence.sql.dml;
+package persistence.sql.dml.querybuilder;
 
-import persistence.sql.ddl.TableClause;
+import persistence.sql.ddl.clause.TableClause;
 
 public class SelectQueryBuilder {
     public static final String SELECT_ALL_QUERY = "SELECT * FROM %s";

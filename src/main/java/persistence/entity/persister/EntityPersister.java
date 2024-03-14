@@ -4,14 +4,14 @@ import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.entity.exception.OptionalForbiddenException;
 import persistence.entity.exception.UnableToChangeIdException;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
+import persistence.sql.dml.querybuilder.DeleteQueryBuilder;
+import persistence.sql.dml.querybuilder.InsertQueryBuilder;
+import persistence.sql.dml.querybuilder.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-import static persistence.sql.dml.value.PrimaryKeyValue.getPrimaryKeyValue;
+import static persistence.sql.dml.clause.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;

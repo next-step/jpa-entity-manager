@@ -16,8 +16,8 @@ import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
-import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
+import persistence.sql.dml.querybuilder.SelectQueryBuilder;
 
 import java.util.List;
 import java.util.Optional;

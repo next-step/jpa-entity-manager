@@ -1,8 +1,8 @@
-package persistence.sql.dml;
+package persistence.sql.dml.querybuilder;
 
-import persistence.sql.ddl.TableClause;
+import persistence.sql.ddl.clause.TableClause;
 import persistence.sql.dml.clause.SetClauses;
-import persistence.sql.dml.value.ValueClauses;
+import persistence.sql.dml.clause.ValueClauses;
 
 import java.util.List;
 

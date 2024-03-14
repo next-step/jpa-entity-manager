@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.testfixture.notcolumn.Person;
+import persistence.sql.ddl.querybuilder.DropQueryBuilder;
 
 class DropQueryBuilderTest {
     @Test

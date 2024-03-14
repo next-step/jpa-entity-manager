@@ -5,6 +5,8 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.testfixture.notcolumn.Person;
+import persistence.sql.ddl.clause.TableClause;
+import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
 
 import java.util.List;
 

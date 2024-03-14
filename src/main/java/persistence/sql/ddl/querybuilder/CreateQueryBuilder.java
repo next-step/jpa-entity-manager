@@ -1,4 +1,6 @@
-package persistence.sql.ddl;
+package persistence.sql.ddl.querybuilder;
+
+import persistence.sql.ddl.clause.TableClause;
 
 import static persistence.sql.common.SqlConstant.*;
 

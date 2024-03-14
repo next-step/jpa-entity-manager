@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.testfixture.notcolumn.Person;
+import persistence.sql.dml.querybuilder.UpdateQueryBuilder;
 
 class UpdateQueryBuilderTest {
     @Test

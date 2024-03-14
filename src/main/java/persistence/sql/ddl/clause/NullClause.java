@@ -1,4 +1,4 @@
-package persistence.sql.ddl.column;
+package persistence.sql.ddl.clause;
 
 import jakarta.persistence.Column;
 
