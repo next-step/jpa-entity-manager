@@ -3,19 +3,20 @@ package persistence.core;
 import java.util.List;
 
 public interface PersistenceContext {
-    Object getEntity(Class<?> entity, Long id);
 
-    void addEntity(Long id, Object entity);
+    EntityKey getEntityKey(Class<?> clazz, Long id);
 
-    void removeEntity(Long id, Class<?> clazz);
+    Object getEntity(EntityKey entityKey);
 
-    void getDatabaseSnapshot(Long id, Object entity);
+    void addEntity(EntityKey entityKey, Object entity);
+
+    void removeEntity(EntityKey entityKey);
+
+    void getDatabaseSnapshot(EntityKey entityKey);
 
     <T> List<T> dirtyCheck();
 
-    void addEntityEntry(Class<?> clazz, Long id, EntityEntry entityEntry);
+    void addEntityEntry(EntityKey entityKey, EntityEntry entityEntry);
 
-    EntityEntry getEntityEntry(Class<?> clazz, Long id);
-
-
+    EntityEntry getEntityEntry(EntityKey entityKey);
 }

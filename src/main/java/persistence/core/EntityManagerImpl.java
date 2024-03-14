@@ -22,13 +22,14 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        T entity = (T) persistenceContext.getEntity(clazz, id);
+        EntityKey entityKey = persistenceContext.getEntityKey(clazz, id);
+        T entity = (T) persistenceContext.getEntity(entityKey);
         if (entity == null) {
             EntityEntry entityEntry = new EntityEntry(Status.LOADING);
-            persistenceContext.addEntityEntry(clazz, id, entityEntry);
+            persistenceContext.addEntityEntry(entityKey, entityEntry);
             entity = entityLoader.find(clazz, id);
-            persistenceContext.addEntity(id, entity);
-            persistenceContext.getDatabaseSnapshot(id, entity);
+            persistenceContext.addEntity(entityKey, entity);
+            persistenceContext.getDatabaseSnapshot(entityKey);
             entityEntry.updateStatus(Status.MANAGED);
         }
         return entity;
@@ -37,19 +38,22 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Object entity) {
         Long id = entityPersister.insert(entity);
+        EntityKey entityKey = persistenceContext.getEntityKey(entity.getClass(), id);
         EntityEntry entityEntry = new EntityEntry(Status.SAVING);
-        persistenceContext.addEntity(id, entity);
-        persistenceContext.addEntityEntry(entity.getClass(), id, entityEntry);
+
+        persistenceContext.addEntity(entityKey, entity);
+        persistenceContext.addEntityEntry(entityKey, entityEntry);
         entityPersister.setIdentifier(entity, id);
-        persistenceContext.getDatabaseSnapshot(id, entity);
+        persistenceContext.getDatabaseSnapshot(entityKey);
         entityEntry.updateStatus(Status.MANAGED);
     }
 
     @Override
     public void remove(Object entity) {
         Long id = entityPersister.getIdentifier(entity);
-        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity.getClass(), id);
-        persistenceContext.removeEntity(id, entity.getClass());
+        EntityKey entityKey = persistenceContext.getEntityKey(entity.getClass(), id);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entityKey);
+        persistenceContext.removeEntity(entityKey);
         entityPersister.delete(entity);
         entityEntry.updateStatus(Status.GONE);
     }
@@ -57,7 +61,9 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T merge(T entity) {
         if (entityPersister.update(entity)) {
-            persistenceContext.getDatabaseSnapshot(1L, entity);
+            Long id = entityPersister.getIdentifier(entity);
+            EntityKey entityKey = persistenceContext.getEntityKey(entity.getClass(), id);
+            persistenceContext.getDatabaseSnapshot(entityKey);
             return entity;
         }
 

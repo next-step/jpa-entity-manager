@@ -1,7 +1,6 @@
 package persistence.core;
 
 public class EntityEntry {
-
     private Status status;
 
     public EntityEntry(Status status) {
