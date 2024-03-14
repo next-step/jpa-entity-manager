@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static persistence.sql.dml.clause.PrimaryKeyValue.getPrimaryKeyValue;
+import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityCache {
     private final Map<EntityKey, Object> entityCache;

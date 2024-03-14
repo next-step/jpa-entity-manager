@@ -1,4 +1,4 @@
-package persistence.sql.dml.clause;
+package persistence.sql.dml.clause.set;
 
 import java.util.ArrayList;
 import java.util.List;

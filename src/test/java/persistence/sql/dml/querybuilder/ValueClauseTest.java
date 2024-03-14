@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.testfixture.notcolumn.Person;
-import persistence.sql.dml.clause.ValueClause;
+import persistence.sql.dml.clause.value.ValueClause;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

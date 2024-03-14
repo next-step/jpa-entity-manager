@@ -1,8 +1,7 @@
-package persistence.sql.ddl.clause;
+package persistence.sql.ddl.clause.primkarykey;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import persistence.sql.dml.clause.PrimaryKeyValue;
 
 import java.lang.reflect.Field;
 import java.util.Map;

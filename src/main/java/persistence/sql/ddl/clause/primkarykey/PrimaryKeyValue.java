@@ -1,4 +1,4 @@
-package persistence.sql.dml.clause;
+package persistence.sql.ddl.clause.primkarykey;
 
 import jakarta.persistence.Id;
 import persistence.entity.exception.InvalidPrimaryKeyException;

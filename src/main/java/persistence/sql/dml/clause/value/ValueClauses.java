@@ -1,4 +1,4 @@
-package persistence.sql.dml.clause;
+package persistence.sql.dml.clause.value;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;

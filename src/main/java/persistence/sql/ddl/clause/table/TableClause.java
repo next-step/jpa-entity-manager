@@ -1,8 +1,10 @@
-package persistence.sql.ddl.clause;
+package persistence.sql.ddl.clause.table;
 
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import persistence.sql.ddl.clause.column.ColumnClauses;
+import persistence.sql.ddl.clause.primkarykey.PrimaryKeyClause;
 import persistence.sql.exception.InvalidEntityException;
 
 import java.lang.reflect.Field;

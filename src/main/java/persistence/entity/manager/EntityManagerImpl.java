@@ -9,7 +9,7 @@ import persistence.entity.persister.EntityPersister;
 
 import java.util.Optional;
 
-import static persistence.sql.dml.clause.PrimaryKeyValue.getPrimaryKeyValue;
+import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;

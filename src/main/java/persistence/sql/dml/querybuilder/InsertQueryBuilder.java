@@ -1,7 +1,7 @@
 package persistence.sql.dml.querybuilder;
 
-import persistence.sql.ddl.clause.TableClause;
-import persistence.sql.dml.clause.ValueClauses;
+import persistence.sql.ddl.clause.table.TableClause;
+import persistence.sql.dml.clause.value.ValueClauses;
 import persistence.sql.exception.InvalidValueClausesException;
 
 import java.lang.reflect.Field;

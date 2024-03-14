@@ -1,6 +1,6 @@
 package persistence.sql.ddl.querybuilder;
 
-import persistence.sql.ddl.clause.TableClause;
+import persistence.sql.ddl.clause.table.TableClause;
 
 public class DropQueryBuilder {
     public static final String DROP_TABLE = "DROP TABLE IF EXISTS %s";

@@ -2,7 +2,7 @@ package persistence.entity.persistencecontext;
 
 import java.util.Optional;
 
-import static persistence.sql.dml.clause.PrimaryKeyValue.getPrimaryKeyValue;
+import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
