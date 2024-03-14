@@ -19,8 +19,4 @@ public class EntitySnapshots {
         entitySnapshots.remove(entityKey);
     }
 
-    public boolean compareWithSnapshot(final EntityKey<?> entityKey, final Object entity) {
-        return this.entitySnapshots.get(entityKey).isSame(entity);
-    }
-
 }
