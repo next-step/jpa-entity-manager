@@ -23,12 +23,6 @@ public class EntityManagerImpl implements EntityManager {
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate, EntityPersister entityPersister, EntityLoader entityLoader) {
-        this.persistenceContext = new PersistenceContextImpl();
-        this.entityLoader = entityLoader;
-        this.entityPersister = entityPersister;
-    }
-
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
         var cachedEntity = persistenceContext.getEntity(clazz, id);
