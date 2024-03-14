@@ -25,7 +25,7 @@ public class ColumnClause {
         return typeToSqlConverter.get(type).apply(name) + " " + nullClause.getQuery();
     }
 
-    public String getNameFrom(Field field) {
+    private String getNameFrom(Field field) {
         jakarta.persistence.Column column = field.getAnnotation(jakarta.persistence.Column.class);
         if (column == null) {
             return field.getName();
