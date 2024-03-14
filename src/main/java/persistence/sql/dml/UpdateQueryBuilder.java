@@ -4,9 +4,11 @@ import static persistence.sql.ddl.common.StringConstants.PRIMARY_KEY_NOT_FOUND;
 
 import jakarta.persistence.Id;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import persistence.sql.AbstractQueryBuilder;
 import persistence.sql.Metadata;
 import persistence.sql.ddl.TableQueryBuilder;
+import persistence.sql.ddl.common.StringConstants;
 
 public class UpdateQueryBuilder extends AbstractQueryBuilder {
     private final TableQueryBuilder tableQueryBuilder;
@@ -21,10 +23,22 @@ public class UpdateQueryBuilder extends AbstractQueryBuilder {
         return String.format(
             "UPDATE %s SET %s WHERE %s = %s",
             tableQueryBuilder.getTableNameFrom(entity.getClass()),
-            metadata.getEntityColumns().getUpdateQueryStringFrom(entity),
+            getUpdateColumnsQuery(metadata, entity),
             getPrimaryKeyColumnName(entity.getClass()),
             getPrimaryKeyValueQueryFromEntity(entity)
         );
+    }
+
+    private String getUpdateColumnsQuery(Metadata metadata, Object entity) {
+        return metadata.getEntityColumns().getColumnsWithoutPrimary()
+            .stream()
+            .map(column ->
+                String.format(
+                    "%s = %s",
+                    column.getColumnName(),
+                    column.getEntityValueFrom(entity).queryString()
+                )
+            ).collect(Collectors.joining(StringConstants.COLUMN_DEFINITION_DELIMITER));
     }
 
     private Object getPrimaryKeyValueQueryFromEntity(Object entity) {
