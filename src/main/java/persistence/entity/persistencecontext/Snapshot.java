@@ -18,7 +18,9 @@ public class Snapshot {
     }
 
     public void remove(Object entity) {
-        EntityKey key = new EntityKey(entity);
+        Class<?> clazz = entity.getClass();
+        Long id = primaryKeyValue(entity);
+        EntityKey key = new EntityKey(clazz, id);
         snapshot.remove(key);
     }
 

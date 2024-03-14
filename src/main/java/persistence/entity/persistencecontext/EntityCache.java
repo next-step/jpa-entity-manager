@@ -15,7 +15,8 @@ public class EntityCache {
 
     public void put(Object entity) {
         Class<?> clazz = entity.getClass();
-        entityCache.put(new EntityKey(clazz, primaryKeyValue(entity)), entity);
+        Long id = primaryKeyValue(entity);
+        entityCache.put(new EntityKey(clazz, id), entity);
     }
 
     public Optional<Object> get(Class<?> clazz, Long key) {
@@ -28,7 +29,9 @@ public class EntityCache {
     }
 
     public void remove(Object entity) {
-        EntityKey key = new EntityKey(entity);
+        Class<?> clazz = entity.getClass();
+        Long id = primaryKeyValue(entity);
+        EntityKey key = new EntityKey(clazz, id);
         entityCache.remove(key);
     }
 }

@@ -2,8 +2,6 @@ package persistence.entity.persistencecontext;
 
 import java.util.Objects;
 
-import static persistence.entity.generator.PrimaryKeyValueGenerator.primaryKeyValue;
-
 public class EntityKey {
     private final String className;
     private final Long id;
@@ -11,11 +9,6 @@ public class EntityKey {
     public EntityKey(Class<?> clazz, Long id) {
         this.className = clazz.getName();
         this.id = id;
-    }
-
-    public EntityKey (Object entity) {
-        this.className = entity.getClass().getName();
-        this.id = primaryKeyValue(entity);
     }
 
     @Override
