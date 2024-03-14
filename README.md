@@ -38,7 +38,7 @@
       }
       ```
 
-* [ ] 요구사항2 - snapshot 만들기
+* [x] 요구사항2 - snapshot 만들기
     1. 영속 컨텍스트 내에서 Entity 를 조회
     2. 조회된 상태의 Entity 를 스냅샷 생성
     3. 트랜잭션 커밋 후 해당 스냅샷과 현재 Entity 를 비교 (데이터베이스 커밋은 신경쓰지 않는다)
@@ -46,5 +46,5 @@
     5. 요구사항3 - 더티체킹 구현
 
 
-* d요구사항3 - 더티체킹 구현
-  Snapshot 기반 Dirty Checking
+* [x] 요구사항3 - 더티체킹 구현
+    * Snapshot 기반 Dirty Checking
