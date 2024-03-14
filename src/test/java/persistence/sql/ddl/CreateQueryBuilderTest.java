@@ -1,6 +1,7 @@
 package persistence.sql.ddl;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.testfixture.notcolumn.Person;
@@ -33,7 +34,8 @@ class CreateQueryBuilderTest {
         List<String> actualColumnQueries = new TableClause(Person.class).columnQueries();
 
         // then
-        Assertions.assertThat(expectedColumnQueries.containsAll(actualColumnQueries)).isTrue();
-        Assertions.assertThat(actualColumnQueries).hasSize(3);
+        var softAssertions = new SoftAssertions();
+        softAssertions.assertThat(expectedColumnQueries.containsAll(actualColumnQueries)).isTrue();
+        softAssertions.assertThat(actualColumnQueries).hasSize(3);
     }
 }

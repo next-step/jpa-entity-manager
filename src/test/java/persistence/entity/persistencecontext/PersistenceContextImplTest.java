@@ -4,6 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +69,9 @@ class PersistenceContextImplTest {
         var actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
 
         // then
-        Assertions.assertThat(actualPerson).isSameAs(person);
-        Assertions.assertThat(actualDog).isSameAs(dog);
+        var softAssertions = new SoftAssertions();
+        softAssertions.assertThat(actualPerson).isSameAs(person);
+        softAssertions.assertThat(actualDog).isSameAs(dog);
     }
 
     @DisplayName("존재하지 않는 값을 조회시, 리턴 객체는 빈값이다.")
@@ -115,7 +117,8 @@ class PersistenceContextImplTest {
         var entityAfterDelete = persistenceContext.getEntity(Person.class, 1L);
 
         // then
-        Assertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
-        Assertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
+        var softAssertions = new SoftAssertions();
+        softAssertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
+        softAssertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
     }
 }
