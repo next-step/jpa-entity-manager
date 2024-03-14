@@ -11,32 +11,19 @@ public class ColumnClause {
             Integer.class, fieldName -> String.format("%s INT", fieldName),
             int.class, fieldName -> String.format("%s INT", fieldName)
     );
-    private final String name;
-    private final Class<?> type;
+    private final ColumnSpec spec;
     private final NullClause nullClause;
 
     public ColumnClause(Field field) {
-        this.name = initName(field);
-        this.type = field.getType();
+        this.spec = new ColumnSpec(field);
         this.nullClause = new NullClause(field);
     }
 
     public String getQuery() {
-        return typeToSqlConverter.get(type).apply(name) + " " + nullClause.getQuery();
+        return typeToSqlConverter.get(this.spec.type()).apply(this.spec.name()) + " " + nullClause.getQuery();
     }
 
-    private String initName(Field field) {
-        jakarta.persistence.Column column = field.getAnnotation(jakarta.persistence.Column.class);
-        if (column == null) {
-            return field.getName();
-        }
-        if (column.name().isEmpty()) {
-            return field.getName();
-        }
-        return column.name();
-    }
-
-    public String nameQuery() {
-        return this.name;
+    public String name() {
+        return this.spec.name();
     }
 }

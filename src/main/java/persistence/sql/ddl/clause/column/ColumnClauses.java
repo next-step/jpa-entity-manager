@@ -23,6 +23,6 @@ public class ColumnClauses {
     }
 
     public List<String> getNames() {
-        return this.columnClauses.stream().map(ColumnClause::nameQuery).collect(Collectors.toList());
+        return this.columnClauses.stream().map(ColumnClause::name).collect(Collectors.toList());
     }
 }
