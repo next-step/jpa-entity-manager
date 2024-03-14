@@ -1,18 +1,14 @@
 package persistence.core;
 
 import database.DatabaseServer;
-import jdbc.JdbcTemplate;
-
 import java.sql.SQLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jdbc.JdbcTemplate;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
     private final PersistenceContext persistenceContext;
 
-    private static final Logger LOG = LoggerFactory.getLogger(EntityManagerImpl.class);
     public EntityManagerImpl(DatabaseServer server) throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
         this.persistenceContext = new DefaultPersistenceContext();
@@ -38,12 +34,11 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Object entity) {
         Long id = entityPersister.insert(entity);
-        EntityKey entityKey = persistenceContext.getEntityKey(entity.getClass(), id);
-        EntityEntry entityEntry = new EntityEntry(Status.SAVING);
-
-        persistenceContext.addEntity(entityKey, entity);
-        persistenceContext.addEntityEntry(entityKey, entityEntry);
         entityPersister.setIdentifier(entity, id);
+        EntityEntry entityEntry = new EntityEntry(Status.SAVING);
+        EntityKey entityKey = persistenceContext.getEntityKey(entity.getClass(), id);
+        persistenceContext.addEntityEntry(entityKey, entityEntry);
+        persistenceContext.addEntity(entityKey, entity);
         persistenceContext.getDatabaseSnapshot(entityKey);
         entityEntry.updateStatus(Status.MANAGED);
     }
@@ -53,6 +48,7 @@ public class EntityManagerImpl implements EntityManager {
         Long id = entityPersister.getIdentifier(entity);
         EntityKey entityKey = persistenceContext.getEntityKey(entity.getClass(), id);
         EntityEntry entityEntry = persistenceContext.getEntityEntry(entityKey);
+        entityEntry.updateStatus(Status.DELETED);
         persistenceContext.removeEntity(entityKey);
         entityPersister.delete(entity);
         entityEntry.updateStatus(Status.GONE);
@@ -75,5 +71,6 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.dirtyCheck()
                 .forEach(this::merge);
     }
+
 
 }
