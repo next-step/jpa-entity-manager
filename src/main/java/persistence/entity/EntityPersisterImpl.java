@@ -1,10 +1,10 @@
 package persistence.entity;
 
 import dialect.Dialect;
-import pojo.EntityMetaData;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
+import pojo.EntityMetaData;
 
 public class EntityPersisterImpl implements EntityPersister {
 
@@ -15,30 +15,28 @@ public class EntityPersisterImpl implements EntityPersister {
      */
 
     private final JdbcTemplate jdbcTemplate;
-    private final Dialect dialect;
     private final EntityMetaData entityMetaData;
 
-    public EntityPersisterImpl(JdbcTemplate jdbcTemplate, Dialect dialect, EntityMetaData entityMetaData) {
+    public EntityPersisterImpl(JdbcTemplate jdbcTemplate, EntityMetaData entityMetaData) {
         this.jdbcTemplate = jdbcTemplate;
-        this.dialect = dialect;
         this.entityMetaData = entityMetaData;
     }
 
     @Override
-    public Object insert(Object object) {
-        UpdateQueryBuilder queryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
-        return jdbcTemplate.executeAndReturnKey(queryBuilder.insertQuery(object));
+    public Object insert(Object entity) {
+        UpdateQueryBuilder queryBuilder = new UpdateQueryBuilder(entityMetaData);
+        return jdbcTemplate.executeAndReturnKey(queryBuilder.insertQuery(entity));
     }
 
     @Override
-    public boolean update(Object object) {
-        UpdateQueryBuilder queryBuilder = new UpdateQueryBuilder(dialect, entityMetaData);
-        return jdbcTemplate.executeUpdate(queryBuilder.updateQuery(object)) > 0;
+    public boolean update(Object entity) {
+        UpdateQueryBuilder queryBuilder = new UpdateQueryBuilder(entityMetaData);
+        return jdbcTemplate.executeUpdate(queryBuilder.updateQuery(entity)) > 0;
     }
 
     @Override
-    public void delete(Object object) {
-        DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(dialect, entityMetaData);
-        jdbcTemplate.execute(queryBuilder.deleteByIdQuery(object));
+    public void delete(Object entity) {
+        DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder(entityMetaData);
+        jdbcTemplate.execute(queryBuilder.deleteByIdQuery(entity));
     }
 }

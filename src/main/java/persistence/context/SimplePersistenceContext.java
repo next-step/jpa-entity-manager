@@ -4,10 +4,10 @@ import dialect.Dialect;
 import dialect.H2Dialect;
 import persistence.entity.EntityCacheKey;
 import persistence.entity.EntitySnapshot;
-import pojo.FieldInfo;
 import pojo.FieldInfos;
-import pojo.FieldValue;
+import pojo.IdField;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,44 +19,51 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public <T> T getEntity(Class<T> clazz, Object id) {
-        Object object = entitiesByKey.get(new EntityCacheKey(clazz, id));
-        return clazz.cast(object);
+        Object entity = entitiesByKey.get(new EntityCacheKey(clazz, id));
+        return clazz.cast(entity);
     }
 
     @Override
     public void addEntity(Object entity) {
-        FieldInfo idFieldData = new FieldInfos(entity.getClass().getDeclaredFields()).getIdFieldData();
-        FieldValue idFieldValue = new FieldValue(dialect, idFieldData.getField(), entity);
-        addEntity(Long.valueOf(String.valueOf(idFieldValue.getValue())), entity);
+        Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, entity);
+        addEntity(Long.valueOf(String.valueOf(idField.getFieldValueData())), entity);
     }
 
     @Override
     public void addEntity(Long id, Object entity) {
         EntityCacheKey entityCacheKey = new EntityCacheKey(entity.getClass(), id);
         entitiesByKey.put(entityCacheKey, entity);
-        entitySnapshotsByKey.put(entityCacheKey, new EntitySnapshot(dialect, entity));
+        entitySnapshotsByKey.put(entityCacheKey, new EntitySnapshot(entity));
     }
 
     @Override
     public void removeEntity(Object entity) {
-        FieldInfo idFieldData = new FieldInfos(entity.getClass().getDeclaredFields()).getIdFieldData();
-        FieldValue idFieldValue = new FieldValue(dialect, idFieldData.getField(), entity);
-        EntityCacheKey entityCacheKey = new EntityCacheKey(entity.getClass(), idFieldValue.getValue());
+        Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, entity);
+        EntityCacheKey entityCacheKey = new EntityCacheKey(entity.getClass(), idField.getFieldValueData());
         entitiesByKey.remove(entityCacheKey);
         entitySnapshotsByKey.remove(entityCacheKey);
     }
 
     @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
+    public EntitySnapshot getDatabaseSnapshot(Object entity) {
+        Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, entity);
+        return getDatabaseSnapshot(Long.valueOf(String.valueOf(idField.getFieldValueData())), entity);
+    }
+
+    @Override
+    public EntitySnapshot getDatabaseSnapshot(Long id, Object entity) {
         EntityCacheKey entityCacheKey = new EntityCacheKey(entity.getClass(), id);
-        return entitySnapshotsByKey.computeIfAbsent(entityCacheKey, cacheKey -> new EntitySnapshot(dialect, entity));
+        return entitySnapshotsByKey.computeIfAbsent(entityCacheKey, cacheKey -> new EntitySnapshot(entity));
     }
 
     @Override
     public EntitySnapshot getCachedDatabaseSnapshot(Object entity) {
-        FieldInfo idFieldData = new FieldInfos(entity.getClass().getDeclaredFields()).getIdFieldData();
-        FieldValue idFieldValue = new FieldValue(dialect, idFieldData.getField(), entity);
-        return getCachedDatabaseSnapshot(Long.valueOf(String.valueOf(idFieldValue.getValue())), entity);
+        Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, entity);
+        return getCachedDatabaseSnapshot(Long.valueOf(String.valueOf(idField.getFieldValueData())), entity);
     }
 
     @Override

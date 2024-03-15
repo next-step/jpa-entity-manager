@@ -1,13 +1,10 @@
 package persistence.sql.dml;
 
-import dialect.Dialect;
 import pojo.EntityMetaData;
 import pojo.FieldInfo;
 import pojo.FieldInfos;
-import pojo.FieldName;
-import pojo.FieldNameAndValue;
-import pojo.FieldValue;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static constants.CommonConstants.AND;
@@ -19,55 +16,52 @@ public class UpdateQueryBuilder {
     private static final String INSERT_DATA_QUERY = "INSERT INTO %s (%s) VALUES (%s);";
     private static final String UPDATE_DATA_QUERY = "UPDATE %s SET %s WHERE %s;";
 
-    private final Dialect dialect;
     private final EntityMetaData entityMetaData;
 
-    public UpdateQueryBuilder(Dialect dialect, EntityMetaData entityMetaData) {
-        this.dialect = dialect;
+    public UpdateQueryBuilder(EntityMetaData entityMetaData) {
         this.entityMetaData = entityMetaData;
     }
 
-    public String insertQuery(Object object) {
-        return String.format(INSERT_DATA_QUERY, entityMetaData.getTableInfo().getName(), columnsClause(object), valuesClause(object));
+    public String insertQuery(Object entity) {
+        return String.format(INSERT_DATA_QUERY, entityMetaData.getTableInfo().getName(), columnsClause(entity), valuesClause(entity));
     }
 
-    public String updateQuery(Object object) {
-        return String.format(UPDATE_DATA_QUERY, entityMetaData.getTableInfo().getName(), setClause(object), whereClause(object));
+    public String updateQuery(Object entity) {
+        return String.format(UPDATE_DATA_QUERY, entityMetaData.getTableInfo().getName(), setClause(entity), whereClause(entity));
     }
 
-    private String columnsClause(Object object) {
-        return new FieldInfos(object.getClass().getDeclaredFields()).getIdAndColumnFieldsData().stream()
-                .map(fieldData -> new FieldName(fieldData.getField()))
-                .map(FieldName::getName)
+    private String columnsClause(Object entity) {
+        return new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFields().stream()
+                .map(field -> new FieldInfo(field, entity))
+                .map(fieldInfo -> fieldInfo.getFieldName().getName())
                 .reduce((o1, o2) -> String.join(COMMA, o1, String.valueOf(o2)))
                 .orElseThrow(() -> new IllegalStateException("Id 혹은 Column 타입이 없습니다."));
     }
 
-    private String valuesClause(Object object) {
-        return new FieldInfos(object.getClass().getDeclaredFields()).getIdAndColumnFieldsData().stream()
-                .map(fieldData -> new FieldValue(dialect, fieldData.getField(), object))
-                .map(FieldValue::getValue)
+    private String valuesClause(Object entity) {
+        return new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFields().stream()
+                .map(field -> new FieldInfo(field, entity))
+                .map(fieldInfo -> fieldInfo.getFieldValue().getValue())
                 .reduce((o1, o2) -> String.join(COMMA, o1, String.valueOf(o2)))
                 .orElseThrow(() -> new IllegalStateException("Id 혹은 Column 타입이 없습니다."));
     }
 
-    private String setClause(Object object) {
-        List<FieldInfo> columnFieldsData = new FieldInfos(object.getClass().getDeclaredFields()).getColumnFieldsData();
-        return fieldNameAndValueClause(columnFieldsData, object, COMMA);
+    private String setClause(Object entity) {
+        List<Field> columnFields = new FieldInfos(entity.getClass().getDeclaredFields()).getColumnFields();
+        return fieldNameAndValueClause(entity, columnFields, COMMA);
     }
 
-    private String whereClause(Object object) {
-        FieldInfo idFieldInfo = new FieldInfos(object.getClass().getDeclaredFields()).getIdFieldData();
-        return fieldNameAndValueClause(List.of(idFieldInfo), object, AND);
+    private String whereClause(Object entity) {
+        Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
+        return fieldNameAndValueClause(entity, List.of(field), AND);
     }
 
-    private String fieldNameAndValueClause(List<FieldInfo> fieldInfoList, Object object, String delimiter) {
-        return fieldInfoList.stream()
-                .map(FieldInfo::getField)
-                .map(field -> new FieldNameAndValue(new FieldName(field), new FieldValue(dialect, field, object)))
-                .filter(FieldNameAndValue::isNotBlankOrEmpty)
-                .map(fieldNameAndValue -> fieldNameAndValue.joinNameAndValueWithDelimiter(EQUAL))
-                .reduce((o1, o2) -> String.join(delimiter, o1, o2))
+    private String fieldNameAndValueClause(Object entity, List<Field> fields, String delimiter) {
+        return fields.stream()
+                .map(field -> new FieldInfo(field, entity))
+                .filter(FieldInfo::isNotBlankOrEmpty)
+                .map(fieldInfo -> fieldInfo.joinNameAndValueWithDelimiter(EQUAL))
+                .reduce((o1, o2) -> String.join(delimiter, o1, String.valueOf(o2)))
                 .orElseThrow(() -> new IllegalStateException("update 데이터가 없습니다."));
     }
 }

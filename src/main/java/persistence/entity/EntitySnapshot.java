@@ -1,11 +1,10 @@
 package persistence.entity;
 
-import dialect.Dialect;
 import pojo.FieldInfo;
 import pojo.FieldInfos;
-import pojo.FieldName;
-import pojo.FieldValue;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,18 +14,18 @@ public class EntitySnapshot {
 
     private final Map<String, Object> map;
 
-    public EntitySnapshot(Dialect dialect, Object entity) {
-        List<FieldInfo> fieldInfos = new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFieldsData();
-        this.map = fieldInfos.stream()
-                .map(FieldInfo::getField)
+    public EntitySnapshot(Object entity) {
+        List<Field> fields = new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFields();
+        this.map = fields.stream()
+                .map(field -> new FieldInfo(field, entity))
                 .collect(Collectors.toMap(
-                        field -> new FieldName(field).getName(),
-                        field -> new FieldValue(dialect, field, entity).getValue()
+                        fieldInfo -> fieldInfo.getFieldName().getName(),
+                        fieldInfo -> fieldInfo.getFieldValue().getValue()
                 ));
     }
 
     public Map<String, Object> getMap() {
-        return map;
+        return new HashMap<>(map);
     }
 
     @Override

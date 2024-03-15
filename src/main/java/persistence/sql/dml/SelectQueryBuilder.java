@@ -1,9 +1,10 @@
 package persistence.sql.dml;
 
 import pojo.EntityMetaData;
-import pojo.FieldInfo;
 import pojo.FieldInfos;
-import pojo.FieldName;
+import pojo.IdField;
+
+import java.lang.reflect.Field;
 
 public class SelectQueryBuilder {
 
@@ -20,9 +21,10 @@ public class SelectQueryBuilder {
         return String.format(FIND_ALL_QUERY, entityMetaData.getTableInfo().getName());
     }
 
-    public String findByIdQuery(Class<?> clazz, Object condition) {
-        FieldInfo idFieldInfo = new FieldInfos(clazz.getDeclaredFields()).getIdFieldData();
+    public String findByIdQuery(Object entity, Class<?> clazz, Object condition) {
+        Field field = new FieldInfos(clazz.getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, entity);
         return String.format(FIND_BY_ID_QUERY, entityMetaData.getTableInfo().getName(),
-                new FieldName(idFieldInfo.getField()).getName(), condition);
+                idField.getFieldNameData(), condition);
     }
 }

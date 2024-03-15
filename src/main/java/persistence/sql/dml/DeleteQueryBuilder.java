@@ -1,11 +1,8 @@
 package persistence.sql.dml;
 
-import dialect.Dialect;
 import pojo.EntityMetaData;
-import pojo.FieldInfo;
 import pojo.FieldInfos;
-import pojo.FieldName;
-import pojo.FieldValue;
+import pojo.IdField;
 
 import java.lang.reflect.Field;
 
@@ -13,22 +10,19 @@ public class DeleteQueryBuilder {
 
     private static final String DELETE_QUERY = "DELETE %s WHERE %s = %s;";
 
-    private final Dialect dialect;
     private final EntityMetaData entityMetaData;
 
-    public DeleteQueryBuilder(Dialect dialect, EntityMetaData entityMetaData) {
-        this.dialect = dialect;
+    public DeleteQueryBuilder(EntityMetaData entityMetaData) {
         this.entityMetaData = entityMetaData;
     }
 
-    public String deleteQuery(Field field, Object object) {
-        FieldName fieldName = new FieldName(field);
-        FieldValue fieldValue = new FieldValue(dialect, field, object);
-        return String.format(DELETE_QUERY, entityMetaData.getTableInfo().getName(), fieldName.getName(), fieldValue.getValue());
+    public String deleteQuery(IdField idField) {
+        return String.format(DELETE_QUERY, entityMetaData.getTableInfo().getName(), idField.getFieldNameData(), idField.getFieldValueData());
     }
 
-    public String deleteByIdQuery(Object object) {
-        FieldInfo idFieldInfo = new FieldInfos(object.getClass().getDeclaredFields()).getIdFieldData();
-        return deleteQuery(idFieldInfo.getField(), object);
+    public String deleteByIdQuery(Object entity) {
+        Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
+        IdField idField = new IdField(field, entity);
+        return deleteQuery(idField);
     }
 }

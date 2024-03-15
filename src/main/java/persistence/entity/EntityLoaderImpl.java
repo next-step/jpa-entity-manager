@@ -1,9 +1,9 @@
 package persistence.entity;
 
-import pojo.EntityMetaData;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
 import persistence.sql.dml.SelectQueryBuilder;
+import pojo.EntityMetaData;
 
 import java.util.List;
 
@@ -17,9 +17,10 @@ public class EntityLoaderImpl implements EntityLoader {
         this.entityMetaData = entityMetaData;
     }
 
-    public <T> T findById(Class<T> clazz, Long id) {
+    @Override
+    public <T> T findById(Class<T> clazz, Object entity, Object condition) {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityMetaData);
-        return jdbcTemplate.queryForObject(selectQueryBuilder.findByIdQuery(clazz, id), new RowMapperImpl<>(clazz));
+        return jdbcTemplate.queryForObject(selectQueryBuilder.findByIdQuery(entity, clazz, condition), new RowMapperImpl<>(clazz));
     }
 
     public <T> List<T> findAll(Class<T> clazz) {

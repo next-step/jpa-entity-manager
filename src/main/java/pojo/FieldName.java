@@ -21,8 +21,7 @@ public class FieldName {
     }
 
     private String getFieldName(Field field) {
-        FieldInfo fieldInfo = new FieldInfo(field);
-        if (fieldInfo.isColumnField()) {
+        if (field.isAnnotationPresent(Column.class)) {
             return StringUtils.isBlankOrEmpty(field.getAnnotation(Column.class).name()) ? field.getName()
                     : field.getAnnotation(Column.class).name();
         }
