@@ -65,6 +65,10 @@ public class Person {
         return index;
     }
 
+    public void changeEmail(String newEmail) {
+        this.email = newEmail;
+    }
+
     @Override
     public String toString() {
         return "Person{" +

@@ -10,9 +10,13 @@ public class EntityColumnValue{
         this.columnValue = columnValue;
     }
 
-   public String queryString() {
+    public Object getColumnValue() {
+        return columnValue;
+    }
+
+    public String queryString() {
         return queryString(columnValue);
-   }
+    }
 
     /**
      * Get the column value from the object

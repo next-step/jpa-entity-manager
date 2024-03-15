@@ -13,7 +13,7 @@ class EntityColumnsTest {
         EntityColumns entityColumns = new EntityColumns(Person.class);
 
         // when
-        EntityColumn primaryColumn = entityColumns.getPrimaryColumn();
+        EntityColumn primaryColumn = entityColumns.getEntityIdColumn();
 
         // then
         assertAll(

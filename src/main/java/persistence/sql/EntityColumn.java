@@ -24,7 +24,7 @@ public class EntityColumn {
         return column.name();
     }
 
-    public EntityColumnValue getEntityValueFrom(Object entity) throws ReflectionRuntimeException {
+    public EntityColumnValue getEntityColumnValueFrom(Object entity) throws ReflectionRuntimeException {
         try {
             field.setAccessible(true);
 

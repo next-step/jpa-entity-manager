@@ -24,7 +24,7 @@ public class EntityColumns {
         this.container = container;
     }
 
-    public EntityColumn getPrimaryColumn() {
+    public EntityColumn getEntityIdColumn() {
         return container.stream()
             .filter(EntityColumn::isPrimary)
             .findFirst()
