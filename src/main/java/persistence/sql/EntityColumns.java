@@ -25,18 +25,14 @@ public class EntityColumns {
     }
 
     public EntityColumn getPrimaryColumn() {
-        return container.stream().findFirst()
+        return container.stream()
+            .filter(EntityColumn::isPrimary)
+            .findFirst()
             .orElseThrow(() -> new IllegalStateException(PRIMARY_KEY_NOT_FOUND));
     }
 
     public List<EntityColumn> getColumns() {
         return container;
-    }
-
-    public List<EntityColumn> getColumnsWithoutPrimary() {
-        return container.stream()
-            .filter(column -> !column.isPrimary())
-            .collect(Collectors.toList());
     }
 
     public static Stream<EntityColumn> streamFrom(Class<?> entityClass) {

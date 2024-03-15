@@ -1,5 +1,6 @@
 package persistence.sql;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Metadata {
@@ -27,8 +28,8 @@ public class Metadata {
         return entityTable;
     }
 
-    public EntityColumns getEntityColumns() {
-        return entityColumns;
+    public List<EntityColumn> getEntityColumns() {
+        return entityColumns.getColumns();
     }
 
     public EntityColumnValues getEntityValuesFrom(Object entity) {

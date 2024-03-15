@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static persistence.sql.EntityTableTest.provideEntityTableMetadata;
 
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,7 +69,7 @@ class MetadataTest {
         Metadata metadata = new Metadata(Person.class);
 
         // when
-        EntityColumns entityColumns = metadata.getEntityColumns();
+        List<EntityColumn> entityColumns = metadata.getEntityColumns();
 
         // then
         assertAll(

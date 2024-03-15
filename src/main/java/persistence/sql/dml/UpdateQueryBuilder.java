@@ -30,8 +30,9 @@ public class UpdateQueryBuilder extends AbstractQueryBuilder {
     }
 
     private String getUpdateColumnsQuery(Metadata metadata, Object entity) {
-        return metadata.getEntityColumns().getColumnsWithoutPrimary()
+        return metadata.getEntityColumns()
             .stream()
+            .filter(column -> !column.isPrimary())
             .map(column ->
                 String.format(
                     "%s = %s",
