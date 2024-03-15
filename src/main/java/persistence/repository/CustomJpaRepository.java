@@ -15,7 +15,7 @@ public class CustomJpaRepository<T, ID> {
 
     public T save(T entity) {
         if (isEmptyEntity(entity)) {
-            return (T) entityManager.persist(entity);
+            return entityManager.persist(entity);
         }
 
         return entityManager.merge(entity);

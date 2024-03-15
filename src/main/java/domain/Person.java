@@ -50,6 +50,14 @@ public class Person {
         return name;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

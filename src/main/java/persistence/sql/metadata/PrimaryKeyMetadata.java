@@ -1,5 +1,7 @@
 package persistence.sql.metadata;
 
+import java.lang.reflect.Field;
+
 public class PrimaryKeyMetadata {
 
     private final String name;
@@ -20,5 +22,16 @@ public class PrimaryKeyMetadata {
 
     public Object getValue() {
         return value;
+    }
+
+    public void setValue(Object entity, Object value) {
+        try {
+            Field field = entity.getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            field.set(entity, value);
+            field.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

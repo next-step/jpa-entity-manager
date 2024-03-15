@@ -16,7 +16,6 @@ public class EntitySnapshot {
     public static EntitySnapshot from(Object entity) {
         EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass(), entity);
         return new EntitySnapshot(entityMetadata.getColumns().stream()
-                .filter(ColumnMetadata::isNonPrimaryKey)
                 .collect(Collectors.toMap(column -> column, ColumnMetadata::getValue)));
     }
 

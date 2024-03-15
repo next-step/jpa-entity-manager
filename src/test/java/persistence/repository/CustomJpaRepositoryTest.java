@@ -24,7 +24,8 @@ class CustomJpaRepositoryTest {
     DatabaseServer databaseServer;
     private JdbcTemplate jdbcTemplate;
     private EntityManager entityManager;
-    private Dialect DIALECT = new H2Dialect();
+    private CustomJpaRepository<Person, Long> customJpaRepository;
+    private final Dialect DIALECT = new H2Dialect();
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -39,6 +40,7 @@ class CustomJpaRepositoryTest {
                 .generateQuery());
 
         entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT);
+        customJpaRepository = new CustomJpaRepository<>(entityManager);
     }
 
     @AfterEach
@@ -53,24 +55,27 @@ class CustomJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("JpaRepository save 테스트")
+    @DisplayName("기존 객체가 없을 경우 save 테스트")
     void save() {
         // given
-        final CustomJpaRepository<Person, Long> customJpaRepository = new CustomJpaRepository<>(entityManager);
         final Person person = Person.of("test", 11, "test12@gmail.com");
 
         // when
         Person savedPerson = customJpaRepository.save(person);
 
         // then
-        assertThat(savedPerson).isEqualTo(person);
+        assertAll(
+                () -> assertThat(savedPerson.getId()).isEqualTo(1L),
+                () -> assertThat(savedPerson.getName()).isEqualTo(person.getName()),
+                () -> assertThat(savedPerson.getAge()).isEqualTo(person.getAge()),
+                () -> assertThat(savedPerson.getEmail()).isEqualTo(person.getEmail())
+        );
     }
 
     @Test
-    @DisplayName("JpaRepository merge 테스트")
+    @DisplayName("기존 객체가 있을 경우 Dirty Checking 테스트 - merge")
     void merge() {
         // given
-        final CustomJpaRepository<Person, Long> customJpaRepository = new CustomJpaRepository<>(entityManager);
         final Person person = Person.of("test", 11, "test12@gmail.com");
         Person savedPerson = customJpaRepository.save(person);
         final String newName = "newName";
@@ -81,8 +86,10 @@ class CustomJpaRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(resultPerson).isEqualTo(savedPerson),
-                () -> assertThat(resultPerson.getName()).isEqualTo(newName)
+                () -> assertThat(resultPerson.getId()).isEqualTo(savedPerson.getId()),
+                () -> assertThat(resultPerson.getName()).isEqualTo(newName),
+                () -> assertThat(resultPerson.getAge()).isEqualTo(savedPerson.getAge()),
+                () -> assertThat(resultPerson.getEmail()).isEqualTo(savedPerson.getEmail())
         );
     }
 }

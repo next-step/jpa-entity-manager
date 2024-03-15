@@ -88,8 +88,4 @@ public class ColumnMetadata {
 
         return result.toLowerCase();
     }
-
-    public boolean isNonPrimaryKey() {
-        return annotations.stream().noneMatch(annotation -> annotation.annotationType().equals(jakarta.persistence.Id.class));
-    }
 }

@@ -6,6 +6,7 @@ import persistence.context.PersistenceContext;
 import persistence.context.SimplePersistenceContext;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.metadata.EntityMetadata;
+import persistence.sql.metadata.PrimaryKeyMetadata;
 
 import java.util.Objects;
 
@@ -34,8 +35,11 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     @Override
-    public Object persist(Object entity) {
+    public <T> T persist(T entity) {
         Object id = entityPersister.insert(entity);
+
+        PrimaryKeyMetadata primaryKey = EntityMetadata.of(entity.getClass(), entity).getPrimaryKey();
+        primaryKey.setValue(entity, id);
 
         cachedEntity(id, entity);
         return entity;

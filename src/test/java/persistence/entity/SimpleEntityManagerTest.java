@@ -71,8 +71,10 @@ class SimpleEntityManagerTest {
     @DisplayName("요구사항2 - persist (insert)")
     void insert() {
         // when
+        Person savedPerson = entityManager.persist(person);
+
         // then
-        assertThat(entityManager.persist(person)).isEqualTo(person);
+        assertThat(savedPerson).isEqualTo(person);
     }
 
     @Test
@@ -83,7 +85,7 @@ class SimpleEntityManagerTest {
         Person newPerson = Person.of(1L, "test12", 12, "test12@gmail.com");
 
         // when
-        Person updatePerson = (Person) entityManager.persist(newPerson);
+        Person updatePerson = entityManager.persist(newPerson);
 
         // then
         assertAll(
