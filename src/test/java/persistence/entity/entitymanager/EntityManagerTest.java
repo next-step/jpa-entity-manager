@@ -98,9 +98,7 @@ class EntityManagerTest {
         Optional<Person> actual = entityManager.find(Person.class, 1L);
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(actual).isSameAs(entityLoader.find(Person.class, 1L));
-        softAssertions.assertThat(actual).isSameAs(persistenceContext.getEntity(Person.class, 1L));
+        Assertions.assertThat(actual.get()).isSameAs(persistenceContext.getEntity(Person.class, 1L).get());
     }
 
     @Test

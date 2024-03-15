@@ -4,6 +4,7 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,10 +60,14 @@ class CustomJpaRepositoryTest {
 
         // when
         Person updatedPerson = savedPerson.changeEmail("soo@gmail.com");
-        Person actual = repository.save(updatedPerson);
+        Person changedPerson = repository.save(updatedPerson);
+        Person foundPerson = repository.find(Person.class, personId).get();
 
         // then
-        Assertions.assertThat(actual).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(changedPerson).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
+            softly.assertThat(foundPerson).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
+        });
     }
 
 

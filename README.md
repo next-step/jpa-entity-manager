@@ -8,6 +8,7 @@
   - [x] remove 메서드의 파라메터로 entityKey를 전달하라
   - [x] 실제 예외가 발생했을때만 객체를 생성하라.
   - [x] updateEntity 메서드 실행시 EntityCache에도 값을 넣어준다. addEntity의 파라메터로 id도 함께 넘긴다. 
+  - [x] entityLoader.find에서 가져오는 객체는 매번 다른 주소값을 리턴하므로 테스트에서 대상에서 제거하라
 
 ## 3단계
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라
