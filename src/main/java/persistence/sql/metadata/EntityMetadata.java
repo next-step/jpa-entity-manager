@@ -12,24 +12,25 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class EntityMetadata {
-
+    private final Class<?> clazz;
     private final String name;
     private final ColumnsMetadata columns;
     private final PrimaryKeyMetadata primaryKey;
 
 
-    private EntityMetadata(String name, ColumnsMetadata columns, PrimaryKeyMetadata primaryKey) {
+    private EntityMetadata(Class<?> clazz, String name, ColumnsMetadata columns, PrimaryKeyMetadata primaryKey) {
+        this.clazz = clazz;
         this.name = name;
         this.columns = columns;
         this.primaryKey = primaryKey;
     }
 
-    public static EntityMetadata of(Class<?> clazz) {
-        return new EntityMetadata(generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, null)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, null)));
+    public static EntityMetadata from(Class<?> clazz) {
+        return new EntityMetadata(clazz, generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, null)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, null)));
     }
 
     public static EntityMetadata of(Class<?> clazz, Object object) {
-        return new EntityMetadata(generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, object)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, object)));
+        return new EntityMetadata(clazz, generateTableName(clazz), ColumnsMetadata.of(createColumns(clazz, object)), PrimaryKeyMetadata.of(generatePrimaryKey(clazz, object)));
     }
 
     private static String generateTableName(Class<?> clazz) {
@@ -54,7 +55,6 @@ public class EntityMetadata {
                 .orElse(null);
     }
 
-    // TODO: 분리?
     public static List<ColumnMetadata> createColumns(Class<?> clazz, Object entity) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
@@ -62,11 +62,19 @@ public class EntityMetadata {
                 .collect(Collectors.toList());
     }
 
+    public Class<?> getClazz() {
+        return clazz;
+    }
+
     public String getName() {
         return name;
     }
 
-    public ColumnsMetadata getColumns() {
+    public List<ColumnMetadata> getColumns() {
+        return columns.getColumns();
+    }
+
+    public ColumnsMetadata getColumnsMetadata() {
         return columns;
     }
 

@@ -5,8 +5,6 @@ import jdbc.JdbcTemplate;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.conditions.WhereRecord;
-import persistence.sql.metadata.EntityMetadata;
-import persistence.sql.metadata.PrimaryKeyMetadata;
 
 import java.util.List;
 
@@ -19,27 +17,15 @@ public class EntityLoader {
         this.dialect = dialect;
     }
 
-    public <T> T find(Class<T> clazz, Object Id) {
-        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.builder()
-                .dialect(dialect)
-                .entity(clazz)
-                .where(List.of(WhereRecord.of("id", "=", Id)))
-                .build();
-
-        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> new EntityRowMapper<>(clazz).mapRow(resultSet));
-    }
-
-    public <T> T findByEntity(T entity) {
-        Class<T> clazz = (Class<T>) entity.getClass();
-        EntityMetadata metadata = EntityMetadata.of(clazz, entity);
-        PrimaryKeyMetadata primaryKey = metadata.getPrimaryKey();
+    public <T> T find(EntityId entityId) {
+        Class<?> clazz = entityId.getClazz();
 
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.builder()
                 .dialect(dialect)
                 .entity(clazz)
-                .where(List.of(WhereRecord.of(primaryKey.getName(), "=", primaryKey.getValue())))
+                .where(List.of(WhereRecord.of(String.valueOf(entityId.getName()), "=", entityId.getValue())))
                 .build();
 
-        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> new EntityRowMapper<>(clazz).mapRow(resultSet));
+        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> (T) new EntityRowMapper<>(clazz).mapRow(resultSet));
     }
 }

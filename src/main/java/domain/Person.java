@@ -58,8 +58,8 @@ public class Person {
         return email;
     }
 
-    public Integer getIndex() {
-        return index;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

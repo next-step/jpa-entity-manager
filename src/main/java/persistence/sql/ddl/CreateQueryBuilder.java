@@ -37,7 +37,7 @@ public class CreateQueryBuilder {
         }
 
         public Builder entity(Class<?> clazz) {
-            this.entity = EntityMetadata.of(clazz);
+            this.entity = EntityMetadata.from(clazz);
             return this;
         }
 
@@ -47,7 +47,7 @@ public class CreateQueryBuilder {
     }
 
     private String generateColumnsQuery() {
-        return entity.getColumns().getColumns().stream()
+        return entity.getColumns().stream()
                 .map(this::generateColumnQuery)
                 .collect(Collectors.joining(DELIMITER));
     }

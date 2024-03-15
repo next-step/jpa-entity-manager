@@ -71,8 +71,10 @@ class SimpleEntityManagerTest {
     @DisplayName("요구사항2 - persist (insert)")
     void insert() {
         // when
+        Person savedPerson = entityManager.persist(person);
+
         // then
-        assertThat(entityManager.persist(person)).isEqualTo(person);
+        assertThat(savedPerson).isEqualTo(person);
     }
 
     @Test
@@ -83,7 +85,7 @@ class SimpleEntityManagerTest {
         Person newPerson = Person.of(1L, "test12", 12, "test12@gmail.com");
 
         // when
-        Person updatePerson = (Person) entityManager.persist(newPerson);
+        Person updatePerson = entityManager.persist(newPerson);
 
         // then
         assertAll(
@@ -104,5 +106,19 @@ class SimpleEntityManagerTest {
         // then
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
                 .isExactlyInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("요구사항1 - First Level Cache")
+    void find_WithFirstLevelCache() {
+        // given
+        entityManager.persist(person);
+
+        // when
+        Person nonCachingPerson = entityManager.find(Person.class, 1L);
+        Person cachingPerson = entityManager.find(Person.class, 1L);
+
+        // then
+        assertThat(nonCachingPerson).isEqualTo(cachingPerson);
     }
 }
