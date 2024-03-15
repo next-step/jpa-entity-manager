@@ -1,5 +1,10 @@
 # jpa-entity-manager
 
+## 4단계
+- [ ] 요구사항 1 - CRUD 작업 수행시 엔터티의 상태를 추가해보자. (EntryEntity 추가)
+- [ ] 2단계 피드백 반영
+  - [x] merge 테스트 코드 추가, entity와 snpashot은 다를때 값 업데이트하도록 버그 픽스
+
 ## 3단계
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라
 - [x] 요구사항 2 - snapshot을 구현하여라

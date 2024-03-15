@@ -103,6 +103,18 @@ class EntityManagerTest {
         softAssertions.assertThat(actual).isSameAs(persistenceContext.getEntity(Person.class, 1L));
     }
 
+    @Test
+    void merge시_entity가_업데이트된다() {
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(person);
+
+        Person changedPerson = person.changeEmail("soo@gmail.com");
+
+        entityManager.merge(changedPerson);
+
+        Assertions.assertThat(entityManager.find(person.getClass(), person.getId()).get()).isEqualTo(changedPerson);
+    }
+
 
     @Test
     void persist() {
