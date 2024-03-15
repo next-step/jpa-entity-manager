@@ -48,12 +48,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> Optional<T> getDatabaseSnapshot(T entity, Long id) {
+    public <T> T getDatabaseSnapshot(T entity, Long id) {
         EntityKey key = new EntityKey(entity.getClass(), id);
-        Object o = snapshot.get(key);
-        if (o == null) {
-            return Optional.empty();
-        }
-        return Optional.of((T) o);
+        return snapshot.get(key);
     }
 }

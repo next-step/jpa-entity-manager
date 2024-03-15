@@ -2,6 +2,7 @@ package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
 import persistence.entity.exception.EntityExistsException;
+import persistence.entity.exception.EntityNotExistsException;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
@@ -62,23 +63,26 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T merge(T entity) {
         Long primaryKey = getPrimaryKeyValue(entity);
-        Optional<Object> snapshot = getSnapShot(entity, primaryKey);
+        Object snapshot = getSnapShot(entity, primaryKey);
 
-        if (!entity.equals(snapshot.get())) {
+        if (!entity.equals(snapshot)) {
             T updatedEntity = entityPersister.update(entity, primaryKey);
             return persistenceContext.updateEntity(updatedEntity, primaryKey);
         }
         return entity;
     }
 
-    private <T> Optional<Object> getSnapShot(T entity, Long primaryKey) {
-        Optional<Object> snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
+    private <T> Object getSnapShot(T entity, Long primaryKey) {
+        T snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
 
-        if (snapshot.isEmpty()) {
-            Optional<?> searchedEntity = entityLoader.find(entity.getClass(), primaryKey);
-            snapshot = Optional.of(persistenceContext.updateEntity(searchedEntity, primaryKey));
+        if (snapshot != null) {
+            return snapshot;
         }
-        return snapshot;
+        Optional<?> searchedEntity = entityLoader.find(entity.getClass(), primaryKey);
+        if (searchedEntity.isPresent()) {
+            return persistenceContext.updateEntity(searchedEntity, primaryKey);
+        }
+        throw new EntityNotExistsException();
     }
 
     @Override

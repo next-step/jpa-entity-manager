@@ -15,5 +15,5 @@ public interface PersistenceContext {
     /**
      * 스냅샷을 이용해 데이터를 조회한다.
      */
-    <T> Optional<T> getDatabaseSnapshot(T entity, Long id);
+    <T> T getDatabaseSnapshot(T entity, Long id);
 }
