@@ -40,7 +40,7 @@ public class EntityManagerImpl implements EntityManager {
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        T addedEntity = persistenceContext.addEntity(searchedEntity.get());
+        T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
         return Optional.of(addedEntity);
     }
 

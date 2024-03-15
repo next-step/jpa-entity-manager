@@ -27,16 +27,15 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> T addEntity(T entity) {
+    public <T> T addEntity(T entity, Long id) {
         Class<?> clazz = entity.getClass();
-        Long id = getPrimaryKeyValue(entity);
         entityCache.put(entity, new EntityKey(clazz, id));
         return entity;
     }
 
     @Override
-    public <T> T    updateEntity(T entity, Long id) {
-        EntityKey key = new EntityKey(entity.getClass(), getPrimaryKeyValue(entity));
+    public <T> T updateEntity(T entity, Long id) {
+        EntityKey key = new EntityKey(entity.getClass(), id);
         entityCache.put(entity, key);
         snapshot.put(entity, key);
         return entity;

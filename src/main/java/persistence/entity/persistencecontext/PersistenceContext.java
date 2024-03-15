@@ -6,7 +6,7 @@ public interface PersistenceContext {
 
     <T> Optional<T> getEntity(Class<T> clazz, Long id);
 
-    <T> T addEntity(T entity);
+    <T> T addEntity(T entity, Long id);
 
     <T> T updateEntity(T entity, Long id);
 

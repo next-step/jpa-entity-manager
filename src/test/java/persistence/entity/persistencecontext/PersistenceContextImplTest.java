@@ -61,8 +61,8 @@ class PersistenceContextImplTest {
         // given
         Person person = new Person(1L,"김철수", 21, "chulsoo.kim@gmail.com", 11);
         Dog dog = new Dog(1L, "바둑이");
-        persistenceContext.addEntity(person);
-        persistenceContext.addEntity(dog);
+        persistenceContext.addEntity(person, 1L);
+        persistenceContext.addEntity(dog, 1L);
 
         // when
         Person actualPerson = persistenceContext.getEntity(Person.class, 1L).get();
@@ -79,7 +79,7 @@ class PersistenceContextImplTest {
     void addEntityEmptyResult() {
         // given
         Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, 1L);
 
         // when
         Optional<Person> actual = persistenceContext.getEntity(Person.class, 2L);
@@ -96,7 +96,7 @@ class PersistenceContextImplTest {
         Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
 
         // when
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, 1L);
 
         // then
         Person actual = persistenceContext.getEntity(Person.class, 1L).get();
@@ -109,7 +109,7 @@ class PersistenceContextImplTest {
     void removeEntity() {
         // given
         Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, 1L);
 
         // when
         Optional<Person> entityBeforeDelete = persistenceContext.getEntity(Person.class, 1L);
