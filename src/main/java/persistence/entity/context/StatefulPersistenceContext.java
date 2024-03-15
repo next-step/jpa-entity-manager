@@ -9,34 +9,47 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     private final PersistenceCache cache = new PersistenceCache();
     private final EntitySnapshots snapshots = new EntitySnapshots();
+    private final EntityEntryContext entityEntryContext = new EntityEntryContext();
 
     @Override
     public <T> T getEntity(final Object key, final String className) {
-        final EntityKey<T> entityKey = generateEntityKey(key, className);
+        final EntityKey entityKey = generateEntityKey(key, className);
         return this.cache.get(entityKey);
     }
 
     @Override
     public void addEntity(final Object key, final Object entity) {
-        final EntityKey<?> entityKey = generateEntityKey(key, entity.getClass().getName());
+        final EntityKey entityKey = generateEntityKey(key, entity.getClass().getName());
         this.cache.add(entityKey, entity);
         this.snapshots.add(entityKey, entity);
+        this.entityEntryContext.add(entityKey);
     }
 
     @Override
     public void removeEntity(final Object key, final Object entity) {
-        final EntityKey<?> entityKey = generateEntityKey(key, entity.getClass().getName());
+        final EntityKey entityKey = generateEntityKey(key, entity.getClass().getName());
         this.cache.remove(entityKey);
         this.snapshots.remove(entityKey);
     }
 
     @Override
     public EntitySnapshot getDatabaseSnapshot(final Object key, final Object entity) {
-        final EntityKey<Object> entityKey = generateEntityKey(key, entity.getClass().getName());
+        final EntityKey entityKey = generateEntityKey(key, entity.getClass().getName());
         return this.snapshots.get(entityKey, entity);
     }
 
-    private <T> EntityKey<T> generateEntityKey(final Object key, final String className) {
-        return new EntityKey<T>(key, className);
+    @Override
+    public EntityEntry getEntityEntry(final Object key, final Class<?> entityClass) {
+        final EntityKey entityKey = generateEntityKey(key, entityClass.getName());
+        return this.entityEntryContext.get(entityKey);
+    }
+
+    @Override
+    public EntityEntry getEntityEntry(final Object key, final Object entity) {
+        return this.getEntityEntry(key, entity.getClass());
+    }
+
+    private <T> EntityKey generateEntityKey(final Object key, final String className) {
+        return new EntityKey(key, className);
     }
 }

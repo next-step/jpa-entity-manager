@@ -17,7 +17,7 @@ public class EntitySnapshot {
         values.putAll(entityMetaData.extractValues(entity));
     }
 
-    public boolean isSame(final Object entity) {
+    public boolean checkDirty(final Object entity) {
         if (entity.getClass() != entityMetaData.getEntityType()) {
             return false;
         }
@@ -25,6 +25,6 @@ public class EntitySnapshot {
         final Map<String, Object> thatValues = entityMetaData.extractValues(entity);
 
         return thatValues.keySet().stream()
-                .allMatch(fieldName -> Objects.deepEquals(thatValues.get(fieldName), values.get(fieldName)));
+                .anyMatch(fieldName -> !Objects.deepEquals(thatValues.get(fieldName), values.get(fieldName)));
     }
 }
