@@ -1,8 +1,8 @@
 package persistence.entity.persistencecontext;
 
-import java.util.Optional;
+import persistence.PrimaryKey;
 
-import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
+import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
@@ -44,7 +44,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void removeEntity(Object entity) {
         Class<?> clazz = entity.getClass();
-        Long id = getPrimaryKeyValue(entity);
+        Long id = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
         EntityKey entityKey = new EntityKey(clazz, id);
         entityCache.remove(entityKey);
         snapshot.remove(entityKey);

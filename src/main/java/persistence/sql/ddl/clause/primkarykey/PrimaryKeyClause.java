@@ -2,6 +2,7 @@ package persistence.sql.ddl.clause.primkarykey;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import persistence.PrimaryKey;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -14,11 +15,11 @@ public class PrimaryKeyClause {
             GenerationType.TABLE, "%s %s PRIMARY KEY, seq_value INT",
             GenerationType.UUID, "%s UUID PRIMARY KEY"
     );
-    private final PrimaryKeyValue value;
+    private final PrimaryKey value;
     private final GenerationType generationType;
 
     public PrimaryKeyClause(Class<?> clazz) {
-        this.value = new PrimaryKeyValue(clazz);
+        this.value = new PrimaryKey(clazz);
         this.generationType = getType(value.field());
     }
 

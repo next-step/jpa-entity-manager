@@ -1,6 +1,7 @@
 package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
+import persistence.PrimaryKey;
 import persistence.entity.exception.EntityExistsException;
 import persistence.entity.exception.EntityNotExistsException;
 import persistence.entity.loader.EntityLoader;
@@ -9,8 +10,6 @@ import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
 
 import java.util.Optional;
-
-import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -48,11 +47,11 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         validate(entity);
         T insertedEntity = entityPersister.insert(entity);
-        return persistenceContext.updateEntity(insertedEntity, getPrimaryKeyValue(insertedEntity));
+        return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity.getClass()).getPrimaryKeyValue(insertedEntity));
     }
 
     private void validate(Object entity) {
-        Long primaryKey = getPrimaryKeyValue(entity);
+        Long primaryKey = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
         Optional<?> searchedEntity = this.find(entity.getClass(), primaryKey);
 
         if (searchedEntity.isPresent()) {
@@ -62,7 +61,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        Long primaryKey = getPrimaryKeyValue(entity);
+        Long primaryKey = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
         Object snapshot = getSnapShot(entity, primaryKey);
 
         if (!entity.equals(snapshot)) {

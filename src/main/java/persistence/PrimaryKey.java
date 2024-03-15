@@ -1,4 +1,4 @@
-package persistence.sql.ddl.clause.primkarykey;
+package persistence;
 
 import jakarta.persistence.Id;
 import persistence.entity.exception.InvalidPrimaryKeyException;
@@ -8,19 +8,19 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class PrimaryKeyValue {
+public class PrimaryKey {
 
     private final Field field;
     private final String name;
     private final String dataTypeName;
 
-    public PrimaryKeyValue(Class<?> clazz) {
+    public PrimaryKey(Class<?> clazz) {
         this.field = getIdField(clazz);
         this.name = field.getName();
         this.dataTypeName = field.getType().getSimpleName();
     }
 
-    public static Long getPrimaryKeyValue(Object entity) {
+    public Long getPrimaryKeyValue(Object entity) {
         Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findAny()
