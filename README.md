@@ -6,6 +6,7 @@
   - [x] merge 테스트 코드 추가, entity와 snpashot은 다를때 값 업데이트하도록 버그 픽스
   - [x] snapshot return 시 optional을 제거하라. 
   - [x] remove 메서드의 파라메터로 entityKey를 전달하라
+  - [x] 실제 예외가 발생했을때만 객체를 생성하라.
 
 ## 3단계
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라

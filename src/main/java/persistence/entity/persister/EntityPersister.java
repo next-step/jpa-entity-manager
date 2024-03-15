@@ -10,6 +10,7 @@ import persistence.sql.dml.querybuilder.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
@@ -21,14 +22,18 @@ public class EntityPersister {
     }
 
     public <T> T update(T entity, Long id) {
-        new OptionalForbiddenException().validate(entity);
+        if (entity instanceof Optional) {
+            throw new OptionalForbiddenException();
+        }
         String query = new UpdateQueryBuilder(entity.getClass()).getQuery(entity, id);
         jdbcTemplate.executeUpdate(query);
         return entity;
     }
 
     public <T> T insert(T entity) {
-        new OptionalForbiddenException().validate(entity);
+        if (entity instanceof Optional) {
+            throw new OptionalForbiddenException();
+        }
         Class<?> clazz = entity.getClass();
         String queryToInsert = new InsertQueryBuilder(clazz).getInsertQuery(entity);
         Long id = jdbcTemplate.executeUpdate(queryToInsert);
