@@ -3,7 +3,7 @@ package persistence.entity;
 public interface PersistenceContext {
     <T> T getEntity(Class<T> entityClass, Object id);
 
-    void addEntity(Object id, Object entity);
+    <T> void addEntity(Object id, T entity);
 
     <T> void removeEntity(T entity);
 

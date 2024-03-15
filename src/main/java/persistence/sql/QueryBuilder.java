@@ -4,15 +4,12 @@ package persistence.sql;
 import java.lang.reflect.Field;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.ddl.TableQueryBuilder;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
 public class QueryBuilder extends AbstractQueryBuilder {
-
-    private final TableQueryBuilder tableQueryBuilder;
 
     private final SelectQueryBuilder selectQueryBuilder;
 
@@ -27,17 +24,12 @@ public class QueryBuilder extends AbstractQueryBuilder {
     private final UpdateQueryBuilder updateQueryBuilder;
 
     public QueryBuilder() {
-        this(new TableQueryBuilder());
-    }
-
-    public QueryBuilder(TableQueryBuilder tableQueryBuilder) {
-        this.tableQueryBuilder = tableQueryBuilder;
-        this.selectQueryBuilder = new SelectQueryBuilder(tableQueryBuilder);
-        this.deleteQueryBuilder = new DeleteQueryBuilder(tableQueryBuilder);
-        this.insertQueryTranslator = new InsertQueryBuilder(tableQueryBuilder);
-        this.dropQueryBuilder = new DropQueryBuilder(tableQueryBuilder);
-        this.createQueryBuilder = new CreateQueryBuilder(tableQueryBuilder);
-        this.updateQueryBuilder = new UpdateQueryBuilder(tableQueryBuilder);
+        this.selectQueryBuilder = new SelectQueryBuilder();
+        this.deleteQueryBuilder = new DeleteQueryBuilder();
+        this.insertQueryTranslator = new InsertQueryBuilder();
+        this.dropQueryBuilder = new DropQueryBuilder();
+        this.createQueryBuilder = new CreateQueryBuilder();
+        this.updateQueryBuilder = new UpdateQueryBuilder();
     }
 
     public String getCreateTableQuery(final Class<?> entityClass) {
@@ -63,6 +55,7 @@ public class QueryBuilder extends AbstractQueryBuilder {
     public String getSelectCountQuery(Class<?> entityClass) {
         return selectQueryBuilder.getSelectCountQuery(entityClass);
     }
+
     public String getUpdateQuery(Object entity) {
         return updateQueryBuilder.getUpdateQuery(entity);
     }
@@ -79,17 +72,20 @@ public class QueryBuilder extends AbstractQueryBuilder {
         return deleteQueryBuilder.getDeleteQueryFromEntity(entity);
     }
 
+    // TODO: Remove this method because it is used only in tests
     public String getTableNameFrom(Class<?> entityClass) {
-        return tableQueryBuilder.getTableNameFrom(entityClass);
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+
+        return entityMetadata.getTableName();
     }
 
+    // TODO: Remove this method because it is used only in tests
     public String getColumnDefinitionFrom(Field field) {
         return createQueryBuilder.getColumnDefinitionFrom(field);
     }
 
+    // TODO: Remove this method because it is used only in tests
     public String getColumnDefinitionsFrom(Class<?> entityClass) {
         return createQueryBuilder.getColumnDefinitionsFrom(entityClass);
     }
-
-
 }

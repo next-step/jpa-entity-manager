@@ -11,7 +11,7 @@ public interface EntityLoader {
      * @return the entity
      * @param <T> the entity type
      */
-    <T> T select(Class<T> entityClass, Long id);
+    <T> T select(Class<T> entityClass, Object id);
 
     /**
      * Selects all entities of the given class
@@ -20,4 +20,12 @@ public interface EntityLoader {
      * @param <T> the entity type
      */
     <T> List<T> selectAll(Class<T> entityClass);
+
+    /**
+     * Checks if an entity exists by its id
+     * @param entityClass the entity class
+     * @param id the id of the entity
+     * @return true if the entity exists, false otherwise
+     */
+    boolean isExists(Class<?> entityClass, Object id);
 }

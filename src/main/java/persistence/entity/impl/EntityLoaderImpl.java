@@ -26,7 +26,7 @@ public class EntityLoaderImpl implements EntityLoader {
     }
 
     @Override
-    public <T> T select(Class<T> entityClass, Long id) {
+    public <T> T select(Class<T> entityClass, Object id) {
         String selectByIdQuery = queryBuilder.getSelectByIdQuery(entityClass, id);
 
         log.info("Entity selected successfully. SQL: {}", selectByIdQuery);
@@ -40,7 +40,7 @@ public class EntityLoaderImpl implements EntityLoader {
     public <T> List<T> selectAll(Class<T> entityClass) {
         String selectAllQuery = queryBuilder.getSelectAllQuery(entityClass);
 
-        log.info("SQL: {}", selectAllQuery);
+        log.info("Entity selected all successfully. SQL: {}", selectAllQuery);
 
         RowMapper<T> rowMapper = EntityRowMapperFactory.getInstance().getRowMapper(entityClass);
 
@@ -48,5 +48,22 @@ public class EntityLoaderImpl implements EntityLoader {
             selectAllQuery,
             rowMapper
         );
+    }
+
+    @Override
+    public boolean isExists(Class<?> entityClass, Object id) {
+        if (id == null) {
+            return false;
+        }
+        
+        String selectByIdQuery = queryBuilder.getSelectByIdQuery(entityClass, id);
+
+        log.info("SQL: {}", selectByIdQuery);
+
+        RowMapper<?> rowMapper = EntityRowMapperFactory.getInstance().getRowMapper(entityClass);
+
+        Object object = jdbcTemplate.queryForObjectWithoutException(selectByIdQuery, rowMapper);
+
+        return object != null;
     }
 }

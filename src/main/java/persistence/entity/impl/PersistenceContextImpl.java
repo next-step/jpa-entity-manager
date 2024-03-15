@@ -22,7 +22,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(Object id, Object entity) {
+    public <T> void addEntity(Object id, T entity) {
         EntityId entityId = new EntityId(entity.getClass(), id);
 
         entityIdToEntityMap.put(entityId, entity);

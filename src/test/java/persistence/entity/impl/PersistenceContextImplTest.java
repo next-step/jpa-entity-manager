@@ -1,7 +1,7 @@
 package persistence.entity.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -43,7 +43,7 @@ class PersistenceContextImplTest {
         // then
         assertAll(
             () -> assertThat(entity).isInstanceOf(Person.class),
-            () -> assertThat(entity).isEqualTo(givenPerson)
+            () -> assertThat(entity).isSameAs(givenPerson)
         );
     }
 
@@ -59,7 +59,7 @@ class PersistenceContextImplTest {
         // then
         Object getEntityResult = persistenceContext.getEntity(Person.class, givenPerson.getId());
 
-        assertThat(getEntityResult).isEqualTo(givenPerson);
+        assertThat(getEntityResult).isSameAs(givenPerson);
     }
 
     @DisplayName("요구사항1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용해보자 (removeEntity)")
@@ -93,7 +93,7 @@ class PersistenceContextImplTest {
 
         // then
         assertAll(
-            () -> assertThat(databaseSnapshot).isEqualTo(givenPerson),
+            () -> assertThat(databaseSnapshot).isSameAs(givenPerson),
             () -> assertThat(databaseSnapshot).isNotEqualTo(changedPerson)
         );
     }

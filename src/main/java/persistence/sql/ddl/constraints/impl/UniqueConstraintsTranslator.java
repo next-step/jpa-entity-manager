@@ -2,9 +2,9 @@ package persistence.sql.ddl.constraints.impl;
 
 import jakarta.persistence.Column;
 import java.lang.reflect.Field;
+import persistence.exception.UnsupportedFieldException;
 import persistence.sql.ddl.common.StringConstants;
 import persistence.sql.ddl.constraints.ConstraintsTranslator;
-import persistence.exception.UnsupportedFieldException;
 
 public class UniqueConstraintsTranslator implements ConstraintsTranslator {
 

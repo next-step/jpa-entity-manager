@@ -1,7 +1,7 @@
 package persistence.sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static persistence.sql.EntityTableTest.provideEntityTableMetadata;
 
 import java.util.List;
@@ -85,11 +85,12 @@ class EntityMetadataTest {
         Person person = new Person(1L, "홍길동", 20, "test@gmail.com");
 
         // when
-        EntityColumnValues entityColumnValues = entityMetadata.getEntityColumnValuesFrom(person);
+        List<EntityColumnValue> entityColumnValues = entityMetadata.getEntityColumnValuesFrom(
+            person);
 
         // then
         assertAll(
-            () -> assertThat(entityColumnValues).isNotNull()
+            () -> assertThat(entityColumnValues).hasSize(4)
         );
     }
 

@@ -2,58 +2,65 @@ package persistence.sql.dml;
 
 import static persistence.sql.ddl.common.StringConstants.COLUMN_DEFINITION_DELIMITER;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 import persistence.sql.AbstractQueryBuilder;
-import persistence.sql.ddl.TableQueryBuilder;
+import persistence.sql.EntityColumn;
+import persistence.sql.EntityColumnValue;
+import persistence.sql.EntityMetadata;
 
 public class InsertQueryBuilder extends AbstractQueryBuilder {
-    private final TableQueryBuilder tableQueryBuilder;
-
-    public InsertQueryBuilder(TableQueryBuilder tableQueryBuilder) {
-        this.tableQueryBuilder = tableQueryBuilder;
-    }
 
     public String getInsertQuery(Object entity) {
-        Class<?> entityClass = entity.getClass();
+        EntityMetadata entityMetadata = new EntityMetadata(entity.getClass());
 
         return String.format(
             "INSERT INTO %s (%s) VALUES (%s)",
-            tableQueryBuilder.getTableNameFrom(entityClass),
-            getColumnNamesWithoutPrimaryKey(entityClass),
-            getColumnValuesQuery(entity)
+            entityMetadata.getTableName(),
+            getColumnNamesQuery(entityMetadata, entity),
+            getColumnValuesQuery(entityMetadata, entity)
         );
     }
 
-    private String getColumnValuesQuery(Object entity) {
-        Class<?> clazz = entity.getClass();
-        return Arrays.stream(clazz.getDeclaredFields())
-            .filter(field -> !field.isAnnotationPresent(Transient.class))
-            .filter(field -> !field.isAnnotationPresent(Id.class))
-            .sorted(Comparator.comparing(field -> field.isAnnotationPresent(Id.class) ? 0 : 1))
-            .map(field -> getColumnValueFromEntity(entity, field))
-            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
-    }
-
-    private String getColumnNamesWithoutPrimaryKey(Class<?> entityClass) {
-        return getColumnFieldStream(entityClass)
-            .filter(field -> !field.isAnnotationPresent(Id.class))
-            .map(this::getColumnNameFrom)
-            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
-    }
-
-    private String getColumnValueFromEntity(Object entity, Field field) {
-        try {
-            field.setAccessible(true);
-            Object columnValue = field.get(entity);
-
-            return getColumnValueFromObject(columnValue);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+    private String getColumnValuesQuery(EntityMetadata entityMetadata, Object entity) {
+        if (entityMetadata.hasIdFrom(entity)) {
+            return getColumnValuesQueryWithId(entityMetadata, entity);
         }
+
+        return getColumnValuesQueryWithoutId(entityMetadata, entity);
+    }
+
+    private String getColumnNamesQuery(EntityMetadata entityMetadata, Object entity) {
+        if (entityMetadata.hasIdFrom(entity)) {
+            return getColumnNamesQueryWithId(entityMetadata);
+        }
+
+        return getColumnNamesQueryWithoutPrimaryKey(entityMetadata);
+    }
+
+    private String getColumnValuesQueryWithId(EntityMetadata entityMetadata, Object entity) {
+        return entityMetadata.getEntityColumnValuesFrom(entity).stream()
+            .map(EntityColumnValue::queryString)
+            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
+    }
+
+    private String getColumnValuesQueryWithoutId(EntityMetadata entityMetadata, Object entity) {
+        return entityMetadata.getEntityColumns().stream()
+            .filter(entityColumn -> !entityColumn.isPrimary())
+            .map(entityColumn -> entityColumn.getEntityColumnValueFrom(entity))
+            .map(EntityColumnValue::queryString)
+            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
+    }
+
+    private String getColumnNamesQueryWithId(EntityMetadata entityMetadata) {
+        return entityMetadata.getEntityColumns().stream()
+            .map(EntityColumn::getColumnName)
+            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
+    }
+
+    private String getColumnNamesQueryWithoutPrimaryKey(EntityMetadata entityMetadata) {
+        return entityMetadata.getEntityColumns().stream()
+            .filter(entityColumn -> !entityColumn.isPrimary())
+            .map(EntityColumn::getColumnName)
+            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
     }
 }

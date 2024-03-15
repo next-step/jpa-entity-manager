@@ -1,16 +1,15 @@
 package persistence.sql.ddl;
 
-public class DropQueryBuilder {
-    private final TableQueryBuilder tableQueryBuilder;
+import persistence.sql.EntityMetadata;
 
-    public DropQueryBuilder(TableQueryBuilder tableQueryBuilder) {
-        this.tableQueryBuilder = tableQueryBuilder;
-    }
+public class DropQueryBuilder {
 
     public String getDropTableQuery(Class<?> entityClass) {
+        EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+
         return String.format(
             "DROP TABLE %s",
-            tableQueryBuilder.getTableNameFrom(entityClass)
+            entityMetadata.getTableName()
         );
     }
 }
