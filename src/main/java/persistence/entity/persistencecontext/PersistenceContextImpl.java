@@ -67,7 +67,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id) {
         EntityEntry entityEntry = this.entityEntries.get(new EntityKey(clazz, id));
-        if(entityEntry==null) {
+        if (entityEntry == null) {
             return Optional.empty();
         }
         return Optional.of(entityEntry);
