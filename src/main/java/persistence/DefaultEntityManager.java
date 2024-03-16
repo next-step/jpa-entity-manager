@@ -53,6 +53,7 @@ public class DefaultEntityManager implements EntityManager {
 
         if (!entity.equals(snapshot)) {
             entityPersister.insert(entity);
+            persistenceContext.addEntity(id, entity);
         }
 
         return entity;
