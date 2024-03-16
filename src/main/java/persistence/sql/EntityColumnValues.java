@@ -9,7 +9,7 @@ public class EntityColumnValues {
     public <T> EntityColumnValues(T entity) {
         this(
             EntityColumns.streamFrom(entity.getClass())
-                .map(entityColumn -> entityColumn.getEntityValueFrom(entity))
+                .map(entityColumn -> entityColumn.getEntityColumnValueFrom(entity))
                 .collect(Collectors.toList())
         );
     }

@@ -112,4 +112,10 @@ abstract class AbstractJdbcTemplateTest {
         return idToPersonMap.values().stream()
             .map(Arguments::of);
     }
+
+    protected static Stream<Arguments> providePersonId() {
+        return idToPersonMap.values().stream()
+            .map(Person::getId)
+            .map(Arguments::of);
+    }
 }

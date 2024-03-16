@@ -1,13 +1,10 @@
 package persistence.sql;
 
+import static persistence.sql.ddl.common.StringConstants.COLUMN_DEFINITION_DELIMITER;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.stream.Stream;
-import persistence.exception.UnsupportedClassException;
+import java.util.stream.Collectors;
 
 public abstract class AbstractQueryBuilder {
 
@@ -16,17 +13,51 @@ public abstract class AbstractQueryBuilder {
     }
 
     /**
-     * Get the stream of fields that are not annotated with <code>@Transient</code> from the entity class
-     * @param entityClass Entity class
-     * @return Stream of fields that are annotated with <code>@Column</code> or <code>@Id</code>
-     * @see Column
-     * @see Id
-     * @see Transient
+     * Get the column names query from the entity metadata
+     * @param entityMetadata Entity metadata
+     * @return Column names query
      */
-    protected Stream<Field> getColumnFieldStream(Class<?> entityClass) {
-        return Arrays.stream(entityClass.getDeclaredFields())
-            .filter(field -> !field.isAnnotationPresent(Transient.class))
-            .sorted(Comparator.comparing(field -> field.isAnnotationPresent(Id.class) ? 0 : 1));
+    protected String getColumnNamesQuery(EntityMetadata entityMetadata) {
+        return entityMetadata.getEntityColumns().stream()
+            .map(EntityColumn::getColumnName)
+            .collect(Collectors.joining(COLUMN_DEFINITION_DELIMITER));
+    }
+
+
+    /**
+     * Get the primary key column name query from the entity metadata
+     * @param entityMetadata Entity metadata
+     * @return Primary key column name query
+     */
+    protected String getPrimaryKeyColumnNameQuery(EntityMetadata entityMetadata) {
+        return entityMetadata
+            .getEntityIdColumn()
+            .getColumnName();
+    }
+
+    /**
+     * Get the column names query from the entity metadata
+     * @param entityMetadata Entity metadata
+     * @param entityClass Entity class
+     * @param id Entity id
+     * @return Id query
+     */
+    protected String getIdQuery(EntityMetadata entityMetadata, Class<?> entityClass, Object id) {
+        return entityMetadata
+            .getEntityIdFrom(entityClass, id)
+            .queryString();
+    }
+
+    /**
+     * Get the id query from the entity metadata and entity
+     * @param entityMetadata Entity metadata
+     * @param entity Entity object
+     * @return Id query
+     */
+    protected String getIdQuery(EntityMetadata entityMetadata, Object entity) {
+        return entityMetadata
+            .getEntityIdFrom(entity)
+            .queryString();
     }
 
     /**
@@ -46,25 +77,5 @@ public abstract class AbstractQueryBuilder {
         }
 
         return column.name();
-    }
-
-    /**
-     * Get the column value from the object
-     * @param columnValue Column value object
-     * @return Column value from the object
-     */
-    protected String getColumnValueFromObject(Object columnValue) {
-        // TODO: remove this else-if statement
-        if (columnValue.getClass().equals(Boolean.class)) {
-            return columnValue == Boolean.TRUE ? "1" : "0";
-        } else if (columnValue.getClass().equals(String.class)) {
-            return String.format("'%s'", columnValue);
-        } else if (columnValue.getClass().equals(Integer.class)) {
-            return columnValue.toString();
-        } else if (columnValue.getClass().equals(Long.class)) {
-            return columnValue.toString();
-        }
-
-        throw new UnsupportedClassException(columnValue.getClass());
     }
 }

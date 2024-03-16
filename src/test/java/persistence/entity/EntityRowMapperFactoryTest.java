@@ -40,7 +40,6 @@ class EntityRowMapperFactoryTest {
         // then
         Person expectedPerson = new Person(givenId, givenName, givenAge, givenEmail);
         assertAll(
-            () -> assertThat(person).isNotNull(),
             () -> assertThat(person).isEqualTo(expectedPerson)
         );
     }

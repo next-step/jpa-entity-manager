@@ -12,7 +12,7 @@ public interface EntityManager {
      *
      * @param <T> the entity type
      */
-    <T> T find(Class<T> entityClass, Long id);
+    <T> T find(Class<T> entityClass, Object id);
 
     /**
      * Finds all entities of the given class
@@ -30,7 +30,7 @@ public interface EntityManager {
      * @param entity entity object to persist
      * @return the persisted entity object
      */
-    Object persist(Object entity);
+    <T> T persist(T entity);
 
     /**
      * Removes the entity object

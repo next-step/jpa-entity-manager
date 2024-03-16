@@ -10,6 +10,14 @@ public class EntityColumn {
         this.field = field;
     }
 
+    public Field getColumnField() {
+        return field;
+    }
+
+    public Class<?> getColumnClass() {
+        return field.getType();
+    }
+
     public String getColumnName() {
         if (!field.isAnnotationPresent(jakarta.persistence.Column.class)) {
             return field.getName();
@@ -24,7 +32,7 @@ public class EntityColumn {
         return column.name();
     }
 
-    public EntityColumnValue getEntityValueFrom(Object entity) throws ReflectionRuntimeException {
+    public EntityColumnValue getEntityColumnValueFrom(Object entity) throws ReflectionRuntimeException {
         try {
             field.setAccessible(true);
 
