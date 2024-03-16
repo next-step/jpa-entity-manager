@@ -114,10 +114,26 @@ class PersistenceContextTest {
     }
 
     @Test
-    void getDatabaseSnapshot() {
+    @DisplayName("이전에 저장된 값이 없는 경우 null 을 반환한다.")
+    void getDatabaseSnapshot_1() {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
+
+        // when
+        Object result = persistenceContext.getDatabaseSnapshot(id, entity);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("이전에 저장된 값이 있는 경우 동일성이 보장된다")
+    void getDatabaseSnapshot_2() {
+        // given
+        long id = 1L;
+        Person entity = new Person(id, "name", 26, "email", 1);
+        persistenceContext.getDatabaseSnapshot(id, entity);
 
         // when
         Object result = persistenceContext.getDatabaseSnapshot(id, entity);

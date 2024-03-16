@@ -6,10 +6,12 @@ public class DefaultEntityManager implements EntityManager {
 
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
+    private final PersistenceContext persistenceContext;
 
-    public DefaultEntityManager(EntityPersister entityPersister, EntityLoader entityLoader) {
+    public DefaultEntityManager(EntityPersister entityPersister, EntityLoader entityLoader, PersistenceContext persistenceContext) {
         this.entityPersister = entityPersister;
         this.entityLoader = entityLoader;
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
@@ -18,7 +20,15 @@ public class DefaultEntityManager implements EntityManager {
             throw new IllegalArgumentException("[EntityManager] find: id is null");
         }
 
-        return entityLoader.load(clazz, id);
+        T entity = (T) persistenceContext.getEntity(id);
+
+        if (entity == null) {
+            entity = entityLoader.load(clazz, id);
+        }
+
+        persistenceContext.getDatabaseSnapshot(id, entity);
+
+        return entity;
     }
 
     @Override

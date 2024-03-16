@@ -36,7 +36,9 @@ class EntityPersisterTest {
 
         entityPersister = new EntityPersister(jdbcTemplate, dmlGenerator);
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dmlGenerator);
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        PersistenceContext persistenceContext = new DefaultPersistenceContext();
+
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
     }
 
     @AfterEach

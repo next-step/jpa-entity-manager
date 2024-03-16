@@ -29,6 +29,7 @@ class DefaultEntityManagerTest {
 
     DDLGenerator ddlGenerator = new DDLGenerator(Person.class);
     DMLGenerator dmlGenerator = new DMLGenerator(Table.from(Person.class));
+    PersistenceContext persistenceContext = new DefaultPersistenceContext();
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -40,7 +41,8 @@ class DefaultEntityManagerTest {
 
         entityPersister = new EntityPersister(jdbcTemplate, dmlGenerator);
         entityLoader = new EntityLoader(jdbcTemplate, dmlGenerator);
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        DefaultPersistenceContext persistenceContext = new DefaultPersistenceContext();
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
     }
 
     @AfterEach
@@ -112,7 +114,7 @@ class DefaultEntityManagerTest {
     @DisplayName("persist 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void persist_2() {
         // given
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.persist(new NotEntity(1L)));
@@ -144,7 +146,7 @@ class DefaultEntityManagerTest {
     @DisplayName("remove 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void remove_2() {
         // given
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.remove(new NotEntity(1L)));

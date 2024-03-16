@@ -40,9 +40,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
             if (entitySnapshotsByKey == null) {
                 entitySnapshotsByKey = new HashMap<>();
             }
-            entitySnapshotsByKey.put(id, entity);
+            snapshot = entitySnapshotsByKey.put(id, entity);
         }
 
-        return entitySnapshotsByKey.get(id);
+        return snapshot;
     }
 }
