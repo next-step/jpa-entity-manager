@@ -21,6 +21,21 @@ public class JdbcTemplate {
         }
     }
 
+    public Object executeAndReturnKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getObject(1);
+            }
+
+            throw new IllegalStateException("not generate key");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public int executeUpdate(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             return statement.executeUpdate(sql);

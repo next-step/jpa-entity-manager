@@ -25,13 +25,7 @@ public class ValueClause {
     }
 
     private String getFieldValue(Field field) {
-        field.setAccessible(true);
-
-        try {
-            String value = field.get(entity).toString();
-            return ClauseUtil.addQuotesWhenRequire(field.getType(), value);
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException("not access " + field.getName());
-        }
+        Object value = new FieldValue(field).getFieldValue(entity);
+        return ClauseUtil.addQuotesWhenRequire(field.getType(), value.toString());
     }
 }

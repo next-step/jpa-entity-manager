@@ -21,21 +21,22 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         T entity = (T) persistenceContext.getEntity(id);
-
         if (entity == null) {
             entity = entityLoader.load(clazz, id);
         }
 
         persistenceContext.getDatabaseSnapshot(id, entity);
-
         return entity;
     }
 
     @Override
-    public void persist(Object entity) {
+    public <T> T persist(Object entity) {
         validEntity(entity);
 
-        entityPersister.insert(entity);
+        Long id = (Long) entityPersister.insert(entity);
+        persistenceContext.addEntity(id, entity);
+
+        return (T) find(entity.getClass(), id);
     }
 
     @Override
@@ -43,6 +44,18 @@ public class DefaultEntityManager implements EntityManager {
         validEntity(entity);
 
         entityPersister.delete(entity);
+        persistenceContext.removeEntity(new IdMetadata(entity).getMetadata());
+    }
+
+    @Override
+    public <T> T merge(Long id, T entity) {
+        Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
+
+        if (!entity.equals(snapshot)) {
+            entityPersister.insert(entity);
+        }
+
+        return entity;
     }
 
     private static void validEntity(Object entity) {
