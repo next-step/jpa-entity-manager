@@ -16,4 +16,7 @@ public interface PersistenceContext {
      * 스냅샷을 이용해 데이터를 조회한다.
      */
     <T> T getDatabaseSnapshot(T entity, Long id);
+
+    EntityEntry getEntityEntry(Class<?> clazz, Long id);
+    <T> void addEntityEntry(Class<?> clazz, Long id);
 }

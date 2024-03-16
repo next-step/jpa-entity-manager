@@ -40,6 +40,7 @@ public class EntityManagerImpl implements EntityManager {
             return Optional.empty();
         }
         T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
+        persistenceContext.addEntityEntry(clazz, id);
         return Optional.of(addedEntity);
     }
 

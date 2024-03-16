@@ -61,7 +61,13 @@ public class PersistenceContextImpl implements PersistenceContext {
         return snapshot.get(key);
     }
 
-    public EntityEntry getEntityEntry(EntityKey entityKey) {
-        return this.entityEntries.get(entityKey);
+    @Override
+    public EntityEntry getEntityEntry(Class<?> clazz, Long id) {
+        return this.entityEntries.get(new EntityKey(clazz, id));
+    }
+
+    @Override
+    public <T> void addEntityEntry(Class<?> clazz, Long id) {
+        this.entityEntries.put(new EntityKey(clazz, id), new EntityEntry());
     }
 }
