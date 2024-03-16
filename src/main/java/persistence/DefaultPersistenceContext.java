@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class DefaultPersistenceContext implements PersistenceContext {
 
     private HashMap<Long, Object> entitiesByKey;
+    private HashMap<Long, Object> entitySnapshotsByKey;
 
     @Override
     public Object getEntity(Long id) {
@@ -27,5 +28,21 @@ public class DefaultPersistenceContext implements PersistenceContext {
         }
 
         return null;
+    }
+
+    @Override
+    public Object getDatabaseSnapshot(Long id, Object entity) {
+        Object snapshot = entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(id);
+
+        if (snapshot != null) {
+            return snapshot;
+        } else {
+            if (entitySnapshotsByKey == null) {
+                entitySnapshotsByKey = new HashMap<>();
+            }
+            entitySnapshotsByKey.put(id, entity);
+        }
+
+        return entitySnapshotsByKey.get(id);
     }
 }

@@ -112,4 +112,17 @@ class PersistenceContextTest {
         // then
         assertThat(result).isEqualTo(entity);
     }
+
+    @Test
+    void getDatabaseSnapshot() {
+        // given
+        long id = 1L;
+        Person entity = new Person(id, "name", 26, "email", 1);
+
+        // when
+        Object result = persistenceContext.getDatabaseSnapshot(id, entity);
+
+        // then
+        assertThat(result).isEqualTo(entity);
+    }
 }
