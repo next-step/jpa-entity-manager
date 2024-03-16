@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
+import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
@@ -22,6 +23,7 @@ import persistence.sql.dml.querybuilder.SelectQueryBuilder;
 import java.util.List;
 import java.util.Optional;
 
+import static persistence.entity.persistencecontext.Status.MANAGED;
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
 class EntityManagerTest {
@@ -99,6 +101,20 @@ class EntityManagerTest {
 
         // then
         Assertions.assertThat(actual.get()).isSameAs(persistenceContext.getEntity(Person.class, 1L).get());
+    }
+
+    @Test
+    void find_entryEntity는_엔티티를_MANAGED_상태로_초기화한다() {
+        // given
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityPersister.insert(person);
+
+        // when
+        entityManager.find(Person.class, 1L).get();
+
+        // then
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(person.getClass(), 1L).get();
+        Assertions.assertThat(entityEntry.getStatus()).isSameAs(MANAGED);
     }
 
     @Test

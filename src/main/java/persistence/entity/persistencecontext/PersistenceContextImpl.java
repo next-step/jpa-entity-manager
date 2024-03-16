@@ -1,10 +1,13 @@
 package persistence.entity.persistencecontext;
 
 import persistence.PrimaryKey;
+import persistence.entity.exception.NotHandledEntityEntryException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static persistence.entity.persistencecontext.Status.SAVING;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
@@ -62,12 +65,37 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public EntityEntry getEntityEntry(Class<?> clazz, Long id) {
-        return this.entityEntries.get(new EntityKey(clazz, id));
+    public Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id) {
+        EntityEntry entityEntry = this.entityEntries.get(new EntityKey(clazz, id));
+        if(entityEntry==null) {
+            return Optional.empty();
+        }
+        return Optional.of(entityEntry);
     }
 
     @Override
-    public <T> void addEntityEntry(Class<?> clazz, Long id) {
+    public void manageEntityEntry(Class<?> clazz, Long id) {
         this.entityEntries.put(new EntityKey(clazz, id), new EntityEntry());
+    }
+
+    @Override
+    public <T> void manageEntityEntry(T entity) {
+        this.entityEntries.put(new EntityKey(entity), new EntityEntry());
+    }
+
+    @Override
+    public <T> void saveEntryEntity(T entity) {
+        EntityEntry entityEntry = this.getEntityEntry(entity);
+        entityEntry.updateStatus(SAVING); // TODO: 동일한 객체로 있는지 확인 (entryEntity)
+        this.entityEntries.put(new EntityKey(entity), entityEntry); // TODO: PUT 필요할까?
+    }
+    
+    private <T> EntityEntry getEntityEntry(T entity) {
+        EntityKey key = new EntityKey(entity);
+        EntityEntry entityEntry = this.entityEntries.get(key);
+        if (entityEntry == null) {
+            throw new NotHandledEntityEntryException(key);
+        }
+        return entityEntry;
     }
 }

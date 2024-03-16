@@ -1,6 +1,7 @@
 package persistence.entity.persistencecontext;
 
 public class EntityEntry {
+
     private Status status;
 
     public EntityEntry() {
@@ -9,5 +10,9 @@ public class EntityEntry {
 
     public void updateStatus(Status status) {
         this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 }

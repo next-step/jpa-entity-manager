@@ -40,21 +40,23 @@ public class EntityManagerImpl implements EntityManager {
             return Optional.empty();
         }
         T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
-        persistenceContext.addEntityEntry(clazz, id);
+        persistenceContext.manageEntityEntry(clazz, id);
         return Optional.of(addedEntity);
     }
 
     @Override
     public <T> T persist(T entity) {
         validate(entity);
+
         T insertedEntity = entityPersister.insert(entity);
+        this.persistenceContext.manageEntityEntry(entity);
         return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity.getClass()).getPrimaryKeyValue(insertedEntity));
     }
 
     private void validate(Object entity) {
         Long primaryKey = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
-        Optional<?> searchedEntity = this.find(entity.getClass(), primaryKey);
 
+        Optional<?> searchedEntity = this.persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
         if (searchedEntity.isPresent()) {
             throw new EntityExistsException();
         }
