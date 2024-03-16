@@ -13,13 +13,16 @@ class DefaultPersistenceContextTest {
 
     DefaultPersistenceContext defaultPersistenceContext = new DefaultPersistenceContext();
 
+    EntityKey entityKey = defaultPersistenceContext.getEntityKey(Person.class, 1L);
     @Test
     @DisplayName("persistenceContext에 entity추가 테스트")
     public void addEntityTest() {
         Person person = new Person();
-        defaultPersistenceContext.addEntity(1L, person);
+        person.setId(1L);
 
-        assertEquals(person, defaultPersistenceContext.getEntity(person.getClass(), 1L));
+        defaultPersistenceContext.addEntity(entityKey, person);
+
+        assertEquals(person, defaultPersistenceContext.getEntity(entityKey));
     }
 
     @Test
@@ -28,9 +31,9 @@ class DefaultPersistenceContextTest {
         Person person = new Person();
         person.setId(1L);
 
-        defaultPersistenceContext.removeEntity(1L, person);
+        defaultPersistenceContext.removeEntity(entityKey);
 
-        assertNull(defaultPersistenceContext.getEntity(person.getClass(), 1L));
+        assertNull(defaultPersistenceContext.getEntity(entityKey));
     }
 
     @Test
@@ -41,10 +44,10 @@ class DefaultPersistenceContextTest {
         person.setName("test");
         person.setAge(20);
 
-        defaultPersistenceContext.addEntity(1L, person);
-        defaultPersistenceContext.getDatabaseSnapshot(1L, person);
+        defaultPersistenceContext.addEntity(entityKey, person);
+        defaultPersistenceContext.getDatabaseSnapshot(entityKey);
 
-        Snapshot snapshot = defaultPersistenceContext.getSnapshot(person.getClass(), 1L);
+        Snapshot snapshot = defaultPersistenceContext.getSnapshot(entityKey);
         Map<String, Object> snapShot = snapshot.get();
 
         assertEquals(person.getId(), snapShot.get("id"));
@@ -60,12 +63,29 @@ class DefaultPersistenceContextTest {
         person.setName("test");
         person.setAge(20);
 
-        defaultPersistenceContext.addEntity(1L, person);
-        defaultPersistenceContext.getDatabaseSnapshot(1L, person);
+        defaultPersistenceContext.addEntity(entityKey, person);
+        defaultPersistenceContext.getDatabaseSnapshot(entityKey);
 
         person.setName("test2");
         List<Object> objects = defaultPersistenceContext.dirtyCheck();
 
         assertEquals(1, objects.size());
+    }
+
+    @Test
+    @DisplayName("persistenceContext clear 테스트")
+    public void clearTest() {
+        Person person = new Person();
+        person.setId(1L);
+        person.setName("test");
+        person.setAge(20);
+
+        defaultPersistenceContext.addEntityEntry(entityKey, new EntityEntry(Status.MANAGED));
+        defaultPersistenceContext.addEntity(entityKey, person);
+        defaultPersistenceContext.getDatabaseSnapshot(entityKey);
+
+        defaultPersistenceContext.clear();
+
+        assertNull(defaultPersistenceContext.getEntity(entityKey));
     }
 }

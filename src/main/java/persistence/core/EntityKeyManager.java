@@ -10,20 +10,15 @@ public class EntityKeyManager {
         this.keys = new HashMap<>();
     }
 
-    public EntityKey createKey(Class<?> clazz, Long id) {
+    private EntityKey createKey(Class<?> clazz, Long id) {
         EntityKey entityKey = new EntityKey(clazz, id);
-        put(entityKey);
         return entityKey;
-    }
-
-    private void put(EntityKey entityKey) {
-        keys.put(entityKey.getKey(), entityKey);
     }
 
     public EntityKey from(Class<?> clazz, Long id) {
         String keyString = EntityKey.genEntityKey(clazz.getSimpleName(), id);
 
-        return keys.computeIfAbsent(keyString, k -> new EntityKey(clazz, id));
+        return keys.computeIfAbsent(keyString, key -> createKey(clazz, id));
     }
 
 }

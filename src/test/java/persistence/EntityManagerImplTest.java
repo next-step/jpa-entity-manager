@@ -91,11 +91,14 @@ class EntityManagerImplTest {
     @DisplayName("entity 삭제")
     public void removeTest() {
         final Person person = new Person();
+        person.setId(1L);
         person.setName("jinny");
         person.setAge(30);
         person.setEmail("");
 
         entityManager.persist(person);
+
+        System.out.println("------------------------------------------- remove start ");
 
         entityManager.remove(person);
 

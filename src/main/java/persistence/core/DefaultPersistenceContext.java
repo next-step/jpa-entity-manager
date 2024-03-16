@@ -1,49 +1,60 @@
 package persistence.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DefaultPersistenceContext implements PersistenceContext {
+
     private EntityKeyManager entityKeyManager;
     private Map<EntityKey, Object> managedEntities;
     private Map<EntityKey, Snapshot> snapshotEntities;
-
+    private Map<EntityKey, EntityEntry> entityEntries;
 
     public DefaultPersistenceContext() {
+        this.entityKeyManager = new EntityKeyManager();
         this.managedEntities = new HashMap<>();
         this.snapshotEntities = new HashMap<>();
-        this.entityKeyManager = new EntityKeyManager();
+        this.entityEntries = new HashMap<>();
     }
 
     @Override
-    public Object getEntity(Class<?> clazz, Long id) {
-        EntityKey entityKey = entityKeyManager.from(clazz, id);
+    public EntityKey getEntityKey(Class<?> clazz, Long id) {
+        return entityKeyManager.from(clazz, id);
+    }
 
+    @Override
+    public Object getEntity(EntityKey entityKey) {
         return managedEntities.get(entityKey);
     }
 
     @Override
-    public void addEntity(Long id, Object entity) {
-        EntityKey entityKey = entityKeyManager.createKey(entity.getClass(), id);
+    public void addEntity(EntityKey entityKey, Object entity) {
         managedEntities.put(entityKey, entity);
     }
 
     @Override
-    public void removeEntity(Long id, Object entity) {
-        EntityKey entityKey = entityKeyManager.from(entity.getClass(), id);
+    public void removeEntity(EntityKey entityKey) {
         managedEntities.remove(entityKey);
     }
 
     @Override
-    public void getDatabaseSnapshot(Long id, Object entity) {
-        EntityKey entityKey = entityKeyManager.from(entity.getClass(), id);
+    public void getDatabaseSnapshot(EntityKey entityKey) {
         snapshotEntities.put(entityKey, new Snapshot(managedEntities.get(entityKey)));
     }
 
-    public Snapshot getSnapshot(Class<?> clazz, Long id) {
-        EntityKey entityKey = entityKeyManager.from(clazz, id);
-        return snapshotEntities.get(entityKey);
+    @Override
+    public void addEntityEntry(EntityKey entityKey, EntityEntry entityEntry) {
+        entityEntries.put(entityKey, entityEntry);
     }
 
+    @Override
+    public EntityEntry getEntityEntry(EntityKey entityKey) {
+        return entityEntries.get(entityKey);
+    }
+
+    @Override
     public <T> List<T> dirtyCheck() {
         List<T> dirtyEntities = new ArrayList<>();
         managedEntities.forEach((key, entity) -> {
@@ -61,6 +72,17 @@ public class DefaultPersistenceContext implements PersistenceContext {
         Map<String, Object> stringObjectMap = currentEntity.get();
 
         return !snapshotEntity.equals(stringObjectMap);
+    }
+
+    public Snapshot getSnapshot(EntityKey entityKey) {
+        return snapshotEntities.get(entityKey);
+    }
+
+    @Override
+    public void clear() {
+        managedEntities.clear();
+        snapshotEntities.clear();
+        entityEntries.clear();
     }
 
 }
