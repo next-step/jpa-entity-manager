@@ -18,9 +18,9 @@ public interface PersistenceContext {
     <T> T getDatabaseSnapshot(T entity, Long id);
 
     Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id);
-    void manageEntityEntry(Class<?> clazz, Long id);
+    void addEntityEntry(Class<?> clazz, Long id);
 
-    <T> void manageEntityEntry(T entity);
+    <T> void addEntityEntry(T entity);
 
     <T> void saveEntryEntity(T entity);
 }

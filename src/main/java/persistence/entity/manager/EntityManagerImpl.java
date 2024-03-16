@@ -40,7 +40,7 @@ public class EntityManagerImpl implements EntityManager {
             return Optional.empty();
         }
         T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
-        persistenceContext.manageEntityEntry(clazz, id);
+        persistenceContext.addEntityEntry(clazz, id);
         return Optional.of(addedEntity);
     }
 
@@ -49,7 +49,7 @@ public class EntityManagerImpl implements EntityManager {
         validate(entity);
 
         T insertedEntity = entityPersister.insert(entity);
-        this.persistenceContext.manageEntityEntry(entity);
+        this.persistenceContext.addEntityEntry(entity);
         return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity.getClass()).getPrimaryKeyValue(insertedEntity));
     }
 

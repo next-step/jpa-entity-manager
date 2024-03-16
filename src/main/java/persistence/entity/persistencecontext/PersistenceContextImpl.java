@@ -74,12 +74,12 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void manageEntityEntry(Class<?> clazz, Long id) {
+    public void addEntityEntry(Class<?> clazz, Long id) {
         this.entityEntries.put(new EntityKey(clazz, id), new EntityEntry());
     }
 
     @Override
-    public <T> void manageEntityEntry(T entity) {
+    public <T> void addEntityEntry(T entity) {
         this.entityEntries.put(new EntityKey(entity), new EntityEntry());
     }
 
