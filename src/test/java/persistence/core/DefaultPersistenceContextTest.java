@@ -71,4 +71,21 @@ class DefaultPersistenceContextTest {
 
         assertEquals(1, objects.size());
     }
+
+    @Test
+    @DisplayName("persistenceContext clear 테스트")
+    public void clearTest() {
+        Person person = new Person();
+        person.setId(1L);
+        person.setName("test");
+        person.setAge(20);
+
+        defaultPersistenceContext.addEntityEntry(entityKey, new EntityEntry(Status.MANAGED));
+        defaultPersistenceContext.addEntity(entityKey, person);
+        defaultPersistenceContext.getDatabaseSnapshot(entityKey);
+
+        defaultPersistenceContext.clear();
+
+        assertNull(defaultPersistenceContext.getEntity(entityKey));
+    }
 }

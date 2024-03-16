@@ -72,5 +72,10 @@ public class EntityManagerImpl implements EntityManager {
                 .forEach(this::merge);
     }
 
+    @Override
+    public void clear() {
+        persistenceContext.clear();
+    }
+
 
 }

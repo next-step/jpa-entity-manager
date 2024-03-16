@@ -54,8 +54,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
         return entityEntries.get(entityKey);
     }
 
-
-
     @Override
     public <T> List<T> dirtyCheck() {
         List<T> dirtyEntities = new ArrayList<>();
@@ -76,8 +74,15 @@ public class DefaultPersistenceContext implements PersistenceContext {
         return !snapshotEntity.equals(stringObjectMap);
     }
 
-
     public Snapshot getSnapshot(EntityKey entityKey) {
         return snapshotEntities.get(entityKey);
     }
+
+    @Override
+    public void clear() {
+        managedEntities.clear();
+        snapshotEntities.clear();
+        entityEntries.clear();
+    }
+
 }
