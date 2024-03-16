@@ -121,4 +121,18 @@ class PersistenceContextImplTest {
         softAssertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
         softAssertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
     }
+
+    @DisplayName("스냅샷을 조회시 처음에 저장한 엔티티가 조회된다.")
+    @Test
+    void getDatabaseSnapshot() {
+        // given
+        Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        persistenceContext.updateEntity(person, 1L);
+
+        // when
+        Person actual = persistenceContext.getDatabaseSnapshot(person, 1L);
+
+        // then
+        Assertions.assertThat(actual).isSameAs(person);
+    }
 }
