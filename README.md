@@ -12,11 +12,14 @@
   - [x] primaryKey로 클래스 네이밍 변경, 패키지 위치 이동, static 메서드 대신 멤버 변수화
 
 ### 4단계 질문사항
-* [PR 코멘트 링크](https://github.com/next-step/jpa-entity-manager/pull/165#discussion_r1525250415)
-* PR 코멘트 스크린샷
-![스크린샷 2024-03-16 오전 8.16.12.png](..%2F..%2F..%2F..%2Fvar%2Ffolders%2F_q%2Fd52gkwbn3y539jdm707grkpr0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_C2M3gP%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-03-16%20%EC%98%A4%EC%A0%84%208.16.12.png)
-넵 종민님! 질문이 있습니다. 멤버 메서드로 변경시, PrimaryKey 클래스의 name, field, dataTypeName은 getPrimaryKeyValue를 실행시 사용되지 않는데요. 그래서 static으로 선언했던 거였는데, 멤버 메서드로 변경시 어떤 이점이 있을까요?
+* 질문 1
+  * [PR 코멘트 링크](https://github.com/next-step/jpa-entity-manager/pull/165#discussion_r1525250415)
+  * PR 코멘트 스크린샷
+     ![스크린샷 2024-03-16 오전 8.16.12.png](..%2F..%2F..%2F..%2Fvar%2Ffolders%2F_q%2Fd52gkwbn3y539jdm707grkpr0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_C2M3gP%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-03-16%20%EC%98%A4%EC%A0%84%208.16.12.png)
+     넵 종민님! 질문이 있습니다. 멤버 메서드로 변경시, PrimaryKey 클래스의 name, field, dataTypeName은 getPrimaryKeyValue를 실행시 사용되지 않는데요. 그래서 static으로 선언했던 거였는데, 멤버 메서드로 변경시 어떤 이점이 있을까요?
 
+* 질문 2
+  * EntityEntry의 개념이 아예 생소해 hibernate 구현체를 참고하여 만들었는데요. 종민님께서 미션을 받으셨을때 어떻게 접근하셨는지 궁금해요. PersistenceContext나 EntityManger와 달리 본 미션은 entity의 상태를 관리한다는 디스크립션 뿐이라, 미션의 요구사항이 조금 모호하다고 느꼈던지라 질문 드립니다-! 
 ## 3단계
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라
 - [x] 요구사항 2 - snapshot을 구현하여라

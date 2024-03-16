@@ -2,14 +2,18 @@ package persistence.entity.persistencecontext;
 
 import persistence.PrimaryKey;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
+    private final Map<EntityKey, EntityEntry> entityEntries;
     private final EntityCache entityCache;
     private final Snapshot snapshot;
 
     public PersistenceContextImpl() {
+        this.entityEntries = new HashMap<>();
         this.entityCache = new EntityCache();
         this.snapshot = new Snapshot();
     }
@@ -29,7 +33,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T addEntity(T entity, Long id) {
         Class<?> clazz = entity.getClass();
-        entityCache.put(entity, new EntityKey(clazz, id));
+        EntityKey entityKey = new EntityKey(clazz, id);
+        entityCache.put(entity, entityKey);
         return entity;
     }
 
@@ -54,5 +59,9 @@ public class PersistenceContextImpl implements PersistenceContext {
     public <T> T getDatabaseSnapshot(T entity, Long id) {
         EntityKey key = new EntityKey(entity.getClass(), id);
         return snapshot.get(key);
+    }
+
+    public EntityEntry getEntityEntry(EntityKey entityKey) {
+        return this.entityEntries.get(entityKey);
     }
 }
