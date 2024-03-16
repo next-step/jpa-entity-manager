@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static persistence.entity.persistencecontext.Status.SAVING;
+import static persistence.entity.persistencecontext.Status.*;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
@@ -74,22 +74,46 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntityEntry(Class<?> clazz, Long id) {
+    public void manageEntityEntry(Class<?> clazz, Long id) {
         this.entityEntries.put(new EntityKey(clazz, id), new EntityEntry());
     }
 
     @Override
-    public <T> void addEntityEntry(T entity) {
+    public <T> void manageEntityEntry(T entity) {
         this.entityEntries.put(new EntityKey(entity), new EntityEntry());
     }
 
     @Override
     public <T> void saveEntryEntity(T entity) {
         EntityEntry entityEntry = this.getEntityEntry(entity);
-        entityEntry.updateStatus(SAVING); // TODO: 동일한 객체로 있는지 확인 (entryEntity)
-        this.entityEntries.put(new EntityKey(entity), entityEntry); // TODO: PUT 필요할까?
+        entityEntry.updateStatus(SAVING);
     }
-    
+
+    @Override
+    public <T> void detachEntity(T entity) {
+        EntityEntry entityEntry = this.getEntityEntry(entity);
+        entityEntry.updateStatus(GONE);
+    }
+
+    @Override
+    public <T> void deleteEntity(T entity) {
+        EntityEntry entityEntry = this.getEntityEntry(entity);
+        entityEntry.updateStatus(DELETED);
+    }
+
+    @Override
+    public <T> boolean isReadOnly(T entity) {
+        EntityEntry entityEntry = this.getEntityEntry(entity);
+        return entityEntry.getStatus() == READ_ONLY;
+    }
+
+    @Override
+    public <T> void loadEntity(T entity) {
+        EntityEntry entityEntry = this.getEntityEntry(entity);
+        entityEntry.updateStatus(LOADING);
+    }
+
+
     private <T> EntityEntry getEntityEntry(T entity) {
         EntityKey key = new EntityKey(entity);
         EntityEntry entityEntry = this.entityEntries.get(key);

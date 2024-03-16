@@ -10,7 +10,11 @@ public interface PersistenceContext {
 
     <T> T updateEntity(T entity, Long id);
 
-    void removeEntity(Object entity);
+    <T> void detachEntity(T entity);
+
+    <T> void deleteEntity(T entity);
+
+    <T> void removeEntity(T entity);
 
     /**
      * 스냅샷을 이용해 데이터를 조회한다.
@@ -18,9 +22,13 @@ public interface PersistenceContext {
     <T> T getDatabaseSnapshot(T entity, Long id);
 
     Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id);
-    void addEntityEntry(Class<?> clazz, Long id);
+    void manageEntityEntry(Class<?> clazz, Long id);
 
-    <T> void addEntityEntry(T entity);
+    <T> void manageEntityEntry(T entity);
 
     <T> void saveEntryEntity(T entity);
+
+    <T> boolean isReadOnly(T entity);
+
+    <T> void loadEntity(T entity);
 }

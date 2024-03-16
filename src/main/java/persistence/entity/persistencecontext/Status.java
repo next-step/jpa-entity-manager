@@ -11,7 +11,7 @@ package persistence.entity.persistencecontext;
  * - SAVING: 엔티티가 저장중인 상태. 이 상태의 엔티티는 영속성 컨텍스트에서 관리되며, 데이터 베이스에 저장되는 중이다.
  */
 public enum Status {
-    MANAGED, // TODO: (작업중 임시 기재, 작업 끝나고 지우기) done
+    MANAGED,
     READ_ONLY,
     DELETED,
     GONE,

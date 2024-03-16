@@ -4,6 +4,7 @@ import jdbc.JdbcTemplate;
 import persistence.PrimaryKey;
 import persistence.entity.exception.EntityExistsException;
 import persistence.entity.exception.EntityNotExistsException;
+import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
@@ -40,7 +41,7 @@ public class EntityManagerImpl implements EntityManager {
             return Optional.empty();
         }
         T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
-        persistenceContext.addEntityEntry(clazz, id);
+        persistenceContext.manageEntityEntry(clazz, id);
         return Optional.of(addedEntity);
     }
 
@@ -49,7 +50,7 @@ public class EntityManagerImpl implements EntityManager {
         validate(entity);
 
         T insertedEntity = entityPersister.insert(entity);
-        this.persistenceContext.addEntityEntry(entity);
+        this.persistenceContext.manageEntityEntry(entity);
         return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity.getClass()).getPrimaryKeyValue(insertedEntity));
     }
 
@@ -64,12 +65,20 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
+
+        if (persistenceContext.isReadOnly(entity)) {
+            throw new ReadOnlyException();
+        }
+
         Long primaryKey = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
         Object snapshot = getSnapShot(entity, primaryKey);
 
         if (!entity.equals(snapshot)) {
+            persistenceContext.saveEntryEntity(entity);
             T updatedEntity = entityPersister.update(entity, primaryKey);
-            return persistenceContext.updateEntity(updatedEntity, primaryKey);
+            T result = persistenceContext.updateEntity(updatedEntity, primaryKey);
+            persistenceContext.manageEntityEntry(entity.getClass(), primaryKey);
+            return result;
         }
         return entity;
     }
@@ -89,6 +98,8 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
+        persistenceContext.detachEntity(entity);
+        persistenceContext.removeEntity(entity);
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
     }
