@@ -140,8 +140,9 @@ class EntityManagerTest {
         // then
         String query = new SelectQueryBuilder(Person.class).getFindAllQuery();
         List<Person> actual = jdbcTemplate.query(query, new DtoMapper<>(Person.class));
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(actual.get(0)).isEqualTo(new Person(2L, "김영희", 15, "younghee.kim@gmail.com", 11));
-        softAssertions.assertThat(actual.get(1)).isEqualTo(new Person(3L, "신짱구", 15, "jjangoo.sin@gmail.com", 11));
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(actual.get(0)).isEqualTo(new Person(2L, "김영희", 15, "younghee.kim@gmail.com", 11));
+            softly.assertThat(actual.get(1)).isEqualTo(new Person(3L, "신짱구", 15, "jjangoo.sin@gmail.com", 11));
+        });
     }
 }

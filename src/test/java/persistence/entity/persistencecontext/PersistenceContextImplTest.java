@@ -69,9 +69,10 @@ class PersistenceContextImplTest {
         Dog actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(actualPerson).isSameAs(person);
-        softAssertions.assertThat(actualDog).isSameAs(dog);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(actualPerson).isSameAs(person);
+            softly.assertThat(actualDog).isSameAs(dog);
+        });
     }
 
     @DisplayName("존재하지 않는 값을 조회시, 리턴 객체는 빈값이다.")
@@ -117,9 +118,10 @@ class PersistenceContextImplTest {
         Optional<Person> entityAfterDelete = persistenceContext.getEntity(Person.class, 1L);
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
-        softAssertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(entityBeforeDelete.get()).isEqualTo(person);
+            softly.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
+        });
     }
 
     @DisplayName("스냅샷을 조회시 처음에 저장한 엔티티가 조회된다.")
