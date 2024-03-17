@@ -77,10 +77,6 @@ public class SimpleEntityManager implements EntityManager {
             return false;
         }
 
-        if (findObject.equals(entity)) {
-            return false;
-        }
-
-        return true;
+        return !findObject.equals(entity);
     }
 }
