@@ -52,8 +52,8 @@ class EntityManagerImplTest {
 
     @DisplayName("EntityManagerImpl find를 호출하면 엔티티가 리턴된다.")
     @Test
-    void findTest() throws IllegalAccessException {
-        final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
+    void findTest() {
+        final Person person = new Person( "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
@@ -61,13 +61,15 @@ class EntityManagerImplTest {
 
         final Person findPerson = entityManager.find(person.getClass(), 1L);
 
-        assertThat(person).isEqualTo(findPerson);
+        assertThat(person.getEmail()).isEqualTo(findPerson.getEmail());
+        assertThat(person.getAge()).isEqualTo(findPerson.getAge());
+        assertThat(person.getName()).isEqualTo(findPerson.getName());
     }
 
     @DisplayName("EntityManagerImpl persist를 호출하면 엔티티를 저장한다.")
     @Test
-    void persistTest() throws IllegalAccessException {
-        final Person person = new Person(1L, "simpson", 31, "simpson@naver.com");
+    void persistTest() {
+        final Person person = new Person("simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
@@ -75,21 +77,38 @@ class EntityManagerImplTest {
         entityManager.persist(person);
 
         final Person savedPerson = entityManager.find(person.getClass(), 1L);
-        assertThat(savedPerson).isEqualTo(person);
+
+        assertThat(person.getEmail()).isEqualTo(savedPerson.getEmail());
+        assertThat(person.getAge()).isEqualTo(savedPerson.getAge());
+        assertThat(person.getName()).isEqualTo(savedPerson.getName());
+    }
+
+    @DisplayName("EntityManagerImpl persist를 호출할때, IDENTITY전략인데 key가 존재하면 예외가 발생한다.")
+    @Test
+    void persistTest_autu_strategy_contains_key() {
+        final Person person = new Person(1L, "simpson", 31, "simpson@naver.com");
+        EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
+        final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
+        final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
+
+        assertThatThrownBy(() -> entityManager.persist(person))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("EntityManagerImpl delete를 호출하면 엔티티를 삭제한다.")
     @Test
-    void removeTest() throws IllegalAccessException {
-        final Person person = new Person( 1L, "simpson", 31, "simpson@naver.com");
+    void removeTest() {
+        final Person person = new Person( "simpson", 31, "simpson@naver.com");
         EntityPersisterImpl entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaCreator);
         final EntityLoaderImpl entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaCreator);
         final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
         entityManager.persist(person);
+        final Person persistPerson = entityManager.find(Person.class, 1L);
 
-        entityManager.remove(person);
+        System.out.println("persistPerson" + persistPerson.toString());
+        entityManager.remove(persistPerson);
 
         assertThatThrownBy(() -> entityManager.find(person.getClass(), 1L))
-                .isInstanceOf(IllegalAccessException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

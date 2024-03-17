@@ -1,5 +1,7 @@
 package persistence.sql.entity.impl;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;
@@ -19,11 +21,31 @@ public class EntityKey<T> {
     public static EntityKey fromEntity(Object entity) {
         final Object value = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(Id.class))
-                .map(f -> createSimpleValue(f, entity))
                 .findFirst()
+                .map(f -> createSimpleValue(f, entity))
                 .orElseThrow(IllegalArgumentException::new);
 
         return new EntityKey(entity.getClass().getName(), value);
+    }
+
+    public static boolean isDetachedEntity(final Object entity) {
+        return Arrays.stream(entity.getClass().getDeclaredFields())
+                .anyMatch(f -> {
+                    final Object value = createSimpleValue(f, entity);
+                    if (f.isAnnotationPresent(GeneratedValue.class)) {
+
+                        final GeneratedValue generatedValue = f.getAnnotation(GeneratedValue.class);
+                        if (generatedValue.strategy().equals(GenerationType.IDENTITY) && isNotNull(value)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
+    }
+
+    private static boolean isNotNull(final Object value) {
+        return !Objects.isNull(value);
     }
 
     public static <T> EntityKey fromNameAndValue(String name, T value) {
@@ -31,7 +53,7 @@ public class EntityKey<T> {
     }
 
     public T value() {
-        return null;
+        return this.value;
     }
 
     private static Object createSimpleValue(Field field, Object object) {

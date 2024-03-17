@@ -60,4 +60,9 @@ public class PersistenceContextImpl implements PersistenceContext {
     private void addEntityEntry(final EntityKey key, final EntityEntry entityEntry) {
         entityEntryByKey.put(key, entityEntry);
     }
+
+    @Override
+    public boolean contains(final EntityKey key) {
+        return entitiesByKey.containsKey(key);
+    }
 }

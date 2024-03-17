@@ -13,4 +13,6 @@ public interface PersistenceContext {
     boolean isDirty(EntityKey key, Object entity);
 
     EntityEntry getEntityEntry(EntityKey key);
+
+    boolean contains(EntityKey key);
 }

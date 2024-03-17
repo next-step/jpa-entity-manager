@@ -2,11 +2,11 @@ package persistence.sql.entity;
 
 public interface EntityManager {
 
-    <T> T find(Class<T> clazz, Long Id) throws IllegalAccessException;
+    <T> T find(Class<T> clazz, Long Id);
 
-    Object persist(Object entity) throws IllegalAccessException;
+    Object persist(Object entity);
 
-    Object merge(Object entity) throws IllegalAccessException;
+    Object merge(Object entity);
 
-    void remove(Object entity) throws IllegalAccessException;
+    void remove(Object entity);
 }

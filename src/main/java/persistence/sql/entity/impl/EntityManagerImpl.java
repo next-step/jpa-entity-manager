@@ -1,5 +1,6 @@
 package persistence.sql.entity.impl;
 
+import jakarta.persistence.EntityExistsException;
 import persistence.sql.entity.EntityLoader;
 import persistence.sql.entity.EntityManager;
 import persistence.sql.entity.EntityPersister;
@@ -20,12 +21,12 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(final Class<T> clazz, final Long id) throws IllegalAccessException {
+    public <T> T find(final Class<T> clazz, final Long id) {
         final EntityKey key = EntityKey.fromNameAndValue(clazz.getName(), id);
         final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
 
         if (existEntityEntry != null && existEntityEntry.isGone()) {
-            throw new IllegalAccessException();
+            throw new IllegalArgumentException();
         }
 
         if (Objects.isNull(persistenceContext.getEntity(key))) {
@@ -41,31 +42,48 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public Object persist(final Object entity) throws IllegalAccessException {
-        final EntityKey entityKey = EntityKey.fromEntity(entity);
-        final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(entityKey);
+    public Object persist(final Object entity) {
+        checkDetachedEntity(entity);
 
-        if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
-            throw new IllegalAccessException();
-        }
+        checkExistEntity(entity);
 
         final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
 
         final Long id = entityPersister.insert(entity);
         final EntityKey key = EntityKey.fromNameAndValue(entity.getClass().getName(), id);
         entityEntry.updateStatus(Status.MANAGED);
-        persistenceContext.addEntity(key, entity, entityEntry);
 
-        return entity;
+        final Object persistEntity = find(entity.getClass(), id);
+        persistenceContext.addEntity(key, persistEntity, entityEntry);
+
+        return persistEntity;
+    }
+
+    private void checkDetachedEntity(final Object entity) {
+        if (EntityKey.isDetachedEntity(entity)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void checkExistEntity(final Object entity) {
+        if (!EntityKey.isDetachedEntity(entity)) {
+            return;
+        }
+
+        final EntityKey entityKey = EntityKey.fromEntity(entity);
+
+        if (persistenceContext.contains(entityKey)) {
+            throw new EntityExistsException();
+        }
     }
 
     @Override
-    public Object merge(final Object entity) throws IllegalAccessException {
+    public Object merge(final Object entity) {
         final EntityKey key = EntityKey.fromEntity(entity);
         final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
 
         if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
-            throw new IllegalAccessException();
+//            throw new IllegalAccessException();
         }
 
         final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
@@ -83,12 +101,12 @@ public class EntityManagerImpl implements EntityManager {
 
 
     @Override
-    public void remove(final Object entity) throws IllegalAccessException {
+    public void remove(final Object entity) {
         final EntityKey key = EntityKey.fromEntity(entity);
         final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
 
         if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
-            throw new IllegalAccessException();
+            throw new IllegalArgumentException();
         }
 
         final EntityEntry entityEntry = EntityEntry.of(Status.DELETED);
