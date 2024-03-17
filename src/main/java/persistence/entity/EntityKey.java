@@ -1,13 +1,16 @@
 package persistence.entity;
 
-import persistence.sql.metadata.EntityMetadata;
+import jakarta.persistence.Id;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 public class EntityKey {
-    private final EntityMetadata entityMetadata;
+    private final Class<?> clazz;
     private final Object id;
 
     private EntityKey(Class<?> clazz, Object id) {
-        this.entityMetadata = EntityMetadata.from(clazz);
+        this.clazz = clazz;
         this.id = id;
     }
 
@@ -16,14 +19,32 @@ public class EntityKey {
     }
 
     public Class<?> getClazz() {
-        return entityMetadata.getClazz();
+        return this.clazz;
     }
 
-    public Object getName() {
-        return entityMetadata.getPrimaryKey().getName();
+    public String getName() {
+        return Objects.requireNonNull(Arrays.stream(this.clazz.getDeclaredFields())
+                        .filter(field -> Arrays.stream(field.getAnnotations())
+                                .anyMatch(annotation -> annotation.annotationType().equals(Id.class)))
+                        .findFirst()
+                        .orElse(null))
+                .getName();
     }
 
     public Object getValue() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        EntityKey key = (EntityKey) object;
+        return Objects.equals(clazz, key.clazz) && Objects.equals(id, key.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz, id);
     }
 }

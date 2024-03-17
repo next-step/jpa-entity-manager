@@ -15,12 +15,12 @@ public class UpdateQueryBuilder {
     public static final String DELIMITER = ", ";
     public static final String WHERE_DELIMITER = " ";
     private final Dialect dialect;
-    private final EntityMetadata entityMetadata;
+    private final EntityMetadata entity;
     private final WhereQueryBuilder whereQueryBuilder;
 
-    private UpdateQueryBuilder(Dialect dialect, EntityMetadata entityMetadata, WhereQueryBuilder whereQueryBuilder) {
+    private UpdateQueryBuilder(Dialect dialect, EntityMetadata entity, WhereQueryBuilder whereQueryBuilder) {
         this.dialect = dialect;
-        this.entityMetadata = entityMetadata;
+        this.entity = entity;
         this.whereQueryBuilder = whereQueryBuilder;
     }
 
@@ -30,7 +30,7 @@ public class UpdateQueryBuilder {
 
     public static class Builder {
         private Dialect dialect;
-        private EntityMetadata entityMetadata;
+        private EntityMetadata entity;
         private WhereQueryBuilder whereQueryBuilder;
 
         private Builder() {
@@ -42,32 +42,32 @@ public class UpdateQueryBuilder {
         }
 
         public Builder entity(Object object) {
-            this.entityMetadata = EntityMetadata.of(object.getClass(), object);
+            this.entity = EntityMetadata.of(object.getClass(), object);
             this.whereQueryBuilder = WhereQueryBuilder.builder()
-                    .whereConditions(entityMetadata)
+                    .whereConditions(entity)
                     .build();
             return this;
         }
 
         public Builder where(List<WhereRecord> whereRecords) {
-            if (Objects.isNull(entityMetadata)) {
+            if (Objects.isNull(entity)) {
                 throw new IllegalStateException("Entity must be set before setting where clause");
             }
 
             this.whereQueryBuilder = WhereQueryBuilder.builder()
-                    .whereConditions(entityMetadata.getColumnsMetadata(), whereRecords)
+                    .whereConditions(entity.getColumnsMetadata(), whereRecords)
                     .build();
             return this;
         }
 
         public UpdateQueryBuilder build() {
-            return new UpdateQueryBuilder(dialect, entityMetadata, whereQueryBuilder);
+            return new UpdateQueryBuilder(dialect, entity, whereQueryBuilder);
         }
     }
 
     private String setClause() {
-        return entityMetadata.getColumns().stream()
-                .filter(columnMetadata -> !entityMetadata.getPrimaryKey().getName().equals(columnMetadata.getName()))
+        return entity.getColumns().stream()
+                .filter(columnMetadata -> !entity.getPrimaryKey().getName().equals(columnMetadata.getName()))
                 .filter(ColumnMetadata::isNotNull)
                 .map(column -> column.getName() + " = " + generateColumnValue(column.getValue()))
                 .collect(Collectors.joining(DELIMITER));
@@ -82,6 +82,6 @@ public class UpdateQueryBuilder {
     }
 
     public String generateQuery() {
-        return String.format(UPDATE_TEMPLATE, entityMetadata.getName(), Objects.isNull(whereQueryBuilder) ? setClause() : String.join(WHERE_DELIMITER, setClause(), whereQueryBuilder.generateWhereClausesQuery()));
+        return String.format(UPDATE_TEMPLATE, entity.getName(), Objects.isNull(whereQueryBuilder) ? setClause() : String.join(WHERE_DELIMITER, setClause(), whereQueryBuilder.generateWhereClausesQuery()));
     }
 }

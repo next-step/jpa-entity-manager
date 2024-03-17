@@ -101,11 +101,11 @@ class SimpleEntityManagerTest {
         entityManager.persist(person);
 
         // when
-        entityManager.remove(new Person());
+        entityManager.remove(person);
 
         // then
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
-                .isExactlyInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test

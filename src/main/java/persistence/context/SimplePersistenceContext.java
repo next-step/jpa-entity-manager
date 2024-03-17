@@ -1,16 +1,15 @@
 package persistence.context;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import persistence.entity.EntityEntry;
 import persistence.entity.EntityKey;
 import persistence.sql.metadata.EntityMetadata;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class SimplePersistenceContext implements PersistenceContext {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimplePersistenceContext.class);
     private final Map<EntityKey, Object> firstLevelCache = new HashMap<>();
     private final Map<EntityKey, EntitySnapshot> snapshots = new HashMap<>();
     private final Map<EntityKey, EntityEntry> entries = new HashMap<>();
@@ -58,10 +57,6 @@ public class SimplePersistenceContext implements PersistenceContext {
     public void removeEntity(Object entity) {
         EntityMetadata entityMetadata = EntityMetadata.of(entity.getClass(), entity);
         EntityKey key = EntityKey.of(entity.getClass(), entityMetadata.getPrimaryKey().getValue());
-        List<EntityKey> keys = new ArrayList<>(entries.keySet());
-        EntityKey key1 = keys.get(0);
-        logger.info("key1: " + key1);
-        logger.info("key: " + key);
 
         EntityEntry entry = entries.get(key);
 

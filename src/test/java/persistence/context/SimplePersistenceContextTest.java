@@ -19,7 +19,7 @@ class SimplePersistenceContextTest {
 
     @Test
     @DisplayName("Entity가 Persistent 시 상태가 Managed인지 확인한다.")
-    void entityPersistent_ThenEntityStatusIsManaged() {
+    void entityPersistent_ThenEntityStatus_IsManaged() {
         // given
         final Person person = Person.of(1L, "crong", 35, "test12@gmail.com");
         persistenceContext.addEntity(1L, person);
@@ -31,7 +31,7 @@ class SimplePersistenceContextTest {
 
     @Test
     @DisplayName("Persistent 상태의 Entity를 제거하면 상태가 Gone인지 확인한다.")
-    void entityPersistent_With_EntityStatus_Managed() {
+    void removeEntityPersistent_ThenEntityStatus_IsGone() {
         // given
         final Person person = Person.of(1L, "crong", 35, "test12@gmail.com");
         persistenceContext.addEntity(1L, person);
@@ -42,5 +42,4 @@ class SimplePersistenceContextTest {
         // then
         assertThat(persistenceContext.getEntry(person).getStatus()).isEqualTo(EntityStatus.GONE);
     }
-
 }

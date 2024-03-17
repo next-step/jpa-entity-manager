@@ -53,6 +53,7 @@ public class SimpleEntityManager implements EntityManager {
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 
     @Override
@@ -61,11 +62,25 @@ public class SimpleEntityManager implements EntityManager {
         Object key = entityMetadata.getPrimaryKey().getValue();
 
         EntitySnapshot snapshot = persistenceContext.getDatabaseSnapshot(key, entity);
-        if (snapshot.isNotEqualToSnapshot(entity)) {
+        if (snapshot.isNotEqualToSnapshot(entity) || isNotEqualToDatabase(entity, key)) {
             entityPersister.update(entity);
             cachedEntity(key, entity);
         }
 
         return entity;
+    }
+
+    private <T> boolean isNotEqualToDatabase(T entity, Object key) {
+        Object findObject = entityLoader.find(EntityKey.of(entity.getClass(), key));
+
+        if (Objects.isNull(findObject)) {
+            return false;
+        }
+
+        if (findObject.equals(entity)) {
+            return false;
+        }
+
+        return true;
     }
 }

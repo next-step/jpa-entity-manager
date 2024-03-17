@@ -90,11 +90,11 @@ class EntityPersisterTest {
     @DisplayName("Delete query builder 동작 테스트")
     void delete() {
         // given
-        final Person person = Person.of(1L, "crong", 35, "test@gmail.com");
+        final Person person = Person.of("crong", 35, "test@gmail.com");
         entityManager.persist(person);
 
         // when
-        entityPersister.delete(person);
+        entityManager.remove(person);
 
         // then
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L)).isInstanceOf(RuntimeException.class);
