@@ -37,4 +37,8 @@ public class EntityEntry {
     public boolean isGone() {
         return this.status.equals(Status.GONE);
     }
+
+    public boolean isNotReadOnly() {
+        return !this.status.equals(Status.READ_ONLY);
+    }
 }

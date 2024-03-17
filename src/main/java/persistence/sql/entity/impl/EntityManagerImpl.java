@@ -82,13 +82,13 @@ public class EntityManagerImpl implements EntityManager {
         final EntityKey key = EntityKey.fromEntity(entity);
         final EntityEntry existEntityEntry = persistenceContext.getEntityEntry(key);
 
-        if (existEntityEntry != null && existEntityEntry.isReadOnly()) {
-//            throw new IllegalAccessException();
+        if (existEntityEntry != null && existEntityEntry.isGone()) {
+            throw new IllegalArgumentException();
         }
 
         final EntityEntry entityEntry = EntityEntry.of(Status.SAVING);
 
-        if (persistenceContext.isDirty(key, entity)) {
+        if (persistenceContext.isDirty(key, entity) && existEntityEntry.isNotReadOnly()) {
             entityPersister.update(entity);
         } else {
             entityPersister.insert(entity);
