@@ -14,13 +14,23 @@ public class PrimaryKey {
     private final String name;
     private final String dataTypeName;
 
+    private final Long value;
+
     public PrimaryKey(Class<?> clazz) {
         this.field = getIdField(clazz);
         this.name = field.getName();
         this.dataTypeName = field.getType().getSimpleName();
+        this.value = 11L;
     }
 
-    public Long getPrimaryKeyValue(Object entity) {
+    public <T> PrimaryKey(T entity) {
+        this.field = getIdField(entity.getClass());
+        this.name = field.getName();
+        this.dataTypeName = field.getType().getSimpleName();
+        this.value = getPrimaryKeyValue(entity);
+    }
+
+    private Long getPrimaryKeyValue(Object entity) {
         Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findAny()
@@ -32,6 +42,9 @@ public class PrimaryKey {
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
         }
+    }
+    public Long value() {
+        return value;
     }
 
     public Field field() {

@@ -51,11 +51,11 @@ public class EntityManagerImpl implements EntityManager {
 
         T insertedEntity = entityPersister.insert(entity);
         this.persistenceContext.manageEntityEntry(entity);
-        return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity.getClass()).getPrimaryKeyValue(insertedEntity));
+        return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).value());
     }
 
     private void validate(Object entity) {
-        Long primaryKey = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
+        Long primaryKey = new PrimaryKey(entity).value();
 
         Optional<?> searchedEntity = this.persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
         if (searchedEntity.isPresent()) {
@@ -70,7 +70,7 @@ public class EntityManagerImpl implements EntityManager {
             throw new ReadOnlyException();
         }
 
-        Long primaryKey = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
+        Long primaryKey = new PrimaryKey(entity).value();
         Object snapshot = getSnapShot(entity, primaryKey);
 
         if (!entity.equals(snapshot)) {

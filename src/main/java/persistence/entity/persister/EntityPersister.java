@@ -50,7 +50,7 @@ public class EntityPersister {
         }
     }
     public void delete(Object entity) {
-        Long id = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
+        Long id = new PrimaryKey(entity).value();
         String query = new DeleteQueryBuilder(entity.getClass()).deleteById(id);
         jdbcTemplate.execute(query);
     }

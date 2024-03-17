@@ -15,7 +15,7 @@ public class EntityKey {
 
     public <T> EntityKey(T entity) {
         this.className = entity.getClass().getName();
-        this.id = new PrimaryKey(entity.getClass()).getPrimaryKeyValue(entity);
+        this.id = new PrimaryKey(entity).value();
     }
 
     public String getClassName() {
