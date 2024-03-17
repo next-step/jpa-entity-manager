@@ -17,13 +17,13 @@ public class EntityLoader {
         this.dialect = dialect;
     }
 
-    public <T> T find(EntityId entityId) {
-        Class<?> clazz = entityId.getClazz();
+    public <T> T find(EntityKey entityKey) {
+        Class<?> clazz = entityKey.getClazz();
 
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.builder()
                 .dialect(dialect)
                 .entity(clazz)
-                .where(List.of(WhereRecord.of(String.valueOf(entityId.getName()), "=", entityId.getValue())))
+                .where(List.of(WhereRecord.of(String.valueOf(entityKey.getName()), "=", entityKey.getValue())))
                 .build();
 
         return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> (T) new EntityRowMapper<>(clazz).mapRow(resultSet));

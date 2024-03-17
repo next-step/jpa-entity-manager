@@ -2,15 +2,41 @@ package persistence.entity;
 
 public class EntityEntry {
 
-    private final Object entity;
     private EntityStatus status;
 
-    private EntityEntry(Object entity, EntityStatus status) {
-        this.entity = entity;
+    private EntityEntry(EntityStatus status) {
         this.status = status;
     }
 
-    public static EntityEntry from(Object entity) {
-        return new EntityEntry(entity, EntityStatus.LOADING);
+    public static EntityEntry loading() {
+        return new EntityEntry(EntityStatus.LOADING);
+    }
+
+    public void save() {
+        this.status = EntityStatus.SAVING;
+    }
+
+    public void delete() {
+        this.status = EntityStatus.DELETED;
+    }
+
+    public void gone() {
+        this.status = EntityStatus.GONE;
+    }
+
+    public void managed() {
+        this.status = EntityStatus.MANAGED;
+    }
+
+    public boolean isGone() {
+        return status == EntityStatus.GONE;
+    }
+
+    public boolean isReadOnly() {
+        return status == EntityStatus.READ_ONLY;
+    }
+
+    public EntityStatus getStatus() {
+        return status;
     }
 }

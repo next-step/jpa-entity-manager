@@ -28,7 +28,7 @@ public class SimpleEntityManager implements EntityManager {
             return entity;
         }
 
-        Object object = entityLoader.find(EntityId.of(clazz, id));
+        Object object = entityLoader.find(EntityKey.of(clazz, id));
         persistenceContext.addEntity(id, object);
 
         return clazz.cast(object);
