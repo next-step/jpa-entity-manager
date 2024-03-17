@@ -91,7 +91,10 @@ public class EntityManagerImpl implements EntityManager {
         }
         Optional<?> searchedEntity = entityLoader.find(entity.getClass(), primaryKey);
         if (searchedEntity.isPresent()) {
-            return persistenceContext.updateEntity(searchedEntity, primaryKey);
+            persistenceContext.saveEntryEntity(searchedEntity.get());
+            Optional<?> o = persistenceContext.updateEntity(searchedEntity, primaryKey);
+            persistenceContext.manageEntityEntry(searchedEntity.get());
+            return o;
         }
         throw new EntityNotExistsException();
     }
