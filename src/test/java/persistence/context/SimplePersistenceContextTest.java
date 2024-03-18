@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.EntityStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SimplePersistenceContextTest {
 
@@ -41,5 +42,19 @@ class SimplePersistenceContextTest {
 
         // then
         assertThat(persistenceContext.getEntry(person).getStatus()).isEqualTo(EntityStatus.GONE);
+    }
+
+    @Test
+    @DisplayName("ReadOnly 시에 persist 시도 시 예외 발생")
+    void whenReadOnlyStatus_ThenException() {
+        // given
+        final Person person = Person.of(1L, "crong", 35, "test12@gmail.com");
+        persistenceContext.addEntity(1L, person);
+        persistenceContext.getEntry(person).readOnly();
+
+        // when
+        // then
+        assertThatThrownBy(() -> persistenceContext.removeEntity(person))
+                .isInstanceOf(IllegalStateException.class);
     }
 }

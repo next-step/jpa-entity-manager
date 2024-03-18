@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.context.SimplePersistenceContext;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
@@ -24,6 +25,7 @@ class EntityPersisterTest {
     private EntityManager entityManager;
     private EntityPersister entityPersister;
     private DatabaseServer databaseServer;
+    private SimplePersistenceContext persistenceContext;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -36,7 +38,8 @@ class EntityPersisterTest {
         databaseServer.start();
 
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
-        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT);
+        persistenceContext = new SimplePersistenceContext();
+        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT, persistenceContext);
         entityPersister = new EntityPersister(jdbcTemplate, DIALECT);
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery());

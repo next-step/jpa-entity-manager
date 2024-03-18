@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.context.SimplePersistenceContext;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
@@ -23,6 +24,7 @@ class SimpleEntityManagerTest {
     private final Dialect DIALECT = new H2Dialect();
     private JdbcTemplate jdbcTemplate;
     private EntityManager entityManager;
+    private SimplePersistenceContext persistenceContext;
     private DatabaseServer server;
     private Person person;
 
@@ -31,6 +33,7 @@ class SimpleEntityManagerTest {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+        persistenceContext = new SimplePersistenceContext();
 
         person = Person.of(1L, "test", 11, "test!@gmail.com");
 
@@ -40,7 +43,7 @@ class SimpleEntityManagerTest {
                 .build()
                 .generateQuery());
 
-        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT);
+        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT, persistenceContext);
     }
 
     @AfterEach
@@ -120,5 +123,51 @@ class SimpleEntityManagerTest {
 
         // then
         assertThat(nonCachingPerson).isEqualTo(cachingPerson);
+    }
+
+    @Test
+    @DisplayName("merge 시 수정 사항이 없는 케이스 테스트")
+    void merge_WithNoChanges_entityEntryIsManagedStatus_WhenPersisted() {
+        // given
+        entityManager.persist(person);
+        Person person = entityManager.find(Person.class, 1L);
+
+        // when
+        Person mergedPerson = entityManager.merge(person);
+
+        // then
+        assertThat(mergedPerson).isEqualTo(person);
+        assertThat(persistenceContext.getEntry(person).getStatus()).isEqualTo(EntityStatus.MANAGED);
+    }
+
+    @Test
+    @DisplayName("remove 시 EntityEntry 가 Gone 상태인지 확인한다.")
+    void remove_ThenEntityEntryIsGoneStatus() {
+        // given
+        entityManager.persist(person);
+
+        // when
+        entityManager.remove(person);
+
+        // then
+        assertThat(persistenceContext.getEntry(person).getStatus()).isEqualTo(EntityStatus.GONE);
+    }
+
+    @Test
+    @DisplayName("")
+    void find_WhenReadOnlyStatus_ThenException() {
+        // given
+        entityManager.persist(person);
+        Person findPerson = entityManager.find(Person.class, 1L);
+        findPerson.setName("test2");
+        persistenceContext.getEntry(findPerson).readOnly();
+
+        // when
+        // then
+        assertThatThrownBy(() -> entityManager.merge(findPerson))
+                .isExactlyInstanceOf(IllegalStateException.class);
+
+        assertThatThrownBy(() -> entityManager.remove(findPerson))
+                .isExactlyInstanceOf(IllegalStateException.class);
     }
 }

@@ -24,6 +24,10 @@ public class EntityEntry {
         this.status = EntityStatus.GONE;
     }
 
+    public void readOnly() {
+        this.status = EntityStatus.READ_ONLY;
+    }
+
     public void managed() {
         this.status = EntityStatus.MANAGED;
     }
