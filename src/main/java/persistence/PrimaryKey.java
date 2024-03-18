@@ -5,7 +5,6 @@ import persistence.entity.exception.InvalidPrimaryKeyException;
 import persistence.sql.exception.NotIdException;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class PrimaryKey {
@@ -27,18 +26,13 @@ public class PrimaryKey {
         this.field = getIdField(entity.getClass());
         this.name = field.getName();
         this.dataTypeName = field.getType().getSimpleName();
-        this.value = getPrimaryKeyValue(entity);
+        this.value = getPrimaryKeyValue(entity, field);
     }
 
-    private Long getPrimaryKeyValue(Object entity) { // TODO: 간단하게
-        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(x -> x.isAnnotationPresent(Id.class))
-                .findAny()
-                .orElseThrow(InvalidPrimaryKeyException::new);
-
-        idField.setAccessible(true);
+    private <T> Long getPrimaryKeyValue(T entity, Field primaryKeyField) {
+        primaryKeyField.setAccessible(true);
         try {
-            return (Long) idField.get(entity);
+            return (Long) primaryKeyField.get(entity);
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
         }
