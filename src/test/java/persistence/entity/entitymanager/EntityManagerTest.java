@@ -8,6 +8,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persistencecontext.EntityEntry;
@@ -113,14 +114,32 @@ class EntityManagerTest {
 
     @Test
     void merge시_entity가_업데이트된다() {
+        // given
         Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
         entityManager.persist(person);
 
+        // when
         Person changedPerson = person.changeEmail("soo@gmail.com");
-
         entityManager.merge(changedPerson);
 
-        Assertions.assertThat(entityManager.find(person.getClass(), person.getId()).get()).isEqualTo(changedPerson);
+        // then
+        Person foundPerson = entityManager.find(person.getClass(), person.getId()).get();
+        Assertions.assertThat(foundPerson).isEqualTo(changedPerson);
+    }
+
+    @Test
+    void READ_ONLY_entity를_merge시_예외가_발생한다() {
+        // given
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(person);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(person.getClass(), person.getId()).get();
+        entityEntry.changeToReadOnly();
+
+        // when
+        Person changedPerson = person.changeEmail("soo@gmail.com");
+
+        // then
+        Assertions.assertThatThrownBy(() -> entityManager.merge(changedPerson)).isInstanceOf(ReadOnlyException.class);
     }
 
 

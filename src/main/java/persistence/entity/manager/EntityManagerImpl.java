@@ -60,8 +60,8 @@ public class EntityManagerImpl implements EntityManager {
     private void validate(Object entity) {
         Long primaryKey = new PrimaryKey(entity).value();
 
-        Optional<?> searchedEntity = persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
-        if (searchedEntity.isPresent()) {
+        Optional<?> searchedEntityEntry = persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
+        if (searchedEntityEntry.isPresent()) {
             throw new EntityExistsException();
         }
     }

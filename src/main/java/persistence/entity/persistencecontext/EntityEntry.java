@@ -7,7 +7,7 @@ public class EntityEntry {
     private Status status;
 
     public EntityEntry() {
-        this.status = Status.MANAGED;
+        this.status = MANAGED;
     }
 
     public Status getStatus() {
@@ -32,6 +32,10 @@ public class EntityEntry {
 
     public void removeFromDatabase() {
         this.status = GONE;
+    }
+
+    public void changeToReadOnly() {
+        this.status = READ_ONLY;
     }
 
     public <T> boolean isReadOnly() {
