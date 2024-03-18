@@ -1,5 +1,16 @@
 # jpa-entity-manager
 
+## 4단계
+- [x] 요구사항 1 - CRUD 작업 수행시 엔터티의 상태를 추가해보자. (EntryEntity 추가)
+- [x] 2단계 피드백 반영
+  - [x] merge 테스트 코드 추가, entity와 snpashot은 다를때 값 업데이트하도록 버그 픽스
+  - [x] snapshot return 시 optional을 제거하라. 
+  - [x] remove 메서드의 파라메터로 entityKey를 전달하라
+  - [x] 실제 예외가 발생했을때만 객체를 생성하라.
+  - [x] updateEntity 메서드 실행시 EntityCache에도 값을 넣어준다. addEntity의 파라메터로 id도 함께 넘긴다. 
+  - [x] entityLoader.find에서 가져오는 객체는 매번 다른 주소값을 리턴하므로 테스트에서 대상에서 제거하라
+  - [x] primaryKey로 클래스 네이밍 변경, 패키지 위치 이동, static 메서드 대신 멤버 변수화
+
 ## 3단계
 - [x] 요구사항 1 - PersistenceContext 구현체를 만들어 보고 1차 캐싱을 적용하라
 - [x] 요구사항 2 - snapshot을 구현하여라

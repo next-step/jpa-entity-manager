@@ -1,14 +1,29 @@
 package persistence.entity.persistencecontext;
 
-import java.util.Objects;
+import persistence.PrimaryKey;
 
+import java.util.Objects;
 public class EntityKey {
+
     private final String className;
     private final Long id;
 
     public EntityKey(Class<?> clazz, Long id) {
         this.className = clazz.getName();
         this.id = id;
+    }
+
+    public <T> EntityKey(T entity) {
+        this.className = entity.getClass().getName();
+        this.id = new PrimaryKey(entity).value();
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override

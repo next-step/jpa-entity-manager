@@ -2,6 +2,7 @@ package persistence.sql.ddl.clause.primkarykey;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import persistence.PrimaryKey;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -14,12 +15,12 @@ public class PrimaryKeyClause {
             GenerationType.TABLE, "%s %s PRIMARY KEY, seq_value INT",
             GenerationType.UUID, "%s UUID PRIMARY KEY"
     );
-    private final PrimaryKeyValue value;
+    private final PrimaryKey primaryKey;
     private final GenerationType generationType;
 
     public PrimaryKeyClause(Class<?> clazz) {
-        this.value = new PrimaryKeyValue(clazz);
-        this.generationType = getType(value.field());
+        this.primaryKey = new PrimaryKey(clazz);
+        this.generationType = getType(primaryKey.field());
     }
 
     private static GenerationType getType(Field field) {
@@ -31,9 +32,9 @@ public class PrimaryKeyClause {
 
     public String getQuery() {
         if (generationType == GenerationType.UUID) {
-            return String.format(sqlMap.get(generationType), value.name());
+            return String.format(sqlMap.get(generationType), primaryKey.name());
         }
-        String query = String.format(sqlMap.get(generationType), value.name(), value.dataTypeName());
+        String query = String.format(sqlMap.get(generationType), primaryKey.name(), primaryKey.dataTypeName());
         if (query == null) {
             return ID_AUTO_INCREMENT;
         }
@@ -41,6 +42,6 @@ public class PrimaryKeyClause {
     }
 
     public String name() {
-        return this.value.name();
+        return this.primaryKey.name();
     }
 }

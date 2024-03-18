@@ -8,12 +8,12 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.loader.EntityLoader;
+import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
+import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
-import persistence.entity.persister.EntityPersister;
 import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
@@ -22,6 +22,7 @@ import persistence.sql.dml.querybuilder.SelectQueryBuilder;
 import java.util.List;
 import java.util.Optional;
 
+import static persistence.entity.persistencecontext.Status.MANAGED;
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
 class EntityManagerTest {
@@ -32,8 +33,6 @@ class EntityManagerTest {
     private EntityManager entityManager;
 
     private PersistenceContext persistenceContext;
-    private EntityPersister entityPersister;
-    private EntityLoader entityLoader;
 
     @BeforeAll
     static void setupOnce() {
@@ -53,9 +52,7 @@ class EntityManagerTest {
         jdbcTemplate.execute(query);
 
         persistenceContext = new PersistenceContextImpl();
-        entityPersister = new EntityPersister(jdbcTemplate);
-        entityLoader = new EntityLoader(jdbcTemplate);
-        entityManager = new EntityManagerImpl(persistenceContext, entityLoader, entityPersister);
+        entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
     }
 
     @AfterEach
@@ -94,13 +91,55 @@ class EntityManagerTest {
     @Test
     void find_entityCache에_값이_없고_entity_loader에_존재하면_entityloader를_통해_값을_가져오고_entityCache에도_값을_넣는다() {
         // given&when
-        entityPersister.insert(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
+        entityManager.persist(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
         Optional<Person> actual = entityManager.find(Person.class, 1L);
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(actual).isSameAs(entityLoader.find(Person.class, 1L));
-        softAssertions.assertThat(actual).isSameAs(persistenceContext.getEntity(Person.class, 1L));
+        Assertions.assertThat(actual.get()).isSameAs(persistenceContext.getEntity(Person.class, 1L).get());
+    }
+
+    @Test
+    void find_entryEntity는_엔티티를_MANAGED_상태로_초기화한다() {
+        // given
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(person);
+
+        // when
+        entityManager.find(Person.class, 1L).get();
+
+        // then
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(person.getClass(), 1L).get();
+        Assertions.assertThat(entityEntry.getStatus()).isSameAs(MANAGED);
+    }
+
+    @Test
+    void merge시_entity가_업데이트된다() {
+        // given
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(person);
+
+        // when
+        Person changedPerson = person.changeEmail("soo@gmail.com");
+        entityManager.merge(changedPerson);
+
+        // then
+        Person foundPerson = entityManager.find(person.getClass(), person.getId()).get();
+        Assertions.assertThat(foundPerson).isEqualTo(changedPerson);
+    }
+
+    @Test
+    void READ_ONLY_entity를_merge시_예외가_발생한다() {
+        // given
+        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
+        entityManager.persist(person);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(person.getClass(), person.getId()).get();
+        entityEntry.changeToReadOnly();
+
+        // when
+        Person changedPerson = person.changeEmail("soo@gmail.com");
+
+        // then
+        Assertions.assertThatThrownBy(() -> entityManager.merge(changedPerson)).isInstanceOf(ReadOnlyException.class);
     }
 
 
@@ -130,8 +169,9 @@ class EntityManagerTest {
         // then
         String query = new SelectQueryBuilder(Person.class).getFindAllQuery();
         List<Person> actual = jdbcTemplate.query(query, new DtoMapper<>(Person.class));
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(actual.get(0)).isEqualTo(new Person(2L, "김영희", 15, "younghee.kim@gmail.com", 11));
-        softAssertions.assertThat(actual.get(1)).isEqualTo(new Person(3L, "신짱구", 15, "jjangoo.sin@gmail.com", 11));
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(actual.get(0)).isEqualTo(new Person(2L, "김영희", 15, "younghee.kim@gmail.com", 11));
+            softly.assertThat(actual.get(1)).isEqualTo(new Person(3L, "신짱구", 15, "jjangoo.sin@gmail.com", 11));
+        });
     }
 }

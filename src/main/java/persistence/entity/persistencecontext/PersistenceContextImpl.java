@@ -1,15 +1,16 @@
 package persistence.entity.persistencecontext;
 
+import persistence.PrimaryKey;
+
 import java.util.Optional;
 
-import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
-
 public class PersistenceContextImpl implements PersistenceContext {
-
+    private final EntityEntries entityEntries;
     private final EntityCache entityCache;
     private final Snapshot snapshot;
 
     public PersistenceContextImpl() {
+        this.entityEntries = new EntityEntries();
         this.entityCache = new EntityCache();
         this.snapshot = new Snapshot();
     }
@@ -27,33 +28,52 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> T addEntity(T entity) {
+    public <T> T addEntity(T entity, Long id) {
         Class<?> clazz = entity.getClass();
-        Long id = getPrimaryKeyValue(entity);
-        entityCache.put(entity, new EntityKey(clazz, id));
+        EntityKey entityKey = new EntityKey(clazz, id);
+        entityCache.put(entity, entityKey);
         return entity;
     }
 
     @Override
     public <T> T updateEntity(T entity, Long id) {
-        EntityKey key = new EntityKey(entity.getClass(), getPrimaryKeyValue(entity));
+        EntityKey key = new EntityKey(entity.getClass(), id);
         snapshot.put(entity, key);
         return entity;
     }
 
     @Override
     public void removeEntity(Object entity) {
-        entityCache.remove(entity);
-        snapshot.remove(entity);
+        Class<?> clazz = entity.getClass();Long id = new PrimaryKey(entity).value();
+        EntityKey entityKey = new EntityKey(clazz, id);
+        entityCache.remove(entityKey);
+        snapshot.remove(entityKey);
     }
 
     @Override
-    public <T> Optional<T> getDatabaseSnapshot(T entity, Long id) {
+    public <T> T getDatabaseSnapshot(T entity, Long id) {
         EntityKey key = new EntityKey(entity.getClass(), id);
-        Object o = snapshot.get(key);
-        if (o == null) {
-            return Optional.empty();
+        return snapshot.get(key);
+    }
+
+    @Override
+    public <T> boolean isDirty(T entity) {
+        return snapshot.isDirty(entity);
+    }
+
+    @Override
+    public Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id) {
+        return this.entityEntries.get(clazz, id);
+    }
+
+    @Override
+    public <T> EntityEntry getEntityEntry(T entity) {
+        EntityKey key = new EntityKey(entity);
+        Optional<EntityEntry> entityEntry = this.entityEntries.get(key);
+        if (entityEntry.isEmpty()) {
+            entityEntries.put(entity);
+            return entityEntries.get(key).get();
         }
-        return Optional.of((T) o);
+        return entityEntry.get();
     }
 }

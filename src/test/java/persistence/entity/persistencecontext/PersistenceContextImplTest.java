@@ -61,17 +61,18 @@ class PersistenceContextImplTest {
         // given
         Person person = new Person(1L,"김철수", 21, "chulsoo.kim@gmail.com", 11);
         Dog dog = new Dog(1L, "바둑이");
-        persistenceContext.addEntity(person);
-        persistenceContext.addEntity(dog);
+        persistenceContext.addEntity(person, 1L);
+        persistenceContext.addEntity(dog, 1L);
 
         // when
         Person actualPerson = persistenceContext.getEntity(Person.class, 1L).get();
         Dog actualDog = persistenceContext.getEntity(Dog.class, 1L).get();
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(actualPerson).isSameAs(person);
-        softAssertions.assertThat(actualDog).isSameAs(dog);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(actualPerson).isSameAs(person);
+            softly.assertThat(actualDog).isSameAs(dog);
+        });
     }
 
     @DisplayName("존재하지 않는 값을 조회시, 리턴 객체는 빈값이다.")
@@ -79,7 +80,7 @@ class PersistenceContextImplTest {
     void addEntityEmptyResult() {
         // given
         Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, 1L);
 
         // when
         Optional<Person> actual = persistenceContext.getEntity(Person.class, 2L);
@@ -96,7 +97,7 @@ class PersistenceContextImplTest {
         Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
 
         // when
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, 1L);
 
         // then
         Person actual = persistenceContext.getEntity(Person.class, 1L).get();
@@ -109,7 +110,7 @@ class PersistenceContextImplTest {
     void removeEntity() {
         // given
         Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, 1L);
 
         // when
         Optional<Person> entityBeforeDelete = persistenceContext.getEntity(Person.class, 1L);
@@ -117,8 +118,23 @@ class PersistenceContextImplTest {
         Optional<Person> entityAfterDelete = persistenceContext.getEntity(Person.class, 1L);
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(entityBeforeDelete.get()).isEqualTo(person);
-        softAssertions.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(entityBeforeDelete.get()).isEqualTo(person);
+            softly.assertThat(entityAfterDelete).isEqualTo(Optional.empty());
+        });
+    }
+
+    @DisplayName("스냅샷을 조회시 처음에 저장한 엔티티가 조회된다.")
+    @Test
+    void getDatabaseSnapshot() {
+        // given
+        Person person = new Person(1L, "김철수", 21, "chulsoo.kim@gmail.com", 11);
+        persistenceContext.updateEntity(person, 1L);
+
+        // when
+        Person actual = persistenceContext.getDatabaseSnapshot(person, 1L);
+
+        // then
+        Assertions.assertThat(actual).isSameAs(person);
     }
 }

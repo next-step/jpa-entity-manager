@@ -2,6 +2,7 @@ package persistence.entity.persister;
 
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
+import persistence.PrimaryKey;
 import persistence.entity.exception.OptionalForbiddenException;
 import persistence.entity.exception.UnableToChangeIdException;
 import persistence.sql.dml.querybuilder.DeleteQueryBuilder;
@@ -10,8 +11,7 @@ import persistence.sql.dml.querybuilder.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-
-import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
+import java.util.Optional;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
@@ -21,14 +21,18 @@ public class EntityPersister {
     }
 
     public <T> T update(T entity, Long id) {
-        new OptionalForbiddenException().validate(entity);
+        if (entity instanceof Optional) {
+            throw new OptionalForbiddenException();
+        }
         String query = new UpdateQueryBuilder(entity.getClass()).getQuery(entity, id);
         jdbcTemplate.executeUpdate(query);
         return entity;
     }
 
     public <T> T insert(T entity) {
-        new OptionalForbiddenException().validate(entity);
+        if (entity instanceof Optional) {
+            throw new OptionalForbiddenException();
+        }
         Class<?> clazz = entity.getClass();
         String queryToInsert = new InsertQueryBuilder(clazz).getInsertQuery(entity);
         Long id = jdbcTemplate.executeUpdate(queryToInsert);
@@ -46,7 +50,7 @@ public class EntityPersister {
         }
     }
     public void delete(Object entity) {
-        Long id = getPrimaryKeyValue(entity);
+        Long id = new PrimaryKey(entity).value();
         String query = new DeleteQueryBuilder(entity.getClass()).deleteById(id);
         jdbcTemplate.execute(query);
     }

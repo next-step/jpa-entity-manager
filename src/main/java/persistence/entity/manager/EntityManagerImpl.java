@@ -1,15 +1,16 @@
 package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
+import persistence.PrimaryKey;
 import persistence.entity.exception.EntityExistsException;
+import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.loader.EntityLoader;
+import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
 
 import java.util.Optional;
-
-import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -22,10 +23,10 @@ public class EntityManagerImpl implements EntityManager {
         this.entityLoader = new EntityLoader(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
-    public EntityManagerImpl(PersistenceContext persistenceContext, EntityLoader entityLoader, EntityPersister entityPersister) {
+    public EntityManagerImpl(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate) {
         this.persistenceContext = persistenceContext;
-        this.entityLoader = entityLoader;
-        this.entityPersister = entityPersister;
+        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
@@ -39,7 +40,10 @@ public class EntityManagerImpl implements EntityManager {
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        T addedEntity = persistenceContext.addEntity(searchedEntity.get());
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(clazz, id).get();
+        entityEntry.load();
+        T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
+        entityEntry.finishStatusUpdate();
         return Optional.of(addedEntity);
     }
 
@@ -47,43 +51,46 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         validate(entity);
         T insertedEntity = entityPersister.insert(entity);
-        return persistenceContext.updateEntity(insertedEntity, getPrimaryKeyValue(insertedEntity));
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        entityEntry.save();
+        entityEntry.finishStatusUpdate();
+        return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).value());
     }
 
     private void validate(Object entity) {
-        Long primaryKey = getPrimaryKeyValue(entity);
-        Optional<?> searchedEntity = this.find(entity.getClass(), primaryKey);
+        Long primaryKey = new PrimaryKey(entity).value();
 
-        if (searchedEntity.isPresent()) {
+        Optional<?> searchedEntityEntry = persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
+        if (searchedEntityEntry.isPresent()) {
             throw new EntityExistsException();
         }
     }
 
     @Override
     public <T> T merge(T entity) {
-        Long primaryKey = getPrimaryKeyValue(entity);
-        Optional<Object> snapshot = getSnapShot(entity, primaryKey);
 
-        if (entity.equals(snapshot.get())) {
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        if (entityEntry.isReadOnly()) {
+            throw new ReadOnlyException();
+        }
+
+        Long primaryKey = new PrimaryKey(entity).value();
+
+        if (persistenceContext.isDirty(entity)) {
+            entityEntry.save();
             T updatedEntity = entityPersister.update(entity, primaryKey);
-            return persistenceContext.updateEntity(updatedEntity, primaryKey);
+            T result = persistenceContext.updateEntity(updatedEntity, primaryKey);
+            entityEntry.finishStatusUpdate();
+            return result;
         }
         return entity;
     }
 
-    private <T> Optional<Object> getSnapShot(T entity, Long primaryKey) {
-        Optional<Object> snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
-
-        if (snapshot.isEmpty()) {
-            Optional<?> searchedEntity = entityLoader.find(entity.getClass(), primaryKey);
-            snapshot = Optional.of(persistenceContext.updateEntity(searchedEntity, primaryKey));
-        }
-        return snapshot;
-    }
-
     @Override
     public void remove(Object entity) {
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        entityEntry.removeFromPersistenceContext();
         entityPersister.delete(entity);
-        persistenceContext.removeEntity(entity);
+        entityEntry.removeFromDatabase();
     }
 }

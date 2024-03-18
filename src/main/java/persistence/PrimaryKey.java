@@ -1,37 +1,45 @@
-package persistence.sql.ddl.clause.primkarykey;
+package persistence;
 
 import jakarta.persistence.Id;
 import persistence.entity.exception.InvalidPrimaryKeyException;
 import persistence.sql.exception.NotIdException;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class PrimaryKeyValue {
+public class PrimaryKey {
 
     private final Field field;
     private final String name;
     private final String dataTypeName;
 
-    public PrimaryKeyValue(Class<?> clazz) {
+    private final Long value;
+
+    public PrimaryKey(Class<?> clazz) {
         this.field = getIdField(clazz);
         this.name = field.getName();
         this.dataTypeName = field.getType().getSimpleName();
+        this.value = 11L;
     }
 
-    public static Long getPrimaryKeyValue(Object entity) {
-        Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(x -> x.isAnnotationPresent(Id.class))
-                .findAny()
-                .orElseThrow(InvalidPrimaryKeyException::new);
+    public <T> PrimaryKey(T entity) {
+        this.field = getIdField(entity.getClass());
+        this.name = field.getName();
+        this.dataTypeName = field.getType().getSimpleName();
+        this.value = getPrimaryKeyValue(entity, field);
+    }
 
-        idField.setAccessible(true);
+    private <T> Long getPrimaryKeyValue(T entity, Field primaryKeyField) {
+        primaryKeyField.setAccessible(true);
         try {
-            return (Long) idField.get(entity);
+            return (Long) primaryKeyField.get(entity);
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
         }
+    }
+
+    public Long value() {
+        return value;
     }
 
     public Field field() {

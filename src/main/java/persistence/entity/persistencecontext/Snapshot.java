@@ -1,9 +1,9 @@
 package persistence.entity.persistencecontext;
 
+import persistence.PrimaryKey;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import static persistence.sql.ddl.clause.primkarykey.PrimaryKeyValue.getPrimaryKeyValue;
 
 public class Snapshot {
     private final Map<EntityKey, Object> snapshot;
@@ -16,18 +16,20 @@ public class Snapshot {
         snapshot.put(key, entity);
     }
 
-    public void remove(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Long id = getPrimaryKeyValue(entity);
-        EntityKey key = new EntityKey(clazz, id);
+    public void remove(EntityKey key) {
         snapshot.remove(key);
     }
 
     public <T> T get(EntityKey key) {
-        Object cachedEntity = snapshot.get(key);
-        if (cachedEntity == null) {
-            return null;
-        }
         return (T) snapshot.get(key);
+    }
+
+    public <T> boolean isDirty(T entity) {
+
+        Class<?> clazz = entity.getClass();
+        Long primaryKeyValue = new PrimaryKey(entity).value();
+        EntityKey key = new EntityKey(clazz, primaryKeyValue);
+        T searchedEntity = (T) snapshot.get(key);
+        return !entity.equals(searchedEntity);
     }
 }
