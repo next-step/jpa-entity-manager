@@ -21,6 +21,8 @@ public interface PersistenceContext {
      */
     <T> T getDatabaseSnapshot(T entity, Long id);
 
+    <T> boolean isDirty(T entity);
+
     Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id);
     void manageEntityEntry(Class<?> clazz, Long id);
 

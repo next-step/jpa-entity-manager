@@ -63,6 +63,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
+    public <T> boolean isDirty(T entity) {
+        return snapshot.isDirty(entity);
+    }
+
+    @Override
     public Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id) {
         EntityEntry entityEntry = this.entityEntries.get(new EntityKey(clazz, id));
         if (entityEntry == null) {

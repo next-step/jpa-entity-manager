@@ -20,7 +20,6 @@ public class CustomJpaRepository {
         if (isInEntityManger) {
            return entityManager.merge(entity);
         }
-        // TODO 여기서 cache 변경
         return entityManager.persist(entity);
     }
 

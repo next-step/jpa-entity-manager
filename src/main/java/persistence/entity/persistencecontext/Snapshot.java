@@ -1,5 +1,7 @@
 package persistence.entity.persistencecontext;
 
+import persistence.PrimaryKey;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,5 +22,14 @@ public class Snapshot {
 
     public <T> T get(EntityKey key) {
         return (T) snapshot.get(key);
+    }
+
+    public <T> boolean isDirty(T entity) {
+
+        Class<?> clazz = entity.getClass();
+        Long primaryKeyValue = new PrimaryKey(entity).value();
+        EntityKey key = new EntityKey(clazz, primaryKeyValue);
+        T searchedEntity = (T) snapshot.get(key);
+        return !entity.equals(searchedEntity);
     }
 }

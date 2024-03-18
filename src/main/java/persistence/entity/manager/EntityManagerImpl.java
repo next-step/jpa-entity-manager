@@ -3,7 +3,6 @@ package persistence.entity.manager;
 import jdbc.JdbcTemplate;
 import persistence.PrimaryKey;
 import persistence.entity.exception.EntityExistsException;
-import persistence.entity.exception.EntityNotExistsException;
 import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persistencecontext.PersistenceContext;
@@ -72,9 +71,8 @@ public class EntityManagerImpl implements EntityManager {
         }
 
         Long primaryKey = new PrimaryKey(entity).value();
-        Object snapshot = getSnapShot(entity, primaryKey);
 
-        if (!entity.equals(snapshot)) { // dirtyChecking
+        if (persistenceContext.isDirty(entity)) {
             persistenceContext.saveEntryEntity(entity);
             T updatedEntity = entityPersister.update(entity, primaryKey);
             T result = persistenceContext.updateEntity(updatedEntity, primaryKey);
@@ -82,22 +80,6 @@ public class EntityManagerImpl implements EntityManager {
             return result;
         }
         return entity;
-    }
-
-    private <T> Object getSnapShot(T entity, Long primaryKey) {
-        T snapshot = persistenceContext.getDatabaseSnapshot(entity, primaryKey);
-
-        if (snapshot != null) {
-            return snapshot;
-        }
-        Optional<?> searchedEntity = entityLoader.find(entity.getClass(), primaryKey);
-        if (searchedEntity.isPresent()) {
-            persistenceContext.saveEntryEntity(searchedEntity.get());
-            Optional<?> o = persistenceContext.updateEntity(searchedEntity, primaryKey);
-            persistenceContext.manageEntityEntry(searchedEntity.get());
-            return o;
-        }
-        throw new EntityNotExistsException();
     }
 
     @Override
