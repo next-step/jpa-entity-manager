@@ -1,8 +1,5 @@
 package persistence.entity;
 
-import jakarta.persistence.Id;
-
-import java.util.Arrays;
 import java.util.Objects;
 
 public class EntityKey {
@@ -20,15 +17,6 @@ public class EntityKey {
 
     public Class<?> getClazz() {
         return this.clazz;
-    }
-
-    public String getName() {
-        return Objects.requireNonNull(Arrays.stream(this.clazz.getDeclaredFields())
-                        .filter(field -> Arrays.stream(field.getAnnotations())
-                                .anyMatch(annotation -> annotation.annotationType().equals(Id.class)))
-                        .findFirst()
-                        .orElse(null))
-                .getName();
     }
 
     public Object getValue() {

@@ -40,10 +40,13 @@ public class SimplePersistenceContext implements PersistenceContext {
         EntityKey key = EntityKey.of(entity.getClass(), id);
         EntityEntry entry = entries.get(key);
 
+
         if (Objects.isNull(entry)) {
             entry = EntityEntry.loading();
             entries.put(key, entry);
         }
+
+        isReadOnly(entry);
 
         entry.save();
 
@@ -59,20 +62,25 @@ public class SimplePersistenceContext implements PersistenceContext {
         EntityKey key = EntityKey.of(entity.getClass(), entityMetadata.getPrimaryKey().getValue());
 
         EntityEntry entry = entries.get(key);
+        boolean isAlreadyGoneStatus = Objects.isNull(entry);
 
-        if (Objects.isNull(entry)) {
+        if (isAlreadyGoneStatus) {
             return;
         }
 
-        if (entry.isReadOnly()) {
-            throw new IllegalStateException("Entity is read-only");
-        }
+        isReadOnly(entry);
 
         entry.delete();
         firstLevelCache.remove(key);
         snapshots.remove(key);
 
         entry.gone();
+    }
+
+    private static void isReadOnly(EntityEntry entry) {
+        if (entry.isReadOnly()) {
+            throw new IllegalStateException("Entity is read-only");
+        }
     }
 
     @Override

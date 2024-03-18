@@ -28,7 +28,7 @@ public class SimpleEntityManager implements EntityManager {
             return entity;
         }
 
-        Object object = entityLoader.find(EntityKey.of(clazz, id));
+        Object object = entityLoader.find(clazz, id);
         persistenceContext.addEntity(id, object);
 
         return clazz.cast(object);
@@ -71,7 +71,7 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private <T> boolean isNotEqualToDatabase(T entity, Object key) {
-        Object findObject = entityLoader.find(EntityKey.of(entity.getClass(), key));
+        Object findObject = entityLoader.find(entity.getClass(), key);
 
         if (Objects.isNull(findObject)) {
             return false;
