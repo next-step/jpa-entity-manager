@@ -74,7 +74,7 @@ public class EntityManagerImpl implements EntityManager {
         Long primaryKey = new PrimaryKey(entity).value();
         Object snapshot = getSnapShot(entity, primaryKey);
 
-        if (!entity.equals(snapshot)) {
+        if (!entity.equals(snapshot)) { // dirtyChecking
             persistenceContext.saveEntryEntity(entity);
             T updatedEntity = entityPersister.update(entity, primaryKey);
             T result = persistenceContext.updateEntity(updatedEntity, primaryKey);

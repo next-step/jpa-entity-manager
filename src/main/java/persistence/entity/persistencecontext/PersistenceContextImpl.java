@@ -43,7 +43,6 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T updateEntity(T entity, Long id) {
         EntityKey key = new EntityKey(entity.getClass(), id);
-        entityCache.put(entity, key);
         snapshot.put(entity, key);
         return entity;
     }

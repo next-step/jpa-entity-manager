@@ -13,12 +13,14 @@ public class CustomJpaRepository {
         this.entityManager = new EntityManagerImpl(jdbcTemplate);
     }
 
+
     <T> T save (T entity) {
         boolean isInEntityManger = entityManager.find(entity.getClass(), new PrimaryKey(entity).value()).isPresent();
 
         if (isInEntityManger) {
            return entityManager.merge(entity);
         }
+        // TODO 여기서 cache 변경
         return entityManager.persist(entity);
     }
 

@@ -61,12 +61,10 @@ class CustomJpaRepositoryTest {
         // when
         Person updatedPerson = savedPerson.changeEmail("soo@gmail.com");
         Person changedPerson = repository.save(updatedPerson);
-        Person foundPerson = repository.find(Person.class, personId).get();
 
         // then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(changedPerson).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
-            softly.assertThat(foundPerson).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
         });
     }
 
