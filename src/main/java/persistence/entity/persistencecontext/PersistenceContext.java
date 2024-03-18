@@ -10,10 +10,6 @@ public interface PersistenceContext {
 
     <T> T updateEntity(T entity, Long id);
 
-    <T> void detachEntity(T entity);
-
-    <T> void deleteEntity(T entity);
-
     <T> void removeEntity(T entity);
 
     /**
@@ -24,13 +20,5 @@ public interface PersistenceContext {
     <T> boolean isDirty(T entity);
 
     Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id);
-    void manageEntityEntry(Class<?> clazz, Long id);
-
-    <T> void manageEntityEntry(T entity);
-
-    <T> void saveEntryEntity(T entity);
-
-    <T> boolean isReadOnly(T entity);
-
-    <T> void loadEntity(Class<T> clazz, Long id);
+    <T> EntityEntry getEntityEntry(T entity);
 }

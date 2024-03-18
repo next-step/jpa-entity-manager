@@ -5,6 +5,7 @@ import persistence.PrimaryKey;
 import persistence.entity.exception.EntityExistsException;
 import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.loader.EntityLoader;
+import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
@@ -39,9 +40,10 @@ public class EntityManagerImpl implements EntityManager {
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
-        persistenceContext.loadEntity(clazz, id);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(clazz, id).get();
+        entityEntry.load();
         T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
-        persistenceContext.manageEntityEntry(clazz, id);
+        entityEntry.finishStatusUpdate();
         return Optional.of(addedEntity);
     }
 
@@ -49,8 +51,9 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         validate(entity);
         T insertedEntity = entityPersister.insert(entity);
-        persistenceContext.saveEntryEntity(insertedEntity);
-        persistenceContext.manageEntityEntry(insertedEntity);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        entityEntry.save();
+        entityEntry.finishStatusUpdate();
         return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).value());
     }
 
@@ -66,17 +69,18 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T merge(T entity) {
 
-        if (persistenceContext.isReadOnly(entity)) {
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        if (entityEntry.isReadOnly()) {
             throw new ReadOnlyException();
         }
 
         Long primaryKey = new PrimaryKey(entity).value();
 
         if (persistenceContext.isDirty(entity)) {
-            persistenceContext.saveEntryEntity(entity);
+            entityEntry.save();
             T updatedEntity = entityPersister.update(entity, primaryKey);
             T result = persistenceContext.updateEntity(updatedEntity, primaryKey);
-            persistenceContext.manageEntityEntry(entity.getClass(), primaryKey);
+            entityEntry.finishStatusUpdate();
             return result;
         }
         return entity;
@@ -84,8 +88,9 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        persistenceContext.detachEntity(entity);
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        entityEntry.removeFromPersistenceContext();
         entityPersister.delete(entity);
-        persistenceContext.deleteEntity(entity);
+        entityEntry.removeFromDatabase();
     }
 }

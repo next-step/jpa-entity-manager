@@ -2,20 +2,15 @@ package persistence.entity.persistencecontext;
 
 import persistence.PrimaryKey;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-import static persistence.entity.persistencecontext.Status.*;
-
 public class PersistenceContextImpl implements PersistenceContext {
-
-    private final Map<EntityKey, EntityEntry> entityEntries;
+    private final EntityEntries entityEntries;
     private final EntityCache entityCache;
     private final Snapshot snapshot;
 
     public PersistenceContextImpl() {
-        this.entityEntries = new HashMap<>();
+        this.entityEntries = new EntityEntries();
         this.entityCache = new EntityCache();
         this.snapshot = new Snapshot();
     }
@@ -49,8 +44,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void removeEntity(Object entity) {
-        Class<?> clazz = entity.getClass();
-        Long id = new PrimaryKey(entity).value();
+        Class<?> clazz = entity.getClass();Long id = new PrimaryKey(entity).value();
         EntityKey entityKey = new EntityKey(clazz, id);
         entityCache.remove(entityKey);
         snapshot.remove(entityKey);
@@ -69,72 +63,17 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public Optional<EntityEntry> getEntityEntry(Class<?> clazz, Long id) {
-        EntityEntry entityEntry = this.entityEntries.get(new EntityKey(clazz, id));
-        if (entityEntry == null) {
-            return Optional.empty();
-        }
-        return Optional.of(entityEntry);
+        return this.entityEntries.get(clazz, id);
     }
 
     @Override
-    public void manageEntityEntry(Class<?> clazz, Long id) {
-        if (id == null) {
-            return;
-        }
-        this.entityEntries.put(new EntityKey(clazz, id), new EntityEntry());
-    }
-
-    @Override
-    public <T> void manageEntityEntry(T entity) {
+    public <T> EntityEntry getEntityEntry(T entity) {
         EntityKey key = new EntityKey(entity);
-        if (key.getId() == null) {
-            return;
+        Optional<EntityEntry> entityEntry = this.entityEntries.get(key);
+        if (entityEntry.isEmpty()) {
+            entityEntries.put(entity);
+            return entityEntries.get(key).get();
         }
-        this.entityEntries.put(key, new EntityEntry());
-    }
-
-    @Override
-    public <T> void saveEntryEntity(T entity) {
-        EntityEntry entityEntry = this.getEntityEntry(entity);
-        // entityManager에서 persist시 manage 상태로 먼저 초기화를 진행한다.
-        if (entityEntry == null) {
-            manageEntityEntry(entity);
-            entityEntry = this.getEntityEntry(entity);
-        }
-        entityEntry.updateStatus(SAVING);
-    }
-
-    @Override
-    public <T> void detachEntity(T entity) {
-        EntityEntry entityEntry = this.getEntityEntry(entity);
-        entityEntry.updateStatus(GONE);
-    }
-
-    @Override
-    public <T> void deleteEntity(T entity) {
-        EntityEntry entityEntry = this.getEntityEntry(entity);
-        entityEntry.updateStatus(DELETED);
-    }
-
-    @Override
-    public <T> boolean isReadOnly(T entity) {
-        EntityEntry entityEntry = this.getEntityEntry(entity);
-        return entityEntry.getStatus() == READ_ONLY;
-    }
-
-    @Override
-    public <T> void loadEntity(Class<T> clazz, Long id) {
-        EntityKey key = new EntityKey(clazz, id);
-        EntityEntry entityEntry = this.entityEntries.get(key);
-        entityEntry.updateStatus(LOADING);
-    }
-
-    private <T> EntityEntry getEntityEntry(T entity) {
-        EntityKey key = new EntityKey(entity);
-        EntityEntry entityEntry = this.entityEntries.get(key);
-        if (entityEntry == null) {
-            this.manageEntityEntry(entity);
-        }
-        return entityEntry;
+        return entityEntry.get();
     }
 }
