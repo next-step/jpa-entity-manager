@@ -30,5 +30,5 @@ public interface PersistenceContext {
 
     <T> boolean isReadOnly(T entity);
 
-    <T> void loadEntity(T entity);
+    <T> void loadEntity(Class<T> clazz, Long id);
 }

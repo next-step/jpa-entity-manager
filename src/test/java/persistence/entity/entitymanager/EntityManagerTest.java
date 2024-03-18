@@ -8,13 +8,11 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.loader.EntityLoader;
 import persistence.entity.manager.EntityManager;
 import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
-import persistence.entity.persister.EntityPersister;
 import persistence.entity.testfixture.notcolumn.Person;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
@@ -34,8 +32,6 @@ class EntityManagerTest {
     private EntityManager entityManager;
 
     private PersistenceContext persistenceContext;
-    private EntityPersister entityPersister;
-    private EntityLoader entityLoader;
 
     @BeforeAll
     static void setupOnce() {
@@ -55,9 +51,7 @@ class EntityManagerTest {
         jdbcTemplate.execute(query);
 
         persistenceContext = new PersistenceContextImpl();
-        entityPersister = new EntityPersister(jdbcTemplate);
-        entityLoader = new EntityLoader(jdbcTemplate);
-        entityManager = new EntityManagerImpl(persistenceContext, entityLoader, entityPersister);
+        entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
     }
 
     @AfterEach
@@ -96,7 +90,7 @@ class EntityManagerTest {
     @Test
     void find_entityCache에_값이_없고_entity_loader에_존재하면_entityloader를_통해_값을_가져오고_entityCache에도_값을_넣는다() {
         // given&when
-        entityPersister.insert(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
+        entityManager.persist(new Person("김철수", 21, "chulsoo.kim@gmail.com", 11));
         Optional<Person> actual = entityManager.find(Person.class, 1L);
 
         // then
@@ -107,7 +101,7 @@ class EntityManagerTest {
     void find_entryEntity는_엔티티를_MANAGED_상태로_초기화한다() {
         // given
         Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        entityPersister.insert(person);
+        entityManager.persist(person);
 
         // when
         entityManager.find(Person.class, 1L).get();

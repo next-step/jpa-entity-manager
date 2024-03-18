@@ -30,7 +30,7 @@ public class PrimaryKey {
         this.value = getPrimaryKeyValue(entity);
     }
 
-    private Long getPrimaryKeyValue(Object entity) {
+    private Long getPrimaryKeyValue(Object entity) { // TODO: 간단하게
         Field idField = Arrays.stream(entity.getClass().getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
                 .findAny()
@@ -43,6 +43,7 @@ public class PrimaryKey {
             throw new InvalidPrimaryKeyException();
         }
     }
+
     public Long value() {
         return value;
     }

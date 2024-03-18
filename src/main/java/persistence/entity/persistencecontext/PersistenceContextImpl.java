@@ -1,7 +1,6 @@
 package persistence.entity.persistencecontext;
 
 import persistence.PrimaryKey;
-import persistence.entity.exception.NotHandledEntityEntryException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,12 +74,19 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void manageEntityEntry(Class<?> clazz, Long id) {
+        if (id == null) {
+            return;
+        }
         this.entityEntries.put(new EntityKey(clazz, id), new EntityEntry());
     }
 
     @Override
     public <T> void manageEntityEntry(T entity) {
-        this.entityEntries.put(new EntityKey(entity), new EntityEntry());
+        EntityKey key = new EntityKey(entity);
+        if (key.getId() == null) {
+            return;
+        }
+        this.entityEntries.put(key, new EntityEntry());
     }
 
     @Override
@@ -108,17 +114,17 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public <T> void loadEntity(T entity) {
-        EntityEntry entityEntry = this.getEntityEntry(entity);
+    public <T> void loadEntity(Class<T> clazz, Long id) {
+        EntityKey key = new EntityKey(clazz, id);
+        EntityEntry entityEntry = this.entityEntries.get(key);
         entityEntry.updateStatus(LOADING);
     }
-
 
     private <T> EntityEntry getEntityEntry(T entity) {
         EntityKey key = new EntityKey(entity);
         EntityEntry entityEntry = this.entityEntries.get(key);
         if (entityEntry == null) {
-            throw new NotHandledEntityEntryException(key);
+            this.manageEntityEntry(entity);
         }
         return entityEntry;
     }

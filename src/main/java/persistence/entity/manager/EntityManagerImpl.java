@@ -23,10 +23,10 @@ public class EntityManagerImpl implements EntityManager {
         this.entityLoader = new EntityLoader(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
-    public EntityManagerImpl(PersistenceContext persistenceContext, EntityLoader entityLoader, EntityPersister entityPersister) {
+    public EntityManagerImpl(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate) {
         this.persistenceContext = persistenceContext;
-        this.entityLoader = entityLoader;
-        this.entityPersister = entityPersister;
+        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
@@ -40,6 +40,7 @@ public class EntityManagerImpl implements EntityManager {
         if (searchedEntity.isEmpty()) {
             return Optional.empty();
         }
+        persistenceContext.loadEntity(clazz, id);
         T addedEntity = persistenceContext.addEntity(searchedEntity.get(), id);
         persistenceContext.manageEntityEntry(clazz, id);
         return Optional.of(addedEntity);
@@ -48,16 +49,15 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T persist(T entity) {
         validate(entity);
-
         T insertedEntity = entityPersister.insert(entity);
-        this.persistenceContext.manageEntityEntry(entity);
+        persistenceContext.manageEntityEntry(insertedEntity);
         return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).value());
     }
 
     private void validate(Object entity) {
         Long primaryKey = new PrimaryKey(entity).value();
 
-        Optional<?> searchedEntity = this.persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
+        Optional<?> searchedEntity = persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
         if (searchedEntity.isPresent()) {
             throw new EntityExistsException();
         }
