@@ -50,6 +50,7 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         validate(entity);
         T insertedEntity = entityPersister.insert(entity);
+        persistenceContext.saveEntryEntity(insertedEntity);
         persistenceContext.manageEntityEntry(insertedEntity);
         return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).value());
     }

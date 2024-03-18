@@ -92,6 +92,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> void saveEntryEntity(T entity) {
         EntityEntry entityEntry = this.getEntityEntry(entity);
+        // entityManager에서 persist시 manage 상태로 먼저 초기화를 진행한다.
+        if (entityEntry == null) {
+            manageEntityEntry(entity);
+            entityEntry = this.getEntityEntry(entity);
+        }
         entityEntry.updateStatus(SAVING);
     }
 
