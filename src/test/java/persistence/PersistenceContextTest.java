@@ -121,7 +121,7 @@ class PersistenceContextTest {
         Person entity = new Person(id, "name", 26, "email", 1);
 
         // when
-        Object result = persistenceContext.getDatabaseSnapshot(id, entity);
+        Object result = persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         // then
         assertThat(result).isNull();
@@ -133,10 +133,10 @@ class PersistenceContextTest {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
-        persistenceContext.getDatabaseSnapshot(id, entity);
+        persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         // when
-        Object result = persistenceContext.getDatabaseSnapshot(id, entity);
+        Object result = persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         // then
         assertThat(result).isEqualTo(entity);

@@ -31,18 +31,17 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getDatabaseSnapshot(Long id, Object entity) {
+    public Object getCachedDatabaseSnapshot(Long id, Object entity) {
         Object snapshot = entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(id);
 
         if (snapshot != null) {
             return snapshot;
-        } else {
-            if (entitySnapshotsByKey == null) {
-                entitySnapshotsByKey = new HashMap<>();
-            }
-            snapshot = entitySnapshotsByKey.put(id, entity);
         }
 
-        return snapshot;
+        if (entitySnapshotsByKey == null) {
+            entitySnapshotsByKey = new HashMap<>();
+        }
+
+        return entitySnapshotsByKey.putIfAbsent(id, entity);
     }
 }

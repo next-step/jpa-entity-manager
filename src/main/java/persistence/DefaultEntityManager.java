@@ -25,7 +25,7 @@ public class DefaultEntityManager implements EntityManager {
             entity = entityLoader.load(clazz, id);
         }
 
-        persistenceContext.getDatabaseSnapshot(id, entity);
+        persistenceContext.getCachedDatabaseSnapshot(id, entity);
         return entity;
     }
 
@@ -49,7 +49,7 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> T merge(Long id, T entity) {
-        Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
+        Object snapshot = persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         if (!entity.equals(snapshot)) {
             entityPersister.insert(entity);
