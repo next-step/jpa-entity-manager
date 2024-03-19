@@ -5,6 +5,7 @@ import jdbc.JdbcTemplate;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.conditions.WhereRecord;
+import persistence.sql.metadata.EntityMetadata;
 
 import java.util.List;
 
@@ -17,15 +18,13 @@ public class EntityLoader {
         this.dialect = dialect;
     }
 
-    public <T> T find(EntityId entityId) {
-        Class<?> clazz = entityId.getClazz();
-
+    public <T> T find(Class<T> clazz, Object id) {
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.builder()
                 .dialect(dialect)
                 .entity(clazz)
-                .where(List.of(WhereRecord.of(String.valueOf(entityId.getName()), "=", entityId.getValue())))
+                .where(List.of(WhereRecord.of(EntityMetadata.from(clazz).getPrimaryKey().getName(), "=", id)))
                 .build();
 
-        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> (T) new EntityRowMapper<>(clazz).mapRow(resultSet));
+        return jdbcTemplate.queryForObject(selectQueryBuilder.generateQuery(), resultSet -> new EntityRowMapper<>(clazz).mapRow(resultSet));
     }
 }

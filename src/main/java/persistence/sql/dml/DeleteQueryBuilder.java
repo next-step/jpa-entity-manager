@@ -39,8 +39,13 @@ public class DeleteQueryBuilder {
             return this;
         }
 
-        public Builder entity(Class<?> clazz) {
-            this.entity = EntityMetadata.from(clazz);
+        public Builder entity(Object entity) {
+            this.entity = EntityMetadata.of(entity.getClass(), entity);
+            if (Objects.nonNull(this.entity.getPrimaryKey().getValue())) {
+                this.whereQueryBuilder = WhereQueryBuilder.builder()
+                        .whereConditions(this.entity)
+                        .build();
+            }
             return this;
         }
 

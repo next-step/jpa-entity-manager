@@ -48,3 +48,9 @@
 
 * [x] 요구사항3 - 더티체킹 구현
     * Snapshot 기반 Dirty Checking
+
+### 🚀 4단계 - EntityEntry
+
+#### 요구사항
+
+* [x] 요구사항 1 - CRUD 작업 수행 시 엔터티의 상태를 추가해보자

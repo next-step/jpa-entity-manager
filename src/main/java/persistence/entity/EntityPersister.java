@@ -45,7 +45,7 @@ public class EntityPersister {
     public void delete(Object entity) {
         DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.builder()
                 .dialect(dialect)
-                .entity(entity.getClass())
+                .entity(entity)
                 .build();
 
         String deleteQuery = deleteQueryBuilder.generateQuery();

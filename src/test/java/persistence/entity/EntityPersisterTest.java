@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.context.SimplePersistenceContext;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
@@ -24,6 +25,7 @@ class EntityPersisterTest {
     private EntityManager entityManager;
     private EntityPersister entityPersister;
     private DatabaseServer databaseServer;
+    private SimplePersistenceContext persistenceContext;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -36,7 +38,8 @@ class EntityPersisterTest {
         databaseServer.start();
 
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
-        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT);
+        persistenceContext = new SimplePersistenceContext();
+        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT, persistenceContext);
         entityPersister = new EntityPersister(jdbcTemplate, DIALECT);
 
         jdbcTemplate.execute(createQueryBuilder.generateQuery());
@@ -90,11 +93,11 @@ class EntityPersisterTest {
     @DisplayName("Delete query builder 동작 테스트")
     void delete() {
         // given
-        final Person person = Person.of(1L, "crong", 35, "test@gmail.com");
+        final Person person = Person.of("crong", 35, "test@gmail.com");
         entityManager.persist(person);
 
         // when
-        entityPersister.delete(person);
+        entityManager.remove(person);
 
         // then
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L)).isInstanceOf(RuntimeException.class);

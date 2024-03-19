@@ -24,11 +24,4 @@ public class ColumnsMetadata {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Column not found"));
     }
-
-//    public void setPrimaryKeyValue(Object id) {
-//        getColumns().stream()
-//                .filter(ColumnMetadata::isPrimaryKey)
-//                .findFirst()
-//                .ifPresent(column -> column.setValue(id));
-//    }
 }

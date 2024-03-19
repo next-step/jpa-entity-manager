@@ -22,7 +22,7 @@ public class JdbcTemplate {
     public Object executeAndReturnObject(final String sql) {
         try (final PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.executeUpdate();
-            
+
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getObject(1);
@@ -37,7 +37,7 @@ public class JdbcTemplate {
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         final List<T> results = query(sql, rowMapper);
         if (results.size() != 1) {
-            throw new RuntimeException("Expected 1 result, got " + results.size());
+            return null;
         }
         return results.get(0);
     }

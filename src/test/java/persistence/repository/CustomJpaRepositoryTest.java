@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.context.SimplePersistenceContext;
 import persistence.entity.EntityManager;
 import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.CreateQueryBuilder;
@@ -24,6 +25,7 @@ class CustomJpaRepositoryTest {
     DatabaseServer databaseServer;
     private JdbcTemplate jdbcTemplate;
     private EntityManager entityManager;
+    private SimplePersistenceContext persistenceContext;
     private CustomJpaRepository<Person, Long> customJpaRepository;
     private final Dialect DIALECT = new H2Dialect();
 
@@ -33,13 +35,14 @@ class CustomJpaRepositoryTest {
         databaseServer.start();
 
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
+        persistenceContext = new SimplePersistenceContext();
         jdbcTemplate.execute(CreateQueryBuilder.builder()
                 .dialect(DIALECT)
                 .entity(Person.class)
                 .build()
                 .generateQuery());
 
-        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT);
+        entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT, persistenceContext);
         customJpaRepository = new CustomJpaRepository<>(entityManager);
     }
 
