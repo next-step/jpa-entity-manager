@@ -1,6 +1,10 @@
 package persistence;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class DefaultEntityManager implements EntityManager {
 
@@ -30,13 +34,25 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> T persist(Object entity) {
+    public <T> T persist(Object entity) throws IllegalAccessException {
         validEntity(entity);
 
         Long id = (Long) entityPersister.insert(entity);
         persistenceContext.addEntity(id, entity);
 
-        return (T) find(entity.getClass(), id);
+        injectIdToEntity(entity, id);
+        return (T) entity;
+    }
+
+    private static void injectIdToEntity(Object entity, Long id) throws IllegalAccessException {
+        Field field = Arrays.stream(entity.getClass()
+                        .getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("not found entity Id field"));
+
+        field.setAccessible(true);
+        field.set(entity, id);
     }
 
     @Override
