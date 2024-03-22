@@ -20,17 +20,25 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("[EntityManager] find: id is null");
-        }
+        validId(id);
 
         T entity = (T) persistenceContext.getEntity(id);
+
         if (entity == null) {
             entity = entityLoader.load(clazz, id);
         }
 
-        persistenceContext.getCachedDatabaseSnapshot(id, entity);
+        if (entity != null) {
+            persistenceContext.getCachedDatabaseSnapshot(id, entity);
+        }
+
         return entity;
+    }
+
+    private static void validId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("[EntityManager] find: id is null");
+        }
     }
 
     @Override
@@ -39,6 +47,7 @@ public class DefaultEntityManager implements EntityManager {
 
         Long id = (Long) entityPersister.insert(entity);
         persistenceContext.addEntity(id, entity);
+        persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         injectIdToEntity(entity, id);
         return entity;

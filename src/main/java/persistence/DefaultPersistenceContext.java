@@ -6,8 +6,8 @@ import java.util.HashMap;
 
 public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
-    private HashMap<Long, T> entitiesByKey;
-    private HashMap<Long, T> entitySnapshotsByKey;
+    private final HashMap<Long, T> entitiesByKey = new HashMap<>();
+    private final HashMap<Long, T> entitySnapshotsByKey = new HashMap<>();
 
     @Override
     public T getEntity(Long id) {
@@ -16,10 +16,6 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
     @Override
     public void addEntity(Long id, T entity) {
-        if (entitiesByKey == null) {
-            entitiesByKey = new HashMap<>();
-        }
-
         entitiesByKey.put(id, entity);
     }
 
@@ -30,14 +26,10 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
     @Override
     public T getCachedDatabaseSnapshot(Long id, T entity) {
-        T snapshot = entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(id);
+        T snapshot = entitySnapshotsByKey.get(id);
 
         if (snapshot != null) {
             return snapshot;
-        }
-
-        if (entitySnapshotsByKey == null) {
-            entitySnapshotsByKey = new HashMap<>();
         }
 
         T snapshotEntity = getSnapshotEntity(entity);

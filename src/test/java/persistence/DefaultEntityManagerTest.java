@@ -55,14 +55,13 @@ class DefaultEntityManagerTest {
     @DisplayName("Person 을 조회한다.")
     void find_1() {
         // given
-        long id = 1L;
-        jdbcTemplate.execute(dmlGenerator.generateInsert(new Person(id, "name", 26, "email")));
+        Person person = entityManager.persist(new Person("name", 26, "email", 1));
 
         // when
-        Person person = entityManager.find(Person.class, id);
+        Person result = entityManager.find(Person.class, person.getId());
 
         // then
-        assertThat(person.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(person.getId());
     }
 
     @Test
