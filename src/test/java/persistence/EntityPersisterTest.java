@@ -74,7 +74,7 @@ class EntityPersisterTest {
         person.changeName(newName);
 
         // when
-        entityPersister.update(person, id);
+        entityPersister.update(id, person);
 
         // then
         Person result = entityManager.find(Person.class, id);

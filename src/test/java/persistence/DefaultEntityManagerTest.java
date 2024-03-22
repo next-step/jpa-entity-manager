@@ -156,4 +156,21 @@ class DefaultEntityManagerTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("[EntityManager] persist: the instance is not an entity");
     }
+
+    @Test
+    @DisplayName("getCachedDatabaseSnapshot 에 저장 후 merge 호출하여 더티체킹")
+    void merge() {
+        // given
+        Person person = new Person("name", 26, "email", 1);
+        Person persistedPerson = entityManager.persist(person);
+        entityManager.find(Person.class, persistedPerson.getId());
+
+        person.changeName("juri");
+
+        // when
+        Person mergedPerson = entityManager.merge(persistedPerson.getId(), person);
+
+        // then
+        assertThat(mergedPerson.getName()).isEqualTo("juri");
+    }
 }

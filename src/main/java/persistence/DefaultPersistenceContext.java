@@ -1,11 +1,13 @@
 package persistence;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-public class DefaultPersistenceContext implements PersistenceContext {
+public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
     private HashMap<Long, Object> entitiesByKey;
-    private HashMap<Long, Object> entitySnapshotsByKey;
+    private HashMap<Long, T> entitySnapshotsByKey;
 
     @Override
     public Object getEntity(Long id) {
@@ -27,8 +29,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public Object getCachedDatabaseSnapshot(Long id, Object entity) {
-        Object snapshot = entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(id);
+    public T getCachedDatabaseSnapshot(Long id, T entity) {
+        T snapshot = entitySnapshotsByKey == null ? null : entitySnapshotsByKey.get(id);
 
         if (snapshot != null) {
             return snapshot;
@@ -38,6 +40,24 @@ public class DefaultPersistenceContext implements PersistenceContext {
             entitySnapshotsByKey = new HashMap<>();
         }
 
-        return entitySnapshotsByKey.putIfAbsent(id, entity);
+        T snapshotEntity = getSnapshotEntity(entity);
+
+        return entitySnapshotsByKey.putIfAbsent(id, snapshotEntity);
+    }
+
+    private static <T> T getSnapshotEntity(T entity) {
+        Class<?> entityClass = entity.getClass();
+        T snapshotEntity;
+        try {
+            snapshotEntity = (T) entityClass.getDeclaredConstructor().newInstance();
+            for (Field field : entityClass.getDeclaredFields()) {
+                field.setAccessible(true);
+                field.set(snapshotEntity, field.get(entity));
+            }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            throw new IllegalArgumentException("not work getSnapshotEntity", e);
+        }
+        return snapshotEntity;
     }
 }

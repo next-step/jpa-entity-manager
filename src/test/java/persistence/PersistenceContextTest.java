@@ -25,21 +25,8 @@ class PersistenceContextTest {
     }
 
     @Test
-    @DisplayName("persistenceContext 에 아무것도 저장되지 않았다면 null 을 반환한다.")
-    void getEntity_1() {
-        // given
-        long id = 1L;
-
-        // when
-        Object result = persistenceContext.getEntity(id);
-
-        // then
-        assertThat(result).isNull();
-    }
-
-    @Test
     @DisplayName("해당 id 로 저장된 entity 가 없다면 null 을 반환한다.")
-    void getEntity_2() {
+    void getEntity_1() {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
@@ -54,7 +41,7 @@ class PersistenceContextTest {
 
     @Test
     @DisplayName("persistenceContext 에 저장되어 있다면 조회된다.")
-    void getEntity_3() {
+    void getEntity_2() {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
@@ -69,21 +56,8 @@ class PersistenceContextTest {
     }
 
     @Test
-    @DisplayName("persistenceContext 에 아무것도 저장되지 않았다면 null 을 반환한다.")
-    void removeEntity_1() {
-        // given
-        long id = 1L;
-
-        // when
-        Object result = persistenceContext.removeEntity(id);
-
-        // then
-        assertThat(result).isNull();
-    }
-
-    @Test
     @DisplayName("저장된 entity 가 없다면 null 을 반환한다.")
-    void removeEntity_2() {
+    void removeEntity_1() {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
@@ -99,7 +73,7 @@ class PersistenceContextTest {
 
     @Test
     @DisplayName("저장된 entity 가 삭제된다면 해당 entity 를 반환한다.")
-    void removeEntity_3() {
+    void removeEntity_2() {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);

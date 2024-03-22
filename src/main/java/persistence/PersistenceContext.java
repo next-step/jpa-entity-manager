@@ -1,6 +1,6 @@
 package persistence;
 
-public interface PersistenceContext {
+public interface PersistenceContext<T> {
 
     Object getEntity(Long id);
 
@@ -8,5 +8,5 @@ public interface PersistenceContext {
 
     Object removeEntity(Long id);
 
-    Object getCachedDatabaseSnapshot(Long id, Object entity);
+    T getCachedDatabaseSnapshot(Long id, T entity);
 }

@@ -34,14 +34,14 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> T persist(Object entity) {
+    public <T> T persist(T entity) {
         validEntity(entity);
 
         Long id = (Long) entityPersister.insert(entity);
         persistenceContext.addEntity(id, entity);
 
         injectIdToEntity(entity, id);
-        return (T) entity;
+        return entity;
     }
 
     private static void injectIdToEntity(Object entity, Long id) {
@@ -72,7 +72,7 @@ public class DefaultEntityManager implements EntityManager {
         Object snapshot = persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         if (!entity.equals(snapshot)) {
-            entityPersister.insert(entity);
+            entityPersister.update(id, entity);
             persistenceContext.addEntity(id, entity);
         }
 
