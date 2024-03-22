@@ -6,16 +6,16 @@ import java.util.HashMap;
 
 public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
-    private HashMap<Long, Object> entitiesByKey;
+    private HashMap<Long, T> entitiesByKey;
     private HashMap<Long, T> entitySnapshotsByKey;
 
     @Override
-    public Object getEntity(Long id) {
+    public T getEntity(Long id) {
         return entitiesByKey.get(id);
     }
 
     @Override
-    public void addEntity(Long id, Object entity) {
+    public void addEntity(Long id, T entity) {
         if (entitiesByKey == null) {
             entitiesByKey = new HashMap<>();
         }
@@ -24,7 +24,7 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
     }
 
     @Override
-    public Object removeEntity(Long id) {
+    public T removeEntity(Long id) {
         return entitiesByKey.remove(id);
     }
 
