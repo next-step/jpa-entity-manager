@@ -9,7 +9,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public Object getEntity(Long id) {
-        return entitiesByKey == null ? null : entitiesByKey.get(id);
+        return entitiesByKey.get(id);
     }
 
     @Override
@@ -23,11 +23,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public Object removeEntity(Long id) {
-        if (entitiesByKey != null) {
-            return entitiesByKey.remove(id);
-        }
-
-        return null;
+        return entitiesByKey.remove(id);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> T persist(Object entity) throws IllegalAccessException {
+    public <T> T persist(Object entity) {
         validEntity(entity);
 
         Long id = (Long) entityPersister.insert(entity);
@@ -44,7 +44,7 @@ public class DefaultEntityManager implements EntityManager {
         return (T) entity;
     }
 
-    private static void injectIdToEntity(Object entity, Long id) throws IllegalAccessException {
+    private static void injectIdToEntity(Object entity, Long id) {
         Field field = Arrays.stream(entity.getClass()
                         .getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(Id.class))
@@ -52,7 +52,11 @@ public class DefaultEntityManager implements EntityManager {
                 .orElseThrow(() -> new IllegalArgumentException("not found entity Id field"));
 
         field.setAccessible(true);
-        field.set(entity, id);
+        try {
+            field.set(entity, id);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(String.format("not access %s entity %s field", entity.getClass().getTypeName(), field.getName()));
+        }
     }
 
     @Override
