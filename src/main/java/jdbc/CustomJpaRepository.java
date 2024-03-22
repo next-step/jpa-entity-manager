@@ -1,7 +1,7 @@
 package jdbc;
 
 import persistence.EntityManager;
-import persistence.IdMetadata;
+import persistence.EntityMetadata;
 
 public class CustomJpaRepository<T> {
 
@@ -12,7 +12,7 @@ public class CustomJpaRepository<T> {
     }
 
     public T save(T entity) {
-        Long id = new IdMetadata(entity).getMetadata();
+        Long id = new EntityMetadata(entity).getIdValue();
 
         if (id == null) {
             return entityManager.persist(entity);
