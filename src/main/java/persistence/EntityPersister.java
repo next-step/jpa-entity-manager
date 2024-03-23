@@ -16,12 +16,12 @@ public class EntityPersister {
         this.dmlGenerator = dmlGenerator;
     }
 
-    public void insert(Object entity) {
+    public Object insert(Object entity) {
         String sql = dmlGenerator.generateInsert(entity);
-        jdbcTemplate.execute(sql);
+        return jdbcTemplate.executeAndReturnKey(sql);
     }
 
-    public boolean update(Object entity, Long id) {
+    public boolean update(Long id, Object entity) {
         String sql = dmlGenerator.generateUpdateById(entity, id);
         return jdbcTemplate.executeUpdate(sql) == 1;
     }

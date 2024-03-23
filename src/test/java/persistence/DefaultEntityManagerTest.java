@@ -29,6 +29,7 @@ class DefaultEntityManagerTest {
 
     DDLGenerator ddlGenerator = new DDLGenerator(Person.class);
     DMLGenerator dmlGenerator = new DMLGenerator(Table.from(Person.class));
+    PersistenceContext persistenceContext = new DefaultPersistenceContext();
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -40,7 +41,8 @@ class DefaultEntityManagerTest {
 
         entityPersister = new EntityPersister(jdbcTemplate, dmlGenerator);
         entityLoader = new EntityLoader(jdbcTemplate, dmlGenerator);
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        DefaultPersistenceContext persistenceContext = new DefaultPersistenceContext();
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
     }
 
     @AfterEach
@@ -53,14 +55,13 @@ class DefaultEntityManagerTest {
     @DisplayName("Person 을 조회한다.")
     void find_1() {
         // given
-        long id = 1L;
-        jdbcTemplate.execute(dmlGenerator.generateInsert(new Person(id, "name", 26, "email")));
+        Person person = entityManager.persist(new Person("name", 26, "email", 1));
 
         // when
-        Person person = entityManager.find(Person.class, id);
+        Person result = entityManager.find(Person.class, person.getId());
 
         // then
-        assertThat(person.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(person.getId());
     }
 
     @Test
@@ -112,7 +113,7 @@ class DefaultEntityManagerTest {
     @DisplayName("persist 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void persist_2() {
         // given
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.persist(new NotEntity(1L)));
@@ -144,7 +145,7 @@ class DefaultEntityManagerTest {
     @DisplayName("remove 할 Object 가 Entity 가 아닐 경우, 예외가 발생한다.")
     void remove_2() {
         // given
-        entityManager = new DefaultEntityManager(entityPersister, entityLoader);
+        entityManager = new DefaultEntityManager(entityPersister, entityLoader, persistenceContext);
 
         // when
         Throwable throwable = catchThrowable(() -> entityManager.remove(new NotEntity(1L)));
@@ -153,5 +154,22 @@ class DefaultEntityManagerTest {
         assertThat(throwable)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("[EntityManager] persist: the instance is not an entity");
+    }
+
+    @Test
+    @DisplayName("getCachedDatabaseSnapshot 에 저장 후 merge 호출하여 더티체킹")
+    void merge() {
+        // given
+        Person person = new Person("name", 26, "email", 1);
+        Person persistedPerson = entityManager.persist(person);
+        entityManager.find(Person.class, persistedPerson.getId());
+
+        person.changeName("juri");
+
+        // when
+        Person mergedPerson = entityManager.merge(persistedPerson.getId(), person);
+
+        // then
+        assertThat(mergedPerson.getName()).isEqualTo("juri");
     }
 }
