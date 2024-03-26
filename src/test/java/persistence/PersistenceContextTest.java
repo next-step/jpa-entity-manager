@@ -17,7 +17,7 @@ class PersistenceContextTest {
         Person entity = new Person(id, "name", 26, "email", 1);
 
         // when
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntityEntry(id, entity);
 
         // then
         Object result = persistenceContext.getEntity(id);
@@ -30,7 +30,7 @@ class PersistenceContextTest {
         // given
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntityEntry(id, entity);
 
         // when
         Object result = persistenceContext.getEntity(2L);
@@ -46,7 +46,7 @@ class PersistenceContextTest {
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
 
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntityEntry(id, entity);
 
         // when
         Object result = persistenceContext.getEntity(id);
@@ -62,7 +62,7 @@ class PersistenceContextTest {
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
 
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntityEntry(id, entity);
 
         // when
         Object result = persistenceContext.removeEntity(2L);
@@ -78,7 +78,7 @@ class PersistenceContextTest {
         long id = 1L;
         Person entity = new Person(id, "name", 26, "email", 1);
 
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntityEntry(id, entity);
 
         // when
         Object result = persistenceContext.removeEntity(id);

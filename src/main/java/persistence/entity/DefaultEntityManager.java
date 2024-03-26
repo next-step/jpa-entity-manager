@@ -46,8 +46,9 @@ public class DefaultEntityManager implements EntityManager {
     public <T> T persist(T entity) {
         validEntity(entity);
 
+        persistenceContext.addEntityEntry(entity, Status.SAVING);
         Long id = (Long) entityPersister.insert(entity);
-        persistenceContext.addEntity(id, entity);
+        persistenceContext.addEntityEntry(id, entity);
         persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         injectIdToEntity(entity, id);
@@ -82,8 +83,9 @@ public class DefaultEntityManager implements EntityManager {
         Object snapshot = persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         if (!entity.equals(snapshot)) {
+            persistenceContext.addEntityEntry(entity, Status.SAVING);
             entityPersister.update(id, entity);
-            persistenceContext.addEntity(id, entity);
+            persistenceContext.addEntityEntry(id, entity);
         }
 
         return entity;

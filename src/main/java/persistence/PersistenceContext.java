@@ -1,10 +1,14 @@
 package persistence;
 
+import persistence.entity.Status;
+
 public interface PersistenceContext<T> {
 
     T getEntity(Long id);
 
-    void addEntity(Long id, T entity);
+    void addEntityEntry(T entity, Status status);
+
+    void addEntityEntry(Long id, T entity);
 
     T removeEntity(Long id);
 
