@@ -14,7 +14,9 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
     @Override
     public T getEntity(Long id) {
-        return entitiesByKey.get(id);
+        T entity = entitiesByKey.get(id);
+        entityEntries.put(entity, Status.MANAGED);
+        return entity;
     }
 
     @Override
@@ -23,7 +25,7 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
     }
 
     @Override
-    public void addEntityEntry(Long id, T entity) {
+    public void addEntity(Long id, T entity) {
         entitiesByKey.put(id, entity);
         entityEntries.put(entity, Status.MANAGED);
     }
@@ -42,7 +44,6 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
         }
 
         T snapshotEntity = getSnapshotEntity(entity);
-
         return entitySnapshotsByKey.putIfAbsent(id, snapshotEntity);
     }
 

@@ -8,7 +8,7 @@ public interface PersistenceContext<T> {
 
     void addEntityEntry(T entity, Status status);
 
-    void addEntityEntry(Long id, T entity);
+    void addEntity(Long id, T entity);
 
     T removeEntity(Long id);
 
