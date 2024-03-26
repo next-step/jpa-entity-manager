@@ -76,8 +76,9 @@ public class DefaultEntityManager implements EntityManager {
     public void remove(Object entity) {
         validEntity(entity);
 
+        persistenceContext.addEntityEntry(entity, Status.DELETED);
         entityPersister.delete(entity);
-        persistenceContext.removeEntity(new EntityMetadata(entity).getIdValue());
+        persistenceContext.removeEntity(entity);
     }
 
     @Override

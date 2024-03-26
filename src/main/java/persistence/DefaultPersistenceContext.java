@@ -1,5 +1,6 @@
 package persistence;
 
+import persistence.entity.EntityMetadata;
 import persistence.entity.Status;
 
 import java.lang.reflect.Field;
@@ -31,8 +32,10 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
     }
 
     @Override
-    public T removeEntity(Long id) {
-        return entitiesByKey.remove(id);
+    public T removeEntity(T entity) {
+        T removedEntity = entitiesByKey.remove(new EntityMetadata(entity).getIdValue());
+        entityEntries.put(entity, Status.GONE);
+        return removedEntity;
     }
 
     @Override
