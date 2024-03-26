@@ -1,4 +1,4 @@
-package persistence;
+package persistence.entity;
 
 import jakarta.persistence.Id;
 import persistence.sql.dml.clause.FieldValue;

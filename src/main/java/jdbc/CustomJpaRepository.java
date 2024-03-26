@@ -1,7 +1,7 @@
 package jdbc;
 
-import persistence.EntityManager;
-import persistence.EntityMetadata;
+import persistence.entity.EntityManager;
+import persistence.entity.EntityMetadata;
 
 public class CustomJpaRepository<T> {
 

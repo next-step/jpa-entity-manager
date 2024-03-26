@@ -1,7 +1,8 @@
-package persistence;
+package persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import persistence.PersistenceContext;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
