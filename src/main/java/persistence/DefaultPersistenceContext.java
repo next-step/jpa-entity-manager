@@ -1,5 +1,7 @@
 package persistence;
 
+import persistence.entity.Status;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -8,6 +10,7 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
     private final HashMap<Long, T> entitiesByKey = new HashMap<>();
     private final HashMap<Long, T> entitySnapshotsByKey = new HashMap<>();
+    private final HashMap<Object, Status> entityEntries = new HashMap<>();
 
     @Override
     public T getEntity(Long id) {
@@ -15,8 +18,14 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
     }
 
     @Override
-    public void addEntity(Long id, T entity) {
+    public void addEntityEntry(T entity, Status status) {
+        entityEntries.put(entity, status);
+    }
+
+    @Override
+    public void addEntityEntry(Long id, T entity) {
         entitiesByKey.put(id, entity);
+        entityEntries.put(entity, Status.MANAGED);
     }
 
     @Override
