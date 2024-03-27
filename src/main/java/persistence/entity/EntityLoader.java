@@ -1,4 +1,4 @@
-package persistence;
+package persistence.entity;
 
 import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;

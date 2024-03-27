@@ -1,4 +1,4 @@
-package persistence;
+package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DMLGenerator;

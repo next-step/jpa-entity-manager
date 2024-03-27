@@ -1,5 +1,8 @@
 package persistence;
 
+import persistence.entity.EntityMetadata;
+import persistence.entity.Status;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -8,20 +11,31 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
 
     private final HashMap<Long, T> entitiesByKey = new HashMap<>();
     private final HashMap<Long, T> entitySnapshotsByKey = new HashMap<>();
+    private final HashMap<Object, Status> entityEntries = new HashMap<>();
 
     @Override
     public T getEntity(Long id) {
-        return entitiesByKey.get(id);
+        T entity = entitiesByKey.get(id);
+        entityEntries.put(entity, Status.MANAGED);
+        return entity;
+    }
+
+    @Override
+    public void addEntityEntry(T entity, Status status) {
+        entityEntries.put(entity, status);
     }
 
     @Override
     public void addEntity(Long id, T entity) {
         entitiesByKey.put(id, entity);
+        entityEntries.put(entity, Status.MANAGED);
     }
 
     @Override
-    public T removeEntity(Long id) {
-        return entitiesByKey.remove(id);
+    public T removeEntity(T entity) {
+        T removedEntity = entitiesByKey.remove(new EntityMetadata(entity).getIdValue());
+        entityEntries.put(entity, Status.GONE);
+        return removedEntity;
     }
 
     @Override
@@ -33,7 +47,6 @@ public class DefaultPersistenceContext<T> implements PersistenceContext<T> {
         }
 
         T snapshotEntity = getSnapshotEntity(entity);
-
         return entitySnapshotsByKey.putIfAbsent(id, snapshotEntity);
     }
 

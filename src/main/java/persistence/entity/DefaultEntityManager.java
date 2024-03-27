@@ -1,7 +1,8 @@
-package persistence;
+package persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import persistence.PersistenceContext;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ public class DefaultEntityManager implements EntityManager {
         validId(id);
 
         T entity = (T) persistenceContext.getEntity(id);
+        persistenceContext.addEntityEntry(entity, Status.LOADING);
 
         if (entity == null) {
             entity = entityLoader.load(clazz, id);
@@ -30,6 +32,7 @@ public class DefaultEntityManager implements EntityManager {
 
         if (entity != null) {
             persistenceContext.getCachedDatabaseSnapshot(id, entity);
+            persistenceContext.addEntityEntry(entity, Status.MANAGED);
         }
 
         return entity;
@@ -45,6 +48,7 @@ public class DefaultEntityManager implements EntityManager {
     public <T> T persist(T entity) {
         validEntity(entity);
 
+        persistenceContext.addEntityEntry(entity, Status.SAVING);
         Long id = (Long) entityPersister.insert(entity);
         persistenceContext.addEntity(id, entity);
         persistenceContext.getCachedDatabaseSnapshot(id, entity);
@@ -72,8 +76,9 @@ public class DefaultEntityManager implements EntityManager {
     public void remove(Object entity) {
         validEntity(entity);
 
+        persistenceContext.addEntityEntry(entity, Status.DELETED);
         entityPersister.delete(entity);
-        persistenceContext.removeEntity(new EntityMetadata(entity).getIdValue());
+        persistenceContext.removeEntity(entity);
     }
 
     @Override
@@ -81,6 +86,7 @@ public class DefaultEntityManager implements EntityManager {
         Object snapshot = persistenceContext.getCachedDatabaseSnapshot(id, entity);
 
         if (!entity.equals(snapshot)) {
+            persistenceContext.addEntityEntry(entity, Status.SAVING);
             entityPersister.update(id, entity);
             persistenceContext.addEntity(id, entity);
         }
