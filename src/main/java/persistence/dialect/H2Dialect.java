@@ -1,14 +1,11 @@
 package persistence.dialect;
 
-import java.util.Map;
+import java.sql.Types;
 
 public class H2Dialect extends Dialect {
-    @Override
-    protected Map<Class<?>, String> initTypeRegistry() {
-        return Map.of(
-                String.class, "VARCHAR",
-                Integer.class, "INTEGER",
-                Long.class, "BIGINT"
-        );
+    public H2Dialect() {
+        addType(Types.VARCHAR, "VARCHAR");
+        addType(Types.INTEGER, "INTEGER");
+        addType(Types.BIGINT, "BIGINT");
     }
 }

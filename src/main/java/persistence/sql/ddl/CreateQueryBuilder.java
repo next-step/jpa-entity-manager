@@ -1,6 +1,7 @@
 package persistence.sql.ddl;
 
 import persistence.dialect.Dialect;
+import persistence.entity.JavaTypeConvertor;
 import persistence.sql.meta.EntityField;
 import persistence.sql.meta.EntityTable;
 
@@ -54,7 +55,8 @@ public class CreateQueryBuilder {
     }
 
     private String getDbType(EntityField entityField) {
-        final String dbTypeName = dialect.getDbTypeName(entityField);
+        final int sqlType = new JavaTypeConvertor().getSqlType(entityField.getType());
+        final String dbTypeName = dialect.getDbTypeName(sqlType);
         final int columnLength = entityField.getColumnLength();
 
         if (columnLength == 0) {

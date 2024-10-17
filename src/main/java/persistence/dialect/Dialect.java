@@ -1,19 +1,20 @@
 package persistence.dialect;
 
-import persistence.sql.meta.EntityField;
-
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Dialect {
-    private final Map<Class<?>, String> typeRegistry;
+    private final Map<Integer, String> typeRegistry;
 
     protected Dialect() {
-        this.typeRegistry = initTypeRegistry();
+        this.typeRegistry = new HashMap<>();
     }
 
-    protected abstract Map<Class<?>, String> initTypeRegistry();
+    protected void addType(int sqlType, String dbType) {
+        typeRegistry.put(sqlType, dbType);
+    }
 
-    public String getDbTypeName(EntityField entityField) {
-        return typeRegistry.get(entityField.getType());
+    public String getDbTypeName(int sqlType) {
+        return typeRegistry.get(sqlType);
     }
 }
