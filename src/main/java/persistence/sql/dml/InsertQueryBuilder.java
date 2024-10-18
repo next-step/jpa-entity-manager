@@ -18,7 +18,7 @@ public class InsertQueryBuilder {
     }
 
     public String insert() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), getColumnClause(), getValueClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getColumnClause(), getValueClause());
     }
 
     private String getColumnClause() {

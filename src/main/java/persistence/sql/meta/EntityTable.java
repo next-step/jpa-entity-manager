@@ -3,8 +3,6 @@ package persistence.sql.meta;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,10 +26,6 @@ public class EntityTable {
         return entityFields.getEntityFields();
     }
 
-    public String getQuery(String queryTemplate, String... templateArgs) {
-        return String.format(queryTemplate, (Object[]) templateArgs);
-    }
-
     public String getTableName() {
         final Table table = entityType.getAnnotation(Table.class);
         if (Objects.nonNull(table) && Objects.nonNull(table.name()) && !table.name().isBlank()) {
@@ -52,14 +46,6 @@ public class EntityTable {
     }
 
     private EntityField getIdEntityField() {
-        final Field field = Arrays.stream(entityType.getDeclaredFields())
-                .filter(this::isId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(NOT_ID_FAILED_MESSAGE));
-        return new EntityField(field);
-    }
-
-    private boolean isId(Field field) {
-        return new EntityField(field).isId();
+        return entityFields.getIdEntityField();
     }
 }

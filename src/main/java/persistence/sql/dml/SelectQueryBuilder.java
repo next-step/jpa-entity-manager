@@ -17,11 +17,11 @@ public class SelectQueryBuilder {
     }
 
     public String findAll() {
-        return entityTable.getQuery(FIND_ALL_QUERY_TEMPLATE, getColumnClause(), entityTable.getTableName());
+        return FIND_ALL_QUERY_TEMPLATE.formatted(getColumnClause(), entityTable.getTableName());
     }
 
     public String findById(Object id) {
-        return entityTable.getQuery(FIND_BY_ID_QUERY_TEMPLATE, getColumnClause(), entityTable.getTableName(), entityTable.getWhereClause(id));
+        return FIND_BY_ID_QUERY_TEMPLATE.formatted(getColumnClause(), entityTable.getTableName(), entityTable.getWhereClause(id));
     }
 
     private String getColumnClause() {

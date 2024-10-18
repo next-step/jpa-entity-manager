@@ -18,7 +18,7 @@ public class UpdateQueryBuilder {
     }
 
     public String update() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), getSetClause(), getWhereClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(), getWhereClause());
     }
 
     private String getSetClause() {

@@ -15,6 +15,6 @@ public class DeleteQueryBuilder {
 
     public String delete() {
         final Object id = entityTable.getIdValue(entity);
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), entityTable.getWhereClause(id));
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), entityTable.getWhereClause(id));
     }
 }

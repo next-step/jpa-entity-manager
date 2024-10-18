@@ -50,19 +50,6 @@ class EntityTableTest {
     }
 
     @Test
-    @DisplayName("쿼리를 반환한다.")
-    void getQuery() {
-        // given
-        final EntityTable entityTable = new EntityTable(EntityWithId.class);
-
-        // when
-        final String query = entityTable.getQuery("DROP TABLE %s", "users");
-
-        // then
-        assertThat(query).isEqualTo("DROP TABLE users");
-    }
-
-    @Test
     @DisplayName("@Table 애노테이션이 있는 엔티티로 테이블명을 반환한다.")
     void getTableName_withTable() {
         // given

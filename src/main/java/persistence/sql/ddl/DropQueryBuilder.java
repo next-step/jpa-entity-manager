@@ -12,6 +12,6 @@ public class DropQueryBuilder {
     }
 
     public String drop() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName());
     }
 }

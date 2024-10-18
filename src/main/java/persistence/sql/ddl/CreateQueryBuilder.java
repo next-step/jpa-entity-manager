@@ -23,7 +23,7 @@ public class CreateQueryBuilder {
     }
 
     public String create() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), getColumnClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getColumnClause());
     }
 
     private String getColumnClause() {
