@@ -10,12 +10,12 @@ import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.sql.Connection;
 
-public class EntityManagerImpl<T> implements EntityManager<T> {
-    private static final Logger logger = LoggerFactory.getLogger(EntityManagerImpl.class);
+public class DefaultEntityManager<T> implements EntityManager<T> {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultEntityManager.class);
 
     private final JdbcTemplate jdbcTemplate;
 
-    EntityManagerImpl(Connection connection) {
+    DefaultEntityManager(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
     }
 
