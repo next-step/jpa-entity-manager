@@ -18,6 +18,7 @@ public class EntityField {
 
     private final List<Class<?>> quotesNeededTypes = List.of(String.class);
     private final List<Class<?>> lengthNeededTypes = List.of(String.class);
+
     private final Field field;
 
     public EntityField(Field field) {
@@ -51,10 +52,6 @@ public class EntityField {
         }
     }
 
-    private boolean isQuotesNeeded() {
-        return quotesNeededTypes.contains(getType());
-    }
-
     public void setValue(Object entity, Object value){
         try {
             field.setAccessible(true);
@@ -62,6 +59,10 @@ public class EntityField {
         } catch (IllegalAccessException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public Class<?> getType() {
+        return field.getType();
     }
 
     public String getColumnName() {
@@ -74,14 +75,10 @@ public class EntityField {
 
     public int getColumnLength() {
         final Column column = field.getAnnotation(Column.class);
-        if (!lengthNeededTypes.contains(getType())) {
+        if (!lengthNeededTypes.contains(field.getType())) {
             return DEFAULT_LENGTH;
         }
         return column.length();
-    }
-
-    public Class<?> getType() {
-        return field.getType();
     }
 
     public boolean isGeneration() {
@@ -106,5 +103,9 @@ public class EntityField {
 
     public boolean isPersistent() {
         return !field.isAnnotationPresent(Transient.class);
+    }
+
+    private boolean isQuotesNeeded() {
+        return quotesNeededTypes.contains(field.getType());
     }
 }
