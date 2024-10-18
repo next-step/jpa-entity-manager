@@ -23,7 +23,7 @@ public class EntityManagerImpl<T> implements EntityManager<T> {
     public T find(Class<T> clazz, Long id) {
         final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
         final String sql = selectQueryBuilder.findById(id);
-        return jdbcTemplate.queryForObject(sql, new CustomRowMapper<>(clazz));
+        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
     }
 
     @Override

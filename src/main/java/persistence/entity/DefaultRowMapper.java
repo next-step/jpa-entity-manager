@@ -9,12 +9,12 @@ import persistence.sql.meta.EntityTable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CustomRowMapper<T> implements RowMapper<T> {
-    private static final Logger logger = LoggerFactory.getLogger(CustomRowMapper.class);
+public class DefaultRowMapper<T> implements RowMapper<T> {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRowMapper.class);
 
     private final Class<T> clazz;
 
-    CustomRowMapper(Class<T> clazz) {
+    DefaultRowMapper(Class<T> clazz) {
         this.clazz = clazz;
     }
 
