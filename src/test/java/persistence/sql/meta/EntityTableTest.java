@@ -50,32 +50,6 @@ class EntityTableTest {
     }
 
     @Test
-    @DisplayName("@Table 애노테이션이 있는 엔티티로 테이블명을 반환한다.")
-    void getTableName_withTable() {
-        // given
-        final EntityTable entityTable = new EntityTable(EntityWithId.class);
-
-        // when
-        final String tableName = entityTable.getTableName();
-
-        // then
-        assertThat(tableName).isEqualTo("users");
-    }
-
-    @Test
-    @DisplayName("@Table 애노테이션이 없는 엔티티로 테이블명을 반환한다.")
-    void getTableName_withoutTable() {
-        // given
-        final EntityTable entityTable = new EntityTable(EntityWithoutTable.class);
-
-        // when
-        final String tableName = entityTable.getTableName();
-
-        // then
-        assertThat(tableName).isEqualTo("entitywithouttable");
-    }
-
-    @Test
     @DisplayName("where절을 반환한다.")
     void getWhereClause() {
         // given

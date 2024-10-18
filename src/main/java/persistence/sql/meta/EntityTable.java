@@ -10,7 +10,7 @@ public class EntityTable {
     public static final String NOT_ENTITY_FAILED_MESSAGE = "클래스에 @Entity 애노테이션이 없습니다.";
     public static final String NOT_ID_FAILED_MESSAGE = "필드에 @Id 애노테이션이 없습니다.";
 
-    private final Class<?> entityType;
+    private final TableName tableName;
     private final EntityFields entityFields;
 
     public EntityTable(Class<?> entityType) {
@@ -18,22 +18,18 @@ public class EntityTable {
             throw new IllegalArgumentException(NOT_ENTITY_FAILED_MESSAGE);
         }
 
-        this.entityType = entityType;
+        this.tableName = new TableName(entityType);
         this.entityFields = new EntityFields(entityType);
+    }
+
+    public String getTableName() {
+        return tableName.getName();
     }
 
     public List<EntityField> getEntityFields() {
         return entityFields.getEntityFields();
     }
 
-    public String getTableName() {
-        final Table table = entityType.getAnnotation(Table.class);
-        if (Objects.nonNull(table) && Objects.nonNull(table.name()) && !table.name().isBlank()) {
-            return table.name();
-        }
-        return entityType.getSimpleName()
-                .toLowerCase();
-    }
 
     public String getWhereClause(Object id) {
         final EntityField entityField = getIdEntityField();
