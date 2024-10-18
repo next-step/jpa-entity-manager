@@ -1,7 +1,7 @@
 package persistence.sql.ddl;
 
 import persistence.dialect.Dialect;
-import persistence.entity.JavaTypeConvertor;
+import persistence.sql.meta.JavaTypeConvertor;
 import persistence.sql.meta.EntityField;
 import persistence.sql.meta.EntityTable;
 
