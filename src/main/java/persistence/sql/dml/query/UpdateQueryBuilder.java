@@ -19,7 +19,8 @@ public class UpdateQueryBuilder {
         String columnClause = columnClause(tableDefinition, entity, query);
         query.append(columnClause);
 
-        query.append(" WHERE id = ");
+        query.append(" WHERE ");
+        query.append(tableDefinition.tableId().name()).append(" = ");
         query.append(tableDefinition.tableId().getValue(entity));
         query.append(";");
 

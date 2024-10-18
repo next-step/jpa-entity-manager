@@ -12,7 +12,8 @@ public class DeleteByIdQueryBuilder {
         final StringBuilder query = new StringBuilder("DELETE FROM ");
 
         query.append(tableDefinition.tableName());
-        query.append(" WHERE id = ");
+        query.append(" WHERE ");
+        query.append(tableId.name()).append(" = ");
         query.append(idValue).append(";");
 
         return query.toString();
