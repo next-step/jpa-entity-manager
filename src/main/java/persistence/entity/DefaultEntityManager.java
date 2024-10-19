@@ -9,22 +9,20 @@ import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
-import java.sql.Connection;
-
 public class DefaultEntityManager<T> implements EntityManager<T> {
     private static final Logger logger = LoggerFactory.getLogger(DefaultEntityManager.class);
 
     private final JdbcTemplate jdbcTemplate;
 
-    DefaultEntityManager(Connection connection) {
-        this.jdbcTemplate = new JdbcTemplate(connection);
+    DefaultEntityManager(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public T find(Class<T> clazz, Long id) {
-        final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
+    public T find(Class<T> entityType, Object id) {
+        final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityType);
         final String sql = selectQueryBuilder.findById(id);
-        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
+        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(entityType));
     }
 
     @Override
@@ -45,4 +43,5 @@ public class DefaultEntityManager<T> implements EntityManager<T> {
         final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entity);
         jdbcTemplate.execute(updateQueryBuilder.update());
     }
+
 }

@@ -61,7 +61,7 @@ class EntityTableTest {
         final EntityTable entityTable = new EntityTable(entityWithId);
 
         // when
-        final Object idValue = entityTable.getIdValue();
+        final Object idValue = entityTable.getIdValueWithQuotes();
 
         // then
         assertThat(idValue).isEqualTo("1");

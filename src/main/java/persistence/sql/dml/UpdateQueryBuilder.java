@@ -16,7 +16,7 @@ public class UpdateQueryBuilder {
     }
 
     public String update() {
-        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(), getWhereClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(), entityTable.getWhereClause());
     }
 
     private String getSetClause() {
@@ -34,11 +34,6 @@ public class UpdateQueryBuilder {
     }
 
     private String getSetClause(EntityColumn entityColumn) {
-        return entityColumn.getColumnName() + " = " + entityColumn.getValue();
-    }
-
-    private String getWhereClause() {
-        final Object id = entityTable.getIdValue();
-        return entityTable.getWhereClause(id);
+        return entityColumn.getColumnName() + " = " + entityColumn.getValueWithQuotes();
     }
 }

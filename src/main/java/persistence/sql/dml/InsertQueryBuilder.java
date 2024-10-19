@@ -33,7 +33,7 @@ public class InsertQueryBuilder {
         final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)
-                .map(EntityColumn::getValue)
+                .map(EntityColumn::getValueWithQuotes)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);

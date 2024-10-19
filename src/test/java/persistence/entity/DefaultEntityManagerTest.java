@@ -14,18 +14,16 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 
-import java.sql.Connection;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultEntityManagerTest {
-    private Connection connection;
+    private JdbcTemplate jdbcTemplate;
     private Dialect dialect;
 
     @BeforeEach
     void setUp() {
-        connection= H2ConnectionFactory.getConnection();
+        jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
         dialect = new H2Dialect();
 
         createTable();
@@ -41,7 +39,7 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 조회한다.")
     void find() {
         // given
-        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(connection);
+        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(jdbcTemplate);
 
         // when
         final EntityWithId entityWithId = entityManager.find(EntityWithId.class, 1L);
@@ -61,7 +59,7 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 저장한다.")
     void persist() {
         // given
-        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(connection);
+        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(jdbcTemplate);
         final EntityWithId entityWithId = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
@@ -83,7 +81,7 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 삭제한다.")
     void remove() {
         // given
-        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(connection);
+        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(jdbcTemplate);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
 
         // when
@@ -99,7 +97,7 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 수정한다.")
     void update() {
         // given
-        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(connection);
+        final EntityManager<EntityWithId> entityManager = new DefaultEntityManager<>(jdbcTemplate);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jackson", 20, "test2@email.com");
 
         // when
@@ -118,13 +116,11 @@ class DefaultEntityManagerTest {
     }
 
     private void createTable() {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
     private void insertData() {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(
                 new EntityWithId("Jaden", 30, "test@email.com", 1)
         );
@@ -132,7 +128,6 @@ class DefaultEntityManagerTest {
     }
 
     private void dropTable() {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
         jdbcTemplate.execute(dropQueryBuilder.drop());
     }

@@ -53,8 +53,12 @@ public class EntityColumn {
         return columnOption.isNotNull();
     }
 
-    public String getValue() {
+    public Object getValue() {
         return columnValue.getValue();
+    }
+
+    public String getValueWithQuotes() {
+        return columnValue.getValueWithQuotes();
     }
 
     @Override

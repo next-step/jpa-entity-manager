@@ -25,7 +25,11 @@ public class ColumnValue {
         this.isQuotesNeeded = isQuotesNeeded();
     }
 
-    public String getValue() {
+    public Object getValue() {
+        return value;
+    }
+
+    public String getValueWithQuotes() {
         if (isQuotesNeeded) {
             return "'%s'".formatted(String.valueOf(value));
         }

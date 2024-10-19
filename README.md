@@ -15,5 +15,5 @@
 
 ### 🚀 1단계 - EntityPersister 구현
 
-- [ ] 요구 사항 1 - Persistence Context 구현
+- [x] 요구 사항 1 - Persistence Context 구현
 - [ ] 요구 사항 2 - Persister 구현

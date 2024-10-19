@@ -40,7 +40,7 @@ public class Application {
             jdbcTemplate.execute(insertQueryBuilder.insert());
 
             final Person updatedEntity = new Person(1L, "Jackson", 20, "test2@email.com");
-            final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entity);
+            final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(updatedEntity);
             jdbcTemplate.execute(updateQueryBuilder.update());
 
             final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(Person.class);
@@ -50,7 +50,7 @@ public class Application {
             final Person person = jdbcTemplate.queryForObject(selectQueryBuilder.findById(1), new PersonRowMapper());
             logger.debug(person.toString());
 
-            final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entity);
+            final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(updatedEntity);
             jdbcTemplate.execute(deleteQueryBuilder.delete());
 
             final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
