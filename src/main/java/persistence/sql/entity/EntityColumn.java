@@ -9,13 +9,11 @@ import java.lang.reflect.Field;
 public class EntityColumn {
 
     private final String columnName;
-    private final FieldType fieldType;
     private final boolean isPrimaryKey;
     private final boolean isNullable;
 
-    public EntityColumn(String columnName, FieldType fieldType, boolean isPrimaryKey, boolean isNullable) {
+    public EntityColumn(String columnName, boolean isPrimaryKey, boolean isNullable) {
         this.columnName = columnName;
-        this.fieldType = fieldType;
         this.isPrimaryKey = isPrimaryKey;
         this.isNullable = isNullable;
     }
@@ -23,7 +21,6 @@ public class EntityColumn {
     public static EntityColumn from(Field field) {
         return new EntityColumn(
                 getFieldName(field),
-                FieldType.from(field.getType()),
                 field.isAnnotationPresent(Id.class),
                 isColumnNullable(field)
         );
