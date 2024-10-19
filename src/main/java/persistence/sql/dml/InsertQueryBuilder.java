@@ -42,6 +42,6 @@ public class InsertQueryBuilder {
     }
 
     private boolean isNotNeeded(EntityField entityField) {
-        return !entityField.isGeneration() && entityField.isPersistent();
+        return !entityField.isGenerationValue() && entityField.isPersistent();
     }
 }

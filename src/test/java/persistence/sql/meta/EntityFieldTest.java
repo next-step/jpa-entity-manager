@@ -9,31 +9,6 @@ import java.lang.reflect.Field;
 import static org.assertj.core.api.Assertions.*;
 
 class EntityFieldTest {
-    @Test
-    @DisplayName("generation 필드인 경우 true를 반환한다.")
-    void isGeneration_true() {
-        // given
-        final EntityField entityField = new EntityField(getField("id"));
-
-        // when
-        final boolean result = entityField.isGeneration();
-
-        // then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("generation 필드가 아닌 경우 false를 반환한다.")
-    void isGeneration_false() {
-        // given
-        final EntityField entityField = new EntityField(getField("age"));
-
-        // when
-        final boolean result = entityField.isGeneration();
-
-        // then
-        assertThat(result).isFalse();
-    }
 
     @Test
     @DisplayName("not null 필드인 경우 true를 반환한다.")
@@ -56,32 +31,6 @@ class EntityFieldTest {
 
         // when
         final boolean result = entityField.isNotNull();
-
-        // then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    @DisplayName("primary key 필드인 경우 true를 반환한다.")
-    void isId_true() {
-        // given
-        final EntityField entityField = new EntityField(getField("id"));
-
-        // when
-        final boolean result = entityField.isId();
-
-        // then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("primary key 필드가 아닌 경우 false를 반환한다.")
-    void isId_false() {
-        // given
-        final EntityField entityField = new EntityField(getField("age"));
-
-        // when
-        final boolean result = entityField.isId();
 
         // then
         assertThat(result).isFalse();

@@ -1,9 +1,6 @@
 package persistence.sql.meta;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +16,7 @@ public class EntityField {
 
     private final ColumnName columnName;
     private final ColumnLength columnLength;
+    private final ColumnIdOption columnIdOption;
 
     private final Field field;
 
@@ -26,6 +24,7 @@ public class EntityField {
         this.field = field;
         this.columnName = new ColumnName(field);
         this.columnLength = new ColumnLength(field);
+        this.columnIdOption = new ColumnIdOption(field);
     }
 
     public String getColumnName() {
@@ -34,6 +33,14 @@ public class EntityField {
 
     public int getColumnLength() {
         return columnLength.getLength();
+    }
+
+    public boolean isId() {
+        return columnIdOption.isId();
+    }
+
+    public boolean isGenerationValue() {
+        return columnIdOption.isGenerationValue();
     }
 
     @Override
@@ -76,13 +83,6 @@ public class EntityField {
         return field.getType();
     }
 
-    public boolean isGeneration() {
-        final GeneratedValue generatedValue = field.getAnnotation(GeneratedValue.class);
-        if (Objects.isNull(generatedValue)) {
-            return false;
-        }
-        return generatedValue.strategy() == GenerationType.IDENTITY;
-    }
 
     public boolean isNotNull() {
         final Column column = field.getAnnotation(Column.class);
@@ -90,10 +90,6 @@ public class EntityField {
             return false;
         }
         return !column.nullable();
-    }
-
-    public boolean isId() {
-        return field.isAnnotationPresent(Id.class);
     }
 
     public boolean isPersistent() {

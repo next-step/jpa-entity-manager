@@ -43,7 +43,7 @@ public class CreateQueryBuilder {
             columDefinition += " " + NOT_NULL_COLUMN_DEFINITION;
         }
 
-        if (entityField.isGeneration()) {
+        if (entityField.isGenerationValue()) {
             columDefinition += " " + GENERATION_COLUMN_DEFINITION;
         }
 
