@@ -14,22 +14,26 @@ import java.util.Objects;
 
 public class EntityField {
     private static final Logger logger = LoggerFactory.getLogger(EntityField.class);
-    private static final int DEFAULT_LENGTH = 0;
 
     private final List<Class<?>> quotesNeededTypes = List.of(String.class);
-    private final List<Class<?>> lengthNeededTypes = List.of(String.class);
 
     private final ColumnName columnName;
+    private final ColumnLength columnLength;
 
     private final Field field;
 
     public EntityField(Field field) {
         this.field = field;
         this.columnName = new ColumnName(field);
+        this.columnLength = new ColumnLength(field);
     }
 
     public String getColumnName() {
         return columnName.getName();
+    }
+
+    public int getColumnLength() {
+        return columnLength.getLength();
     }
 
     @Override
@@ -70,14 +74,6 @@ public class EntityField {
 
     public Class<?> getType() {
         return field.getType();
-    }
-
-    public int getColumnLength() {
-        final Column column = field.getAnnotation(Column.class);
-        if (!lengthNeededTypes.contains(field.getType())) {
-            return DEFAULT_LENGTH;
-        }
-        return column.length();
     }
 
     public boolean isGeneration() {

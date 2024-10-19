@@ -15,7 +15,7 @@ public class EntityWithId {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nick_name")
+    @Column(name = "nick_name", length = 20)
     private String name;
 
     @Column(name = "old")
