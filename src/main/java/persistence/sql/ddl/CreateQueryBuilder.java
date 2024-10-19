@@ -27,7 +27,7 @@ public class CreateQueryBuilder {
     }
 
     private String getColumnClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .map(this::getColumnDefinition)
                 .collect(Collectors.toList());

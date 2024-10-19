@@ -50,7 +50,7 @@ class EntityTableTest {
         // when & then
         assertThatThrownBy(() -> entityTable.getWhereClause(1))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage(EntityFields.NOT_ID_FAILED_MESSAGE);
+                .hasMessage(EntityColumns.NOT_ID_FAILED_MESSAGE);
     }
 
     @Test

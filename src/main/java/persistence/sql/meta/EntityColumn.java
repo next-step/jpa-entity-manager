@@ -62,7 +62,9 @@ public class EntityColumn {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EntityColumn that = (EntityColumn) o;
-        return Objects.equals(type, that.type) && Objects.equals(columnName, that.columnName) && Objects.equals(columnLength, that.columnLength) && Objects.equals(columnIdOption, that.columnIdOption) && Objects.equals(columnOption, that.columnOption) && Objects.equals(columnValue, that.columnValue);
+        return Objects.equals(type, that.type) && Objects.equals(columnName, that.columnName)
+                && Objects.equals(columnLength, that.columnLength) && Objects.equals(columnIdOption, that.columnIdOption)
+                && Objects.equals(columnOption, that.columnOption) && Objects.equals(columnValue, that.columnValue);
     }
 
     @Override

@@ -20,7 +20,7 @@ public class UpdateQueryBuilder {
     }
 
     private String getSetClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)
                 .map(this::getSetClause)
