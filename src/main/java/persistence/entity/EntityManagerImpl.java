@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.sql.definition.TableDefinition;
 import persistence.sql.dml.query.DeleteByIdQueryBuilder;
 import persistence.sql.dml.query.InsertQueryBuilder;
 import persistence.sql.dml.query.SelectByIdQueryBuilder;
@@ -14,15 +15,27 @@ public class EntityManagerImpl implements EntityManager {
     private static final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
 
     private final JdbcTemplate jdbcTemplate;
+    private final PersistenceContext persistenceContext;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.persistenceContext = PersistenceContext.getInstance();
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Object Id) {
-        final String query = selectByIdQueryBuilder.build(clazz, Id);
-        return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
+    public <T> T find(Class<T> clazz, Object id) {
+        final EntityKey entityKey = new EntityKey(id);
+        final Object managedEntity = persistenceContext.findEntity(entityKey);
+
+        return managedEntity != null ? clazz.cast(managedEntity) : queryForObject(clazz, entityKey);
+    }
+
+    private <T> T queryForObject(Class<T> clazz, EntityKey id) {
+        final String query = selectByIdQueryBuilder.build(clazz, id.value());
+        T queried = jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
+
+        persistenceContext.addEntity(id, queried);
+        return queried;
     }
 
     @Override
