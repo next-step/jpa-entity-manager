@@ -1,5 +1,8 @@
 package persistence.sql.meta;
 
+import jakarta.persistence.Transient;
+
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +14,7 @@ public class EntityFields {
 
     public EntityFields(Class<?> entityType) {
         this.entityFields = Arrays.stream(entityType.getDeclaredFields())
+                .filter(this::isPersistent)
                 .map(EntityField::new)
                 .collect(Collectors.toList());
     }
@@ -24,5 +28,9 @@ public class EntityFields {
                 .filter(EntityField::isId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(NOT_ID_FAILED_MESSAGE));
+    }
+
+    private boolean isPersistent(Field field) {
+        return !field.isAnnotationPresent(Transient.class);
     }
 }

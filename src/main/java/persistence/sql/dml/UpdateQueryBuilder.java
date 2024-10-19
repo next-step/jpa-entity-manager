@@ -32,7 +32,7 @@ public class UpdateQueryBuilder {
     }
 
     private boolean isNotNeeded(EntityField entityField) {
-        return !entityField.isId() && entityField.isPersistent();
+        return !entityField.isId();
     }
 
     private String getSetClause(EntityField entityField) {

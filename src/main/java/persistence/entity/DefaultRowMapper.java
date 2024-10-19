@@ -22,8 +22,6 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     public T mapRow(ResultSet resultSet) {
         final T entity = new InstanceFactory<>(clazz).createInstance();
         new EntityTable(clazz).getEntityFields()
-                .stream()
-                .filter(EntityField::isPersistent)
                 .forEach(entityField -> mapField(resultSet, entityField, entity));
         return entity;
     }

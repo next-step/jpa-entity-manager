@@ -7,10 +7,12 @@ import persistence.fixture.EntityWithoutID;
 import persistence.fixture.EntityWithoutTable;
 import persistence.fixture.NotEntity;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EntityTableTest {
     @Test
@@ -30,23 +32,6 @@ class EntityTableTest {
         assertThatThrownBy(() -> new EntityTable(NotEntity.class))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(EntityTable.NOT_ENTITY_FAILED_MESSAGE);
-    }
-
-    @Test
-    @DisplayName("필드 리스트를 반환한다.")
-    void getEntityFields() {
-        // given
-        final EntityTable entityTable = new EntityTable(EntityWithId.class);
-
-        // when
-        final List<EntityField> entityFields = entityTable.getEntityFields();
-
-        // then
-        assertThat(entityFields).containsAll(
-                Arrays.stream(EntityWithId.class.getDeclaredFields())
-                        .map(EntityField::new)
-                        .toList()
-        );
     }
 
     @Test

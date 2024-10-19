@@ -29,7 +29,6 @@ public class CreateQueryBuilder {
     private String getColumnClause() {
         final List<String> columnDefinitions = entityTable.getEntityFields()
                 .stream()
-                .filter(EntityField::isPersistent)
                 .map(this::getColumnDefinition)
                 .collect(Collectors.toList());
 

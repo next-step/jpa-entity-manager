@@ -17,6 +17,7 @@ public class EntityField {
     private final ColumnName columnName;
     private final ColumnLength columnLength;
     private final ColumnIdOption columnIdOption;
+    private final ColumnOption columnOption;
 
     private final Field field;
 
@@ -25,6 +26,7 @@ public class EntityField {
         this.columnName = new ColumnName(field);
         this.columnLength = new ColumnLength(field);
         this.columnIdOption = new ColumnIdOption(field);
+        this.columnOption = new ColumnOption(field);
     }
 
     public String getColumnName() {
@@ -41,6 +43,10 @@ public class EntityField {
 
     public boolean isGenerationValue() {
         return columnIdOption.isGenerationValue();
+    }
+
+    public boolean isNotNull() {
+        return columnOption.isNotNull();
     }
 
     @Override
@@ -83,20 +89,8 @@ public class EntityField {
         return field.getType();
     }
 
-
-    public boolean isNotNull() {
-        final Column column = field.getAnnotation(Column.class);
-        if (Objects.isNull(column)) {
-            return false;
-        }
-        return !column.nullable();
-    }
-
-    public boolean isPersistent() {
-        return !field.isAnnotationPresent(Transient.class);
-    }
-
     private boolean isQuotesNeeded() {
         return quotesNeededTypes.contains(field.getType());
     }
+
 }

@@ -3,72 +3,30 @@ package persistence.sql.meta;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.fixture.EntityWithId;
+import util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EntityFieldTest {
-
     @Test
-    @DisplayName("not null 필드인 경우 true를 반환한다.")
-    void isNotNull_true() {
+    @DisplayName("인스턴스를 생성한다.")
+    void constructor() {
         // given
-        final EntityField entityField = new EntityField(getField("email"));
+        final Field field = ReflectionUtils.getField(EntityWithId.class, "id");
 
         // when
-        final boolean result = entityField.isNotNull();
+        final EntityField entityField = new EntityField(field);
 
         // then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("not null 필드가 아닌 경우 false를 반환한다.")
-    void isNotNull_false() {
-        // given
-        final EntityField entityField = new EntityField(getField("age"));
-
-        // when
-        final boolean result = entityField.isNotNull();
-
-        // then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    @DisplayName("영속성 관리 필드인 경우 true를 반환한다.")
-    void isPersistent_true() {
-        // given
-        final EntityField entityField = new EntityField(getField("age"));
-
-        // when
-        final boolean result = entityField.isPersistent();
-
-        // then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("영속성 관리 필드가 아닌 경우 false를 반환한다.")
-    void isPersistent_false() {
-        // given
-        final EntityField entityField = new EntityField(getField("index"));
-
-        // when
-        final boolean result = entityField.isPersistent();
-
-        // then
-        assertThat(result).isFalse();
-    }
-
-    private static Field getField(String fieldName) {
-        Class<EntityWithId> clazz = EntityWithId.class;
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.getName().equals(fieldName)) {
-                return field;
-            }
-        }
-        return null;
+        assertAll(
+                () -> assertThat(entityField.getColumnName()).isNotBlank(),
+                () -> assertThat(entityField.getColumnLength()).isZero(),
+                () -> assertThat(entityField.isId()).isTrue(),
+                () -> assertThat(entityField.isGenerationValue()).isTrue(),
+                () -> assertThat(entityField.isNotNull()).isFalse()
+        );
     }
 }

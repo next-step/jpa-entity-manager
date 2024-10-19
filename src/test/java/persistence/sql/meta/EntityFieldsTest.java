@@ -21,13 +21,12 @@ class EntityFieldsTest {
         final Field[] fields = EntityWithId.class.getDeclaredFields();
         assertAll(
                 () -> assertThat(entityFields).isNotNull(),
-                () -> assertThat(entityFields.getEntityFields()).hasSize(5),
+                () -> assertThat(entityFields.getEntityFields()).hasSize(4),
                 () -> assertThat(entityFields.getEntityFields()).containsExactly(
                         new EntityField(fields[0]),
                         new EntityField(fields[1]),
                         new EntityField(fields[2]),
-                        new EntityField(fields[3]),
-                        new EntityField(fields[4])
+                        new EntityField(fields[3])
                 )
         );
     }
