@@ -23,10 +23,10 @@ class EntityFieldsTest {
                 () -> assertThat(entityFields).isNotNull(),
                 () -> assertThat(entityFields.getEntityFields()).hasSize(4),
                 () -> assertThat(entityFields.getEntityFields()).containsExactly(
-                        new EntityField(fields[0]),
-                        new EntityField(fields[1]),
-                        new EntityField(fields[2]),
-                        new EntityField(fields[3])
+                        new EntityColumn(fields[0]),
+                        new EntityColumn(fields[1]),
+                        new EntityColumn(fields[2]),
+                        new EntityColumn(fields[3])
                 )
         );
     }
@@ -38,10 +38,10 @@ class EntityFieldsTest {
         final EntityFields entityFields = new EntityFields(EntityWithId.class);
 
         // when
-        final EntityField entityField = entityFields.getIdEntityField();
+        final EntityColumn entityColumn = entityFields.getIdEntityField();
 
         // then
-        final EntityField expected = new EntityField(ReflectionUtils.getField(EntityWithId.class, "id"));
-        assertThat(entityField).isEqualTo(expected);
+        final EntityColumn expected = new EntityColumn(ReflectionUtils.getField(EntityWithId.class, "id"));
+        assertThat(entityColumn).isEqualTo(expected);
     }
 }

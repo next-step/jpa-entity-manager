@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class SelectQueryBuilder {
     private String getColumnClause() {
         final List<String> columnDefinitions = entityTable.getEntityFields()
                 .stream()
-                .map(EntityField::getColumnName)
+                .map(EntityColumn::getColumnName)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);

@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class InsertQueryBuilder {
         final List<String> columnDefinitions = entityTable.getEntityFields()
                 .stream()
                 .filter(this::isNotNeeded)
-                .map(EntityField::getColumnName)
+                .map(EntityColumn::getColumnName)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);
@@ -33,13 +33,13 @@ public class InsertQueryBuilder {
         final List<String> columnDefinitions = entityTable.getEntityFields()
                 .stream()
                 .filter(this::isNotNeeded)
-                .map(EntityField::getValue)
+                .map(EntityColumn::getValue)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);
     }
 
-    private boolean isNotNeeded(EntityField entityField) {
-        return !entityField.isGenerationValue();
+    private boolean isNotNeeded(EntityColumn entityColumn) {
+        return !entityColumn.isGenerationValue();
     }
 }

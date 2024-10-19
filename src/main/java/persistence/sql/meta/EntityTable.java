@@ -27,18 +27,18 @@ public class EntityTable {
         return tableName.getName();
     }
 
-    public List<EntityField> getEntityFields() {
+    public List<EntityColumn> getEntityFields() {
         return entityFields.getEntityFields();
     }
 
     public String getWhereClause(Object id) {
-        final EntityField entityField = getIdEntityField();
-        return entityField.getColumnName() + " = " + id;
+        final EntityColumn entityColumn = getIdEntityField();
+        return entityColumn.getColumnName() + " = " + id;
     }
 
     public Object getIdValue() {
-        final EntityField entityField = getIdEntityField();
-        return entityField.getValue();
+        final EntityColumn entityColumn = getIdEntityField();
+        return entityColumn.getValue();
     }
 
     private void validate(Class<?> entityType) {
@@ -47,7 +47,7 @@ public class EntityTable {
         }
     }
 
-    private EntityField getIdEntityField() {
+    private EntityColumn getIdEntityField() {
         return entityFields.getIdEntityField();
     }
 }

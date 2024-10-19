@@ -3,7 +3,7 @@ package persistence.sql.meta;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public class EntityField {
+public class EntityColumn {
     private final Class<?> type;
     private final ColumnName columnName;
     private final ColumnLength columnLength;
@@ -11,7 +11,7 @@ public class EntityField {
     private final ColumnOption columnOption;
     private final ColumnValue columnValue;
 
-    public EntityField(Field field) {
+    public EntityColumn(Field field) {
         this.type = field.getType();
         this.columnName = new ColumnName(field);
         this.columnLength = new ColumnLength(field);
@@ -20,7 +20,7 @@ public class EntityField {
         this.columnValue = new ColumnValue(field);
     }
 
-    public EntityField(Field field, Object entity) {
+    public EntityColumn(Field field, Object entity) {
         this.type = field.getType();
         this.columnName = new ColumnName(field);
         this.columnLength = new ColumnLength(field);
@@ -61,7 +61,7 @@ public class EntityField {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EntityField that = (EntityField) o;
+        EntityColumn that = (EntityColumn) o;
         return Objects.equals(type, that.type) && Objects.equals(columnName, that.columnName) && Objects.equals(columnLength, that.columnLength) && Objects.equals(columnIdOption, that.columnIdOption) && Objects.equals(columnOption, that.columnOption) && Objects.equals(columnValue, that.columnValue);
     }
 

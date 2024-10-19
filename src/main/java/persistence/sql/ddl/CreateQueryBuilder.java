@@ -1,7 +1,7 @@
 package persistence.sql.ddl;
 
 import persistence.dialect.Dialect;
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 import persistence.sql.meta.JavaTypeConvertor;
 
@@ -35,28 +35,28 @@ public class CreateQueryBuilder {
         return String.join(", ", columnDefinitions);
     }
 
-    private String getColumnDefinition(EntityField entityField) {
-        String columDefinition = entityField.getColumnName() + " " + getDbType(entityField);
+    private String getColumnDefinition(EntityColumn entityColumn) {
+        String columDefinition = entityColumn.getColumnName() + " " + getDbType(entityColumn);
 
-        if (entityField.isNotNull()) {
+        if (entityColumn.isNotNull()) {
             columDefinition += " " + NOT_NULL_COLUMN_DEFINITION;
         }
 
-        if (entityField.isGenerationValue()) {
+        if (entityColumn.isGenerationValue()) {
             columDefinition += " " + GENERATION_COLUMN_DEFINITION;
         }
 
-        if (entityField.isId()) {
+        if (entityColumn.isId()) {
             columDefinition += " " + PRIMARY_KEY_COLUMN_DEFINITION;
         }
 
         return columDefinition;
     }
 
-    private String getDbType(EntityField entityField) {
-        final int sqlType = new JavaTypeConvertor().getSqlType(entityField.getType());
+    private String getDbType(EntityColumn entityColumn) {
+        final int sqlType = new JavaTypeConvertor().getSqlType(entityColumn.getType());
         final String dbTypeName = dialect.getDbTypeName(sqlType);
-        final int columnLength = entityField.getColumnLength();
+        final int columnLength = entityColumn.getColumnLength();
 
         if (columnLength == 0) {
             return dbTypeName;

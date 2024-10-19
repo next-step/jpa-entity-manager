@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 
 import java.util.List;
@@ -29,12 +29,12 @@ public class UpdateQueryBuilder {
         return String.join(", ", columnDefinitions);
     }
 
-    private boolean isNotNeeded(EntityField entityField) {
-        return !entityField.isId();
+    private boolean isNotNeeded(EntityColumn entityColumn) {
+        return !entityColumn.isId();
     }
 
-    private String getSetClause(EntityField entityField) {
-        return entityField.getColumnName() + " = " + entityField.getValue();
+    private String getSetClause(EntityColumn entityColumn) {
+        return entityColumn.getColumnName() + " = " + entityColumn.getValue();
     }
 
     private String getWhereClause() {
