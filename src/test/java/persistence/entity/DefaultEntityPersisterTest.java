@@ -17,14 +17,16 @@ import persistence.sql.dml.InsertQueryBuilder;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class DefaultEntityManagerTest {
+class DefaultEntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
     private Dialect dialect;
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
         dialect = new H2Dialect();
+        entityManager = new DefaultEntityManager(jdbcTemplate);
 
         createTable();
         insertData();
@@ -36,34 +38,14 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 조회한다.")
-    void find() {
-        // given
-        final EntityManager entityManager = new DefaultEntityManager(jdbcTemplate);
-
-        // when
-        final EntityWithId entityWithId = entityManager.find(EntityWithId.class, 1L);
-
-        // then
-        assertAll(
-                () -> assertThat(entityWithId).isNotNull(),
-                () -> assertThat(entityWithId.getId()).isEqualTo(1),
-                () -> assertThat(entityWithId.getName()).isEqualTo("Jaden"),
-                () -> assertThat(entityWithId.getAge()).isEqualTo(30),
-                () -> assertThat(entityWithId.getEmail()).isEqualTo("test@email.com"),
-                () -> assertThat(entityWithId.getIndex()).isNull()
-        );
-    }
-
-    @Test
     @DisplayName("엔티티를 저장한다.")
-    void persist() {
+    void insert() {
         // given
-        final EntityManager entityManager = new DefaultEntityManager(jdbcTemplate);
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate);
         final EntityWithId entityWithId = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
-        entityManager.persist(entityWithId);
+        entityPersister.insert(entityWithId);
 
         // then
         final EntityWithId savedEntity = entityManager.find(EntityWithId.class, 1L);
@@ -81,11 +63,11 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 수정한다.")
     void update() {
         // given
-        final EntityManager entityManager = new DefaultEntityManager(jdbcTemplate);
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jackson", 20, "test2@email.com");
 
         // when
-        entityManager.update(entityWithId);
+        entityPersister.update(entityWithId);
 
         // then
         final EntityWithId savedEntity = entityManager.find(EntityWithId.class, 1L);
@@ -101,13 +83,13 @@ class DefaultEntityManagerTest {
 
     @Test
     @DisplayName("엔티티를 삭제한다.")
-    void remove() {
+    void delete() {
         // given
-        final EntityManager entityManager = new DefaultEntityManager(jdbcTemplate);
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
 
         // when
-        entityManager.remove(entityWithId);
+        entityPersister.delete(entityWithId);
 
         // then
         assertThatThrownBy(() -> entityManager.find(EntityWithId.class, 1L))
