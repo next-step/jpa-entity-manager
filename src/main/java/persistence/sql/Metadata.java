@@ -21,7 +21,7 @@ public class Metadata {
         return entityTable.getTableName();
     }
 
-    public String getIdField() {
+    public String getIdFieldName() {
         for (EntityColumn column : entityColumns.getColumns()) {
             if (column.isPrimaryKey()) {
                 return column.getColumnName();

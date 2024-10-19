@@ -30,7 +30,7 @@ public class SelectQueryBuilder {
     public String findById(Class<?> clazz, Object idValue) {
         Metadata metadata = new Metadata(clazz);
         String selectQuery = findAll(clazz);
-        String idField = metadata.getIdField();
+        String idField = metadata.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);
         return String.format("%s where %s = %s", selectQuery, idField, formattedIdValue);
     }
