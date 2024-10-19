@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import database.H2ConnectionFactory;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

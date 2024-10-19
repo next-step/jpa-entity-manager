@@ -6,7 +6,6 @@ import java.util.List;
 
 public class EntityTable {
     public static final String NOT_ENTITY_FAILED_MESSAGE = "클래스에 @Entity 애노테이션이 없습니다.";
-    public static final String NOT_ID_FAILED_MESSAGE = "필드에 @Id 애노테이션이 없습니다.";
 
     private final TableName tableName;
     private final EntityFields entityFields;

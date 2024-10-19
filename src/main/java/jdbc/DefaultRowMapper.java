@@ -1,6 +1,5 @@
-package persistence.entity;
+package jdbc;
 
-import jdbc.RowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,7 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
 
     private final Class<T> clazz;
 
-    DefaultRowMapper(Class<T> clazz) {
+    public DefaultRowMapper(Class<T> clazz) {
         this.clazz = clazz;
     }
 

@@ -50,7 +50,7 @@ class EntityTableTest {
         // when & then
         assertThatThrownBy(() -> entityTable.getWhereClause(1))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage(EntityTable.NOT_ID_FAILED_MESSAGE);
+                .hasMessage(EntityFields.NOT_ID_FAILED_MESSAGE);
     }
 
     @Test
@@ -65,18 +65,5 @@ class EntityTableTest {
 
         // then
         assertThat(idValue).isEqualTo("1");
-    }
-
-    @Test
-    @DisplayName("@ID 애노테이션이 없는 엔티티로 id 값을 반환면 예외를 발생한다.")
-    void getIdValue_exception() {
-        // given
-        final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
-        final EntityTable entityTable = new EntityTable(entityWithId);
-
-        // when & then
-        assertThatThrownBy(entityTable::getIdValue)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage(EntityTable.NOT_ID_FAILED_MESSAGE);
     }
 }

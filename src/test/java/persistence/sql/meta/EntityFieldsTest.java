@@ -3,6 +3,7 @@ package persistence.sql.meta;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.fixture.EntityWithId;
+import persistence.fixture.EntityWithoutID;
 import util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -43,5 +44,17 @@ class EntityFieldsTest {
         // then
         final EntityColumn expected = new EntityColumn(ReflectionUtils.getField(EntityWithId.class, "id"));
         assertThat(entityColumn).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("@ID 애노테이션이 없는 엔티티로 id 값을 반환면 예외를 발생한다.")
+    void getIdEntityField_exception() {
+        // given
+        final EntityFields entityFields = new EntityFields(EntityWithoutID.class);
+
+        // when & then
+        assertThatThrownBy(entityFields::getIdEntityField)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(EntityFields.NOT_ID_FAILED_MESSAGE);
     }
 }
