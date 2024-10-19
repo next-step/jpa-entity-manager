@@ -37,7 +37,7 @@ class TableDefinitionTest {
 
         assertAll(
                 () -> assertThat(tableDefinition.tableName()).isEqualTo("test_table"),
-                () -> assertThat(tableDefinition.queryableColumns()).hasSize(4),
+                () -> assertThat(tableDefinition.allColumns()).hasSize(4),
                 () -> assertThat(tableDefinition.tableId().name()).isEqualTo("id")
         );
     }

@@ -12,7 +12,7 @@ public class SelectByIdQueryBuilder {
         StringBuilder query = new StringBuilder("SELECT ");
         StringJoiner columns = new StringJoiner(", ");
 
-        tableDefinition.queryableColumns().forEach(column -> columns.add(column.name()));
+        tableDefinition.allColumns().forEach(column -> columns.add(column.name()));
 
         query.append(columns);
         query.append(" FROM ").append(tableDefinition.tableName());

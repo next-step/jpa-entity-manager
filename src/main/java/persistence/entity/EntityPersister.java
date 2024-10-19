@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import jdbc.JdbcTemplate;
 import persistence.sql.definition.TableDefinition;
 import persistence.sql.dml.query.DeleteByIdQueryBuilder;
 import persistence.sql.dml.query.InsertQueryBuilder;
@@ -12,10 +13,13 @@ public class EntityPersister {
     private static final DeleteByIdQueryBuilder deleteByIdQueryBuilder = new DeleteByIdQueryBuilder();
 
     private final TableDefinition tableDefinition;
+    private final JdbcTemplate jdbcTemplate;
 
 
-    public EntityPersister(Class<?> clazz) {
+    public EntityPersister(Class<?> clazz,
+                           JdbcTemplate jdbcTemplate) {
         this.tableDefinition = new TableDefinition(clazz);
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public String getEntityName() {
@@ -26,15 +30,19 @@ public class EntityPersister {
         return tableDefinition.tableId().getValue(entity);
     }
 
-    public String getUpdateQuery(Object entity) {
-        return updateQueryBuilder.build(entity);
+    public boolean update(Object entity) {
+        String query = updateQueryBuilder.build(entity);
+        jdbcTemplate.execute(query);
+        return true;
     }
 
-    public String getInsertQuery(Object entity) {
-        return insertQueryBuilder.build(entity);
+    public void insert(Object entity) {
+        String query = insertQueryBuilder.build(entity);
+        jdbcTemplate.execute(query);
     }
 
-    public String getDeleteQuery(Object entity) {
-        return deleteByIdQueryBuilder.build(entity);
+    public void delete(Object entity) {
+        String query = deleteByIdQueryBuilder.build(entity);
+        jdbcTemplate.execute(query);
     }
 }

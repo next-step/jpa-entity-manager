@@ -9,7 +9,7 @@ public class UpdateQueryBuilder {
     public String build(Object entity) {
         final Class<?> entityClass = entity.getClass();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
-        final List<? extends Queryable> targetColumns = tableDefinition.queryableColumns();
+        final List<? extends Queryable> targetColumns = tableDefinition.allColumns();
 
         StringBuilder query = new StringBuilder();
         query.append("UPDATE ");
@@ -28,7 +28,7 @@ public class UpdateQueryBuilder {
     }
 
     private static String columnClause(TableDefinition tableDefinition, Object entity, StringBuilder query) {
-        return tableDefinition.queryableColumns().stream()
+        return tableDefinition.withoutIdColumns().stream()
                 .map(column -> {
                     final String columnValue = column.hasValue(entity) ? column.getValue(entity) : "null";
                     return column.name() + " = " + columnValue;

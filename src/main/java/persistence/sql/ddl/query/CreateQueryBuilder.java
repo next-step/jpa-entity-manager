@@ -18,7 +18,7 @@ public class CreateQueryBuilder {
         query.append("CREATE TABLE ").append(tableDefinition.tableName());
         query.append(" (");
 
-        tableDefinition.queryableColumns().forEach(column -> column.applyToCreateQuery(query, dialect));
+        tableDefinition.allColumns().forEach(column -> column.applyToCreateQuery(query, dialect));
 
         definePrimaryKey(tableDefinition.tableId(), query);
 
