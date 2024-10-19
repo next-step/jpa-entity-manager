@@ -5,6 +5,8 @@ public interface PersistenceContext {
 
     void addEntity(EntityKey id, Object entity);
 
+    void removeEntity(EntityKey id);
+
     static PersistenceContext getInstance() {
         return new PersistenceContextImpl();
     }
