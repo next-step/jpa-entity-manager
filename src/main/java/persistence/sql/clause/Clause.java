@@ -7,11 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public interface Clause {
-    boolean supported(ClauseType clauseType);
-
-    String column();
-    String value();
-    String clause();
     static String toColumnValue(Object value) {
         if (value == null) {
             return null;
@@ -37,4 +32,12 @@ public interface Clause {
                 .filter(clause -> clause.supported(clauseType))
                 .toList();
     }
+
+    boolean supported(ClauseType clauseType);
+
+    String column();
+
+    String value();
+
+    String clause();
 }

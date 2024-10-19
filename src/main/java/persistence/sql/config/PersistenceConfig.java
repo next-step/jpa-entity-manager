@@ -22,7 +22,8 @@ public class PersistenceConfig {
 
     private DatabaseServer databaseServer;
 
-    private PersistenceConfig() {}
+    private PersistenceConfig() {
+    }
 
     public static PersistenceConfig getInstance() {
         return INSTANCE;

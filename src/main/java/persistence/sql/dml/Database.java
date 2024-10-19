@@ -16,7 +16,7 @@ public interface Database {
     /**
      * SELECT 쿼리를 실행하고 결과를 반환한다.
      *
-     * @param query                실행할 쿼리
+     * @param query     실행할 쿼리
      * @param rowMapper ResultSet을 매핑하는 함수
      * @return 쿼리 실행 결과
      */

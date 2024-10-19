@@ -34,6 +34,6 @@ public record InsertColumnValueClause(String column, String value) implements Va
 
     @Override
     public String clause() {
-        return "("+ value() +")";
+        return "(" + value() + ")";
     }
 }

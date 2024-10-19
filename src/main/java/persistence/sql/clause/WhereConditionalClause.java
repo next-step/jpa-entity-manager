@@ -12,13 +12,13 @@ public record WhereConditionalClause(String column, String value, String operato
         }
     }
 
+    public static WhereExpression builder() {
+        return new WhereExpression();
+    }
+
     @Override
     public boolean supported(ClauseType clauseType) {
         return clauseType == ClauseType.WHERE;
-    }
-
-    public static WhereExpression builder() {
-        return new WhereExpression();
     }
 
     public static class WhereExpression {
