@@ -15,11 +15,10 @@ public class EntityColumns {
     }
 
     public static EntityColumns from(Class<?> clazz) {
-        List<EntityColumn> collect = Arrays.stream(clazz.getDeclaredFields())
+        return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .map(EntityColumn::from)
-                .collect(Collectors.toList());
-        return new EntityColumns(collect);
+                .collect(Collectors.collectingAndThen(Collectors.toList(), EntityColumns::new));
     }
 
     public List<EntityColumn> getColumns() {
