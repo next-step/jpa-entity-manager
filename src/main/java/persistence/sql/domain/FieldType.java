@@ -1,5 +1,7 @@
 package persistence.sql.domain;
 
+import java.util.Arrays;
+
 public enum FieldType {
     LONG(Long.class, "BIGINT"),
     STRING(String.class, "VARCHAR"),
@@ -14,12 +16,10 @@ public enum FieldType {
     }
 
     public static FieldType from(Class<?> type) {
-        for (FieldType fieldType : values()) {
-            if (fieldType.getType().equals(type)) {
-                return fieldType;
-            }
-        }
-        throw new IllegalArgumentException("Unknown Type");
+        return Arrays.stream(values())
+                .filter(fieldType -> fieldType.getType().equals(type))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown Type"));
     }
 
     public Class<?> getType() {
