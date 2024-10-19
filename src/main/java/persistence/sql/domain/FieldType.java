@@ -13,6 +13,15 @@ public enum FieldType {
         this.sqlType = sqlType;
     }
 
+    public static FieldType from(Class<?> type) {
+        for (FieldType fieldType : values()) {
+            if (fieldType.getType().equals(type)) {
+                return fieldType;
+            }
+        }
+        throw new IllegalArgumentException("Unknown Type");
+    }
+
     public Class<?> getType() {
         return type;
     }
