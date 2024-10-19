@@ -18,7 +18,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntity(Object entity) {
+    public void addEntity(Object entity, Long id) {
         Class<?> clazz = entity.getClass();
         Long idValue = getIdValue(entity);
 

@@ -24,7 +24,7 @@ class PersistenceContextImplTest {
     @Test
     @DisplayName("PersistenceContext getEntity구현")
     void persistenceContext_find() {
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, person.getId());
         Person actual = persistenceContext.getEntity(Person.class, person.getId());
 
         assertEquals(person.getId(), actual.getId());
@@ -34,7 +34,7 @@ class PersistenceContextImplTest {
     @DisplayName("PersistenceContext add구현")
     void persistenceContext_add() {
         Person expectPerson = new Person(2L, "hong", 33, "test@naver.com");
-        persistenceContext.addEntity(expectPerson);
+        persistenceContext.addEntity(expectPerson, expectPerson.getId());
 
         assertTrue(persistenceContext.containsEntity(Person.class, 2L));
     }
@@ -42,7 +42,7 @@ class PersistenceContextImplTest {
     @Test
     @DisplayName("PersistenceContext remove구현")
     void persistenceContext_remove() {
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, person.getId());
         persistenceContext.removeEntity(Person.class, person.getId());
 
         assertFalse(persistenceContext.containsEntity(Person.class, person.getId()));
@@ -51,7 +51,7 @@ class PersistenceContextImplTest {
     @Test
     @DisplayName("PersistenceContext contains구현")
     void persistenceContext_contains() {
-        persistenceContext.addEntity(person);
+        persistenceContext.addEntity(person, person.getId());
 
         assertAll(
                 () -> assertTrue(persistenceContext.containsEntity(Person.class, 1L)),

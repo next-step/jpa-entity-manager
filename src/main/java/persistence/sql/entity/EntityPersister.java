@@ -4,6 +4,7 @@ import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
@@ -48,20 +49,26 @@ public class EntityPersister {
         jdbcTemplate.execute(deleteQuery);
     }
 
-    private Object getIdValue(Object entity) {
+    public <T> T select(Class<T> clazz, Long id) {
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
+        String selectQuery = selectQueryBuilder.findById(clazz, id);
+        return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
+    }
+
+    public Long getIdValue(Object entity) {
         Class<?> clazz = entity.getClass();
 
         for (Field field : clazz.getDeclaredFields()) {
             if (field.isAnnotationPresent(Id.class)) {
                 field.setAccessible(true);
                 try {
-                    return field.get(entity);
+                    return (Long) field.get(entity);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException("id값이 없음");
                 }
             }
         }
-
         return null;
     }
+
 }
