@@ -19,10 +19,17 @@ public class EntityField {
     private final List<Class<?>> quotesNeededTypes = List.of(String.class);
     private final List<Class<?>> lengthNeededTypes = List.of(String.class);
 
+    private final ColumnName columnName;
+
     private final Field field;
 
     public EntityField(Field field) {
         this.field = field;
+        this.columnName = new ColumnName(field);
+    }
+
+    public String getColumnName() {
+        return columnName.getName();
     }
 
     @Override
@@ -63,14 +70,6 @@ public class EntityField {
 
     public Class<?> getType() {
         return field.getType();
-    }
-
-    public String getColumnName() {
-        final Column column = field.getAnnotation(Column.class);
-        if (Objects.nonNull(column) && Objects.nonNull(column.name()) && !column.name().isBlank()) {
-            return column.name();
-        }
-        return field.getName();
     }
 
     public int getColumnLength() {

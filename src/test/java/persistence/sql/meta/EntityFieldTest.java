@@ -10,19 +10,6 @@ import static org.assertj.core.api.Assertions.*;
 
 class EntityFieldTest {
     @Test
-    @DisplayName("컬럼명을 반환한다.")
-    void getColumnName() {
-        // given
-        final EntityField entityField = new EntityField(getField("name"));
-
-        // when
-        final String result = entityField.getColumnName();
-
-        // then
-        assertThat(result).isEqualTo("nick_name");
-    }
-
-    @Test
     @DisplayName("generation 필드인 경우 true를 반환한다.")
     void isGeneration_true() {
         // given
