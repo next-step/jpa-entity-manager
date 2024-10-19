@@ -4,15 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.fixture.EntityWithId;
 import persistence.fixture.EntityWithoutID;
-import persistence.fixture.EntityWithoutTable;
 import persistence.fixture.NotEntity;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class EntityTableTest {
     @Test
@@ -63,11 +57,11 @@ class EntityTableTest {
     @DisplayName("id 값을 반환한다.")
     void getIdValue() {
         // given
-        final EntityTable entityTable = new EntityTable(EntityWithId.class);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
+        final EntityTable entityTable = new EntityTable(entityWithId);
 
         // when
-        final Object idValue = entityTable.getIdValue(entityWithId);
+        final Object idValue = entityTable.getIdValue();
 
         // then
         assertThat(idValue).isEqualTo("1");
@@ -77,11 +71,11 @@ class EntityTableTest {
     @DisplayName("@ID 애노테이션이 없는 엔티티로 id 값을 반환면 예외를 발생한다.")
     void getIdValue_exception() {
         // given
-        final EntityTable entityTable = new EntityTable(EntityWithoutID.class);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
+        final EntityTable entityTable = new EntityTable(entityWithId);
 
         // when & then
-        assertThatThrownBy(() -> entityTable.getIdValue(entityWithId))
+        assertThatThrownBy(entityTable::getIdValue)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(EntityTable.NOT_ID_FAILED_MESSAGE);
     }

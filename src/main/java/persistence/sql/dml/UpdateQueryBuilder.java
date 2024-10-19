@@ -10,11 +10,9 @@ public class UpdateQueryBuilder {
     private static final String QUERY_TEMPLATE = "UPDATE %s SET %s WHERE %s";
 
     private final EntityTable entityTable;
-    private final Object entity;
 
     public UpdateQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity.getClass());
-        this.entity = entity;
+        this.entityTable = new EntityTable(entity);
     }
 
     public String update() {
@@ -36,11 +34,11 @@ public class UpdateQueryBuilder {
     }
 
     private String getSetClause(EntityField entityField) {
-        return entityField.getColumnName() + " = " + entityField.getValue(entity);
+        return entityField.getColumnName() + " = " + entityField.getValue();
     }
 
     private String getWhereClause() {
-        final Object id = entityTable.getIdValue(entity);
+        final Object id = entityTable.getIdValue();
         return entityTable.getWhereClause(id);
     }
 }

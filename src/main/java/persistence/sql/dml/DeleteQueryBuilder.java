@@ -6,15 +6,13 @@ public class DeleteQueryBuilder {
     private static final String QUERY_TEMPLATE = "DELETE FROM %s WHERE %s";
 
     private final EntityTable entityTable;
-    private final Object entity;
 
     public DeleteQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity.getClass());
-        this.entity = entity;
+        this.entityTable = new EntityTable(entity);
     }
 
     public String delete() {
-        final Object id = entityTable.getIdValue(entity);
+        final Object id = entityTable.getIdValue();
         return QUERY_TEMPLATE.formatted(entityTable.getTableName(), entityTable.getWhereClause(id));
     }
 }

@@ -1,9 +1,9 @@
 package persistence.sql.ddl;
 
 import persistence.dialect.Dialect;
-import persistence.sql.meta.JavaTypeConvertor;
 import persistence.sql.meta.EntityField;
 import persistence.sql.meta.EntityTable;
+import persistence.sql.meta.JavaTypeConvertor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +61,6 @@ public class CreateQueryBuilder {
         if (columnLength == 0) {
             return dbTypeName;
         }
-        return String.format("%s(%s)", dbTypeName, columnLength);
+        return "%s(%s)".formatted(dbTypeName, columnLength);
     }
 }

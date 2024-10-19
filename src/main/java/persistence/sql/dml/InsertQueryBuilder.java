@@ -10,11 +10,9 @@ public class InsertQueryBuilder {
     private static final String QUERY_TEMPLATE = "INSERT INTO %s (%s) VALUES (%s)";
 
     private final EntityTable entityTable;
-    private final Object entity;
 
     public InsertQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity.getClass());
-        this.entity = entity;
+        this.entityTable = new EntityTable(entity);
     }
 
     public String insert() {
@@ -35,7 +33,7 @@ public class InsertQueryBuilder {
         final List<String> columnDefinitions = entityTable.getEntityFields()
                 .stream()
                 .filter(this::isNotNeeded)
-                .map(entityField -> entityField.getValue(entity))
+                .map(EntityField::getValue)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);

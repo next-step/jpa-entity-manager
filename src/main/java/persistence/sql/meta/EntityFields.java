@@ -19,6 +19,13 @@ public class EntityFields {
                 .collect(Collectors.toList());
     }
 
+    public EntityFields(Object entity) {
+        this.entityFields = Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(this::isPersistent)
+                .map(field -> new EntityField(field, entity))
+                .collect(Collectors.toList());
+    }
+
     public List<EntityField> getEntityFields() {
         return entityFields;
     }

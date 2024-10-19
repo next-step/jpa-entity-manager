@@ -1,10 +1,8 @@
 package persistence.sql.meta;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 import java.util.List;
-import java.util.Objects;
 
 public class EntityTable {
     public static final String NOT_ENTITY_FAILED_MESSAGE = "클래스에 @Entity 애노테이션이 없습니다.";
@@ -14,12 +12,15 @@ public class EntityTable {
     private final EntityFields entityFields;
 
     public EntityTable(Class<?> entityType) {
-        if (!entityType.isAnnotationPresent(Entity.class)) {
-            throw new IllegalArgumentException(NOT_ENTITY_FAILED_MESSAGE);
-        }
-
+        validate(entityType);
         this.tableName = new TableName(entityType);
         this.entityFields = new EntityFields(entityType);
+    }
+
+    public EntityTable(Object entity) {
+        validate(entity.getClass());
+        this.tableName = new TableName(entity.getClass());
+        this.entityFields = new EntityFields(entity);
     }
 
     public String getTableName() {
@@ -30,15 +31,20 @@ public class EntityTable {
         return entityFields.getEntityFields();
     }
 
-
     public String getWhereClause(Object id) {
         final EntityField entityField = getIdEntityField();
         return entityField.getColumnName() + " = " + id;
     }
 
-    public Object getIdValue(Object entity) {
+    public Object getIdValue() {
         final EntityField entityField = getIdEntityField();
-        return entityField.getValue(entity);
+        return entityField.getValue();
+    }
+
+    private void validate(Class<?> entityType) {
+        if (!entityType.isAnnotationPresent(Entity.class)) {
+            throw new IllegalArgumentException(NOT_ENTITY_FAILED_MESSAGE);
+        }
     }
 
     private EntityField getIdEntityField() {

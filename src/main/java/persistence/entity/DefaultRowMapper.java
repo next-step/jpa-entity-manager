@@ -3,9 +3,8 @@ package persistence.entity;
 import jdbc.RowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.sql.meta.EntityField;
-import persistence.sql.meta.EntityTable;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -21,16 +20,20 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     @Override
     public T mapRow(ResultSet resultSet) {
         final T entity = new InstanceFactory<>(clazz).createInstance();
-        new EntityTable(clazz).getEntityFields()
-                .forEach(entityField -> mapField(resultSet, entityField, entity));
+        final Field[] fields = clazz.getDeclaredFields();
+
+        for (int i = 0; i < fields.length; i++) {
+            mapField(resultSet, entity, fields[i], i + 1);
+        }
         return entity;
     }
 
-    private void mapField(ResultSet resultSet, EntityField entityField, T entity) {
+    private void mapField(ResultSet resultSet, T entity, Field field, int columnIndex) {
         try {
-            final Object value = resultSet.getObject(entityField.getColumnName(), entityField.getType());
-            entityField.setValue(entity, value);
-        } catch (SQLException e) {
+            final Object value = resultSet.getObject(columnIndex);
+            field.setAccessible(true);
+            field.set(entity, value);
+        } catch (SQLException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
         }
     }
