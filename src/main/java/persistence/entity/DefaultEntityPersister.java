@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import jdbc.DefaultIdMapper;
 import jdbc.DefaultRowMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
@@ -25,7 +26,7 @@ public class DefaultEntityPersister implements EntityPersister {
     public void insert(Object entity) {
         final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
         final String sql = insertQueryBuilder.insert();
-        jdbcTemplate.execute(sql);
+        jdbcTemplate.executeAndReturnGeneratedKeys(sql, new DefaultIdMapper(entity));
     }
 
     @Override
