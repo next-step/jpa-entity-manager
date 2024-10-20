@@ -2,8 +2,10 @@ package persistence.sql.config;
 
 import database.DatabaseServer;
 import database.H2;
-import persistence.context.PersistenceContext;
-import persistence.context.impl.DefaultPersistenceContext;
+import persistence.sql.context.EntityPersister;
+import persistence.sql.context.PersistenceContext;
+import persistence.sql.context.impl.DefaultEntityPersister;
+import persistence.sql.context.impl.DefaultPersistenceContext;
 import persistence.sql.common.util.CamelToSnakeConverter;
 import persistence.sql.common.util.NameConverter;
 import persistence.sql.ddl.QueryColumnSupplier;
@@ -59,7 +61,11 @@ public class PersistenceConfig {
     }
 
     public EntityManager entityManager() throws SQLException {
-        return new DefaultEntityManager(database(), nameConverter(), persistenceContext());
+        return new DefaultEntityManager(persistenceContext(), entityPersister());
+    }
+
+    private EntityPersister entityPersister() throws SQLException {
+        return new DefaultEntityPersister(database(), nameConverter());
     }
 
     private PersistenceContext persistenceContext() {

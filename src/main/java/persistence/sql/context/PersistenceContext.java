@@ -1,4 +1,4 @@
-package persistence.context;
+package persistence.sql.context;
 
 import java.util.Collection;
 
@@ -11,4 +11,6 @@ public interface PersistenceContext {
     <T, ID> T add(ID id, T entity);
 
     <T, ID> void merge(ID id, T entity);
+
+    <T> void delete(T entity);
 }

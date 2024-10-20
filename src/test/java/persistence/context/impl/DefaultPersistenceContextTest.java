@@ -2,7 +2,8 @@ package persistence.context.impl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.context.PersistenceContext;
+import persistence.sql.context.PersistenceContext;
+import persistence.sql.context.impl.DefaultPersistenceContext;
 import persistence.sql.fixture.PersonV3;
 
 import java.util.Collection;

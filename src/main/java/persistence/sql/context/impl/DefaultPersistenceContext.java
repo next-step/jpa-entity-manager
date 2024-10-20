@@ -1,6 +1,6 @@
-package persistence.context.impl;
+package persistence.sql.context.impl;
 
-import persistence.context.PersistenceContext;
+import persistence.sql.context.PersistenceContext;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -53,6 +53,11 @@ public class DefaultPersistenceContext implements PersistenceContext {
         }
 
         overwriteEntity(entity, origin);
+    }
+
+    @Override
+    public <T> void delete(T entity) {
+
     }
 
     private boolean isEntityChanged(Object entity, Object snapshot) {
