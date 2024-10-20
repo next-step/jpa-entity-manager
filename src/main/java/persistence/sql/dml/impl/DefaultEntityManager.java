@@ -50,7 +50,10 @@ public class DefaultEntityManager implements EntityManager {
         InsertColumnValueClause clause = InsertColumnValueClause.newInstance(entity, nameConverter);
 
         String insertQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.INSERT, loader, clause);
-        database.executeUpdate(insertQuery);
+        Object id = database.executeUpdate(insertQuery);
+        updatePrimaryKeyValue(entity, id, loader);
+
+        persistenceContext.add(id, entity);
     }
 
     private <T> boolean isNew(Object entity, MetadataLoader<T> loader) {
@@ -146,6 +149,18 @@ public class DefaultEntityManager implements EntityManager {
 
             return entities;
         });
+    }
+
+    private void updatePrimaryKeyValue(Object entity, Object id, MetadataLoader<?> loader) {
+        Field primaryKeyField = loader.getPrimaryKeyField();
+        primaryKeyField.setAccessible(true);
+
+        try {
+            primaryKeyField.set(entity, id);
+        } catch (IllegalAccessException e) {
+            logger.severe("Failed to set primary key value");
+            throw new RuntimeException(e);
+        }
     }
 
     private <T> T mapRowResultSetToEntity(ResultSet resultSet, MetadataLoader<T> loader) {

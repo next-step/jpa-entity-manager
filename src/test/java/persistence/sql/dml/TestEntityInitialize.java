@@ -33,7 +33,7 @@ public class TestEntityInitialize {
             QueryBuilderFactory factory = QueryBuilderFactory.getInstance();
             for (EntityNode<?> node : nodes) {
                 String createTableQuery = factory.buildQuery(QueryType.CREATE,
-                        new SimpleMetadataLoader<>(node.entityClass()), null);
+                        new SimpleMetadataLoader<>(node.entityClass()));
                 database.executeUpdate(createTableQuery);
             }
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class TestEntityInitialize {
             QueryBuilderFactory factory = QueryBuilderFactory.getInstance();
             for (EntityNode<?> node : nodes) {
                 String createTableQuery = factory.buildQuery(QueryType.DROP,
-                        new SimpleMetadataLoader<>(node.entityClass()), null);
+                        new SimpleMetadataLoader<>(node.entityClass()));
                 database.executeUpdate(createTableQuery);
             }
             server.stop();

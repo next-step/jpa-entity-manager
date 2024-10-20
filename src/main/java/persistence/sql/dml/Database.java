@@ -11,7 +11,7 @@ public interface Database {
      *
      * @param query 실행할 쿼리
      */
-    void executeUpdate(String query);
+    Object executeUpdate(String query);
 
     /**
      * SELECT 쿼리를 실행하고 결과를 반환한다.
