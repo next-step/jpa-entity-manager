@@ -38,10 +38,12 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void remove(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
-        if (idValue != null && persistenceContext.containsEntity(entity.getClass(), idValue)) {
-            entityPersister.delete(entity);
-            persistenceContext.removeEntity(entity.getClass(), idValue);
+        if (idValue == null) {
+            return;
         }
+
+        persistenceContext.removeEntity(entity.getClass(), idValue);
+        entityPersister.delete(entity);
     }
 
     @Override
