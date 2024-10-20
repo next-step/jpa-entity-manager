@@ -30,7 +30,7 @@ public class InsertQueryBuilder {
     private String columnsClause(List<? extends Queryable> targetColumns) {
         return targetColumns
                 .stream()
-                .map(Queryable::name)
+                .map(Queryable::getName)
                 .reduce((column1, column2) -> column1 + ", " + column2)
                 .orElse(EMPTY_STRING);
     }

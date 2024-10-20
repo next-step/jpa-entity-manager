@@ -40,7 +40,7 @@ class UpdateQueryBuilderTest {
 
         String query = queryBuilder.build(hasNullableColumnEntity);
 
-        assertThat(query).isEqualTo("UPDATE HasNullableColumnEntity SET id = 1, name = 'john_doe', age = 30 WHERE id = 1;");
+        assertThat(query).isEqualTo("UPDATE HasNullableColumnEntity SET name = 'john_doe', age = 30 WHERE id = 1;");
     }
 
     @Test
@@ -51,6 +51,6 @@ class UpdateQueryBuilderTest {
 
         String query = queryBuilder.build(hasNullableColumnEntity);
 
-        assertThat(query).isEqualTo("UPDATE HasNullableColumnEntity SET id = 1, name = null, age = 30 WHERE id = 1;");
+        assertThat(query).isEqualTo("UPDATE HasNullableColumnEntity SET name = null, age = 30 WHERE id = 1;");
     }
 }

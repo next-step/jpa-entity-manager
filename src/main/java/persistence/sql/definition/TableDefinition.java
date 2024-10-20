@@ -84,15 +84,19 @@ public class TableDefinition {
         return tableName;
     }
 
-    public List<? extends Queryable> queryableColumns() {
+    public List<? extends Queryable> withIdColumns() {
         return Stream.concat(
                 Stream.of(tableId),
                 columns.stream()
         ).toList();
     }
 
+    public List<? extends Queryable> withoutIdColumns() {
+        return columns;
+    }
+
     public List<? extends Queryable> hasValueColumns(Object entity) {
-        return queryableColumns().stream()
+        return withIdColumns().stream()
                 .filter(column -> column.hasValue(entity))
                 .toList();
     }

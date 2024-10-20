@@ -18,7 +18,7 @@ public class CreateQueryBuilder {
         query.append("CREATE TABLE ").append(tableDefinition.tableName());
         query.append(" (");
 
-        tableDefinition.queryableColumns().forEach(column -> column.applyToCreateQuery(query, dialect));
+        tableDefinition.withIdColumns().forEach(column -> column.applyToCreateTableQuery(query, dialect));
 
         definePrimaryKey(tableDefinition.tableId(), query);
 
@@ -27,6 +27,6 @@ public class CreateQueryBuilder {
     }
 
     private void definePrimaryKey(TableId pk, StringBuilder query) {
-        query.append("PRIMARY KEY (").append(pk.name()).append(")");
+        query.append("PRIMARY KEY (").append(pk.getName()).append(")");
     }
 }

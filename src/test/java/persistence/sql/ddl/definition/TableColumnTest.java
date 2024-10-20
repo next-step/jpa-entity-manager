@@ -51,11 +51,11 @@ class TableColumnTest {
 
         Dialect dialect = new H2Dialect();
 
-        tableColumn1.applyToCreateQuery(query1, dialect);
-        tableColumn2.applyToCreateQuery(query2, dialect);
-        tableColumn3.applyToCreateQuery(query3, dialect);
-        tableColumn4.applyToCreateQuery(query4, dialect);
-        tableColumn5.applyToCreateQuery(query5, dialect);
+        tableColumn1.applyToCreateTableQuery(query1, dialect);
+        tableColumn2.applyToCreateTableQuery(query2, dialect);
+        tableColumn3.applyToCreateTableQuery(query3, dialect);
+        tableColumn4.applyToCreateTableQuery(query4, dialect);
+        tableColumn5.applyToCreateTableQuery(query5, dialect);
 
         // Then
         assertAll(
