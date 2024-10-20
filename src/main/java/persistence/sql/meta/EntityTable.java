@@ -26,7 +26,7 @@ public class EntityTable {
     }
 
     public String getTableName() {
-        return tableName.getName();
+        return tableName.value();
     }
 
     public List<EntityColumn> getEntityColumns() {

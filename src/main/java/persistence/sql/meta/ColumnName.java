@@ -9,10 +9,10 @@ public class ColumnName {
     private final String name;
 
     public ColumnName(Field field) {
-        this.name = getName(field);
+        this.name = value(field);
     }
 
-    public String getName() {
+    public String value() {
         return name;
     }
 
@@ -29,7 +29,7 @@ public class ColumnName {
         return Objects.hashCode(name);
     }
 
-    private String getName(Field field) {
+    private String value(Field field) {
         final Column column = field.getAnnotation(Column.class);
         if (Objects.nonNull(column) && Objects.nonNull(column.name()) && !column.name().isBlank()) {
             return column.name();

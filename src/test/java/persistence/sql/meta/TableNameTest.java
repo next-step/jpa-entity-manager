@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import persistence.fixture.EntityWithId;
 import persistence.fixture.EntityWithoutTable;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 class TableNameTest {
@@ -16,7 +15,7 @@ class TableNameTest {
         final TableName tableName = new TableName(EntityWithId.class);
 
         // then
-        assertThat(tableName.getName()).isEqualTo("users");
+        assertThat(tableName.value()).isEqualTo("users");
     }
 
     @Test
@@ -26,6 +25,6 @@ class TableNameTest {
         final TableName tableName = new TableName(EntityWithoutTable.class);
 
         // then
-        assertThat(tableName.getName()).isEqualTo("entitywithouttable");
+        assertThat(tableName.value()).isEqualTo("entitywithouttable");
     }
 }

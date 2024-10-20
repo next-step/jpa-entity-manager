@@ -7,7 +7,6 @@ import util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 class ColumnNameTest {
@@ -21,7 +20,7 @@ class ColumnNameTest {
         final ColumnName columnName = new ColumnName(field);
 
         // then
-        assertThat(columnName.getName()).isEqualTo("nick_name");
+        assertThat(columnName.value()).isEqualTo("nick_name");
     }
 
     @Test
@@ -34,6 +33,6 @@ class ColumnNameTest {
         final ColumnName columnName = new ColumnName(field);
 
         // then
-        assertThat(columnName.getName()).isEqualTo("nick_name");
+        assertThat(columnName.value()).isEqualTo("nick_name");
     }
 }

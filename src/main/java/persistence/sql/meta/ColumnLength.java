@@ -16,7 +16,7 @@ public class ColumnLength {
         this.length = getColumnLength(field);
     }
 
-    public int getLength() {
+    public int value() {
         return length;
     }
 

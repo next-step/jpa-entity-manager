@@ -7,7 +7,6 @@ import util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 class ColumnLengthTest {
@@ -21,7 +20,7 @@ class ColumnLengthTest {
         final ColumnLength columnLength = new ColumnLength(field);
 
         // then
-        assertThat(columnLength.getLength()).isEqualTo(20);
+        assertThat(columnLength.value()).isEqualTo(20);
     }
 
     @Test
@@ -34,7 +33,7 @@ class ColumnLengthTest {
         final ColumnLength columnLength = new ColumnLength(field);
 
         // then
-        assertThat(columnLength.getLength()).isEqualTo(255);
+        assertThat(columnLength.value()).isEqualTo(255);
     }
 
     @Test
@@ -47,6 +46,6 @@ class ColumnLengthTest {
         final ColumnLength columnLength = new ColumnLength(field);
 
         // then
-        assertThat(columnLength.getLength()).isEqualTo(0);
+        assertThat(columnLength.value()).isEqualTo(0);
     }
 }

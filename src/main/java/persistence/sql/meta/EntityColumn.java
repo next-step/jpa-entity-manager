@@ -34,11 +34,11 @@ public class EntityColumn {
     }
 
     public String getColumnName() {
-        return columnName.getName();
+        return columnName.value();
     }
 
     public int getColumnLength() {
-        return columnLength.getLength();
+        return columnLength.value();
     }
 
     public boolean isId() {
@@ -54,11 +54,11 @@ public class EntityColumn {
     }
 
     public Object getValue() {
-        return columnValue.getValue();
+        return columnValue.value();
     }
 
     public String getValueWithQuotes() {
-        return columnValue.getValueWithQuotes();
+        return columnValue.valueWithQuotes();
     }
 
     @Override
