@@ -10,11 +10,11 @@ public class EntityManagerImpl implements EntityManager {
     private static final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
 
     private final JdbcTemplate jdbcTemplate;
-    private final PersistenceContextImpl persistenceContext;
+    private final PersistenceContext persistenceContext;
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
+    public EntityManagerImpl(JdbcTemplate jdbcTemplate, PersistenceContext persistenceContext) {
         this.jdbcTemplate = jdbcTemplate;
-        this.persistenceContext = new PersistenceContextImpl();
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
