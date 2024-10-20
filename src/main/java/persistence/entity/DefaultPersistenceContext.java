@@ -22,8 +22,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T> void removeEntity(Class<T> entityType, Object id) {
-        final EntityKey entityKey = new EntityKey(entityType, id);
-        entityRegistry.remove(entityKey);
+    public void removeEntity(Object entity) {
+        final EntityTable entityTable = new EntityTable(entity);
+        entityRegistry.remove(entityTable.toEntityKey());
     }
 }

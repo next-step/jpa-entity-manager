@@ -1,46 +1,43 @@
 package persistence.entity;
 
-import jdbc.DefaultRowMapper;
-import jdbc.JdbcTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
+import java.util.Objects;
 
 public class DefaultEntityManager implements EntityManager {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultEntityManager.class);
+    private final PersistenceContext persistenceContext;
+    private final EntityPersister entityPersister;
 
-    private final JdbcTemplate jdbcTemplate;
-
-    DefaultEntityManager(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public DefaultEntityManager(PersistenceContext persistenceContext, EntityPersister entityPersister) {
+        this.persistenceContext = persistenceContext;
+        this.entityPersister = entityPersister;
     }
 
     @Override
     public <T> T find(Class<T> entityType, Object id) {
-        final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityType);
-        final String sql = selectQueryBuilder.findById(id);
-        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(entityType));
+        final T managedEntity = persistenceContext.getEntity(entityType, id);
+        if (Objects.nonNull(managedEntity)) {
+            return managedEntity;
+        }
+
+        final T entity = entityPersister.find(entityType, id);
+        persistenceContext.addEntity(entity);
+        return entity;
     }
 
     @Override
     public void persist(Object entity) {
-        final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
-        final String sql = insertQueryBuilder.insert();
-        jdbcTemplate.execute(sql);
+        entityPersister.insert(entity);
+        persistenceContext.addEntity(entity);
     }
 
     @Override
     public void update(Object entity) {
-        final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entity);
-        jdbcTemplate.execute(updateQueryBuilder.update());
+        entityPersister.update(entity);
+        persistenceContext.addEntity(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entity);
-        jdbcTemplate.execute(deleteQueryBuilder.delete());
+        entityPersister.delete(entity);
+        persistenceContext.removeEntity(entity);
     }
 }

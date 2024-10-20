@@ -50,7 +50,7 @@ class DefaultPersistenceContextTest {
         persistenceContext.addEntity(entity);
 
         // when
-        persistenceContext.removeEntity(entity.getClass(), entity.getId());
+        persistenceContext.removeEntity(entity);
 
         // then
         final Object managedEntity = getEntityManagedEntity(persistenceContext, entity.getClass(), entity.getId());

@@ -20,13 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class DefaultEntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
     private Dialect dialect;
-    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
         dialect = new H2Dialect();
-        entityManager = new DefaultEntityManager(jdbcTemplate);
 
         createTable();
         insertData();
@@ -48,7 +46,7 @@ class DefaultEntityPersisterTest {
         entityPersister.insert(entityWithId);
 
         // then
-        final EntityWithId savedEntity = entityManager.find(EntityWithId.class, 1L);
+        final EntityWithId savedEntity = entityPersister.find(EntityWithId.class, 1L);
         assertAll(
                 () -> assertThat(savedEntity).isNotNull(),
                 () -> assertThat(savedEntity.getId()).isNotNull(),
@@ -70,7 +68,7 @@ class DefaultEntityPersisterTest {
         entityPersister.update(entityWithId);
 
         // then
-        final EntityWithId savedEntity = entityManager.find(EntityWithId.class, 1L);
+        final EntityWithId savedEntity = entityPersister.find(EntityWithId.class, 1L);
         assertAll(
                 () -> assertThat(savedEntity).isNotNull(),
                 () -> assertThat(savedEntity.getId()).isEqualTo(entityWithId.getId()),
@@ -92,7 +90,7 @@ class DefaultEntityPersisterTest {
         entityPersister.delete(entityWithId);
 
         // then
-        assertThatThrownBy(() -> entityManager.find(EntityWithId.class, 1L))
+        assertThatThrownBy(() -> entityPersister.find(EntityWithId.class, 1L))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Expected 1 result, got");
     }

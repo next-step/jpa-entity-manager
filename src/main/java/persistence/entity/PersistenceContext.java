@@ -5,5 +5,5 @@ public interface PersistenceContext {
 
     <T> T getEntity(Class<T> entityType, Object id);
 
-    <T> void removeEntity(Class<T> entityType, Object id);
+    void removeEntity(Object entity);
 }
