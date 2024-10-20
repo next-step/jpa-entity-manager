@@ -1,11 +1,11 @@
 package persistence.entity;
 
 public interface PersistenceContext {
-    Object findEntity(EntityKey id);
+    Object findEntity(EntityKey entityKey);
 
-    void addEntity(EntityKey id, Object entity);
+    void addEntity(EntityKey entityKey, Object entity);
 
-    void removeEntity(EntityKey id);
+    void removeEntity(EntityKey entityKey);
 
     static PersistenceContext getInstance() {
         return new PersistenceContextImpl();

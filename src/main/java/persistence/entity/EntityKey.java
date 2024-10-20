@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class EntityKey {
     private final Serializable id;
@@ -24,9 +25,7 @@ public class EntityKey {
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + entityName.hashCode();
-        return result;
+        return Objects.hash(id, entityName);
     }
 
     public Serializable getId() {

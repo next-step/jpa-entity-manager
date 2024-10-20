@@ -7,20 +7,20 @@ public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> managedEntities = new HashMap<>();
 
     @Override
-    public Object findEntity(EntityKey id) {
-        return managedEntities.get(id);
+    public Object findEntity(EntityKey entityKey) {
+        return managedEntities.get(entityKey);
     }
 
     @Override
-    public void addEntity(EntityKey id, Object entity) {
-        if (managedEntities.containsKey(id)) {
+    public void addEntity(EntityKey entityKey, Object entity) {
+        if (managedEntities.containsKey(entityKey)) {
             return;
         }
-        managedEntities.put(id, entity);
+        managedEntities.put(entityKey, entity);
     }
 
     @Override
-    public void removeEntity(EntityKey id) {
-        managedEntities.remove(id);
+    public void removeEntity(EntityKey entityKey) {
+        managedEntities.remove(entityKey);
     }
 }
