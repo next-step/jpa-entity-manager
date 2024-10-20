@@ -11,4 +11,4 @@
 
 ## 2단계 - EntityLoader 구현
 - [x] RowMapper Reflection API 사용해 구현
-- [ ] EntityManager, Persistence Context 책임 전가
+- [x] EntityManager, Persistence Context 책임 전가
