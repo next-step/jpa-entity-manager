@@ -48,7 +48,7 @@ class DefaultEntityPersisterTest {
         entityPersister.insert(entity);
 
         // then
-        final EntityWithId managedEntity = entityLoader.find(EntityWithId.class, 1L);
+        final EntityWithId managedEntity = entityLoader.find(entity.getClass(), entity.getId());
         assertAll(
                 () -> assertThat(managedEntity).isNotNull(),
                 () -> assertThat(managedEntity.getId()).isNotNull(),
@@ -70,7 +70,7 @@ class DefaultEntityPersisterTest {
         entityPersister.update(updatedEntity);
 
         // then
-        final EntityWithId managedEntity = entityLoader.find(EntityWithId.class, entity.getId());
+        final EntityWithId managedEntity = entityLoader.find(entity.getClass(), entity.getId());
         assertAll(
                 () -> assertThat(managedEntity).isNotNull(),
                 () -> assertThat(managedEntity.getId()).isEqualTo(updatedEntity.getId()),
@@ -91,13 +91,13 @@ class DefaultEntityPersisterTest {
         entityPersister.delete(entity);
 
         // then
-        assertThatThrownBy(() -> entityLoader.find(EntityWithId.class, entity.getId()))
+        assertThatThrownBy(() -> entityLoader.find(entity.getClass(), entity.getId()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Expected 1 result, got");
     }
 
     private void createTable() {
-        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(EntityWithId.class, dialect);
+        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(entity.getClass(), dialect);
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
@@ -106,7 +106,7 @@ class DefaultEntityPersisterTest {
     }
 
     private void dropTable() {
-        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(EntityWithId.class);
+        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entity.getClass());
         jdbcTemplate.execute(dropQueryBuilder.drop());
     }
 }

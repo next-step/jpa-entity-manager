@@ -58,7 +58,7 @@ class DefaultEntityLoaderTest {
     }
 
     private void createTable() {
-        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(EntityWithId.class, dialect);
+        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(entity.getClass(), dialect);
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
@@ -67,7 +67,7 @@ class DefaultEntityLoaderTest {
     }
 
     private void dropTable() {
-        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(EntityWithId.class);
+        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entity.getClass());
         jdbcTemplate.execute(dropQueryBuilder.drop());
     }
 }

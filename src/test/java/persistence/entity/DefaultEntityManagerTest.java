@@ -8,26 +8,27 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
 import persistence.dialect.H2Dialect;
-import persistence.example.Person;
 import persistence.fixture.EntityWithId;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultEntityManagerTest {
     private JdbcTemplate jdbcTemplate;
+    private EntityPersister entityPersister;
     private Dialect dialect;
+    private EntityWithId entity;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
+        entityPersister = new DefaultEntityPersister(jdbcTemplate);
         dialect = new H2Dialect();
+        entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         createTable();
-        insertData();
     }
 
     @AfterEach
@@ -39,19 +40,20 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 조회한다.")
     void find() {
         // given
+        insertData();
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
 
         // when
-        final EntityWithId entityWithId = entityManager.find(EntityWithId.class, 1L);
+        final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
 
         // then
         assertAll(
-                () -> assertThat(entityWithId).isNotNull(),
-                () -> assertThat(entityWithId.getId()).isEqualTo(1),
-                () -> assertThat(entityWithId.getName()).isEqualTo("Jaden"),
-                () -> assertThat(entityWithId.getAge()).isEqualTo(30),
-                () -> assertThat(entityWithId.getEmail()).isEqualTo("test@email.com"),
-                () -> assertThat(entityWithId.getIndex()).isNull()
+                () -> assertThat(managedEntity).isNotNull(),
+                () -> assertThat(managedEntity.getId()).isEqualTo(entity.getId()),
+                () -> assertThat(managedEntity.getName()).isEqualTo(entity.getName()),
+                () -> assertThat(managedEntity.getAge()).isEqualTo(entity.getAge()),
+                () -> assertThat(managedEntity.getEmail()).isEqualTo(entity.getEmail()),
+                () -> assertThat(managedEntity.getIndex()).isNull()
         );
     }
 
@@ -60,20 +62,19 @@ class DefaultEntityManagerTest {
     void persist() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
-        final EntityWithId entityWithId = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
-        entityManager.persist(entityWithId);
+        entityManager.persist(entity);
 
         // then
-        final EntityWithId savedEntity = entityManager.find(EntityWithId.class, 1L);
+        final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
         assertAll(
-                () -> assertThat(savedEntity).isNotNull(),
-                () -> assertThat(savedEntity.getId()).isNotNull(),
-                () -> assertThat(savedEntity.getName()).isEqualTo(entityWithId.getName()),
-                () -> assertThat(savedEntity.getAge()).isEqualTo(entityWithId.getAge()),
-                () -> assertThat(savedEntity.getEmail()).isEqualTo(entityWithId.getEmail()),
-                () -> assertThat(savedEntity.getIndex()).isNull()
+                () -> assertThat(managedEntity).isNotNull(),
+                () -> assertThat(managedEntity.getId()).isNotNull(),
+                () -> assertThat(managedEntity.getName()).isEqualTo(entity.getName()),
+                () -> assertThat(managedEntity.getAge()).isEqualTo(entity.getAge()),
+                () -> assertThat(managedEntity.getEmail()).isEqualTo(entity.getEmail()),
+                () -> assertThat(managedEntity.getIndex()).isNotNull()
         );
     }
 
@@ -81,21 +82,21 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 수정한다.")
     void update() {
         // given
+        insertData();
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
-        final EntityWithId entityWithId = new EntityWithId(1L, "Jackson", 20, "test2@email.com");
 
         // when
-        entityManager.update(entityWithId);
+        entityManager.update(entity);
 
         // then
-        final EntityWithId savedEntity = entityManager.find(EntityWithId.class, 1L);
+        final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
         assertAll(
-                () -> assertThat(savedEntity).isNotNull(),
-                () -> assertThat(savedEntity.getId()).isEqualTo(entityWithId.getId()),
-                () -> assertThat(savedEntity.getName()).isEqualTo(entityWithId.getName()),
-                () -> assertThat(savedEntity.getAge()).isEqualTo(entityWithId.getAge()),
-                () -> assertThat(savedEntity.getEmail()).isEqualTo(entityWithId.getEmail()),
-                () -> assertThat(savedEntity.getIndex()).isNull()
+                () -> assertThat(managedEntity).isNotNull(),
+                () -> assertThat(managedEntity.getId()).isEqualTo(entity.getId()),
+                () -> assertThat(managedEntity.getName()).isEqualTo(entity.getName()),
+                () -> assertThat(managedEntity.getAge()).isEqualTo(entity.getAge()),
+                () -> assertThat(managedEntity.getEmail()).isEqualTo(entity.getEmail()),
+                () -> assertThat(managedEntity.getIndex()).isNotNull()
         );
     }
 
@@ -103,32 +104,29 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 삭제한다.")
     void remove() {
         // given
+        insertData();
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
-        final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
 
         // when
-        entityManager.remove(entityWithId);
+        entityManager.remove(entity);
 
         // then
-        assertThatThrownBy(() -> entityManager.find(EntityWithId.class, 1L))
+        assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Expected 1 result, got");
     }
 
     private void createTable() {
-        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
+        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(entity.getClass(), dialect);
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
     private void insertData() {
-        final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(
-                new EntityWithId("Jaden", 30, "test@email.com", 1)
-        );
-        jdbcTemplate.execute(insertQueryBuilder.insert());
+        entityPersister.insert(entity);
     }
 
     private void dropTable() {
-        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
+        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entity.getClass());
         jdbcTemplate.execute(dropQueryBuilder.drop());
     }
 }
