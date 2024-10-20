@@ -49,10 +49,8 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public Object update(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
-        if (persistenceContext.containsEntity(entity.getClass(), idValue)) {
-            entityPersister.update(entity);
-            persistenceContext.addEntity(entity.getClass(), idValue);
-        }
+        entityPersister.update(entity);
+        persistenceContext.addEntity(entity.getClass(), idValue);
         return entity;
     }
 
