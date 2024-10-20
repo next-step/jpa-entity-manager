@@ -2,12 +2,12 @@ package persistence.sql.config;
 
 import database.DatabaseServer;
 import database.H2;
+import persistence.sql.common.util.CamelToSnakeConverter;
+import persistence.sql.common.util.NameConverter;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.context.PersistenceContext;
 import persistence.sql.context.impl.DefaultEntityPersister;
 import persistence.sql.context.impl.DefaultPersistenceContext;
-import persistence.sql.common.util.CamelToSnakeConverter;
-import persistence.sql.common.util.NameConverter;
 import persistence.sql.ddl.QueryColumnSupplier;
 import persistence.sql.ddl.QueryConstraintSupplier;
 import persistence.sql.ddl.TableScanner;

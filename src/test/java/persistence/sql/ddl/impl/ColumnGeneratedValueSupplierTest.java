@@ -51,7 +51,6 @@ class ColumnGeneratedValueSupplierTest {
     }
 
 
-
     @Entity
     private static class ExampleClass {
         @Id

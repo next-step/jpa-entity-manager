@@ -15,6 +15,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("WhereConditionalClause 테스트")
 class WhereConditionalClauseTest {
 
+    public static Stream<Arguments> provideWhereConditionalClause() {
+        return Stream.of(
+                Arguments.of(null, "catsbi", "="),
+                Arguments.of("name", null, "="),
+                Arguments.of("name", "catsbi", null)
+        );
+    }
+
     @Test
     @DisplayName("WhereConditionalClause 레코드 클래스를 생성한다.")
     void create() {
@@ -33,14 +41,6 @@ class WhereConditionalClauseTest {
         assertThatThrownBy(() -> new WhereConditionalClause(column, value, operator))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column, value, operator must not be null");
-    }
-
-    public static Stream<Arguments> provideWhereConditionalClause() {
-        return Stream.of(
-                Arguments.of(null, "catsbi", "="),
-                Arguments.of("name", null, "="),
-                Arguments.of("name", "catsbi", null)
-        );
     }
 
     @Test

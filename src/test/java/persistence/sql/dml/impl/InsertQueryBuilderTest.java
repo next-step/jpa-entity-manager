@@ -58,7 +58,7 @@ class InsertQueryBuilderTest {
     @DisplayName("build 함수는 조건절 매개변수가 없을 경우 쿼리를 생성하지 않는다.")
     void testBuildWithoutClause() {
         // when, then
-        assertThatThrownBy(()-> builder.build(loader))
+        assertThatThrownBy(() -> builder.build(loader))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessage("Conditional clauses are not supported for insert query");
     }
@@ -69,7 +69,7 @@ class InsertQueryBuilderTest {
         WhereConditionalClause invalidClause = WhereConditionalClause.builder().column("id").eq("1");
 
         // when, then
-        assertThatThrownBy(()-> builder.build(loader, invalidClause))
+        assertThatThrownBy(() -> builder.build(loader, invalidClause))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessage("InsertColumnValueClause is required for insert query");
     }

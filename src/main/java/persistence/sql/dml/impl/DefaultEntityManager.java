@@ -1,8 +1,8 @@
 package persistence.sql.dml.impl;
 
+import persistence.sql.clause.Clause;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.context.PersistenceContext;
-import persistence.sql.clause.Clause;
 import persistence.sql.dml.EntityManager;
 import persistence.sql.dml.MetadataLoader;
 

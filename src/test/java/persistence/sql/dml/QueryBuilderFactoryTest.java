@@ -24,28 +24,15 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class QueryBuilderFactoryTest {
-    private final QueryBuilderFactory factory = QueryBuilderFactory.getInstance();
     private static final MetadataLoader<PersonV3> loader = new SimpleMetadataLoader<>(PersonV3.class);
-
-
-    @ParameterizedTest
-    @DisplayName("buildQuery 함수는 매개변수 queryType에 따라 적절한 쿼리를 생성한다.")
-    @MethodSource("provideQueryBuildParameters")
-    void testBuildQuery(QueryType queryType, String expected, List<Clause> clauses) {
-        // given
-
-        // when
-        String actual = factory.buildQuery(queryType, loader, clauses.toArray(Clause[]::new));
-
-        assertThat(actual).isEqualTo(expected);
-    }
+    private final QueryBuilderFactory factory = QueryBuilderFactory.getInstance();
 
     public static Stream<Arguments> provideQueryBuildParameters() {
         PersonV3 person = new PersonV3("catsbi", 55, "catsbi@naver.com", 123);
 
         List<Field> fields = loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class));
         List<Clause> setClauses = fields.stream()
-                .map(field -> (Clause)SetValueClause.newInstance(field, person,
+                .map(field -> (Clause) SetValueClause.newInstance(field, person,
                         loader.getColumnName(field, CamelToSnakeConverter.getInstance())))
                 .collect(Collectors.toCollection(ArrayList::new));
         Clause idClause = new WhereConditionalClause("id", "1", "=");
@@ -57,6 +44,18 @@ class QueryBuilderFactoryTest {
                 Arguments.of(QueryType.UPDATE, "UPDATE users SET nick_name = 'catsbi', old = 55, email = 'catsbi@naver.com' WHERE id = 1", setClauses),
                 Arguments.of(QueryType.DELETE, "DELETE FROM users WHERE id = 1", List.of(idClause))
         );
+    }
+
+    @ParameterizedTest
+    @DisplayName("buildQuery 함수는 매개변수 queryType에 따라 적절한 쿼리를 생성한다.")
+    @MethodSource("provideQueryBuildParameters")
+    void testBuildQuery(QueryType queryType, String expected, List<Clause> clauses) {
+        // given
+
+        // when
+        String actual = factory.buildQuery(queryType, loader, clauses.toArray(Clause[]::new));
+
+        assertThat(actual).isEqualTo(expected);
     }
 
 }

@@ -139,7 +139,7 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
         assertThat(foundPersons).hasSize(2);
     }
 
-        @Test
+    @Test
     @DisplayName("remove 함수는 엔티티를 삭제한다.")
     void testRemove() {
         // given
