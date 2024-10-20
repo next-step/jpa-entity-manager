@@ -84,7 +84,7 @@ public class TableDefinition {
         return tableName;
     }
 
-    public List<? extends Queryable> allColumns() {
+    public List<? extends Queryable> withIdColumns() {
         return Stream.concat(
                 Stream.of(tableId),
                 columns.stream()
@@ -96,7 +96,7 @@ public class TableDefinition {
     }
 
     public List<? extends Queryable> hasValueColumns(Object entity) {
-        return allColumns().stream()
+        return withIdColumns().stream()
                 .filter(column -> column.hasValue(entity))
                 .toList();
     }

@@ -39,8 +39,8 @@ class TableIdTest {
 
         Dialect dialect = new H2Dialect();
 
-        tableId1.applyToCreateQuery(query1, dialect);
-        tableId2.applyToCreateQuery(query2, dialect);
+        tableId1.applyToCreateTableQuery(query1, dialect);
+        tableId2.applyToCreateTableQuery(query2, dialect);
 
         // Then
         assertAll(

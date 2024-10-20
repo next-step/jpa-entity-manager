@@ -13,8 +13,8 @@ public class H2Dialect implements Dialect {
 
     @Override
     public String translateType(ColumnDefinition columnDefinition) {
-        return switch (columnDefinition.sqlType()) {
-            case VARCHAR -> typeMap.get(SqlType.VARCHAR) + "(" + columnDefinition.length() + ")";
+        return switch (columnDefinition.getSqlType()) {
+            case VARCHAR -> typeMap.get(SqlType.VARCHAR) + "(" + columnDefinition.getLength() + ")";
             case BIGINT -> typeMap.get(SqlType.BIGINT);
             case INTEGER -> typeMap.get(SqlType.INTEGER);
         };

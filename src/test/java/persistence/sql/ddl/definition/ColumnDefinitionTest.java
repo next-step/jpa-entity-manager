@@ -41,9 +41,9 @@ class ColumnDefinitionTest {
         ColumnDefinition column3 = new ColumnDefinition(ColumnDefinitionTestEntity.class.getDeclaredField("column3"));
 
         assertAll(
-                () -> assertThat(column1.name()).isEqualTo("column1"),
-                () -> assertThat(column2.name()).isEqualTo("column"),
-                () -> assertThat(column3.name()).isEqualTo("column3")
+                () -> assertThat(column1.getName()).isEqualTo("column1"),
+                () -> assertThat(column2.getName()).isEqualTo("column"),
+                () -> assertThat(column3.getName()).isEqualTo("column3")
         );
     }
 
@@ -55,9 +55,9 @@ class ColumnDefinitionTest {
         ColumnDefinition column5 = new ColumnDefinition(ColumnDefinitionTestEntity.class.getDeclaredField("column5"));
 
         assertAll(
-                () -> assertThat(column3.sqlType()).isEqualTo(SqlType.VARCHAR),
-                () -> assertThat(column4.sqlType()).isEqualTo(SqlType.BIGINT),
-                () -> assertThat(column5.sqlType()).isEqualTo(SqlType.INTEGER)
+                () -> assertThat(column3.getSqlType()).isEqualTo(SqlType.VARCHAR),
+                () -> assertThat(column4.getSqlType()).isEqualTo(SqlType.BIGINT),
+                () -> assertThat(column5.getSqlType()).isEqualTo(SqlType.INTEGER)
         );
 
     }
@@ -69,8 +69,8 @@ class ColumnDefinitionTest {
         ColumnDefinition column4 = new ColumnDefinition(ColumnDefinitionTestEntity.class.getDeclaredField("column4"));
 
         assertAll(
-                () -> assertThat(column1.nullable()).isTrue(),
-                () -> assertThat(column4.nullable()).isFalse()
+                () -> assertThat(column1.isNullable()).isTrue(),
+                () -> assertThat(column4.isNullable()).isFalse()
         );
     }
 
@@ -81,8 +81,8 @@ class ColumnDefinitionTest {
         ColumnDefinition column3 = new ColumnDefinition(ColumnDefinitionTestEntity.class.getDeclaredField("column3"));
 
         assertAll(
-                () -> assertThat(column1.length()).isEqualTo(255),
-                () -> assertThat(column3.length()).isEqualTo(100)
+                () -> assertThat(column1.getLength()).isEqualTo(255),
+                () -> assertThat(column3.getLength()).isEqualTo(100)
         );
     }
 }

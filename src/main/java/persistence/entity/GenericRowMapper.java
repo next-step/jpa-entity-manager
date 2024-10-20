@@ -22,9 +22,9 @@ public class GenericRowMapper<T> implements RowMapper<T> {
 
             T instance = clazz.getDeclaredConstructor().newInstance();
 
-            for (Queryable field : tableDefinition.allColumns()) {
-                final String databaseColumnName = field.name();
-                final Field objectDeclaredField = clazz.getDeclaredField(field.declaredName());
+            for (Queryable field : tableDefinition.withIdColumns()) {
+                final String databaseColumnName = field.getName();
+                final Field objectDeclaredField = clazz.getDeclaredField(field.getDeclaredName());
 
                 final boolean wasAccessible = objectDeclaredField.canAccess(instance);
                 if (!wasAccessible) {

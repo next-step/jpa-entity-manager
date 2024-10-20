@@ -9,7 +9,7 @@ public class UpdateQueryBuilder {
     public String build(Object entity) {
         final Class<?> entityClass = entity.getClass();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
-        final List<? extends Queryable> targetColumns = tableDefinition.allColumns();
+        final List<? extends Queryable> targetColumns = tableDefinition.withIdColumns();
 
         StringBuilder query = new StringBuilder();
         query.append("UPDATE ");
@@ -20,7 +20,7 @@ public class UpdateQueryBuilder {
         query.append(columnClause);
 
         query.append(" WHERE ");
-        query.append(tableDefinition.tableId().name()).append(" = ");
+        query.append(tableDefinition.tableId().getName()).append(" = ");
         query.append(tableDefinition.tableId().getValue(entity));
         query.append(";");
 
@@ -31,7 +31,7 @@ public class UpdateQueryBuilder {
         return tableDefinition.withoutIdColumns().stream()
                 .map(column -> {
                     final String columnValue = column.hasValue(entity) ? column.getValue(entity) : "null";
-                    return column.name() + " = " + columnValue;
+                    return column.getName() + " = " + columnValue;
                 }).reduce((column1, column2) -> column1 + ", " + column2).orElse("");
     }
 

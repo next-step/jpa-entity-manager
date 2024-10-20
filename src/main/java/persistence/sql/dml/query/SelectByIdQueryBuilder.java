@@ -12,7 +12,7 @@ public class SelectByIdQueryBuilder {
         StringBuilder query = new StringBuilder("SELECT ");
         StringJoiner columns = new StringJoiner(", ");
 
-        tableDefinition.allColumns().forEach(column -> columns.add(column.name()));
+        tableDefinition.withIdColumns().forEach(column -> columns.add(column.getName()));
 
         query.append(columns);
         query.append(" FROM ").append(tableDefinition.tableName());
@@ -24,7 +24,7 @@ public class SelectByIdQueryBuilder {
 
     private void whereClause(StringBuilder selectQuery, TableDefinition tableDefinition, Object id) {
         selectQuery.append(" WHERE ");
-        selectQuery.append(tableDefinition.tableId().name()).append(" = ");
+        selectQuery.append(tableDefinition.tableId().getName()).append(" = ");
 
         if (id instanceof String) {
             selectQuery.append("'").append(id).append("';");

@@ -59,23 +59,23 @@ public class ColumnDefinition {
         return field.getAnnotation(Column.class).nullable();
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
-    public SqlType sqlType() {
+    public SqlType getSqlType() {
         return sqlType;
     }
 
-    public boolean shouldNotNull() {
+    public boolean isNotNullable() {
         return !nullable;
     }
 
-    public int length() {
+    public int getLength() {
         return length;
     }
 
-    public boolean nullable() {
+    public boolean isNullable() {
         return nullable;
     }
 

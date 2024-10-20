@@ -13,7 +13,7 @@ public class DeleteByIdQueryBuilder {
 
         query.append(tableDefinition.tableName());
         query.append(" WHERE ");
-        query.append(tableId.name()).append(" = ");
+        query.append(tableId.getName()).append(" = ");
         query.append(idValue).append(";");
 
         return query.toString();

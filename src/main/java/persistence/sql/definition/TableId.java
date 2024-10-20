@@ -58,21 +58,21 @@ public class TableId implements Queryable {
     }
 
     @Override
-    public String name() {
-        return columnDefinition.name();
+    public String getName() {
+        return columnDefinition.getName();
     }
 
     @Override
-    public String declaredName() {
+    public String getDeclaredName() {
         return columnDefinition.declaredName();
     }
 
     @Override
-    public void applyToCreateQuery(StringBuilder query, Dialect dialect) {
+    public void applyToCreateTableQuery(StringBuilder query, Dialect dialect) {
         final String type = dialect.translateType(columnDefinition);
-        query.append(columnDefinition.name()).append(" ").append(type);
+        query.append(columnDefinition.getName()).append(" ").append(type);
 
-        if (columnDefinition.shouldNotNull()) {
+        if (columnDefinition.isNotNullable()) {
             query.append(" NOT NULL");
         }
 
