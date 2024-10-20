@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.sql.Metadata;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
@@ -30,10 +31,10 @@ class EntityManagerImplTest {
     void init() throws SQLException {
         final DatabaseServer server = new H2();
         server.start();
-
+        Metadata metadata = new Metadata(Person.class);
         CreateQueryBuilder queryBuilder = new CreateQueryBuilder(Person.class);
         String tableQuery = queryBuilder.createTableQuery(Person.class);
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata.getEntityTable(),metadata.getEntityColumns());
         Person person = new Person("yang", 23, "rhfp@naver.com", 3);
         String insertQuery = insertQueryBuilder.getInsertQuery(person);
 

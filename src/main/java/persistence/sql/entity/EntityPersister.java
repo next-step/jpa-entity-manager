@@ -27,7 +27,7 @@ public class EntityPersister {
 
     public boolean update(Object entity) {
         try {
-            UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+            UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityTable, entityColumns);
             String updateQuery = updateQueryBuilder.update(entity, getIdValue(entity));
             jdbcTemplate.execute(updateQuery);
             return true;
@@ -38,7 +38,7 @@ public class EntityPersister {
     }
 
     public void insert(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity.getClass());
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityTable, entityColumns);
         String insertQuery = insertQueryBuilder.getInsertQuery(entity);
         jdbcTemplate.execute(insertQuery);
     }
