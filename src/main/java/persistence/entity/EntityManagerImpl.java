@@ -10,17 +10,17 @@ public class EntityManagerImpl implements EntityManager {
     private static final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
 
     private final JdbcTemplate jdbcTemplate;
-    private final PersistenceContext persistenceContext;
+    private final PersistenceContextImpl persistenceContext;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.persistenceContext = new PersistenceContext();
+        this.persistenceContext = new PersistenceContextImpl();
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
         final EntityKey entityKey = new EntityKey((Serializable) id, clazz);
-        final Object managedEntity = persistenceContext.findEntity(entityKey);
+        final Object managedEntity = persistenceContext.getEntity(entityKey);
 
         return managedEntity != null ? clazz.cast(managedEntity) : queryForObject(clazz, entityKey);
     }
@@ -35,44 +35,41 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass());
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
                 (Serializable) entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
-        if (persistenceContext.findEntity(entityKey) != null) {
+        if (persistenceContext.getEntity(entityKey) != null) {
             return;
         }
 
-        final String query = entityPersister.buildInsertQuery(entity);
-        jdbcTemplate.execute(query);
+        entityPersister.insert(entity);
         persistenceContext.addEntity(entityKey, entity);
     }
 
     @Override
     public void remove(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass());
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
                 (Serializable) entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
-        final String query = entityPersister.buildDeleteQuery(entity);
-        jdbcTemplate.execute(query);
+        entityPersister.delete(entity);
         persistenceContext.removeEntity(entityKey);
     }
 
     @Override
     public void update(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass());
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
                 (Serializable) entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
-        final String query = entityPersister.buildUpdateQuery(entity);
-        jdbcTemplate.execute(query);
+        entityPersister.update(entity);
         persistenceContext.addEntity(entityKey, entity);
     }
 }

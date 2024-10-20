@@ -25,37 +25,37 @@ class PersistenceContextTest {
 
     @Test
     void addEntity() {
-        PersistenceContext persistenceContext = new PersistenceContext();
+        PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
         EntityKey entityKey = new EntityKey(1L, TestEntity.class);
         Object entity = new TestEntity(1L, "Test");
 
         persistenceContext.addEntity(entityKey, entity);
 
-        assertThat(persistenceContext.findEntity(entityKey)).isEqualTo(entity);
+        assertThat(persistenceContext.getEntity(entityKey)).isEqualTo(entity);
     }
 
     @Test
     void shouldDoNothingWhenAddTwice() {
-        PersistenceContext persistenceContext = new PersistenceContext();
+        PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
         EntityKey entityKey = new EntityKey(1L, TestEntity.class);
         Object entity = new TestEntity(1L, "Test");
 
         persistenceContext.addEntity(entityKey, entity);
         persistenceContext.addEntity(entityKey, entity);
 
-        assertThat(persistenceContext.findEntity(entityKey)).isEqualTo(entity);
+        assertThat(persistenceContext.getEntity(entityKey)).isEqualTo(entity);
     }
 
     @Test
     void removeEntity() {
-        PersistenceContext persistenceContext = new PersistenceContext();
+        PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
         EntityKey entityKey = new EntityKey(1L, TestEntity.class);
         Object entity = new TestEntity(1L, "Test");
 
         persistenceContext.addEntity(entityKey, entity);
         persistenceContext.removeEntity(entityKey);
 
-        assertThat(persistenceContext.findEntity(entityKey)).isNull();
+        assertThat(persistenceContext.getEntity(entityKey)).isNull();
     }
 
 }
