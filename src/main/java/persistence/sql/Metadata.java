@@ -1,35 +1,30 @@
 package persistence.sql;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import persistence.sql.entity.EntityColumn;
+import persistence.sql.entity.EntityColumns;
+import persistence.sql.entity.EntityTable;
 
 import java.lang.reflect.Field;
 
 public class Metadata {
-    private final Class<?> clazz;
+    private final EntityTable entityTable;
+    private final EntityColumns entityColumns;
+
 
     public Metadata(Class<?> clazz) {
-        this.clazz = clazz;
+        this.entityTable = EntityTable.from(clazz);
+        this.entityColumns = EntityColumns.from(clazz);
     }
 
     public String getTableName() {
-        Table annotation = clazz.getAnnotation(Table.class);
-        if (annotation == null) {
-            return clazz.getSimpleName().toLowerCase();
-        }
-
-        if (!annotation.name().isEmpty()) {
-            return annotation.name();
-        }
-
-        return clazz.getSimpleName().toLowerCase();
+        return entityTable.getTableName();
     }
 
-    public String getIdField() {
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                return field.getName();
+    public String getIdFieldName() {
+        for (EntityColumn column : entityColumns.getColumns()) {
+            if (column.isPrimaryKey()) {
+                return column.getColumnName();
             }
         }
         throw new IllegalArgumentException("@Id 어노테이션이 존재하지 않음");

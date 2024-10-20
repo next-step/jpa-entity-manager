@@ -12,7 +12,7 @@ public class UpdateQueryBuilder {
         Class<?> clazz = object.getClass();
         Metadata metadata = new Metadata(clazz);
         String tableName = metadata.getTableName();
-        String idField = metadata.getIdField();
+        String idField = metadata.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);
         String setColumns = getSetColumns(object, clazz, metadata);
 

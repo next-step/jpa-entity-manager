@@ -1,69 +1,57 @@
 package persistence.sql.entity;
 
-import jakarta.persistence.Id;
-import jdbc.JdbcTemplate;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
-
-import java.lang.reflect.Field;
-import java.sql.Connection;
-
 public class EntityManagerImpl implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityPersister entityPersister;
+    private final PersistenceContext persistenceContext;
 
-    public EntityManagerImpl(Connection connection) {
-        this.jdbcTemplate = new JdbcTemplate(connection);
+    public EntityManagerImpl(EntityPersister entityPersister, PersistenceContext persistenceContext) {
+        this.entityPersister = entityPersister;
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        String selectQuery = new SelectQueryBuilder(clazz).findById(clazz, id);
-        return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
+        if (persistenceContext.containsEntity(clazz, id)) {
+            return persistenceContext.getEntity(clazz, id);
+        }
+
+        T entity = entityPersister.select(clazz, id);
+        if (entity != null) {
+            persistenceContext.addEntity(entity, id);
+        }
+        return entity;
     }
 
     @Override
     public Object persist(Object entity) {
-        Class<?> clazz = entity.getClass();
-        String insertQuery = new InsertQueryBuilder(clazz).getInsertQuery(entity);
-        jdbcTemplate.execute(insertQuery);
+        Long idValue = entityPersister.getIdValue(entity);
+        if (idValue == null) {
+            entityPersister.insert(entity);
+            idValue = entityPersister.getIdValue(entity);
+        }
+        entityPersister.update(entity);
+        persistenceContext.addEntity(entity, idValue);
+
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        Class<?> clazz = entity.getClass();
-
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-        String deleteQuery = deleteQueryBuilder.delete(clazz, getIdValue(entity));
-
-        jdbcTemplate.execute(deleteQuery);
+        Long idValue = entityPersister.getIdValue(entity);
+        if (idValue != null && persistenceContext.containsEntity(entity.getClass(), idValue)) {
+            entityPersister.delete(entity);
+            persistenceContext.removeEntity(entity.getClass(), idValue);
+        }
     }
 
     @Override
     public Object update(Object entity) {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
-        String updateQuery = updateQueryBuilder.update(entity, getIdValue(entity));
-
-        jdbcTemplate.execute(updateQuery);
+        Long idValue = entityPersister.getIdValue(entity);
+        if (persistenceContext.containsEntity(entity.getClass(), idValue)) {
+            entityPersister.update(entity);
+            persistenceContext.addEntity(entity.getClass(), idValue);
+        }
         return entity;
     }
 
-    private Object getIdValue(Object entity) {
-        Class<?> clazz = entity.getClass();
-
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                field.setAccessible(true);
-                try {
-                    return field.get(entity);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("id값이 없음");
-                }
-            }
-        }
-
-        return null;
-    }
 }
