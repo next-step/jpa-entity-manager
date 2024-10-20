@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
-import persistence.entity.GenericRowMapper;
+import persistence.entity.EntityRowMapper;
 import persistence.entity.PersistenceContextImpl;
 import persistence.sql.H2Dialect;
 import persistence.sql.Person;
@@ -79,7 +79,7 @@ public class Application {
         SelectAllQueryBuilder selectAllQuery = new SelectAllQueryBuilder();
         String query = selectAllQuery.build(testClass);
 
-        List<Person> people = jdbcTemplate.query(query, new GenericRowMapper<>(Person.class));
+        List<Person> people = jdbcTemplate.query(query, new EntityRowMapper<>(Person.class));
 
         for (Person person : people) {
             logger.info("Person: {}", person);

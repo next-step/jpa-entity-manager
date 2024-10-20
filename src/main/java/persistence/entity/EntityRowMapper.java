@@ -8,10 +8,10 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class GenericRowMapper<T> implements RowMapper<T> {
+public class EntityRowMapper<T> implements RowMapper<T> {
     private final Class<T> clazz;
 
-    public GenericRowMapper(Class<T> clazz) {
+    public EntityRowMapper(Class<T> clazz) {
         this.clazz = clazz;
     }
 

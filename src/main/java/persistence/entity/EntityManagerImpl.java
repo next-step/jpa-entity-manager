@@ -1,20 +1,18 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.query.SelectByIdQueryBuilder;
 
 import java.io.Serializable;
 
 public class EntityManagerImpl implements EntityManager {
-
-    private static final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
-
     private final JdbcTemplate jdbcTemplate;
     private final PersistenceContext persistenceContext;
+    private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, PersistenceContext persistenceContext) {
         this.jdbcTemplate = jdbcTemplate;
         this.persistenceContext = persistenceContext;
+        this.entityLoader = new EntityLoader(jdbcTemplate);
     }
 
     @Override
@@ -22,15 +20,13 @@ public class EntityManagerImpl implements EntityManager {
         final EntityKey entityKey = new EntityKey((Serializable) id, clazz);
         final Object managedEntity = persistenceContext.getEntity(entityKey);
 
-        return managedEntity != null ? clazz.cast(managedEntity) : queryForObject(clazz, entityKey);
+        return managedEntity != null ? clazz.cast(managedEntity) : loadEntity(clazz, entityKey);
     }
 
-    private <T> T queryForObject(Class<T> clazz, EntityKey id) {
-        final String query = selectByIdQueryBuilder.build(clazz, id.getId());
-        T queried = jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
-
-        persistenceContext.addEntity(id, queried);
-        return queried;
+    private <T> T loadEntity(Class<T> entityClass, EntityKey id) {
+        final T loadedEntity = entityLoader.loadEntity(entityClass, id);
+        persistenceContext.addEntity(id, loadedEntity);
+        return loadedEntity;
     }
 
     @Override
