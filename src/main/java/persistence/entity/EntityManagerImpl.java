@@ -12,21 +12,13 @@ public class EntityManagerImpl implements EntityManager {
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, PersistenceContext persistenceContext) {
         this.jdbcTemplate = jdbcTemplate;
         this.persistenceContext = persistenceContext;
-        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityLoader = new EntityLoader(jdbcTemplate, persistenceContext);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
         final EntityKey entityKey = new EntityKey((Serializable) id, clazz);
-        final Object managedEntity = persistenceContext.getEntity(entityKey);
-
-        return managedEntity != null ? clazz.cast(managedEntity) : loadEntity(clazz, entityKey);
-    }
-
-    private <T> T loadEntity(Class<T> entityClass, EntityKey id) {
-        final T loadedEntity = entityLoader.loadEntity(entityClass, id);
-        persistenceContext.addEntity(id, loadedEntity);
-        return loadedEntity;
+        return entityLoader.loadEntity(clazz, entityKey);
     }
 
     @Override
