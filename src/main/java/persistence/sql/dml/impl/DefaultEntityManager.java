@@ -90,7 +90,9 @@ public class DefaultEntityManager implements EntityManager {
                 .toArray(Clause[]::new);
 
         String mergeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.UPDATE, loader, clauses);
-        database.executeUpdate(mergeQuery);
+        Object id = database.executeUpdate(mergeQuery);
+
+        persistenceContext.merge(id, entity);
     }
 
     @Override

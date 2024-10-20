@@ -2,6 +2,7 @@ package persistence.context.impl;
 
 import persistence.context.PersistenceContext;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,5 +40,36 @@ public class DefaultPersistenceContext implements PersistenceContext {
         }
 
         return (T) entityMap.put(id, entity);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T, ID> void merge(ID id, T entity) {
+        Map<ID, Object> entityMap = (Map<ID, Object>) context.computeIfAbsent(entity.getClass(), k -> new HashMap<>());
+
+        Object origin = entityMap.get(id);
+        if (origin == null || !isEntityChanged(entity, origin)) {
+            return;
+        }
+
+        overwriteEntity(entity, origin);
+    }
+
+    private boolean isEntityChanged(Object entity, Object snapshot) {
+        return !entity.equals(snapshot);
+    }
+
+    private <T> void overwriteEntity(T entity, Object origin) {
+        Field[] declaredFields = entity.getClass().getDeclaredFields();
+
+        for (Field field : declaredFields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(entity);
+                field.set(origin, value);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException("Illegal access to field: " + field.getName());
+            }
+        }
     }
 }

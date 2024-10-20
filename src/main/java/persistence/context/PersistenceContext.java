@@ -9,4 +9,6 @@ public interface PersistenceContext {
     <T> Collection<T> getAll(Class<T> entityType);
 
     <T, ID> T add(ID id, T entity);
+
+    <T, ID> void merge(ID id, T entity);
 }
