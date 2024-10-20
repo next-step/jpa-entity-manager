@@ -72,7 +72,7 @@ class EntityPersisterTest {
 
         persister.insert(entity);
 
-        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate);
+        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
         QueryTestEntity saved = em.find(QueryTestEntity.class, 1L);
         assertAll(
                 () -> assertThat(saved.id).isEqualTo(1L),
@@ -88,7 +88,7 @@ class EntityPersisterTest {
 
         persister.insert(entity);
 
-        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate);
+        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
         QueryTestEntity saved = em.find(QueryTestEntity.class, 1L);
         assertAll(
                 () -> assertThat(saved.id).isEqualTo(1L),
@@ -107,7 +107,7 @@ class EntityPersisterTest {
         QueryTestEntity updatedEntity = new QueryTestEntity(1L, "Chanho", 30);
         persister.update(updatedEntity);
 
-        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate);
+        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
         QueryTestEntity updated = em.find(QueryTestEntity.class, 1L);
 
         assertAll(
@@ -125,7 +125,7 @@ class EntityPersisterTest {
         persister.insert(entity);
         persister.delete(entity);
 
-        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate);
+        EntityManagerImpl em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
         assertThrows(RuntimeException.class, () -> em.find(QueryTestEntity.class, 1L));
     }
 }

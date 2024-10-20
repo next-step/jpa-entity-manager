@@ -65,7 +65,7 @@ public class EntityManagerTest {
     @Test
     @DisplayName("EntityManager.persist()를 통해 엔티티를 저장한다.")
     void testPersist() throws Exception {
-        EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()));
+        EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()), new PersistenceContextImpl());
         EntityManagerUpdateTestEntity entity = new EntityManagerUpdateTestEntity(1L, "john_doe", 30);
         entityManager.persist(entity);
 
@@ -80,7 +80,7 @@ public class EntityManagerTest {
     @Test
     @DisplayName("EntityManager.update()를 통해 엔티티를 수정한다.")
     void testMerge() throws Exception {
-        EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()));
+        EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()), new PersistenceContextImpl());
         EntityManagerUpdateTestEntity entity = new EntityManagerUpdateTestEntity(1L, "john_doe", 30);
         entityManager.persist(entity);
 

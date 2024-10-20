@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerImpl;
-import persistence.entity.GenericRowMapper;
+import persistence.entity.EntityRowMapper;
+import persistence.entity.PersistenceContextImpl;
 import persistence.sql.H2Dialect;
 import persistence.sql.Person;
 import persistence.sql.ddl.query.CreateQueryBuilder;
@@ -27,7 +28,7 @@ public class Application {
             server.start();
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-            final EntityManager em = new EntityManagerImpl(jdbcTemplate);
+            final EntityManager em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
 
             Person person1 = new Person(1L, "a", 10, "aaa@gmail.com", 1);
             Person person2 = new Person(2L, "b", 20, "bbb@gmail.com", 2);
@@ -78,7 +79,7 @@ public class Application {
         SelectAllQueryBuilder selectAllQuery = new SelectAllQueryBuilder();
         String query = selectAllQuery.build(testClass);
 
-        List<Person> people = jdbcTemplate.query(query, new GenericRowMapper<>(Person.class));
+        List<Person> people = jdbcTemplate.query(query, new EntityRowMapper<>(Person.class));
 
         for (Person person : people) {
             logger.info("Person: {}", person);

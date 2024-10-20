@@ -32,4 +32,8 @@ public class EntityKey {
         return id;
     }
 
+    public Class<?> getEntityClass() {
+        return entityClass;
+    }
+
 }
