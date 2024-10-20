@@ -44,14 +44,14 @@ public class EntityPersister {
     }
 
     public void delete(Object entity) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-        String deleteQuery = deleteQueryBuilder.delete(entity.getClass(), getIdValue(entity));
+        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entityTable, entityColumns);
+        String deleteQuery = deleteQueryBuilder.delete(getIdValue(entity));
         jdbcTemplate.execute(deleteQuery);
     }
 
     public <T> T select(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityTable, entityColumns);
+        String selectQuery = selectQueryBuilder.findById(id);
         return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
     }
 
