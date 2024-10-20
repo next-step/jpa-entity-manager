@@ -40,4 +40,6 @@ public interface EntityManager {
      * @return 조회된 엔티티 목록
      */
     <T> List<T> findAll(Class<T> entityClass);
+
+
 }

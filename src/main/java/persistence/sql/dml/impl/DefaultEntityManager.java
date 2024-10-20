@@ -1,6 +1,7 @@
 package persistence.sql.dml.impl;
 
 import jakarta.persistence.Id;
+import persistence.context.PersistenceContext;
 import persistence.sql.QueryBuilderFactory;
 import persistence.sql.clause.Clause;
 import persistence.sql.clause.InsertColumnValueClause;
@@ -25,10 +26,12 @@ public class DefaultEntityManager implements EntityManager {
 
     private final Database database;
     private final NameConverter nameConverter;
+    private final PersistenceContext persistenceContext;
 
-    public DefaultEntityManager(Database database, NameConverter nameConverter) {
+    public DefaultEntityManager(Database database, NameConverter nameConverter, PersistenceContext persistenceContext) {
         this.database = database;
         this.nameConverter = nameConverter;
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
