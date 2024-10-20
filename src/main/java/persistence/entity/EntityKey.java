@@ -5,11 +5,11 @@ import java.util.Objects;
 
 public class EntityKey {
     private final Serializable id;
-    private final String entityName;
+    private final Class<?> entityClass;
 
-    public EntityKey(Serializable id, String entityName) {
+    public EntityKey(Serializable id, Class<?> entityClass) {
         this.id = id;
-        this.entityName = entityName;
+        this.entityClass = entityClass;
     }
 
     @Override
@@ -20,12 +20,12 @@ public class EntityKey {
         EntityKey entityKey = (EntityKey) o;
 
         return id.equals(entityKey.id)
-                && entityKey.entityName.equals(entityName);
+                && entityClass.equals(entityKey.entityClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, entityName);
+        return Objects.hash(id, entityClass);
     }
 
     public Serializable getId() {

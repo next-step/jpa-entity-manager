@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 public class TableDefinition {
 
     private final String tableName;
-    private final String entityName;
     private final List<TableColumn> columns;
     private final TableId tableId;
 
@@ -25,7 +24,6 @@ public class TableDefinition {
         final Field[] fields = entityClass.getDeclaredFields();
 
         this.tableName = determineTableName(entityClass);
-        this.entityName = determineEntityName(entityClass);
         this.columns = createTableColumns(fields);
         this.tableId = new TableId(fields);
     }
@@ -49,17 +47,6 @@ public class TableDefinition {
         }
 
         return tableName;
-    }
-
-    private static String determineEntityName(Class<?> entityClass) {
-        if (entityClass.isAnnotationPresent(Entity.class)) {
-            Entity entityAnnotation = entityClass.getAnnotation(Entity.class);
-            if (!entityAnnotation.name().isEmpty()) {
-                return entityAnnotation.name();
-            }
-        }
-
-        return entityClass.getSimpleName();
     }
 
     private static List<TableColumn> createTableColumns(Field[] fields) {
@@ -112,9 +99,5 @@ public class TableDefinition {
         return allColumns().stream()
                 .filter(column -> column.hasValue(entity))
                 .toList();
-    }
-
-    public String entityName() {
-        return entityName;
     }
 }

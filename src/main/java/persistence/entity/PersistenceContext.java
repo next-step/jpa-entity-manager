@@ -1,13 +1,23 @@
 package persistence.entity;
 
-public interface PersistenceContext {
-    Object findEntity(EntityKey entityKey);
+import java.util.HashMap;
+import java.util.Map;
 
-    void addEntity(EntityKey entityKey, Object entity);
+public class PersistenceContext {
+    private final Map<EntityKey, Object> managedEntities = new HashMap<>();
 
-    void removeEntity(EntityKey entityKey);
+    public Object findEntity(EntityKey entityKey) {
+        return managedEntities.get(entityKey);
+    }
 
-    static PersistenceContext getInstance() {
-        return new PersistenceContextImpl();
+    public void addEntity(EntityKey entityKey, Object entity) {
+        if (managedEntities.containsKey(entityKey)) {
+            return;
+        }
+        managedEntities.put(entityKey, entity);
+    }
+
+    public void removeEntity(EntityKey entityKey) {
+        managedEntities.remove(entityKey);
     }
 }
