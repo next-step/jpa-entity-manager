@@ -3,7 +3,7 @@ package persistence.dialect;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.JavaTypeConvertor;
 
 import java.lang.reflect.Field;
 
@@ -17,10 +17,10 @@ class H2DialectTest {
         // given
         final H2Dialect dialect = new H2Dialect();
         final Field field = EntityWithString.class.getDeclaredFields()[index];
-        final EntityField entityField = new EntityField(field);
+        final int sqlType = new JavaTypeConvertor().getSqlType(field.getType());
 
         // when
-        final String dbTypeName = dialect.getDbTypeName(entityField);
+        final String dbTypeName = dialect.getDbTypeName(sqlType);
 
         // then
         assertThat(dbTypeName).isEqualTo(expected);

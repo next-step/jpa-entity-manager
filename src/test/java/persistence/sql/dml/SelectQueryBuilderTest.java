@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.fixture.EntityWithId;
 import persistence.fixture.EntityWithoutID;
-import persistence.sql.meta.EntityTable;
+import persistence.sql.meta.EntityColumns;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -44,6 +44,6 @@ class SelectQueryBuilderTest {
         // when & then
         assertThatThrownBy(() -> selectQueryBuilder.findById(1))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage(EntityTable.NOT_ID_FAILED_MESSAGE);
+                .hasMessage(EntityColumns.NOT_ID_FAILED_MESSAGE);
     }
 }

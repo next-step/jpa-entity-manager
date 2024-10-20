@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 
 import java.util.List;
@@ -10,19 +10,17 @@ public class UpdateQueryBuilder {
     private static final String QUERY_TEMPLATE = "UPDATE %s SET %s WHERE %s";
 
     private final EntityTable entityTable;
-    private final Object entity;
 
     public UpdateQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity.getClass());
-        this.entity = entity;
+        this.entityTable = new EntityTable(entity);
     }
 
     public String update() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), getSetClause(), getWhereClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(), entityTable.getWhereClause());
     }
 
     private String getSetClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)
                 .map(this::getSetClause)
@@ -31,16 +29,11 @@ public class UpdateQueryBuilder {
         return String.join(", ", columnDefinitions);
     }
 
-    private boolean isNotNeeded(EntityField entityField) {
-        return !entityField.isId() && entityField.isPersistent();
+    private boolean isNotNeeded(EntityColumn entityColumn) {
+        return !entityColumn.isId();
     }
 
-    private String getSetClause(EntityField entityField) {
-        return entityField.getColumnName() + " = " + entityField.getValue(entity);
-    }
-
-    private String getWhereClause() {
-        final Object id = entityTable.getIdValue(entity);
-        return entityTable.getWhereClause(id);
+    private String getSetClause(EntityColumn entityColumn) {
+        return entityColumn.getColumnName() + " = " + entityColumn.getValueWithQuotes();
     }
 }

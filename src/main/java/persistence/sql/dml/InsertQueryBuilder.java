@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 
 import java.util.List;
@@ -10,38 +10,36 @@ public class InsertQueryBuilder {
     private static final String QUERY_TEMPLATE = "INSERT INTO %s (%s) VALUES (%s)";
 
     private final EntityTable entityTable;
-    private final Object entity;
 
     public InsertQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity.getClass());
-        this.entity = entity;
+        this.entityTable = new EntityTable(entity);
     }
 
     public String insert() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), getColumnClause(), getValueClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getColumnClause(), getValueClause());
     }
 
     private String getColumnClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)
-                .map(EntityField::getColumnName)
+                .map(EntityColumn::getColumnName)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);
     }
 
     private String getValueClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)
-                .map(entityField -> entityField.getValue(entity))
+                .map(EntityColumn::getValueWithQuotes)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);
     }
 
-    private boolean isNotNeeded(EntityField entityField) {
-        return !entityField.isGeneration() && entityField.isPersistent();
+    private boolean isNotNeeded(EntityColumn entityColumn) {
+        return !entityColumn.isGenerationValue();
     }
 }

@@ -1,6 +1,4 @@
-package persistence.entity;
-
-import database.H2;
+package database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,7 +11,7 @@ public class H2ConnectionFactory {
         throw new AssertionError();
     }
 
-    static Connection getConnection() {
+    public static Connection getConnection() {
         final H2 server = getServer();
         return cretaeConnection(server);
     }

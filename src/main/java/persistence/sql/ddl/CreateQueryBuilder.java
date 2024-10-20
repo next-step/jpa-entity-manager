@@ -1,8 +1,9 @@
 package persistence.sql.ddl;
 
 import persistence.dialect.Dialect;
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
+import persistence.sql.meta.JavaTypeConvertor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,44 +23,44 @@ public class CreateQueryBuilder {
     }
 
     public String create() {
-        return entityTable.getQuery(QUERY_TEMPLATE, entityTable.getTableName(), getColumnClause());
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getColumnClause());
     }
 
     private String getColumnClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
-                .filter(EntityField::isPersistent)
                 .map(this::getColumnDefinition)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);
     }
 
-    private String getColumnDefinition(EntityField entityField) {
-        String columDefinition = entityField.getColumnName() + " " + getDbType(entityField);
+    private String getColumnDefinition(EntityColumn entityColumn) {
+        String columDefinition = entityColumn.getColumnName() + " " + getDbType(entityColumn);
 
-        if (entityField.isNotNull()) {
+        if (entityColumn.isNotNull()) {
             columDefinition += " " + NOT_NULL_COLUMN_DEFINITION;
         }
 
-        if (entityField.isGeneration()) {
+        if (entityColumn.isGenerationValue()) {
             columDefinition += " " + GENERATION_COLUMN_DEFINITION;
         }
 
-        if (entityField.isId()) {
+        if (entityColumn.isId()) {
             columDefinition += " " + PRIMARY_KEY_COLUMN_DEFINITION;
         }
 
         return columDefinition;
     }
 
-    private String getDbType(EntityField entityField) {
-        final String dbTypeName = dialect.getDbTypeName(entityField);
-        final int columnLength = entityField.getColumnLength();
+    private String getDbType(EntityColumn entityColumn) {
+        final int sqlType = new JavaTypeConvertor().getSqlType(entityColumn.getType());
+        final String dbTypeName = dialect.getDbTypeName(sqlType);
+        final int columnLength = entityColumn.getColumnLength();
 
         if (columnLength == 0) {
             return dbTypeName;
         }
-        return String.format("%s(%s)", dbTypeName, columnLength);
+        return "%s(%s)".formatted(dbTypeName, columnLength);
     }
 }

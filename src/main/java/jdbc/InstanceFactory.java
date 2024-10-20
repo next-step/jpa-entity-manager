@@ -1,4 +1,4 @@
-package persistence.entity;
+package jdbc;
 
 import java.lang.reflect.InvocationTargetException;
 

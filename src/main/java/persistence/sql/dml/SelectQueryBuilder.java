@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.EntityField;
+import persistence.sql.meta.EntityColumn;
 import persistence.sql.meta.EntityTable;
 
 import java.util.List;
@@ -17,18 +17,17 @@ public class SelectQueryBuilder {
     }
 
     public String findAll() {
-        return entityTable.getQuery(FIND_ALL_QUERY_TEMPLATE, getColumnClause(), entityTable.getTableName());
+        return FIND_ALL_QUERY_TEMPLATE.formatted(getColumnClause(), entityTable.getTableName());
     }
 
     public String findById(Object id) {
-        return entityTable.getQuery(FIND_BY_ID_QUERY_TEMPLATE, getColumnClause(), entityTable.getTableName(), entityTable.getWhereClause(id));
+        return FIND_BY_ID_QUERY_TEMPLATE.formatted(getColumnClause(), entityTable.getTableName(), entityTable.getWhereClause(id));
     }
 
     private String getColumnClause() {
-        final List<String> columnDefinitions = entityTable.getEntityFields()
+        final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
-                .filter(EntityField::isPersistent)
-                .map(EntityField::getColumnName)
+                .map(EntityColumn::getColumnName)
                 .collect(Collectors.toList());
 
         return String.join(", ", columnDefinitions);

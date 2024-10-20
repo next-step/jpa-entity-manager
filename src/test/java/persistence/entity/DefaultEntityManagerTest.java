@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import database.H2ConnectionFactory;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,18 +14,20 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 
-import java.sql.Connection;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class EntityManagerImplTest {
-    private Connection connection;
+class DefaultEntityManagerTest {
+    private JdbcTemplate jdbcTemplate;
+    private PersistenceContext persistenceContext;
+    private EntityPersister entityPersister;
     private Dialect dialect;
 
     @BeforeEach
     void setUp() {
-        connection= H2ConnectionFactory.getConnection();
+        jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
+        persistenceContext = new DefaultPersistenceContext();
+        entityPersister = new DefaultEntityPersister(jdbcTemplate);
         dialect = new H2Dialect();
 
         createTable();
@@ -40,7 +43,7 @@ class EntityManagerImplTest {
     @DisplayName("엔티티를 조회한다.")
     void find() {
         // given
-        final EntityManager<EntityWithId> entityManager = new EntityManagerImpl<>(connection);
+        final EntityManager entityManager = new DefaultEntityManager(persistenceContext, entityPersister);
 
         // when
         final EntityWithId entityWithId = entityManager.find(EntityWithId.class, 1L);
@@ -60,7 +63,7 @@ class EntityManagerImplTest {
     @DisplayName("엔티티를 저장한다.")
     void persist() {
         // given
-        final EntityManager<EntityWithId> entityManager = new EntityManagerImpl<>(connection);
+        final EntityManager entityManager = new DefaultEntityManager(persistenceContext, entityPersister);
         final EntityWithId entityWithId = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
@@ -79,26 +82,10 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("엔티티를 삭제한다.")
-    void remove() {
-        // given
-        final EntityManager<EntityWithId> entityManager = new EntityManagerImpl<>(connection);
-        final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
-
-        // when
-        entityManager.remove(entityWithId);
-
-        // then
-        assertThatThrownBy(() -> entityManager.find(EntityWithId.class, 1L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Expected 1 result, got");
-    }
-
-    @Test
     @DisplayName("엔티티를 수정한다.")
     void update() {
         // given
-        final EntityManager<EntityWithId> entityManager = new EntityManagerImpl<>(connection);
+        final EntityManager entityManager = new DefaultEntityManager(persistenceContext, entityPersister);
         final EntityWithId entityWithId = new EntityWithId(1L, "Jackson", 20, "test2@email.com");
 
         // when
@@ -116,14 +103,28 @@ class EntityManagerImplTest {
         );
     }
 
+    @Test
+    @DisplayName("엔티티를 삭제한다.")
+    void remove() {
+        // given
+        final EntityManager entityManager = new DefaultEntityManager(persistenceContext, entityPersister);
+        final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
+
+        // when
+        entityManager.remove(entityWithId);
+
+        // then
+        assertThatThrownBy(() -> entityManager.find(EntityWithId.class, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Expected 1 result, got");
+    }
+
     private void createTable() {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
     private void insertData() {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(
                 new EntityWithId("Jaden", 30, "test@email.com", 1)
         );
@@ -131,7 +132,6 @@ class EntityManagerImplTest {
     }
 
     private void dropTable() {
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
         jdbcTemplate.execute(dropQueryBuilder.drop());
     }

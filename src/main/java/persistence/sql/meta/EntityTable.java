@@ -1,65 +1,72 @@
 package persistence.sql.meta;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class EntityTable {
     public static final String NOT_ENTITY_FAILED_MESSAGE = "클래스에 @Entity 애노테이션이 없습니다.";
-    public static final String NOT_ID_FAILED_MESSAGE = "필드에 @Id 애노테이션이 없습니다.";
 
-    private final Class<?> entityType;
-    private final EntityFields entityFields;
+    private final Class<?> type;
+    private final TableName tableName;
+    private final EntityColumns entityColumns;
 
     public EntityTable(Class<?> entityType) {
-        if (!entityType.isAnnotationPresent(Entity.class)) {
-            throw new IllegalArgumentException(NOT_ENTITY_FAILED_MESSAGE);
-        }
-
-        this.entityType = entityType;
-        this.entityFields = new EntityFields(entityType);
+        validate(entityType);
+        this.type = entityType;
+        this.tableName = new TableName(entityType);
+        this.entityColumns = new EntityColumns(entityType);
     }
 
-    public List<EntityField> getEntityFields() {
-        return entityFields.getEntityFields();
-    }
-
-    public String getQuery(String queryTemplate, String... templateArgs) {
-        return String.format(queryTemplate, (Object[]) templateArgs);
+    public EntityTable(Object entity) {
+        validate(entity.getClass());
+        this.type = entity.getClass();
+        this.tableName = new TableName(entity.getClass());
+        this.entityColumns = new EntityColumns(entity);
     }
 
     public String getTableName() {
-        final Table table = entityType.getAnnotation(Table.class);
-        if (Objects.nonNull(table) && Objects.nonNull(table.name()) && !table.name().isBlank()) {
-            return table.name();
-        }
-        return entityType.getSimpleName()
-                .toLowerCase();
+        return tableName.value();
+    }
+
+    public List<EntityColumn> getEntityColumns() {
+        return entityColumns.getEntityColumns();
+    }
+
+    public String getWhereClause() {
+        final EntityColumn entityColumn = entityColumns.getIdEntityColumn();
+        return entityColumn.getColumnName() + " = " + entityColumn.getValueWithQuotes();
     }
 
     public String getWhereClause(Object id) {
-        final EntityField entityField = getIdEntityField();
-        return entityField.getColumnName() + " = " + id;
+        final EntityColumn entityColumn = entityColumns.getIdEntityColumn();
+        return entityColumn.getColumnName() + " = " + getValueWithQuotes(id);
     }
 
-    public Object getIdValue(Object entity) {
-        final EntityField entityField = getIdEntityField();
-        return entityField.getValue(entity);
+    public Object getIdValue() {
+        final EntityColumn entityColumn = entityColumns.getIdEntityColumn();
+        return entityColumn.getValue();
     }
 
-    private EntityField getIdEntityField() {
-        final Field field = Arrays.stream(entityType.getDeclaredFields())
-                .filter(this::isId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(NOT_ID_FAILED_MESSAGE));
-        return new EntityField(field);
+    public String getIdValueWithQuotes() {
+        final EntityColumn entityColumn = entityColumns.getIdEntityColumn();
+        return entityColumn.getValueWithQuotes();
     }
 
-    private boolean isId(Field field) {
-        return new EntityField(field).isId();
+    public EntityKey toEntityKey() {
+        return new EntityKey(type, getIdValue());
+    }
+
+    private void validate(Class<?> entityType) {
+        if (!entityType.isAnnotationPresent(Entity.class)) {
+            throw new IllegalArgumentException(NOT_ENTITY_FAILED_MESSAGE);
+        }
+    }
+
+    public String getValueWithQuotes(Object id) {
+        if (id.getClass() == String.class) {
+            return "'%s'".formatted(String.valueOf(id));
+        }
+        return String.valueOf(id);
     }
 }
