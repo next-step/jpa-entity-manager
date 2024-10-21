@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("DefaultEntityManager 테스트")
 class DefaultEntityManagerTest extends TestEntityInitialize {
@@ -33,11 +34,14 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
 
         // when
         PersonV3 actual = entityManager.find(PersonV3.class, 1L);
-        assertThat(actual).isNotNull();
-        assertThat(actual.getName()).isEqualTo("catsbi");
-        assertThat(actual.getAge()).isEqualTo(55);
-        assertThat(actual.getEmail()).isEqualTo("catsbi@naver.com");
-        assertThat(actual.getIndex()).isEqualTo(123);
+
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo("catsbi"),
+                () -> assertThat(actual.getAge()).isEqualTo(55),
+                () -> assertThat(actual.getEmail()).isEqualTo("catsbi@naver.com"),
+                () -> assertThat(actual.getIndex()).isEqualTo(123)
+        );
     }
 
     @Test
@@ -100,9 +104,11 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
         entityManager.persist(actual);
         List<PersonV3> persons = entityManager.findAll(PersonV3.class);
 
-        assertThat(persons).hasSize(1);
-        assertThat(persons.getFirst().getName()).isEqualTo("newCatsbi");
-        assertThat(persons.getFirst().getAge()).isEqualTo(123);
+        assertAll(
+                () -> assertThat(persons).hasSize(1),
+                () -> assertThat(persons.getFirst().getName()).isEqualTo("newCatsbi"),
+                () -> assertThat(persons.getFirst().getAge()).isEqualTo(123)
+        );
     }
 
     @Test
@@ -118,10 +124,13 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
 
         // then
         PersonV3 mergedPerson = entityManager.find(PersonV3.class, 1L);
-        assertThat(mergedPerson).isNotNull();
-        assertThat(mergedPerson.getName()).isEqualTo("hansol");
-        assertThat(mergedPerson.getAge()).isEqualTo(33);
-        assertThat(mergedPerson.getEmail()).isEqualTo("hansol@naver.com");
+        assertAll(
+                () -> assertThat(mergedPerson).isNotNull(),
+                () -> assertThat(mergedPerson.getName()).isEqualTo("hansol"),
+                () -> assertThat(mergedPerson.getAge()).isEqualTo(33),
+                () -> assertThat(mergedPerson.getEmail()).isEqualTo("hansol@naver.com")
+
+        );
     }
 
     @Test

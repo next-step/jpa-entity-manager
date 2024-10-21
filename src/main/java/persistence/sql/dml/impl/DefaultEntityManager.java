@@ -1,5 +1,6 @@
 package persistence.sql.dml.impl;
 
+import jakarta.persistence.EntityExistsException;
 import persistence.sql.clause.Clause;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.context.PersistenceContext;
@@ -29,8 +30,7 @@ public class DefaultEntityManager implements EntityManager {
         MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
 
         if (!isNew(entity, loader)) {
-            merge(entity);
-            return;
+            throw new EntityExistsException("Entity already exists");
         }
 
         Object id = entityPersister.insert(entity, loader);

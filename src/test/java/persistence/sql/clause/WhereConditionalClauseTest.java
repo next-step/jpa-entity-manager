@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("WhereConditionalClause 테스트")
 class WhereConditionalClauseTest {
@@ -28,10 +29,12 @@ class WhereConditionalClauseTest {
     void create() {
         WhereConditionalClause actual = new WhereConditionalClause("name", "catsbi", "=");
 
-        assertThat(actual.column()).isEqualTo("name");
-        assertThat(actual.value()).isEqualTo("catsbi");
-        assertThat(actual.operator()).isEqualTo("=");
-        assertThat(actual.clause()).isEqualTo("name = catsbi");
+        assertAll(
+                () -> assertThat(actual.column()).isEqualTo("name"),
+                () -> assertThat(actual.value()).isEqualTo("catsbi"),
+                () -> assertThat(actual.operator()).isEqualTo("="),
+                () -> assertThat(actual.clause()).isEqualTo("name = catsbi")
+        );
     }
 
     @ParameterizedTest
@@ -48,10 +51,12 @@ class WhereConditionalClauseTest {
     void eqTest() {
         WhereConditionalClause actual = WhereConditionalClause.builder().column("name").eq("catsbi");
 
-        assertThat(actual.column()).isEqualTo("name");
-        assertThat(actual.value()).isEqualTo("catsbi");
-        assertThat(actual.operator()).isEqualTo("=");
-        assertThat(actual.clause()).isEqualTo("name = catsbi");
+        assertAll(
+                () -> assertThat(actual.column()).isEqualTo("name"),
+                () -> assertThat(actual.value()).isEqualTo("catsbi"),
+                () -> assertThat(actual.operator()).isEqualTo("="),
+                () -> assertThat(actual.clause()).isEqualTo("name = catsbi")
+        );
     }
 
     @Test
@@ -59,10 +64,12 @@ class WhereConditionalClauseTest {
     void inTest() {
         WhereConditionalClause actual = WhereConditionalClause.builder().column("name").in(List.of("catsbi", "crong"));
 
-        assertThat(actual.column()).isEqualTo("name");
-        assertThat(actual.value()).isEqualTo("'catsbi' , 'crong'");
-        assertThat(actual.operator()).isEqualTo("IN");
-        assertThat(actual.clause()).isEqualTo("name IN 'catsbi' , 'crong'");
+        assertAll(
+                () -> assertThat(actual.column()).isEqualTo("name"),
+                () -> assertThat(actual.value()).isEqualTo("'catsbi' , 'crong'"),
+                () -> assertThat(actual.operator()).isEqualTo("IN"),
+                () -> assertThat(actual.clause()).isEqualTo("name IN 'catsbi' , 'crong'")
+        );
     }
 
     @Test
@@ -70,10 +77,12 @@ class WhereConditionalClauseTest {
     void neqTest() {
         WhereConditionalClause actual = WhereConditionalClause.builder().column("name").neq("catsbi");
 
-        assertThat(actual.column()).isEqualTo("name");
-        assertThat(actual.value()).isEqualTo("catsbi");
-        assertThat(actual.operator()).isEqualTo("!=");
-        assertThat(actual.clause()).isEqualTo("name != catsbi");
+        assertAll(
+                () -> assertThat(actual.column()).isEqualTo("name"),
+                () -> assertThat(actual.value()).isEqualTo("catsbi"),
+                () -> assertThat(actual.operator()).isEqualTo("!="),
+                () -> assertThat(actual.clause()).isEqualTo("name != catsbi")
+        );
     }
 
     @Test
@@ -81,9 +90,11 @@ class WhereConditionalClauseTest {
     void notInTest() {
         WhereConditionalClause actual = WhereConditionalClause.builder().column("name").notIn(List.of("catsbi", "crong"));
 
-        assertThat(actual.column()).isEqualTo("name");
-        assertThat(actual.value()).isEqualTo("'catsbi' , 'crong'");
-        assertThat(actual.operator()).isEqualTo("NOT IN");
-        assertThat(actual.clause()).isEqualTo("name NOT IN 'catsbi' , 'crong'");
+        assertAll(
+                () -> assertThat(actual.column()).isEqualTo("name"),
+                () -> assertThat(actual.value()).isEqualTo("'catsbi' , 'crong'"),
+                () -> assertThat(actual.operator()).isEqualTo("NOT IN"),
+                () -> assertThat(actual.clause()).isEqualTo("name NOT IN 'catsbi' , 'crong'")
+        );
     }
 }
