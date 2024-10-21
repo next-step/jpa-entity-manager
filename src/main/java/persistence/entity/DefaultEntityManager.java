@@ -1,14 +1,24 @@
 package persistence.entity;
 
+import jdbc.JdbcTemplate;
+
 import java.util.Objects;
 
 public class DefaultEntityManager implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
-    public DefaultEntityManager(PersistenceContext persistenceContext, EntityPersister entityPersister) {
+    private DefaultEntityManager(PersistenceContext persistenceContext, EntityPersister entityPersister,
+                                 EntityLoader entityLoader) {
         this.persistenceContext = persistenceContext;
         this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
+    }
+
+    public static DefaultEntityManager of(JdbcTemplate jdbcTemplate) {
+        return new DefaultEntityManager(new DefaultPersistenceContext(), new DefaultEntityPersister(jdbcTemplate),
+                new DefaultEntityLoader(jdbcTemplate));
     }
 
     @Override
@@ -18,7 +28,7 @@ public class DefaultEntityManager implements EntityManager {
             return managedEntity;
         }
 
-        final T entity = entityPersister.find(entityType, id);
+        final T entity = entityLoader.find(entityType, id);
         persistenceContext.addEntity(entity);
         return entity;
     }

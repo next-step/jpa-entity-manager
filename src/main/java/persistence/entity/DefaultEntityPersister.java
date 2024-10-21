@@ -1,10 +1,9 @@
 package persistence.entity;
 
-import jdbc.DefaultRowMapper;
+import jdbc.DefaultIdMapper;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
 public class DefaultEntityPersister implements EntityPersister {
@@ -15,17 +14,10 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> T find(Class<T> entityType, Object id) {
-        final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityType);
-        final String sql = selectQueryBuilder.findById(id);
-        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(entityType));
-    }
-
-    @Override
     public void insert(Object entity) {
         final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
         final String sql = insertQueryBuilder.insert();
-        jdbcTemplate.execute(sql);
+        jdbcTemplate.executeAndReturnGeneratedKeys(sql, new DefaultIdMapper(entity));
     }
 
     @Override

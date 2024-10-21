@@ -21,6 +21,18 @@ public class JdbcTemplate {
         }
     }
 
+    public void executeAndReturnGeneratedKeys(final String sql, final IdMapper idMapper) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                idMapper.mapRow(generatedKeys);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         final List<T> results = query(sql, rowMapper);
         if (results.size() != 1) {
