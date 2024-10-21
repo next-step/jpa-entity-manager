@@ -42,9 +42,9 @@ public class PersistenceContextImplTest {
 
         person.changeEmail("changed@test.com");
 
-        persistenceContext.insertEntity(entityInfo, person);
+        persistenceContext.updateEntity(entityInfo, person);
 
-        assertThat(persistenceContext.findEntity(entityInfo))
+        assertThat(persistenceContext.findEntity(EntityInfo.createEntityInfo(1, Person.class)))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "changed@test.com");
     }
