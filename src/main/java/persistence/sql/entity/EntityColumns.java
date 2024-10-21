@@ -33,4 +33,12 @@ public class EntityColumns {
     }
 
 
+    public String getIdFieldName() {
+        for (EntityColumn column : columns) {
+            if (column.isPrimaryKey()) {
+                return column.getColumnName();
+            }
+        }
+        throw new IllegalArgumentException("@Id 어노테이션이 존재하지 않음");
+    }
 }
