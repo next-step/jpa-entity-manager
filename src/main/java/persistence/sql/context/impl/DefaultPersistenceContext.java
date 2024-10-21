@@ -1,7 +1,10 @@
 package persistence.sql.context.impl;
 
+import jakarta.persistence.Id;
 import persistence.sql.context.KeyHolder;
 import persistence.sql.context.PersistenceContext;
+import persistence.sql.dml.MetadataLoader;
+import persistence.sql.dml.impl.SimpleMetadataLoader;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -59,16 +62,18 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     private <T> void overwriteEntity(T entity, Object origin) {
-        Field[] declaredFields = entity.getClass().getDeclaredFields();
+        MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
+        loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class))
+                .forEach(field -> copyFieldValue(field, entity, origin));
+    }
 
-        for (Field field : declaredFields) {
+    private <T> void copyFieldValue(Field field, T entity, Object origin) {
+        try {
             field.setAccessible(true);
-            try {
-                Object value = field.get(entity);
-                field.set(origin, value);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Illegal access to field: " + field.getName());
-            }
+            Object value = field.get(entity);
+            field.set(origin, value);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Illegal access to field: " + field.getName());
         }
     }
 }
