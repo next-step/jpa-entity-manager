@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 */
 public class PersistenceContextImplTest {
 
-    @DisplayName("영속성 컨텍스트에 Entity객체를 저장한다.")
+    @DisplayName("영속성 컨텍스트에 Entity객체를 저장 후 저장되어있는 Entity 객체를 가져온다..")
     @Test
     void insertFindTest() {
         PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
@@ -26,7 +26,7 @@ public class PersistenceContextImplTest {
 
         persistenceContext.insertEntity(entityInfo, person);
 
-        assertThat(persistenceContext.findEntity(entityInfo))
+        assertThat(persistenceContext.findEntity(EntityInfo.createEntityInfo(1, Person.class)))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
     }
