@@ -1,10 +1,9 @@
 package persistence.sql.context.impl;
 
-import jakarta.persistence.Id;
 import persistence.sql.QueryBuilderFactory;
 import persistence.sql.clause.Clause;
 import persistence.sql.clause.InsertColumnValueClause;
-import persistence.sql.clause.SetValueClause;
+import persistence.sql.clause.UpdateQueryClauses;
 import persistence.sql.clause.WhereConditionalClause;
 import persistence.sql.common.util.NameConverter;
 import persistence.sql.context.EntityPersister;
@@ -41,28 +40,14 @@ public class DefaultEntityPersister implements EntityPersister {
 
     @Override
     public <T> void update(T entity, MetadataLoader<?> loader) {
-        List<Field> fields = loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class));
-        List<Clause> clauses = createUpdateClauses(entity, loader, fields);
-        clauses.add(createWhereClause(entity, loader));
+        UpdateQueryClauses updateQueryClauses = UpdateQueryClauses.builder(nameConverter)
+                .where(entity, loader)
+                .setColumnValues(entity, loader)
+                .build();
 
         String mergeQuery = QueryBuilderFactory.getInstance()
-                .buildQuery(QueryType.UPDATE, loader, clauses.toArray(Clause[]::new));
+                .buildQuery(QueryType.UPDATE, loader, updateQueryClauses.clauseArrays());
         database.executeUpdate(mergeQuery);
-    }
-
-    private <T> List<Clause> createUpdateClauses(T entity, MetadataLoader<?> loader, List<Field> fields) {
-        List<Clause> clauses = new ArrayList<>();
-        for (Field field : fields) {
-            clauses.add(SetValueClause.newInstance(field, entity, loader.getColumnName(field, nameConverter)));
-        }
-
-        return clauses;
-    }
-
-    private <T> WhereConditionalClause createWhereClause(T entity, MetadataLoader<?> loader) {
-        return WhereConditionalClause.builder()
-                .column(loader.getColumnName(loader.getPrimaryKeyField(), nameConverter))
-                .eq(Clause.toColumnValue(Clause.extractValue(loader.getPrimaryKeyField(), entity)));
     }
 
     @Override

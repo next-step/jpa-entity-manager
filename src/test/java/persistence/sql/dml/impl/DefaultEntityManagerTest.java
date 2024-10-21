@@ -1,5 +1,6 @@
 package persistence.sql.dml.impl;
 
+import jakarta.persistence.EntityExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -90,7 +91,7 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
     }
 
     @Test
-    @DisplayName("persist 함수는 엔티티가 이미 존재하는 경우 병합을 수행한다.")
+    @DisplayName("persist 함수는 엔티티가 이미 존재하는 경우 예외를 던진다..")
     void testPersistWithMerge() {
         // given
         PersonV3 person = new PersonV3("catsbi", 25, "casbi@naver.com", 123);
@@ -101,14 +102,9 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
 
         actual.setName("newCatsbi");
         actual.setAge(123);
-        entityManager.persist(actual);
-        List<PersonV3> persons = entityManager.findAll(PersonV3.class);
-
-        assertAll(
-                () -> assertThat(persons).hasSize(1),
-                () -> assertThat(persons.getFirst().getName()).isEqualTo("newCatsbi"),
-                () -> assertThat(persons.getFirst().getAge()).isEqualTo(123)
-        );
+        assertThatThrownBy(()-> entityManager.persist(actual))
+                .isInstanceOf(EntityExistsException.class)
+                .hasMessage("Entity already exists");
     }
 
     @Test
