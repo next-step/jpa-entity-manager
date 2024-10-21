@@ -36,7 +36,12 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public <T, ID> void merge(ID id, T entity) {
         KeyHolder key = new KeyHolder(entity.getClass(), id);
         Object origin = context.get(key);
-        if (origin == null || !isEntityChanged(entity, origin)) {
+        if (origin == null) {
+            add(id, entity);
+            return;
+        }
+
+        if (!isEntityChanged(entity, origin)) {
             return;
         }
 
@@ -45,7 +50,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public <T> void delete(T entity) {
-
+        KeyHolder key = new KeyHolder(entity.getClass(), entity);
+        context.remove(key);
     }
 
     private boolean isEntityChanged(Object entity, Object snapshot) {

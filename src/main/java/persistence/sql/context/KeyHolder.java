@@ -3,6 +3,11 @@ package persistence.sql.context;
 import java.util.Objects;
 
 public record KeyHolder(Class<?> entityType, Object key) {
+    public KeyHolder {
+        if (entityType == null || key == null) {
+            throw new IllegalArgumentException("entityType and key must not be null");
+        }
+    }
 
     @Override
     public boolean equals(Object o) {
