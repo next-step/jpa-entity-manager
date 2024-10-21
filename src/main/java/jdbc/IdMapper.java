@@ -5,5 +5,5 @@ import java.sql.SQLException;
 
 @FunctionalInterface
 public interface IdMapper {
-    void mapRow(final ResultSet resultSet) throws SQLException;
+    void mapRow(final ResultSet resultSet) throws SQLException, IllegalAccessException;
 }

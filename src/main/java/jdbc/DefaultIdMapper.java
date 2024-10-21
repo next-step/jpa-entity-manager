@@ -20,7 +20,7 @@ public class DefaultIdMapper implements IdMapper {
     }
 
     @Override
-    public void mapRow(ResultSet resultSet) throws SQLException {
+    public void mapRow(ResultSet resultSet) throws SQLException, IllegalAccessException {
         final Field field = getIdField();
         mapField(resultSet, field);
     }
@@ -32,13 +32,9 @@ public class DefaultIdMapper implements IdMapper {
                 .orElseThrow(() -> new IllegalStateException(NOT_ID_FAILED_MESSAGE));
     }
 
-    private void mapField(ResultSet resultSet, Field field) {
-        try {
-            final Object value = resultSet.getObject(1);
-            field.setAccessible(true);
-            field.set(entity, value);
-        } catch (SQLException | IllegalAccessException e) {
-            logger.error(e.getMessage(), e);
-        }
+    private void mapField(ResultSet resultSet, Field field) throws SQLException, IllegalAccessException {
+        final Object value = resultSet.getObject(1);
+        field.setAccessible(true);
+        field.set(entity, value);
     }
 }
