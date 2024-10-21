@@ -15,9 +15,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public <T, ID> T get(Class<T> entityType, ID id) {
         if (context.containsKey(entityType) && context.get(entityType).containsKey(id)) {
             return entityType.cast(context.get(entityType).get(id));
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     @Override
@@ -25,9 +25,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
         if (context.containsKey(entityType)) {
             return context.get(entityType).values().stream()
                     .map(entityType::cast).toList();
-        } else {
-            return Collections.emptyList();
         }
+
+        return Collections.emptyList();
     }
 
     @Override
