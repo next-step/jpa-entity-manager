@@ -68,7 +68,7 @@ public class DefaultEntityManager implements EntityManager {
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
         entityPersister.update(entity, loader);
-        persistenceContext.merge(id, loader);
+        persistenceContext.merge(id, entity);
     }
 
     @Override
@@ -90,6 +90,12 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         MetadataLoader<T> loader = new SimpleMetadataLoader<>(returnType);
+        T foundEntity = persistenceContext.get(returnType, primaryKey);
+
+        if (foundEntity != null) {
+            return foundEntity;
+        }
+
         return entityPersister.select(returnType, primaryKey, loader);
     }
 

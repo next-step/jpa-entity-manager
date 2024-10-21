@@ -1,53 +1,41 @@
 package persistence.sql.context.impl;
 
+import persistence.sql.context.KeyHolder;
 import persistence.sql.context.PersistenceContext;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class DefaultPersistenceContext implements PersistenceContext {
-    private final Map<Class<?>, Map<?, Object>> context = new HashMap<>();
+    private final Map<KeyHolder, Object> context = new HashMap<>();
 
     @Override
     public <T, ID> T get(Class<T> entityType, ID id) {
-        if (context.containsKey(entityType) && context.get(entityType).containsKey(id)) {
-            return entityType.cast(context.get(entityType).get(id));
+        KeyHolder key = new KeyHolder(entityType, id);
+
+        if (context.containsKey(key)) {
+            return entityType.cast(context.get(key));
         }
 
         return null;
     }
 
     @Override
-    public <T> List<T> getAll(Class<T> entityType) {
-        if (context.containsKey(entityType)) {
-            return context.get(entityType).values().stream()
-                    .map(entityType::cast).toList();
-        }
-
-        return Collections.emptyList();
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public <T, ID> T add(ID id, T entity) {
-        Map<ID, Object> entityMap = (Map<ID, Object>) context.computeIfAbsent(entity.getClass(), k -> new HashMap<>());
-
-        if (entityMap.containsKey(id)) {
-            return (T) entityMap.get(id);
+        KeyHolder key = new KeyHolder(entity.getClass(), id);
+        if (context.containsKey(key)) {
+            return (T) context.get(key);
         }
 
-        return (T) entityMap.put(id, entity);
+        return (T) context.put(key, entity);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T, ID> void merge(ID id, T entity) {
-        Map<ID, Object> entityMap = (Map<ID, Object>) context.computeIfAbsent(entity.getClass(), k -> new HashMap<>());
-
-        Object origin = entityMap.get(id);
+        KeyHolder key = new KeyHolder(entity.getClass(), id);
+        Object origin = context.get(key);
         if (origin == null || !isEntityChanged(entity, origin)) {
             return;
         }

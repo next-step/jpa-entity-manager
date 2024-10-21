@@ -37,7 +37,7 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
         assertThat(actual.getName()).isEqualTo("catsbi");
         assertThat(actual.getAge()).isEqualTo(55);
         assertThat(actual.getEmail()).isEqualTo("catsbi@naver.com");
-        assertThat(actual.getIndex()).isNull();
+        assertThat(actual.getIndex()).isEqualTo(123);
     }
 
     @Test

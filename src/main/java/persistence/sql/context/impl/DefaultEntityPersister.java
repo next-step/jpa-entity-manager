@@ -40,31 +40,33 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> boolean update(T entity, MetadataLoader<?> loader) {
+    public <T> void update(T entity, MetadataLoader<?> loader) {
         List<Field> fields = loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class));
+        List<Clause> clauses = createUpdateClauses(entity, loader, fields);
+        clauses.add(createWhereClause(entity, loader));
 
-        Clause[] clauses = new Clause[fields.size() + 1];
-        clauses[0] = WhereConditionalClause.builder()
+        String mergeQuery = QueryBuilderFactory.getInstance()
+                .buildQuery(QueryType.UPDATE, loader, clauses.toArray(Clause[]::new));
+        database.executeUpdate(mergeQuery);
+    }
+
+    private <T> List<Clause> createUpdateClauses(T entity, MetadataLoader<?> loader, List<Field> fields) {
+        List<Clause> clauses = new ArrayList<>();
+        for (Field field : fields) {
+            clauses.add(SetValueClause.newInstance(field, entity, loader.getColumnName(field, nameConverter)));
+        }
+
+        return clauses;
+    }
+
+    private <T> WhereConditionalClause createWhereClause(T entity, MetadataLoader<?> loader) {
+        return WhereConditionalClause.builder()
                 .column(loader.getColumnName(loader.getPrimaryKeyField(), nameConverter))
                 .eq(Clause.toColumnValue(Clause.extractValue(loader.getPrimaryKeyField(), entity)));
-
-        for (int i = 0; i < fields.size(); i++) {
-            Field field = fields.get(i);
-            clauses[i + 1] = SetValueClause.newInstance(field, entity, loader.getColumnName(field, nameConverter));
-        }
-
-        String mergeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.UPDATE, loader, clauses);
-        try {
-            database.executeUpdate(mergeQuery);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     @Override
-    public <T> boolean delete(T entity, MetadataLoader<?> loader) {
+    public <T> void delete(T entity, MetadataLoader<?> loader) {
         Field pkField = loader.getPrimaryKeyField();
         Object extractedValue = Clause.extractValue(pkField, entity);
         String value = Clause.toColumnValue(extractedValue);
@@ -74,14 +76,7 @@ public class DefaultEntityPersister implements EntityPersister {
                 .eq(value);
 
         String removeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.DELETE, loader, clause);
-
-        try {
-            database.executeUpdate(removeQuery);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        database.executeUpdate(removeQuery);
     }
 
     @Override

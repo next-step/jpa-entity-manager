@@ -8,9 +8,9 @@ public interface EntityPersister {
 
     <T> Object insert(T entity, MetadataLoader<?> loader);
 
-    <T> boolean update(T entity, MetadataLoader<?> loader);
+    <T> void update(T entity, MetadataLoader<?> loader);
 
-    <T> boolean delete(T entity, MetadataLoader<?> loader);
+    <T> void delete(T entity, MetadataLoader<?> loader);
 
     <T> T select(Class<T> entityType, Object primaryKey, MetadataLoader<?> loader);
 

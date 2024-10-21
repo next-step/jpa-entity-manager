@@ -40,36 +40,4 @@ class DefaultPersistenceContextTest {
 
         assertThat(actual).isNull();
     }
-
-    @Test
-    @DisplayName("getAll 함수는 저장된 모든 엔티티를 반환한다.")
-    void testGetAll() {
-        // given
-        List<PersonV3> expected = List.of(
-                new PersonV3(1L, "catsbi", 12, "catsbi@naver.com", 123),
-                new PersonV3(2L, "crong", 34, "crong@naver.com", 123),
-                new PersonV3(3L, "pobi", 56, "pobi@naver.com", 123)
-        );
-
-        expected.forEach(person -> context.add(person.getId(), person));
-
-        // when
-        Collection<PersonV3> persons = context.getAll(PersonV3.class);
-
-        // then
-        assertThat(persons).isNotNull();
-        assertThat(persons).hasSize(3);
-        assertThat(persons).containsAll(expected);
-    }
-
-    @Test
-    @DisplayName("getAll 함수는 저장된 엔티티가 없으면 빈 컬렉션을 반환한다.")
-    void testGetAllWithEmpty() {
-        // when
-        Collection<PersonV3> persons = context.getAll(PersonV3.class);
-
-        // then
-        assertThat(persons).isNotNull();
-        assertThat(persons).isEmpty();
-    }
 }
