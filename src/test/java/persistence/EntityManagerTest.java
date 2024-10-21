@@ -41,7 +41,7 @@ public class EntityManagerTest {
 
         jdbcTemplate.execute(createQuery);
 
-        this.em = new EntityManagerImpl(jdbcTemplate);
+        this.em = new EntityManagerImpl(new EntityPersister(new PersistenceContextImpl(), jdbcTemplate));
     }
 
     //정확한 테스트를 위해 메소드마다 테이블 DROP 후 DB종료

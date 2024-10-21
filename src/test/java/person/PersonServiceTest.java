@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.EntityManagerImpl;
+import persistence.EntityPersister;
+import persistence.PersistenceContextImpl;
 import service.person.PersonService;
 import service.person.request.PersonRequest;
 import service.person.response.PersonResponse;
@@ -46,7 +48,7 @@ public class PersonServiceTest {
 
         jdbcTemplate.execute(createQuery);
 
-        this.personService = new PersonService(new EntityManagerImpl(jdbcTemplate));
+        this.personService = new PersonService(new EntityManagerImpl(new EntityPersister(new PersistenceContextImpl(), jdbcTemplate)));
 
         this.personService.save(createPersonRequest(1));
         this.personService.save(createPersonRequest(2));
