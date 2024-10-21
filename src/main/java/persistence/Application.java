@@ -43,11 +43,11 @@ public class Application {
             final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(updatedEntity);
             jdbcTemplate.execute(updateQueryBuilder.update());
 
-            final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(Person.class);
-            final List<Person> people = jdbcTemplate.query(selectQueryBuilder.findAll(), new PersonRowMapper());
+            final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+            final List<Person> people = jdbcTemplate.query(selectQueryBuilder.findAll(Person.class), new PersonRowMapper());
             logger.debug(people.toString());
 
-            final Person person = jdbcTemplate.queryForObject(selectQueryBuilder.findById(1), new PersonRowMapper());
+            final Person person = jdbcTemplate.queryForObject(selectQueryBuilder.findById(Person.class, 1), new PersonRowMapper());
             logger.debug(person.toString());
 
             final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(updatedEntity);

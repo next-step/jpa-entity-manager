@@ -11,6 +11,7 @@ import persistence.dialect.H2Dialect;
 import persistence.fixture.EntityWithId;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +27,7 @@ class DefaultEntityPersisterTest {
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
         entityPersister = new DefaultEntityPersister(jdbcTemplate);
-        entityLoader = new DefaultEntityLoader(jdbcTemplate);
+        entityLoader = new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder());
         dialect = new H2Dialect();
         entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 

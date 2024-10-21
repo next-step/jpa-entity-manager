@@ -11,6 +11,7 @@ import persistence.dialect.H2Dialect;
 import persistence.fixture.EntityWithId;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
+import persistence.sql.dml.SelectQueryBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +42,7 @@ class DefaultEntityLoaderTest {
     @DisplayName("엔티티를 조회한다.")
     void find() {
         // given
-        final EntityLoader entityLoader = new DefaultEntityLoader(jdbcTemplate);
+        final EntityLoader entityLoader = new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder());
 
         // when
         final EntityWithId managedEntity = entityLoader.find(entity.getClass(), entity.getId());
