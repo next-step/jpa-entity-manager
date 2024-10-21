@@ -1,9 +1,6 @@
 package persistence.sql.dml.query;
 
-import persistence.sql.Queryable;
 import persistence.sql.definition.TableDefinition;
-
-import java.util.List;
 
 public class UpdateQueryBuilder {
     private final StringBuilder query;
@@ -12,13 +9,12 @@ public class UpdateQueryBuilder {
         query = new StringBuilder();
         final Class<?> entityClass = entity.getClass();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
-        final List<? extends Queryable> targetColumns = tableDefinition.withIdColumns();
 
         query.append("UPDATE ");
         query.append(tableDefinition.tableName());
 
         query.append(" SET ");
-        String columnClause = columnClause(tableDefinition, entity, query);
+        String columnClause = columnClause(tableDefinition, entity);
         query.append(columnClause);
 
         query.append(" WHERE ");
@@ -31,7 +27,7 @@ public class UpdateQueryBuilder {
         return query.toString();
     }
 
-    private static String columnClause(TableDefinition tableDefinition, Object entity, StringBuilder query) {
+    private static String columnClause(TableDefinition tableDefinition, Object entity) {
         return tableDefinition.withoutIdColumns().stream()
                 .map(column -> {
                     final String columnValue = column.hasValue(entity) ? column.getValue(entity) : "null";

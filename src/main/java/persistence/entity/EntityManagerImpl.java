@@ -30,7 +30,7 @@ public class EntityManagerImpl implements EntityManager {
         );
 
         if (persistenceContext.getEntity(entityKey) != null) {
-            return;
+            update(entity);
         }
 
         entityPersister.insert(entity);

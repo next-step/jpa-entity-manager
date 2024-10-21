@@ -19,12 +19,12 @@
   - [x] 엔티티 로드 시 스냅샷 저장
     - [x] 스냅샷은 엔티티의 복사본으로 저장
     - [x] 이미 영속성 컨텍스트에서 조회되었던 엔티티는 스냅샷을 저장하지 않음
-  - [ ] EntityManager.persist()
-    - [ ] 엔티티를 영속성 컨텍스트에 저장
-    - [ ] 스냅샷 저장
-    - [ ] Database에 insert 쿼리 실행 (현재는 flush 개념 구현 전이므로)
-      - [ ] 만약 영속성 컨텍스트에 관리되고 있던 Entity가 다시 persist요청이 오게 되면
-        - [ ] update 실행. 
+  - [x] EntityManager.persist()
+    - [x] 엔티티를 영속성 컨텍스트에 저장
+    - [x] 스냅샷 저장
+    - [x] Database에 insert 쿼리 실행 (현재는 flush 개념 구현 전이므로)
+      - [x] 만약 영속성 컨텍스트에 관리되고 있던 Entity가 다시 persist요청이 오게 되면
+        - [x] update 실행. 
   - [ ] EntityManager.update()
     - [ ] 1차 캐시에 저장되어 관리되고 있는 Snapshot이 있는 지 확인
     - [ ] Snapshot이 있다면, 엔티티의 변경사항을 확인 후 update 쿼리 실행
