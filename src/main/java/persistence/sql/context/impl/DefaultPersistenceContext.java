@@ -3,9 +3,9 @@ package persistence.sql.context.impl;
 import persistence.sql.context.PersistenceContext;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultPersistenceContext implements PersistenceContext {
@@ -21,7 +21,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T> Collection<T> getAll(Class<T> entityType) {
+    public <T> List<T> getAll(Class<T> entityType) {
         if (context.containsKey(entityType)) {
             return context.get(entityType).values().stream()
                     .map(entityType::cast).toList();

@@ -1,12 +1,12 @@
 package persistence.sql.context;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface PersistenceContext {
 
     <T, ID> T get(Class<T> entityType, ID id);
 
-    <T> Collection<T> getAll(Class<T> entityType);
+    <T> List<T> getAll(Class<T> entityType);
 
     <T, ID> T add(ID id, T entity);
 
