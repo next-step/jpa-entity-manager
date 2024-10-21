@@ -6,7 +6,8 @@ package persistence.sql.common.util;
 public class CamelToSnakeConverter implements NameConverter {
     private static final CamelToSnakeConverter INSTANCE = new CamelToSnakeConverter();
 
-    private CamelToSnakeConverter() {}
+    private CamelToSnakeConverter() {
+    }
 
     public static CamelToSnakeConverter getInstance() {
         return INSTANCE;

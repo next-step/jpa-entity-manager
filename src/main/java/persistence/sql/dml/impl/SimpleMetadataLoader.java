@@ -25,6 +25,20 @@ public class SimpleMetadataLoader<T> implements MetadataLoader<T> {
         this.clazz = entityType;
     }
 
+    @Nullable
+    private static String getColumnNameByField(Field declaredField, NameConverter nameConverter) {
+        if (declaredField.isAnnotationPresent(Transient.class)) {
+            return null;
+        }
+
+        Column anno = declaredField.getAnnotation(Column.class);
+        if (anno != null && !anno.name().isBlank()) {
+            return anno.name();
+        }
+
+        return nameConverter.convert(declaredField.getName());
+    }
+
     @Override
     public Field getField(int index) {
         return clazz.getDeclaredFields()[index];
@@ -61,20 +75,6 @@ public class SimpleMetadataLoader<T> implements MetadataLoader<T> {
                 .orElseThrow(() -> new IllegalArgumentException("Field not found"));
 
         return getColumnNameByField(foundField, nameConverter);
-    }
-
-    @Nullable
-    private static String getColumnNameByField(Field declaredField, NameConverter nameConverter) {
-        if (declaredField.isAnnotationPresent(Transient.class)) {
-            return null;
-        }
-
-        Column anno = declaredField.getAnnotation(Column.class);
-        if (anno != null && !anno.name().isBlank()) {
-            return anno.name();
-        }
-
-        return nameConverter.convert(declaredField.getName());
     }
 
     @Override

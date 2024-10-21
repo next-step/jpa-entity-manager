@@ -44,7 +44,6 @@ public class Application {
             }
 
 
-
             //server.stop();
         } catch (Exception e) {
             logger.error("Error occurred", e);

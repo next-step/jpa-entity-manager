@@ -5,7 +5,8 @@ public class Car {
     private String name;
     private int price;
 
-    public Car() {}
+    public Car() {
+    }
 
     public Car(String name, int price) {
         this.name = name;

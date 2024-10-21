@@ -21,7 +21,7 @@ class AnnotatedTableScannerTest {
 
         // when
         Set<EntityNode<?>> actualSet = annotatedTableScanner.scan(basePackage);
-        List<EntityNode<?>> actualList =  actualSet.stream().toList();
+        List<EntityNode<?>> actualList = actualSet.stream().toList();
 
         // then
         assertThat(actualSet).hasSize(1);

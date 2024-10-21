@@ -7,6 +7,7 @@ import persistence.sql.dml.Database;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DefaultDatabase implements Database {
     private final DatabaseServer server;
@@ -16,9 +17,19 @@ public class DefaultDatabase implements Database {
     }
 
     @Override
-    public void executeUpdate(String query) {
-        try (Connection connection = server.getConnection()) {
-            connection.createStatement().executeUpdate(query);
+    public Object executeUpdate(String query) {
+        try (Connection connection = server.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getObject(1);
+                }
+
+                return null;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to execute update: " + query, e);

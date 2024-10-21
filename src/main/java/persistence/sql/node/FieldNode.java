@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * 필드 노드 정보
  */
-public class FieldNode implements SQLNode{
+public class FieldNode implements SQLNode {
     private final Field field;
 
     public FieldNode(Field field) {

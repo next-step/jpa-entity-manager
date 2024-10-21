@@ -11,8 +11,8 @@ import java.util.List;
  * 엔티티 노드 정보
  *
  * @param entityClass 엔티티 클래스
- * @param fields 엔티티 필드 노드 목록
- * @param <T> 엔티티 클래스 타입
+ * @param fields      엔티티 필드 노드 목록
+ * @param <T>         엔티티 클래스 타입
  */
 public record EntityNode<T>(Class<T> entityClass, List<FieldNode> fields) implements SQLNode {
 

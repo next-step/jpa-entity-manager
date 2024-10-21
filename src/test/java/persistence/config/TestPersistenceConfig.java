@@ -1,4 +1,4 @@
-package persistence.sql.config;
+package persistence.config;
 
 import database.DatabaseServer;
 import database.H2;
@@ -16,23 +16,23 @@ import persistence.sql.dml.Database;
 import persistence.sql.dml.EntityManager;
 import persistence.sql.dml.impl.DefaultDatabase;
 import persistence.sql.dml.impl.DefaultEntityManager;
-import sample.application.PersonRowMapper;
+import persistence.sql.fixture.TestPerson;
+import persistence.sql.fixture.TestPersonFakeRowMapper;
 import sample.application.RowMapperFactory;
-import sample.domain.PersonV3;
 
 import java.sql.SQLException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class PersistenceConfig {
-    private static final PersistenceConfig INSTANCE = new PersistenceConfig();
+public class TestPersistenceConfig {
+    private static final TestPersistenceConfig INSTANCE = new TestPersistenceConfig();
 
     private DatabaseServer databaseServer;
 
-    private PersistenceConfig() {
+    private TestPersistenceConfig() {
     }
 
-    public static PersistenceConfig getInstance() {
+    public static TestPersistenceConfig getInstance() {
         return INSTANCE;
     }
 
@@ -89,6 +89,6 @@ public class PersistenceConfig {
 
     public RowMapperFactory rowMapperFactory() {
         return new RowMapperFactory()
-                .addRowMapper(PersonV3.class, new PersonRowMapper());
+                .addRowMapper(TestPerson.class, new TestPersonFakeRowMapper());
     }
 }
