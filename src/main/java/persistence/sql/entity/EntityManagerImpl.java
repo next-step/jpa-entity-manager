@@ -1,12 +1,16 @@
 package persistence.sql.entity;
 
+import java.sql.Connection;
+
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final PersistenceContext persistenceContext;
+    private final EntityLoader entityLoader;
 
-    public EntityManagerImpl(EntityPersister entityPersister, PersistenceContext persistenceContext) {
+    public EntityManagerImpl(EntityPersister entityPersister, PersistenceContext persistenceContext, Connection connection) {
         this.entityPersister = entityPersister;
         this.persistenceContext = persistenceContext;
+        this.entityLoader = new EntityLoader(connection);
     }
 
     @Override
@@ -15,23 +19,22 @@ public class EntityManagerImpl implements EntityManager {
             return persistenceContext.getEntity(clazz, id);
         }
 
-        T entity = entityPersister.select(clazz, id);
-        if (entity != null) {
-            persistenceContext.addEntity(entity, id);
-        }
-        return entity;
+        String selectQuery = entityPersister.select(id);
+        return entityLoader.loadEntity(clazz, selectQuery);
     }
 
     @Override
     public Object persist(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
         if (idValue == null) {
-            entityPersister.insert(entity);
+            String insertQuery = entityPersister.insert(entity);
+            entityLoader.load(insertQuery);
             idValue = entityPersister.getIdValue(entity);
         }
-        entityPersister.update(entity);
-        persistenceContext.addEntity(entity, idValue);
+        String updateQuery = entityPersister.update(entity);
+        entityLoader.load(updateQuery);
 
+        persistenceContext.addEntity(entity, idValue);
         return entity;
     }
 
@@ -42,14 +45,18 @@ public class EntityManagerImpl implements EntityManager {
             return;
         }
 
+        String deleteQuery = entityPersister.delete(entity);
+        entityLoader.load(deleteQuery);
+
         persistenceContext.removeEntity(entity.getClass(), idValue);
-        entityPersister.delete(entity);
     }
 
     @Override
     public Object update(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
-        entityPersister.update(entity);
+        String updateQuery = entityPersister.update(entity);
+        entityLoader.load(updateQuery);
+
         persistenceContext.addEntity(entity.getClass(), idValue);
         return entity;
     }

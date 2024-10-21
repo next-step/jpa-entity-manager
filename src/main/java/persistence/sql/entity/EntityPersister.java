@@ -1,58 +1,44 @@
 package persistence.sql.entity;
 
 import jakarta.persistence.Id;
-import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
 
 public class EntityPersister {
 
     private final String entityName;
     private final EntityTable entityTable;
     private final EntityColumns entityColumns;
-    private final JdbcTemplate jdbcTemplate;
 
-    public EntityPersister(Class<?> clazz, Connection connection) {
+    public EntityPersister(Class<?> clazz) {
         this.entityName = clazz.getSimpleName();
         this.entityTable = EntityTable.from(clazz);
         this.entityColumns = EntityColumns.from(clazz);
-        this.jdbcTemplate = new JdbcTemplate(connection);
 
     }
 
-    public boolean update(Object entity) {
-        try {
-            UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityTable, entityColumns);
-            String updateQuery = updateQueryBuilder.update(entity, getIdValue(entity));
-            jdbcTemplate.execute(updateQuery);
-            return true;
-
-        } catch (Exception e) {
-            return false;
-        }
+    public String update(Object entity) {
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityTable, entityColumns);
+        return updateQueryBuilder.update(entity, getIdValue(entity));
     }
 
-    public void insert(Object entity) {
+    public String insert(Object entity) {
         InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityTable, entityColumns);
-        String insertQuery = insertQueryBuilder.getInsertQuery(entity);
-        jdbcTemplate.execute(insertQuery);
+        return insertQueryBuilder.getInsertQuery(entity);
     }
 
-    public void delete(Object entity) {
+    public String delete(Object entity) {
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entityTable, entityColumns);
-        String deleteQuery = deleteQueryBuilder.delete(getIdValue(entity));
-        jdbcTemplate.execute(deleteQuery);
+        return deleteQueryBuilder.delete(getIdValue(entity));
     }
 
-    public <T> T select(Class<T> clazz, Long id) {
+    public String select(Long id) {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityTable, entityColumns);
-        String selectQuery = selectQueryBuilder.findById(id);
-        return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
+        return selectQueryBuilder.findById(id);
     }
 
     public Long getIdValue(Object entity) {
