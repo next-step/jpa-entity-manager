@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.Dialect;
 import persistence.sql.H2Dialect;
-import persistence.sql.ddl.query.CreateQueryBuilder;
+import persistence.sql.ddl.query.CreateTableQueryBuilder;
 import persistence.sql.ddl.query.DropQueryBuilder;
 
 import java.sql.SQLException;
@@ -65,8 +65,8 @@ class EntityLoaderTest {
         Dialect dialect = new H2Dialect();
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        String createTestEntity1TableQuery = new CreateQueryBuilder(dialect).build(EntityLoaderTestEntity1.class);
-        String createTestEntity2TableQuery = new CreateQueryBuilder(dialect).build(EntityLoaderTestEntity2.class);
+        String createTestEntity1TableQuery = new CreateTableQueryBuilder(dialect, EntityLoaderTestEntity1.class).build();
+        String createTestEntity2TableQuery = new CreateTableQueryBuilder(dialect, EntityLoaderTestEntity2.class).build();
 
         jdbcTemplate.execute(createTestEntity1TableQuery);
         jdbcTemplate.execute(createTestEntity2TableQuery);
@@ -76,8 +76,8 @@ class EntityLoaderTest {
     void tearDown() throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        String dropTestEntity1TableQuery = new DropQueryBuilder().build(EntityLoaderTestEntity1.class);
-        String dropTestEntity2TableQuery = new DropQueryBuilder().build(EntityLoaderTestEntity2.class);
+        String dropTestEntity1TableQuery = new DropQueryBuilder(EntityLoaderTestEntity1.class).build();
+        String dropTestEntity2TableQuery = new DropQueryBuilder(EntityLoaderTestEntity2.class).build();
 
         jdbcTemplate.execute(dropTestEntity1TableQuery);
         jdbcTemplate.execute(dropTestEntity2TableQuery);

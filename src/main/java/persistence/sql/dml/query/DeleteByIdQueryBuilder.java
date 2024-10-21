@@ -4,18 +4,22 @@ import persistence.sql.definition.TableDefinition;
 import persistence.sql.definition.TableId;
 
 public class DeleteByIdQueryBuilder {
+    private final StringBuilder query;
 
-    public String build(Object entity) {
+    public DeleteByIdQueryBuilder(Object entity) {
+        query = new StringBuilder();
         final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
         final TableId tableId = tableDefinition.tableId();
         final Object idValue = tableId.getValue(entity);
-        final StringBuilder query = new StringBuilder("DELETE FROM ");
 
+        query.append("DELETE FROM ");
         query.append(tableDefinition.tableName());
         query.append(" WHERE ");
         query.append(tableId.getName()).append(" = ");
         query.append(idValue).append(";");
+    }
 
+    public String build() {
         return query.toString();
     }
 }

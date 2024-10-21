@@ -11,7 +11,7 @@ import persistence.entity.EntityRowMapper;
 import persistence.entity.PersistenceContextImpl;
 import persistence.sql.H2Dialect;
 import persistence.sql.Person;
-import persistence.sql.ddl.query.CreateQueryBuilder;
+import persistence.sql.ddl.query.CreateTableQueryBuilder;
 import persistence.sql.ddl.query.DropQueryBuilder;
 import persistence.sql.dml.query.SelectAllQueryBuilder;
 
@@ -64,21 +64,19 @@ public class Application {
     }
 
     private static void create(JdbcTemplate jdbcTemplate, Class<?> testClass) {
-        CreateQueryBuilder createQuery = new CreateQueryBuilder(new H2Dialect());
-        jdbcTemplate.execute(createQuery.build(testClass));
+        CreateTableQueryBuilder createQuery = new CreateTableQueryBuilder(new H2Dialect(), testClass);
+        jdbcTemplate.execute(createQuery.build());
     }
 
     private static void drop(JdbcTemplate jdbcTemplate) {
-        DropQueryBuilder dropQuery = new DropQueryBuilder();
-        String build = dropQuery.build(Person.class);
+        DropQueryBuilder dropQuery = new DropQueryBuilder(Person.class);
+        String build = dropQuery.build();
         logger.info("Drop query: {}", build);
         jdbcTemplate.execute(build);
     }
 
     private static void selectAll(JdbcTemplate jdbcTemplate, Class<?> testClass) {
-        SelectAllQueryBuilder selectAllQuery = new SelectAllQueryBuilder();
-        String query = selectAllQuery.build(testClass);
-
+        String query = new SelectAllQueryBuilder(testClass).build();
         List<Person> people = jdbcTemplate.query(query, new EntityRowMapper<>(Person.class));
 
         for (Person person : people) {

@@ -11,8 +11,8 @@ class DropQueryBuilderTest {
     @Test
     @DisplayName("should create a DROP TABLE query")
     void build() {
-        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder();
-        String query = dropQueryBuilder.build(Person.class);
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
+        String query = dropQueryBuilder.build();
 
         // Then
         assertThat(query).isEqualTo("DROP TABLE users if exists;");

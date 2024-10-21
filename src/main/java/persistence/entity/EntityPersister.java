@@ -7,11 +7,6 @@ import persistence.sql.dml.query.InsertQueryBuilder;
 import persistence.sql.dml.query.UpdateQueryBuilder;
 
 public class EntityPersister {
-
-    private static final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
-    private static final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
-    private static final DeleteByIdQueryBuilder deleteByIdQueryBuilder = new DeleteByIdQueryBuilder();
-
     private final TableDefinition tableDefinition;
     private final JdbcTemplate jdbcTemplate;
 
@@ -26,17 +21,17 @@ public class EntityPersister {
     }
 
     public void update(Object entity) {
-        String query = updateQueryBuilder.build(entity);
+        String query = new UpdateQueryBuilder(entity).build();
         jdbcTemplate.execute(query);
     }
 
     public void insert(Object entity) {
-        String query = insertQueryBuilder.build(entity);
+        String query = new InsertQueryBuilder(entity).build();
         jdbcTemplate.execute(query);
     }
 
     public void delete(Object entity) {
-        String query = deleteByIdQueryBuilder.build(entity);
+        String query = new DeleteByIdQueryBuilder(entity).build();
         jdbcTemplate.execute(query);
     }
 }

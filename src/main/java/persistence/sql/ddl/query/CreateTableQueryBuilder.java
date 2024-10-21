@@ -4,16 +4,13 @@ import persistence.sql.Dialect;
 import persistence.sql.definition.TableDefinition;
 import persistence.sql.definition.TableId;
 
-public class CreateQueryBuilder {
-    private final Dialect dialect;
+public class CreateTableQueryBuilder {
+    private final StringBuilder query;
 
-    public CreateQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
-    }
+    public CreateTableQueryBuilder(Dialect dialect, Class<?> entityClass) {
+        this.query = new StringBuilder();
 
-    public String build(Class<?> entityClass) {
         TableDefinition tableDefinition = new TableDefinition(entityClass);
-        StringBuilder query = new StringBuilder();
 
         query.append("CREATE TABLE ").append(tableDefinition.tableName());
         query.append(" (");
@@ -23,6 +20,9 @@ public class CreateQueryBuilder {
         definePrimaryKey(tableDefinition.tableId(), query);
 
         query.append(");");
+    }
+
+    public String build() {
         return query.toString();
     }
 

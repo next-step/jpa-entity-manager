@@ -6,12 +6,14 @@ import persistence.sql.definition.TableDefinition;
 import java.util.List;
 
 public class UpdateQueryBuilder {
-    public String build(Object entity) {
+    private final StringBuilder query;
+
+    public UpdateQueryBuilder(Object entity) {
+        query = new StringBuilder();
         final Class<?> entityClass = entity.getClass();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
         final List<? extends Queryable> targetColumns = tableDefinition.withIdColumns();
 
-        StringBuilder query = new StringBuilder();
         query.append("UPDATE ");
         query.append(tableDefinition.tableName());
 
@@ -23,7 +25,9 @@ public class UpdateQueryBuilder {
         query.append(tableDefinition.tableId().getName()).append(" = ");
         query.append(tableDefinition.tableId().getValue(entity));
         query.append(";");
+    }
 
+    public String build() {
         return query.toString();
     }
 

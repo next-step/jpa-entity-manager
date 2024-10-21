@@ -10,7 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.sql.H2Dialect;
-import persistence.sql.ddl.query.CreateQueryBuilder;
+import persistence.sql.ddl.query.CreateTableQueryBuilder;
 import persistence.sql.ddl.query.DropQueryBuilder;
 
 import java.sql.SQLException;
@@ -54,13 +54,13 @@ class EntityPersisterTest {
         server.start();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        String query = new CreateQueryBuilder(new H2Dialect()).build(QueryTestEntity.class);
+        String query = new CreateTableQueryBuilder(new H2Dialect(), QueryTestEntity.class).build();
         jdbcTemplate.execute(query);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        String query = new DropQueryBuilder().build(QueryTestEntity.class);
+        String query = new DropQueryBuilder(QueryTestEntity.class).build();
         jdbcTemplate.execute(query);
         server.stop();
     }

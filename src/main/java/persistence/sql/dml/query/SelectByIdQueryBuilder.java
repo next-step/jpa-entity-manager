@@ -5,11 +5,13 @@ import persistence.sql.definition.TableDefinition;
 import java.util.StringJoiner;
 
 public class SelectByIdQueryBuilder {
+    private final StringBuilder query;
 
-    public String build(Class<?> entityClass, Object id) {
+    public SelectByIdQueryBuilder(Class<?> entityClass, Object id) {
+        query = new StringBuilder();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
 
-        StringBuilder query = new StringBuilder("SELECT ");
+        query.append("SELECT ");
         StringJoiner columns = new StringJoiner(", ");
 
         tableDefinition.withIdColumns().forEach(column -> columns.add(column.getName()));
@@ -18,7 +20,9 @@ public class SelectByIdQueryBuilder {
         query.append(" FROM ").append(tableDefinition.tableName());
 
         whereClause(query, tableDefinition, id);
+    }
 
+    public String build() {
         return query.toString();
     }
 

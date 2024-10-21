@@ -7,13 +7,14 @@ import java.util.List;
 
 public class InsertQueryBuilder {
     private static final String EMPTY_STRING = "";
+    private final StringBuilder query;
 
-    public String build(Object entity) {
+    public InsertQueryBuilder(Object entity) {
+        query = new StringBuilder();
         final Class<?> entityClass = entity.getClass();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
         final List<? extends Queryable> targetColumns = tableDefinition.hasValueColumns(entity);
 
-        StringBuilder query = new StringBuilder();
         query.append("INSERT INTO ");
         query.append(tableDefinition.tableName());
 
@@ -23,7 +24,9 @@ public class InsertQueryBuilder {
         query.append(") VALUES (");
         query.append(valueClause(entity, targetColumns));
         query.append(");");
+    }
 
+    public String build() {
         return query.toString();
     }
 

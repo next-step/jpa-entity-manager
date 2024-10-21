@@ -5,8 +5,6 @@ import persistence.sql.dml.query.SelectByIdQueryBuilder;
 
 public class EntityLoader {
 
-    private static final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
-
     private final JdbcTemplate jdbcTemplate;
     private final PersistenceContext persistenceContext;
 
@@ -28,10 +26,9 @@ public class EntityLoader {
     }
 
     private <T> T queryEntity(Class<T> entityClass, EntityKey entityKey) {
-        final String query = selectByIdQueryBuilder.build(
-                entityKey.getEntityClass(),
-                entityKey.getId()
-        );
+        final String query = new SelectByIdQueryBuilder(
+                entityKey.getEntityClass(), entityKey.getId()
+        ).build();
 
         final Object queried = jdbcTemplate.queryForObject(query,
                 new EntityRowMapper<>(entityKey.getEntityClass())
