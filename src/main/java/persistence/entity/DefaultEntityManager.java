@@ -1,7 +1,10 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.sql.dml.DeleteQueryBuilder;
+import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.util.Objects;
 
@@ -18,8 +21,11 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     public static DefaultEntityManager of(JdbcTemplate jdbcTemplate) {
-        return new DefaultEntityManager(new DefaultPersistenceContext(), new DefaultEntityPersister(jdbcTemplate),
-                new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder()));
+        return new DefaultEntityManager(
+                new DefaultPersistenceContext(),
+                new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(), new DeleteQueryBuilder()),
+                new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder())
+        );
     }
 
     @Override

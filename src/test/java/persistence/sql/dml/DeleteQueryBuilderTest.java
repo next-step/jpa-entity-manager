@@ -11,11 +11,11 @@ class DeleteQueryBuilderTest {
     @DisplayName("delete 쿼리를 생성한다.")
     void delete() {
         // given
-        final EntityWithId entityWithId = new EntityWithId(1L, "Jaden", 30, "test@email.com");
-        final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entityWithId);
+        final EntityWithId entity = new EntityWithId(1L, "Jaden", 30, "test@email.com");
+        final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
 
         // when
-        final String query = deleteQueryBuilder.delete();
+        final String query = deleteQueryBuilder.delete(entity);
 
         // then
         assertThat(query).isEqualTo("DELETE FROM users WHERE id = 1");

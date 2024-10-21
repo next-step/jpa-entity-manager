@@ -8,27 +8,31 @@ import persistence.sql.dml.UpdateQueryBuilder;
 
 public class DefaultEntityPersister implements EntityPersister {
     private final JdbcTemplate jdbcTemplate;
+    private final InsertQueryBuilder insertQueryBuilder;
+    private final UpdateQueryBuilder updateQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
 
-    public DefaultEntityPersister(JdbcTemplate jdbcTemplate) {
+    public DefaultEntityPersister(JdbcTemplate jdbcTemplate, InsertQueryBuilder insertQueryBuilder,
+                                  UpdateQueryBuilder updateQueryBuilder, DeleteQueryBuilder deleteQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.insertQueryBuilder = insertQueryBuilder;
+        this.updateQueryBuilder = updateQueryBuilder;
+        this.deleteQueryBuilder = deleteQueryBuilder;
     }
 
     @Override
     public void insert(Object entity) {
-        final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
-        final String sql = insertQueryBuilder.insert();
+        final String sql = insertQueryBuilder.insert(entity);
         jdbcTemplate.executeAndReturnGeneratedKeys(sql, new DefaultIdMapper(entity));
     }
 
     @Override
     public void update(Object entity) {
-        final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entity);
-        jdbcTemplate.execute(updateQueryBuilder.update());
+        jdbcTemplate.execute(updateQueryBuilder.update(entity));
     }
 
     @Override
     public void delete(Object entity) {
-        final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entity);
-        jdbcTemplate.execute(deleteQueryBuilder.delete());
+        jdbcTemplate.execute(deleteQueryBuilder.delete(entity));
     }
 }

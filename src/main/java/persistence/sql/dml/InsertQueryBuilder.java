@@ -9,17 +9,12 @@ import java.util.stream.Collectors;
 public class InsertQueryBuilder {
     private static final String QUERY_TEMPLATE = "INSERT INTO %s (%s) VALUES (%s)";
 
-    private final EntityTable entityTable;
-
-    public InsertQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity);
+    public String insert(Object entity) {
+        final EntityTable entityTable = new EntityTable(entity);
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getColumnClause(entityTable), getValueClause(entityTable));
     }
 
-    public String insert() {
-        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getColumnClause(), getValueClause());
-    }
-
-    private String getColumnClause() {
+    private String getColumnClause(EntityTable entityTable) {
         final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)
@@ -29,7 +24,7 @@ public class InsertQueryBuilder {
         return String.join(", ", columnDefinitions);
     }
 
-    private String getValueClause() {
+    private String getValueClause(EntityTable entityTable) {
         final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)

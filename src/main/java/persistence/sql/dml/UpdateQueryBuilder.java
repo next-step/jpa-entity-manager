@@ -9,17 +9,12 @@ import java.util.stream.Collectors;
 public class UpdateQueryBuilder {
     private static final String QUERY_TEMPLATE = "UPDATE %s SET %s WHERE %s";
 
-    private final EntityTable entityTable;
-
-    public UpdateQueryBuilder(Object entity) {
-        this.entityTable = new EntityTable(entity);
+    public String update(Object entity) {
+        final EntityTable entityTable = new EntityTable(entity);
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(entityTable), entityTable.getWhereClause());
     }
 
-    public String update() {
-        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(), entityTable.getWhereClause());
-    }
-
-    private String getSetClause() {
+    private String getSetClause(EntityTable entityTable) {
         final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .filter(this::isNotNeeded)

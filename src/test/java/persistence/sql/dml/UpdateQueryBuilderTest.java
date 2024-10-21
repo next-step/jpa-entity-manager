@@ -11,11 +11,11 @@ class UpdateQueryBuilderTest {
     @DisplayName("update 쿼리를 생성한다.")
     void update() {
         // given
-        final EntityWithId entityWithId = new EntityWithId(1L, "Jackson", 20, "test2@email.com");
-        final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityWithId);
+        final EntityWithId entity = new EntityWithId(1L, "Jackson", 20, "test2@email.com");
+        final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
 
         // when
-        final String query = updateQueryBuilder.update();
+        final String query = updateQueryBuilder.update(entity);
 
         // then
         assertThat(query).isEqualTo("UPDATE users SET nick_name = 'Jackson', old = 20, email = 'test2@email.com' WHERE id = 1");

@@ -36,12 +36,12 @@ public class Application {
             jdbcTemplate.execute(createQueryBuilder.create());
 
             final Person entity = new Person("Jaden", 30, "test@email.com", 1);
-            final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity);
-            jdbcTemplate.execute(insertQueryBuilder.insert());
+            final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+            jdbcTemplate.execute(insertQueryBuilder.insert(entity));
 
             final Person updatedEntity = new Person(1L, "Jackson", 20, "test2@email.com");
-            final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(updatedEntity);
-            jdbcTemplate.execute(updateQueryBuilder.update());
+            final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+            jdbcTemplate.execute(updateQueryBuilder.update(updatedEntity));
 
             final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
             final List<Person> people = jdbcTemplate.query(selectQueryBuilder.findAll(Person.class), new PersonRowMapper());
@@ -50,8 +50,8 @@ public class Application {
             final Person person = jdbcTemplate.queryForObject(selectQueryBuilder.findById(Person.class, 1), new PersonRowMapper());
             logger.debug(person.toString());
 
-            final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(updatedEntity);
-            jdbcTemplate.execute(deleteQueryBuilder.delete());
+            final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+            jdbcTemplate.execute(deleteQueryBuilder.delete(updatedEntity));
 
             final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
             jdbcTemplate.execute(dropQueryBuilder.drop());
