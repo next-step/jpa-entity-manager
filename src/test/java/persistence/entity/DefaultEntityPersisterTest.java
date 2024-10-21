@@ -48,7 +48,7 @@ class DefaultEntityPersisterTest {
         entityPersister.insert(entity);
 
         // then
-        final EntityWithId managedEntity = entityLoader.find(entity.getClass(), entity.getId());
+        final EntityWithId managedEntity = entityLoader.load(entity.getClass(), entity.getId());
         assertAll(
                 () -> assertThat(managedEntity).isNotNull(),
                 () -> assertThat(managedEntity.getId()).isNotNull(),
@@ -71,7 +71,7 @@ class DefaultEntityPersisterTest {
         entityPersister.update(updatedEntity);
 
         // then
-        final EntityWithId managedEntity = entityLoader.find(entity.getClass(), entity.getId());
+        final EntityWithId managedEntity = entityLoader.load(entity.getClass(), entity.getId());
         assertAll(
                 () -> assertThat(managedEntity).isNotNull(),
                 () -> assertThat(managedEntity.getId()).isEqualTo(updatedEntity.getId()),
@@ -93,7 +93,7 @@ class DefaultEntityPersisterTest {
         entityPersister.delete(entity);
 
         // then
-        assertThatThrownBy(() -> entityLoader.find(entity.getClass(), entity.getId()))
+        assertThatThrownBy(() -> entityLoader.load(entity.getClass(), entity.getId()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Expected 1 result, got");
     }

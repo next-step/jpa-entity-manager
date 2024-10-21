@@ -37,15 +37,15 @@ class DefaultEntityLoaderTest {
     }
 
     @Test
-    @DisplayName("엔티티를 조회한다.")
-    void find() {
+    @DisplayName("엔티티를 로드한다.")
+    void load() {
         // given
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         insertData(entity);
         final EntityLoader entityLoader = new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder());
 
         // when
-        final EntityWithId managedEntity = entityLoader.find(entity.getClass(), entity.getId());
+        final EntityWithId managedEntity = entityLoader.load(entity.getClass(), entity.getId());
 
         // then
         assertAll(

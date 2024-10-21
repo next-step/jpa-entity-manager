@@ -35,7 +35,7 @@ public class DefaultEntityManager implements EntityManager {
             return managedEntity;
         }
 
-        final T entity = entityLoader.find(entityType, id);
+        final T entity = entityLoader.load(entityType, id);
         persistenceContext.addEntity(entity);
         return entity;
     }

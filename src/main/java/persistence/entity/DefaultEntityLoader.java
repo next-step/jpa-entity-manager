@@ -14,7 +14,7 @@ public class DefaultEntityLoader implements EntityLoader {
     }
 
     @Override
-    public <T> T find(Class<T> entityType, Object id) {
+    public <T> T load(Class<T> entityType, Object id) {
         final String sql = selectQueryBuilder.findById(entityType, id);
         return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(entityType));
     }
