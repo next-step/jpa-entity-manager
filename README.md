@@ -29,16 +29,10 @@
     - [x] 엔티티를 영속성 컨텍스트에 저장
     - [x] 스냅샷 저장
     - [x] Database에 insert 쿼리 실행 (현재는 flush 개념 구현 전이므로 insert 쿼리는 바로 실행)
-      - [x] 만약 영속성 컨텍스트에 관리되고 있던 Entity가 다시 persist요청이 오게 되면
-        - [x] 그냥 반환. (이미 영속성 컨텍스트에 관리되고 있기 때문... => 추가 insert쿼리 실행하지 않음)
-  - [ ] EntityManager.update()
-    - [ ] 1차 캐시에 저장되어 관리되고 있는 Entity, Snapshot이 있는 지 확인
-    - [ ] Snapshot이 있다면, 1차 캐시에서 조회된 엔티티의 변경사항을 확인 후 update 쿼리 실행
-    - [ ] Snapshot이 없다면, Database에서 조회
-      - [ ] Database에서 조회한 값이 없다면 -> insert 쿼리 실행
-        - Hibernate에서 `merge()`메서드가 새로 생긴 엔티티를 넘기면 insert만 실행. 
-          - 생각해보면 db에 값이 없고 전달받은 Entity가 새로운 Entity라면 insert만 실행해야 맞는 것 같음.
-      - [ ] Database에서 조회한 값이 있다면 -> 
-        - 전달 받은 엔티티를 영속성 컨텍스트에 저장
-        - 스냅샷과 비교 후 변경사항이 있다면 update 쿼리 실행 
-        - [ ] update 쿼리 실행 후 1차 캐시 및 Snapshot 업데이트
+      - [x] 만약 영속성 컨텍스트에 관리되고 있던 Entity가 다시 persist요청이 오게 되면...?
+        - [x] isNew() 메서드를 통해 신규 Entity인지 확인 후 insert 쿼리 실행
+  - [x] EntityManager.update()
+    - [x] 1차 캐시에 저장되어 관리되고 있는 Entity, Snapshot이 있는 지 확인
+    - [x] Snapshot이 있다면, 1차 캐시에서 조회된 엔티티의 변경사항을 확인 후 update 쿼리 실행
+    - [x] Snapshot이 없다면, 신규 저장되는 Entity이거나, 이미 영속성 컨텍스트에서 관리되고 있지 않은 엔티티
+      - [x] 신규 저장되는 Entity -> `persist()` 호출. 관리되지 않는 객체는 예외 처리

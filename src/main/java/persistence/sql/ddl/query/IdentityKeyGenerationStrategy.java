@@ -14,4 +14,9 @@ public class IdentityKeyGenerationStrategy implements PrimaryKeyGenerationStrate
     public boolean supports(TableId pk) {
         return pk.generationType().equals(GenerationType.IDENTITY);
     }
+
+    @Override
+    public boolean shouldFetchId() {
+        return false;
+    }
 }

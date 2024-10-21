@@ -41,19 +41,21 @@ public class Application {
             insert(em, person1);
             insert(em, person2);
             insert(em, person3);
-            selectAll(jdbcTemplate, testClass);
-            select(em, 1L);
-            select(em, 2L);
-            select(em, 3L);
-
-            logger.info("Remove person1");
-            remove(em, person1);
-            selectAll(jdbcTemplate, testClass);
-
-            logger.info("Update person2");
-            update(em, new Person(2L, "b", 25, "ddd@gmail.com", 5));
-            selectAll(jdbcTemplate, testClass);
-            drop(jdbcTemplate);
+            Long lastId = jdbcTemplate.getLastId("users");
+            logger.info("Last id: {}", lastId);
+//            selectAll(jdbcTemplate, testClass);
+//            select(em, 1L);
+//            select(em, 2L);
+//            select(em, 3L);
+//
+//            logger.info("Remove person1");
+//            remove(em, person1);
+//            selectAll(jdbcTemplate, testClass);
+//
+//            logger.info("Update person2");
+//            update(em, new Person(2L, "b", 25, "ddd@gmail.com", 5));
+//            selectAll(jdbcTemplate, testClass);
+//            drop(jdbcTemplate);
 
             server.stop();
         } catch (Exception e) {

@@ -8,6 +8,8 @@ public interface Queryable {
 
     String getValue(Object entity);
 
+    void bindValue(Object entity, Object value);
+
     String getName();
 
     String getDeclaredName();

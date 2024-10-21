@@ -22,6 +22,7 @@ public class EntityLoader {
 
         final T entity = queryEntity(entityClass, entityKey);
         persistenceContext.addEntity(entityKey, entity);
+        persistenceContext.addDatabaseSnapshot(entityKey, entity);
         return entity;
     }
 

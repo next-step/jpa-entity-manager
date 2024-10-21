@@ -95,4 +95,12 @@ public class TableId implements Queryable {
         return value.toString();
     }
 
+    @Override
+    public void bindValue(Object entity, Object value) {
+        columnDefinition.bindValue(entity, value);
+    }
+
+    public boolean shouldFetchId() {
+        return strategy.shouldFetchId();
+    }
 }

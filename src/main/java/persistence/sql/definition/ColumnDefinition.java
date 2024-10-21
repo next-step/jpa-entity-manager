@@ -98,6 +98,26 @@ public class ColumnDefinition {
                 .orElseThrow(() -> new NoSuchElementException("Value is null"));
     }
 
+    public void bindValue(Object entity, Object value) {
+        final Field[] declaredFields = entity.getClass().getDeclaredFields();
+        final Field targetField = getMatchingField(declaredFields);
+
+        boolean wasAccessible = targetField.canAccess(entity);
+        try {
+            if (!wasAccessible) {
+                targetField.setAccessible(true);
+            }
+
+            targetField.set(entity, value);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Cannot access field value", e);
+        } finally {
+            if (!wasAccessible) {
+                targetField.setAccessible(false);
+            }
+        }
+    }
+
     private Field getMatchingField(Field[] declaredFields) {
         for (Field field : declaredFields) {
             if (field.getName().equals(declaredName())) {

@@ -3,6 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
@@ -24,17 +25,10 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Object entity) {
         final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
-        final EntityKey entityKey = new EntityKey(
-                (Serializable) entityPersister.getEntityId(entity),
-                entity.getClass()
-        );
+        final EntityKey entityKey = entityPersister.insert(entity);
 
-        if (persistenceContext.getEntity(entityKey) != null) {
-            update(entity);
-        }
-
-        entityPersister.insert(entity);
         persistenceContext.addEntity(entityKey, entity);
+        persistenceContext.addDatabaseSnapshot(entityKey, entity);
     }
 
     @Override
@@ -52,12 +46,24 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void update(Object entity) {
         final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
+        if (entityPersister.isNew(entity)) {
+            persist(entity);
+            return;
+        }
+
         final EntityKey entityKey = new EntityKey(
                 (Serializable) entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
-        entityPersister.update(entity);
+        final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
+        if (entitySnapshot == null) {
+            throw new IllegalStateException("Not Managed Entity");
+        }
+
+        List<String> dirtyColumns = persistenceContext.dirtyCheck(entityKey, entity);
+        entityPersister.update(entity, dirtyColumns);
         persistenceContext.addEntity(entityKey, entity);
+        persistenceContext.addDatabaseSnapshot(entityKey, entity);
     }
 }

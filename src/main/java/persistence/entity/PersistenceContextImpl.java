@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PersistenceContextImpl implements PersistenceContext {
@@ -19,13 +20,21 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void addEntity(EntityKey entityKey, Object entity) {
-        if (managedEntities.containsKey(entityKey)) {
-            return;
-        }
-
-        final EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
         managedEntities.put(entityKey, entity);
+    }
+
+    @Override
+    public void addDatabaseSnapshot(EntityKey entityKey, Object entity) {
+        final EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
         entitySnapshots.put(entityKey, entitySnapshot);
+    }
+
+    @Override
+    public List<String> dirtyCheck(EntityKey entityKey, Object entity) {
+        final EntitySnapshot databaseSnapshot = entitySnapshots.get(entityKey);
+        final Object managedEntity = managedEntities.get(entityKey);
+
+        return databaseSnapshot.getDirtyColumns(managedEntity);
     }
 
     @Override

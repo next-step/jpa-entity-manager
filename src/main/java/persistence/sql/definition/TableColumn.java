@@ -41,6 +41,11 @@ public class TableColumn implements Queryable {
     }
 
     @Override
+    public void bindValue(Object entity, Object value) {
+        columnDefinition.bindValue(entity, value);
+    }
+
+    @Override
     public String getName() {
         return columnDefinition.getName();
     }

@@ -40,4 +40,21 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
+    public Long insertAndReturnKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+            try (final ResultSet resultSet = statement.getGeneratedKeys()) {
+                resultSet.next();
+                return resultSet.getLong(1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Long getLastId(final String tableName) {
+        final String sql = "SELECT MAX(id) FROM " + tableName + ";";
+        return queryForObject(sql, resultSet -> resultSet.getLong(1));
+    }
 }

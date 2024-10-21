@@ -2,37 +2,50 @@ package persistence.sql.dml.query;
 
 import persistence.sql.definition.TableDefinition;
 
+import java.io.Serializable;
+import java.util.Map;
+
 public class UpdateQueryBuilder {
     private final StringBuilder query;
+    private final TableDefinition tableDefinition;
+    private final Serializable idValue;
 
     public UpdateQueryBuilder(Object entity) {
         query = new StringBuilder();
-        final Class<?> entityClass = entity.getClass();
-        final TableDefinition tableDefinition = new TableDefinition(entityClass);
+        tableDefinition = new TableDefinition(entity.getClass());
+        idValue = tableDefinition.tableId().hasValue(entity) ? tableDefinition.tableId().getValue(entity) : null;
 
         query.append("UPDATE ");
         query.append(tableDefinition.tableName());
+    }
+
+    public UpdateQueryBuilder columns(Map<String, Object> columns) {
+        if (columns == null || columns.isEmpty()) {
+            throw new IllegalArgumentException("Columns cannot be null or empty");
+        }
 
         query.append(" SET ");
-        String columnClause = columnClause(tableDefinition, entity);
+        String columnClause = columns.entrySet().stream()
+                .map(entry -> entry.getKey() + " = " + entry.getValue())
+                .reduce((column1, column2) -> column1 + ", " + column2).orElse("");
         query.append(columnClause);
-
-        query.append(" WHERE ");
-        query.append(tableDefinition.tableId().getName()).append(" = ");
-        query.append(tableDefinition.tableId().getValue(entity));
-        query.append(";");
+        return this;
     }
 
     public String build() {
+        if (idValue == null) {
+            throw new IllegalArgumentException("Entity must have an ID");
+        }
+
+        if (!query.toString().contains("SET")) {
+            throw new IllegalArgumentException("Columns must be set");
+        }
+
+        query.append(" WHERE ");
+        query.append(tableDefinition.tableId().getName()).append(" = ");
+        query.append(idValue);
+        query.append(";");
+
         return query.toString();
     }
-
-    private static String columnClause(TableDefinition tableDefinition, Object entity) {
-        return tableDefinition.withoutIdColumns().stream()
-                .map(column -> {
-                    final String columnValue = column.hasValue(entity) ? column.getValue(entity) : "null";
-                    return column.getName() + " = " + columnValue;
-                }).reduce((column1, column2) -> column1 + ", " + column2).orElse("");
-    }
-
 }
