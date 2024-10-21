@@ -13,7 +13,7 @@ import persistence.sql.clause.WhereConditionalClause;
 import persistence.sql.common.util.CamelToSnakeConverter;
 import persistence.sql.data.QueryType;
 import persistence.sql.dml.impl.SimpleMetadataLoader;
-import persistence.sql.fixture.PersonV3;
+import persistence.sql.fixture.TestPerson;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -24,11 +24,11 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class QueryBuilderFactoryTest {
-    private static final MetadataLoader<PersonV3> loader = new SimpleMetadataLoader<>(PersonV3.class);
+    private static final MetadataLoader<TestPerson> loader = new SimpleMetadataLoader<>(TestPerson.class);
     private final QueryBuilderFactory factory = QueryBuilderFactory.getInstance();
 
     public static Stream<Arguments> provideQueryBuildParameters() {
-        PersonV3 person = new PersonV3("catsbi", 55, "catsbi@naver.com", 123);
+        TestPerson person = new TestPerson("catsbi", 55, "catsbi@naver.com", 123);
 
         List<Field> fields = loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class));
         List<Clause> setClauses = fields.stream()

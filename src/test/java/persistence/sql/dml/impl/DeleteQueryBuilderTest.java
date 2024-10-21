@@ -8,14 +8,14 @@ import persistence.sql.clause.WhereConditionalClause;
 import persistence.sql.common.util.CamelToSnakeConverter;
 import persistence.sql.data.QueryType;
 import persistence.sql.dml.MetadataLoader;
-import persistence.sql.fixture.PersonV3;
+import persistence.sql.fixture.TestPerson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("DeleteQueryBuilder 테스트")
 class DeleteQueryBuilderTest {
     private final DeleteQueryBuilder builder = new DeleteQueryBuilder(CamelToSnakeConverter.getInstance());
-    private final MetadataLoader<PersonV3> loader = new SimpleMetadataLoader<>(PersonV3.class);
+    private final MetadataLoader<TestPerson> loader = new SimpleMetadataLoader<>(TestPerson.class);
 
     @Test
     @DisplayName("build 함수는 조건절을 전달하면 조건절이 추가 된 DELETE 쿼리를 생성한다.")

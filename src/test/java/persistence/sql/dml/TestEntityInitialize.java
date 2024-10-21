@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.config.TestPersistenceConfig;
 import persistence.sql.QueryBuilderFactory;
 import persistence.sql.config.PersistenceConfig;
 import persistence.sql.data.QueryType;
@@ -22,7 +23,7 @@ public class TestEntityInitialize {
     @BeforeEach
     void init() {
         try {
-            PersistenceConfig config = PersistenceConfig.getInstance();
+            TestPersistenceConfig config = TestPersistenceConfig.getInstance();
             Database database = config.database();
             server = config.databaseServer();
             server.start();
@@ -34,6 +35,7 @@ public class TestEntityInitialize {
             for (EntityNode<?> node : nodes) {
                 String createTableQuery = factory.buildQuery(QueryType.CREATE,
                         new SimpleMetadataLoader<>(node.entityClass()));
+                System.out.println("createTableQuery = " + createTableQuery);
                 database.executeUpdate(createTableQuery);
             }
         } catch (Exception e) {

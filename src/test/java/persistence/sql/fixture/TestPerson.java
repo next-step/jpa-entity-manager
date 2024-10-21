@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Table(name = "users")
 @Entity
-public class PersonV3 {
+public class TestPerson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +22,14 @@ public class PersonV3 {
     @Transient
     private Integer index;
 
-    public PersonV3() {
+    public TestPerson() {
     }
 
-    public PersonV3(String name, Integer age, String email, Integer index) {
+    public TestPerson(String name, Integer age, String email, Integer index) {
         this(null, name, age, email, index);
     }
 
-    public PersonV3(Long id, String name, Integer age, String email, Integer index) {
+    public TestPerson(Long id, String name, Integer age, String email, Integer index) {
         this.id = id;
         this.name = name;
         this.age = age;

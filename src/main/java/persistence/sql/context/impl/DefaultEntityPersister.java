@@ -1,5 +1,6 @@
 package persistence.sql.context.impl;
 
+import jdbc.RowMapper;
 import persistence.sql.QueryBuilderFactory;
 import persistence.sql.clause.Clause;
 import persistence.sql.clause.InsertColumnValueClause;
@@ -10,11 +11,9 @@ import persistence.sql.context.EntityPersister;
 import persistence.sql.data.QueryType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.MetadataLoader;
+import sample.application.RowMapperFactory;
 
 import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,10 +23,13 @@ public class DefaultEntityPersister implements EntityPersister {
 
     private final Database database;
     private final NameConverter nameConverter;
+    private final RowMapperFactory rowMapperFactory;
 
-    public DefaultEntityPersister(Database database, NameConverter nameConverter) {
+
+    public DefaultEntityPersister(Database database, NameConverter nameConverter, RowMapperFactory rowMapperFactory) {
         this.database = database;
         this.nameConverter = nameConverter;
+        this.rowMapperFactory = rowMapperFactory;
     }
 
     @Override
@@ -74,9 +76,14 @@ public class DefaultEntityPersister implements EntityPersister {
 
         String selectQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.SELECT, loader, clause);
 
+        RowMapper<T> rowMapper = rowMapperFactory.getRowMapper(entityType);
+        if (rowMapper == null) {
+            throw new IllegalStateException("RowMapper not found for entity type: " + entityType);
+        }
+
         return database.executeQuery(selectQuery, resultSet -> {
             if (resultSet.next()) {
-                return entityType.cast(mapRowResultSetToEntity(resultSet, loader));
+                return rowMapper.mapRow(resultSet);
             }
 
             return null;
@@ -87,36 +94,19 @@ public class DefaultEntityPersister implements EntityPersister {
     public <T> List<T> selectAll(Class<T> entityType, MetadataLoader<?> loader) {
         String selectAllQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.SELECT, loader);
 
+        RowMapper<T> rowMapper = rowMapperFactory.getRowMapper(entityType);
+
+        if (rowMapper == null) {
+            throw new IllegalStateException("RowMapper not found for entity type: " + entityType);
+        }
+
         return database.executeQuery(selectAllQuery, resultSet -> {
             List<T> entities = new ArrayList<>();
             while (resultSet.next()) {
-                entities.add(entityType.cast(mapRowResultSetToEntity(resultSet, loader)));
+                entities.add(rowMapper.mapRow(resultSet));
             }
 
             return entities;
         });
-    }
-
-    private <T> T mapRowResultSetToEntity(ResultSet resultSet, MetadataLoader<T> loader) {
-        try {
-            T entity = loader.getNoArgConstructor().newInstance();
-
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            for (int i = 1; i <= columnCount; i++) {
-                Object columnValue = resultSet.getObject(i);
-
-                Field field = loader.getField(i - 1);
-                field.setAccessible(true);
-                field.set(entity, columnValue);
-            }
-
-            return entity;
-
-        } catch (ReflectiveOperationException | SQLException e) {
-            logger.severe("Failed to map row to entity");
-            throw new RuntimeException(e);
-        }
     }
 }

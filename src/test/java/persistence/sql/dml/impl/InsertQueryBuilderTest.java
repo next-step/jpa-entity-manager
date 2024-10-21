@@ -9,7 +9,7 @@ import persistence.sql.clause.WhereConditionalClause;
 import persistence.sql.common.util.CamelToSnakeConverter;
 import persistence.sql.data.QueryType;
 import persistence.sql.dml.MetadataLoader;
-import persistence.sql.fixture.PersonV3;
+import persistence.sql.fixture.TestPerson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("InsertQueryBuilder 테스트")
 class InsertQueryBuilderTest {
     private final InsertQueryBuilder builder = new InsertQueryBuilder();
-    private final MetadataLoader<PersonV3> loader = new SimpleMetadataLoader<>(PersonV3.class);
+    private final MetadataLoader<TestPerson> loader = new SimpleMetadataLoader<>(TestPerson.class);
 
     @Test
     @DisplayName("build 함수는 유효한 조건절을 전달할 경우 쿼리를 생성한다.")
     void testInsertQueryBuild() {
         // given
-        PersonV3 person = new PersonV3("catsbi", 55, "catsbi@naver.com", 123);
+        TestPerson person = new TestPerson("catsbi", 55, "catsbi@naver.com", 123);
         InsertColumnValueClause clause = InsertColumnValueClause.newInstance(person, CamelToSnakeConverter.getInstance());
 
         // when
