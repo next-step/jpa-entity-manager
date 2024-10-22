@@ -15,14 +15,11 @@ import java.util.stream.Collectors;
 public class EntityPersister {
     private static final Long DEFAULT_ID_VALUE = 0L;
     private final TableDefinition tableDefinition;
-    private final PersistenceContext persistenceContext;
     private final JdbcTemplate jdbcTemplate;
 
     public EntityPersister(Class<?> clazz,
-                           PersistenceContext persistenceContext,
                            JdbcTemplate jdbcTemplate) {
         this.tableDefinition = new TableDefinition(clazz);
-        this.persistenceContext = persistenceContext;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -36,15 +33,6 @@ public class EntityPersister {
 
     public boolean alreadyHasId(Object entity) {
         return tableDefinition.tableId().hasValue(entity);
-    }
-
-    public void update(Object entity, List<String> targetColumns) {
-        final Map<String, Object> modified = tableDefinition.withoutIdColumns().stream()
-                .filter(column -> targetColumns.contains(column.getName()))
-                .collect(Collectors.toMap(Queryable::getName, column -> column.hasValue(entity) ? column.getValueAsString(entity) : "null"));
-
-        final String query = new UpdateQueryBuilder(entity).columns(modified).build();
-        jdbcTemplate.execute(query);
     }
 
     public EntityKey insert(Object entity) {
@@ -63,6 +51,20 @@ public class EntityPersister {
         return entityKey;
     }
 
+    public void update(Object entity, List<String> targetColumns) {
+        final Map<String, Object> modified = tableDefinition.withoutIdColumns().stream()
+                .filter(column -> targetColumns.contains(column.getName()))
+                .collect(
+                        Collectors.toMap(
+                                Queryable::getName,
+                                column -> column.hasValue(entity) ? column.getValueAsString(entity) : "null"
+                        )
+                );
+
+        final String query = new UpdateQueryBuilder(entity).columns(modified).build();
+        jdbcTemplate.execute(query);
+    }
+
     public void delete(Object entity) {
         String query = new DeleteByIdQueryBuilder(entity).build();
         jdbcTemplate.execute(query);
@@ -74,7 +76,7 @@ public class EntityPersister {
 
     @Nullable
     private Object getId(TableDefinition tableDefinition, Object entity) {
-         if (tableDefinition.tableId().idRequired()) {
+        if (tableDefinition.tableId().idRequired()) {
             if (alreadyHasId(entity)) {
                 return getEntityId(entity);
             }

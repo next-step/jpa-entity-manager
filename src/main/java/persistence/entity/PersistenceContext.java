@@ -1,8 +1,5 @@
 package persistence.entity;
 
-import java.io.Serializable;
-import java.util.List;
-
 public interface PersistenceContext {
 
     Object getEntity(EntityKey entityKey);

@@ -3,6 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 import java.util.List;
+import java.util.Objects;
 
 public class EntityManagerImpl implements EntityManager {
     private final JdbcTemplate jdbcTemplate;
@@ -23,7 +24,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), persistenceContext, jdbcTemplate);
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         if (persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
             return;
         }
@@ -36,9 +37,9 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), persistenceContext, jdbcTemplate);
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
-                (Long) entityPersister.getEntityId(entity),
+                entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
@@ -48,19 +49,25 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void update(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), persistenceContext, jdbcTemplate);
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
+        if (!persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
+            persist(entity);
+            return;
+        }
+
         final EntityKey entityKey = new EntityKey(
                 entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
         final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
-        if (entitySnapshot == null) {
-            throw new IllegalStateException("Entity is not managed");
-        }
-        final Object managedEntity = persistenceContext.getEntity(entityKey);
+        persistenceContext.addEntity(entityKey, entity);
 
-        List<String> dirtyColumns = entitySnapshot.getDirtyColumns(managedEntity);
+        List<String> dirtyColumns = entitySnapshot.getDirtyColumns(persistenceContext.getEntity(entityKey));
+
+        if (dirtyColumns.isEmpty()) {
+            return;
+        }
         entityPersister.update(entity, dirtyColumns);
         persistenceContext.addEntity(entityKey, entity);
         persistenceContext.addDatabaseSnapshot(entityKey, entity);

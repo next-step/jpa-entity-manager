@@ -3,6 +3,7 @@ package persistence.sql.dml.query;
 import persistence.sql.definition.TableDefinition;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class UpdateQueryBuilder {
