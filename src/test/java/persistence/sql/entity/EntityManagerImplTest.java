@@ -91,7 +91,7 @@ class EntityManagerImplTest {
 
 
     @Test
-    @DisplayName("EntityManager의 persist시 idValue가 null인 경우")
+    @DisplayName("EntityManager의 persist시 idValue가 null인 경우 id값이 자동으로 생성된다")
     void entityManager_persist_with_null_id() {
         long expectedId = 2L;
         Person expectPerson = new Person(null, "yang2", 25, "rhfpdk92@naver.com");
