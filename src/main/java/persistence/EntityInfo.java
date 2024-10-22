@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class EntityInfo<T> {
 
-    private Object id;
-    private Class<T> clazz;
+    private final Object id;
+    private final Class<T> clazz;
 
     private EntityInfo(Object id, Class<T> clazz) {
         this.id = id;
