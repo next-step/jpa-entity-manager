@@ -17,6 +17,12 @@ public record RowMapperFactory(Map<Class<?>, RowMapper<?>> rowMappers) {
 
     @SuppressWarnings("unchecked")
     public <T> RowMapper<T> getRowMapper(Class<T> clazz) {
-        return (RowMapper<T>) rowMappers.get(clazz);
+        RowMapper<?> foundRowMapper = rowMappers.get(clazz);
+
+        if (foundRowMapper == null) {
+            throw new IllegalArgumentException("RowMapper not found for class: " + clazz.getName());
+        }
+
+        return (RowMapper<T>) foundRowMapper;
     }
 }

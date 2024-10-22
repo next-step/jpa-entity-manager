@@ -2,10 +2,7 @@ package persistence.sql.context.impl;
 
 import jdbc.RowMapper;
 import persistence.sql.QueryBuilderFactory;
-import persistence.sql.clause.Clause;
-import persistence.sql.clause.InsertColumnValueClause;
-import persistence.sql.clause.UpdateQueryClauses;
-import persistence.sql.clause.WhereConditionalClause;
+import persistence.sql.clause.*;
 import persistence.sql.common.util.NameConverter;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.data.QueryType;
@@ -13,7 +10,6 @@ import persistence.sql.dml.Database;
 import persistence.sql.dml.MetadataLoader;
 import sample.application.RowMapperFactory;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -54,15 +50,12 @@ public class DefaultEntityPersister implements EntityPersister {
 
     @Override
     public <T> void delete(T entity, MetadataLoader<?> loader) {
-        Field pkField = loader.getPrimaryKeyField();
-        Object extractedValue = Clause.extractValue(pkField, entity);
-        String value = Clause.toColumnValue(extractedValue);
+        DeleteQueryClauses deleteQueryClauses = DeleteQueryClauses.builder(nameConverter)
+                .where(entity, loader)
+                .build();
 
-        WhereConditionalClause clause = WhereConditionalClause.builder()
-                .column(loader.getColumnName(pkField, nameConverter))
-                .eq(value);
-
-        String removeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.DELETE, loader, clause);
+        String removeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.DELETE, loader,
+                deleteQueryClauses.clauseArrays());
         database.executeUpdate(removeQuery);
     }
 
@@ -77,9 +70,6 @@ public class DefaultEntityPersister implements EntityPersister {
         String selectQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.SELECT, loader, clause);
 
         RowMapper<T> rowMapper = rowMapperFactory.getRowMapper(entityType);
-        if (rowMapper == null) {
-            throw new IllegalStateException("RowMapper not found for entity type: " + entityType);
-        }
 
         return database.executeQuery(selectQuery, resultSet -> {
             if (resultSet.next()) {
@@ -95,10 +85,6 @@ public class DefaultEntityPersister implements EntityPersister {
         String selectAllQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.SELECT, loader);
 
         RowMapper<T> rowMapper = rowMapperFactory.getRowMapper(entityType);
-
-        if (rowMapper == null) {
-            throw new IllegalStateException("RowMapper not found for entity type: " + entityType);
-        }
 
         return database.executeQuery(selectAllQuery, resultSet -> {
             List<T> entities = new ArrayList<>();
