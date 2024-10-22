@@ -27,6 +27,6 @@ public class CreateTableQueryBuilder {
     }
 
     private void definePrimaryKey(TableId pk, StringBuilder query) {
-        query.append("PRIMARY KEY (").append(pk.getName()).append(")");
+        query.append("PRIMARY KEY (").append(pk.getColumnName()).append(")");
     }
 }

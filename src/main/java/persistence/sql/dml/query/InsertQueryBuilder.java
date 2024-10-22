@@ -7,10 +7,9 @@ import java.util.List;
 
 public class InsertQueryBuilder {
     private static final String EMPTY_STRING = "";
-    private final StringBuilder query;
 
-    public InsertQueryBuilder(Object entity) {
-        query = new StringBuilder();
+    public String build(Object entity) {
+        final StringBuilder query = new StringBuilder();
         final Class<?> entityClass = entity.getClass();
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
         final List<? extends Queryable> targetColumns = tableDefinition.hasValueColumns(entity);
@@ -24,16 +23,13 @@ public class InsertQueryBuilder {
         query.append(") VALUES (");
         query.append(valueClause(entity, targetColumns));
         query.append(");");
-    }
-
-    public String build() {
         return query.toString();
     }
 
     private String columnsClause(List<? extends Queryable> targetColumns) {
         return targetColumns
                 .stream()
-                .map(Queryable::getName)
+                .map(Queryable::getColumnName)
                 .reduce((column1, column2) -> column1 + ", " + column2)
                 .orElse(EMPTY_STRING);
     }

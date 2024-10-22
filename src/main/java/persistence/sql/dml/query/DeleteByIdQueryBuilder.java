@@ -4,26 +4,19 @@ import persistence.sql.definition.TableDefinition;
 import persistence.sql.definition.TableId;
 
 public class DeleteByIdQueryBuilder {
-    private final StringBuilder query;
 
-    public DeleteByIdQueryBuilder(Object entity) {
-        query = new StringBuilder();
+    public String build(Object entity) {
+        final StringBuilder query = new StringBuilder();
         final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
         final TableId tableId = tableDefinition.getTableId();
 
-        if (!tableId.hasValue(entity)) {
-            throw new IllegalArgumentException("Entity does not have an ID value");
-        }
-        final Object idValue = tableId.getValueAsString(entity);
+        final Object idValue = tableDefinition.getIdValue(entity);
 
         query.append("DELETE FROM ");
         query.append(tableDefinition.getTableName());
         query.append(" WHERE ");
-        query.append(tableId.getName()).append(" = ");
+        query.append(tableId.getColumnName()).append(" = ");
         query.append(idValue).append(";");
-    }
-
-    public String build() {
         return query.toString();
     }
 }

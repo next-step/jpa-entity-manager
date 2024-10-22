@@ -9,27 +9,28 @@ import java.util.Map;
 import java.util.Objects;
 
 public class EntitySnapshot {
+    private final TableDefinition tableDefinition;
     private final Map<String, Object> columnSnapshots = new HashMap<>();
 
     public EntitySnapshot(Object entity) {
-
-        final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
+        tableDefinition = new TableDefinition(entity.getClass());
         final List<? extends Queryable> columns = tableDefinition.withoutIdColumns();
         for (Queryable column : columns) {
-            columnSnapshots.put(column.getName(), column.hasValue(entity) ? column.getValueAsString(entity) : null);
+            columnSnapshots.put(column.getColumnName(), getNullableValue(entity, column));
         }
     }
 
-    public List<String> getDirtyColumns(Object entity) {
-        final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
+    private static Object getNullableValue(Object entity, Queryable column) {
+        return column.hasValue(entity) ? column.getValueAsString(entity) : null;
+    }
+
+    public boolean hasDirtyColumns(Object entity) {
         final List<? extends Queryable> columns = tableDefinition.withoutIdColumns();
         return columns.stream()
-                .filter(column -> {
-                    final Object currentValue = column.hasValue(entity) ? column.getValueAsString(entity) : null;
-                    final Object snapshotValue = columnSnapshots.get(column.getName());
-                    return !Objects.equals(currentValue, snapshotValue);
-                })
-                .map(Queryable::getName)
-                .toList();
+                .anyMatch(column -> {
+                    final Object entityValue = getNullableValue(entity, column);
+                    final Object snapshotValue = columnSnapshots.get(column.getColumnName());
+                    return !Objects.equals(entityValue, snapshotValue);
+                });
     }
 }

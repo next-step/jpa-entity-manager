@@ -41,9 +41,9 @@ class ColumnDefinitionTest {
         ColumnDefinition column3 = new ColumnDefinition(ColumnDefinitionTestEntity.class.getDeclaredField("column3"));
 
         assertAll(
-                () -> assertThat(column1.getName()).isEqualTo("column1"),
-                () -> assertThat(column2.getName()).isEqualTo("column"),
-                () -> assertThat(column3.getName()).isEqualTo("column3")
+                () -> assertThat(column1.getColumnName()).isEqualTo("column1"),
+                () -> assertThat(column2.getColumnName()).isEqualTo("column"),
+                () -> assertThat(column3.getColumnName()).isEqualTo("column3")
         );
     }
 

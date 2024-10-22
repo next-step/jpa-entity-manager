@@ -123,13 +123,12 @@ class EntityPersisterTest {
     void shouldExecuteUpdate() {
         QueryTestEntityWithIdentityId entity = new QueryTestEntityWithIdentityId(1L, "John", 25);
         EntityPersister persister = new EntityPersister(jdbcTemplate);
-        EntitySnapshot snapshot = new EntitySnapshot(entity);
 
         persister.insert(entity);
 
         QueryTestEntityWithIdentityId updatedEntity = new QueryTestEntityWithIdentityId(1L, "Chanho", 30);
 
-        persister.update(updatedEntity, snapshot.getDirtyColumns(updatedEntity));
+        persister.update(updatedEntity);
 
         EntityManager em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
         QueryTestEntityWithIdentityId updated = em.find(QueryTestEntityWithIdentityId.class, 1L);

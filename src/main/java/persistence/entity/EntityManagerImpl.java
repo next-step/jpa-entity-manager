@@ -2,9 +2,6 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
-import java.io.Serializable;
-import java.util.List;
-
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
@@ -51,7 +48,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void merge(Object entity) {
+    public <T> T merge(T entity) {
         if (!persistenceContext.hasEntity(entity, entityPersister.getEntityId(entity))) {
             throw new IllegalStateException("Can not find entity in persistence context: "
                     + entity.getClass().getSimpleName());
@@ -63,15 +60,13 @@ public class EntityManagerImpl implements EntityManager {
         );
 
         final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
-        persistenceContext.addEntity(entityKey, entity);
 
-        List<String> dirtyColumns = entitySnapshot.getDirtyColumns(persistenceContext.getEntity(entityKey));
-
-        if (dirtyColumns.isEmpty()) {
-            return;
+        if (entitySnapshot.hasDirtyColumns(persistenceContext.getEntity(entityKey))) {
+            entityPersister.update(entity);
         }
-        entityPersister.update(entity, dirtyColumns);
+
         persistenceContext.addEntity(entityKey, entity);
         persistenceContext.addDatabaseSnapshot(entityKey, entity);
+        return entity;
     }
 }

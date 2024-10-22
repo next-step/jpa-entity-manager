@@ -1,11 +1,8 @@
 package persistence.entity;
 
 import jdbc.RowMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import persistence.sql.Queryable;
 import persistence.sql.definition.TableDefinition;
-import persistence.sql.definition.TableId;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -26,7 +23,7 @@ public class EntityRowMapper<T> implements RowMapper<T> {
             T instance = clazz.getDeclaredConstructor().newInstance();
 
             for (Queryable field : tableDefinition.withIdColumns()) {
-                final String databaseColumnName = field.getName();
+                final String databaseColumnName = field.getColumnName();
                 final Field objectDeclaredField = clazz.getDeclaredField(field.getDeclaredName());
 
                 final boolean wasAccessible = objectDeclaredField.canAccess(instance);

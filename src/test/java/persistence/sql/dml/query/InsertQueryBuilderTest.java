@@ -15,7 +15,7 @@ class InsertQueryBuilderTest {
     void shouldBuildInsertUsersQuery() {
         Person person = new Person(1L, "john_doe", 30, "chanho0912@gmail.com", 1);
 
-        String query = new InsertQueryBuilder(person).build();
+        String query = new InsertQueryBuilder().build(person);
 
         assertThat(query).isEqualTo("INSERT INTO users (id, nick_name, old, email) VALUES (1, 'john_doe', 30, 'chanho0912@gmail.com');");
     }
@@ -47,8 +47,8 @@ class InsertQueryBuilderTest {
         HasNullableColumnEntity hasNullableColumnEntity1 = new HasNullableColumnEntity(1L);
         HasNullableColumnEntity hasNullableColumnEntity2 = new HasNullableColumnEntity(2L, 10);
 
-        String query1 = new InsertQueryBuilder(hasNullableColumnEntity1).build();
-        String query2 = new InsertQueryBuilder(hasNullableColumnEntity2).build();
+        String query1 = new InsertQueryBuilder().build(hasNullableColumnEntity1);
+        String query2 = new InsertQueryBuilder().build(hasNullableColumnEntity2);
 
         assertAll(
                 () -> assertThat(query1).isEqualTo("INSERT INTO HasNullableColumnEntity (id) VALUES (1);"),

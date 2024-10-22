@@ -12,7 +12,7 @@ public interface Queryable {
 
     void bindValue(Object entity, Object value);
 
-    String getName();
+    String getColumnName();
 
     String getDeclaredName();
 }

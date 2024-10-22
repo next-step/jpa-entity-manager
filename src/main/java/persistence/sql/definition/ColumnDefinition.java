@@ -11,7 +11,7 @@ import java.util.Optional;
 public class ColumnDefinition {
     private static final int DEFAULT_LENGTH = 255;
 
-    private final String name;
+    private final String columnName;
     private final SqlType sqlType;
     private final String declaredName;
     private final Class<?> declaredType;
@@ -21,7 +21,7 @@ public class ColumnDefinition {
     public ColumnDefinition(Field field) {
         this.declaredName = field.getName();
         this.declaredType = field.getType();
-        this.name = determineColumnName(field);
+        this.columnName = determineColumnName(field);
         this.sqlType = determineColumnType(field);
         this.nullable = determineColumnNullable(field);
         this.length = determineColumnLength(field);
@@ -61,8 +61,8 @@ public class ColumnDefinition {
         return field.getAnnotation(Column.class).nullable();
     }
 
-    public String getName() {
-        return name;
+    public String getColumnName() {
+        return columnName;
     }
 
     public SqlType getSqlType() {
