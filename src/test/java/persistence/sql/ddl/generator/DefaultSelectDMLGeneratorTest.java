@@ -1,4 +1,4 @@
-package ddl.generator;
+package persistence.sql.ddl.generator;
 
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.EntityTable;

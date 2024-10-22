@@ -1,4 +1,4 @@
-package ddl;
+package persistence.sql.ddl;
 
 import jakarta.persistence.GenerationType;
 import org.junit.jupiter.api.Test;

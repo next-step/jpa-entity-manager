@@ -1,4 +1,4 @@
-package ddl;
+package persistence.sql.ddl;
 
 import database.DatabaseServer;
 import database.H2;

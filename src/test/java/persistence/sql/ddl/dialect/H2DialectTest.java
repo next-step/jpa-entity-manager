@@ -1,4 +1,4 @@
-package ddl.dialect;
+package persistence.sql.ddl.dialect;
 
 import jakarta.persistence.GenerationType;
 import org.junit.jupiter.api.Test;
