@@ -22,23 +22,23 @@ public class EntityPersister {
     }
 
     public String update(Object entity) {
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entityTable, entityColumns);
-        return updateQueryBuilder.update(entity, getIdValue(entity));
+        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+        return updateQueryBuilder.update(entityTable, entityColumns, entity, getIdValue(entity));
     }
 
     public String insert(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entityTable, entityColumns);
-        return insertQueryBuilder.getInsertQuery(entity);
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+        return insertQueryBuilder.getInsertQuery(entityTable, entityColumns, entity);
     }
 
     public String delete(Object entity) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(entityTable, entityColumns);
-        return deleteQueryBuilder.delete(getIdValue(entity));
+        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+        return deleteQueryBuilder.delete(entityTable, entityColumns, getIdValue(entity));
     }
 
     public String select(Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityTable, entityColumns);
-        return selectQueryBuilder.findById(id);
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+        return selectQueryBuilder.findById(entityTable, entityColumns, id);
     }
 
     public Long getIdValue(Object entity) {

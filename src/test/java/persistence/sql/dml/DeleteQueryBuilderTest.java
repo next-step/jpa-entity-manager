@@ -13,8 +13,8 @@ class DeleteQueryBuilderTest {
     @DisplayName("Person 객체로 Delete Query 만들기")
     void deleteQuery() {
         Metadata metadata = new Metadata(Person.class);
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(metadata.getEntityTable(), metadata.getEntityColumns());
-        String deleteQuery = deleteQueryBuilder.delete(1L);
+        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+        String deleteQuery = deleteQueryBuilder.delete(metadata.getEntityTable(), metadata.getEntityColumns(), 1L);
 
         assertEquals(deleteQuery, "delete FROM users where id = 1");
     }

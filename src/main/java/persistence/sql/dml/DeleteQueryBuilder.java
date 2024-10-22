@@ -4,15 +4,8 @@ import persistence.sql.entity.EntityColumns;
 import persistence.sql.entity.EntityTable;
 
 public class DeleteQueryBuilder {
-    private final EntityTable entityTable;
-    private final EntityColumns entityColumns;
 
-    public DeleteQueryBuilder(EntityTable entityTable, EntityColumns entityColumns) {
-        this.entityTable = entityTable;
-        this.entityColumns = entityColumns;
-    }
-
-    public String delete(Object idValue) {
+    public String delete(EntityTable entityTable, EntityColumns entityColumns, Object idValue) {
         String tableName = entityTable.getTableName();
         String idField = entityColumns.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);

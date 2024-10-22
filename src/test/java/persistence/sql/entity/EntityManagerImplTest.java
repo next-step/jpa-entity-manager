@@ -34,9 +34,9 @@ class EntityManagerImplTest {
         Metadata metadata = new Metadata(Person.class);
         CreateQueryBuilder queryBuilder = new CreateQueryBuilder(Person.class);
         String tableQuery = queryBuilder.createTableQuery(Person.class);
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata.getEntityTable(), metadata.getEntityColumns());
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
         Person person = new Person("yang", 23, "rhfp@naver.com", 3);
-        String insertQuery = insertQueryBuilder.getInsertQuery(person);
+        String insertQuery = insertQueryBuilder.getInsertQuery(metadata.getEntityTable(), metadata.getEntityColumns(), person);
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(tableQuery);

@@ -7,22 +7,15 @@ import persistence.sql.entity.EntityTable;
 import java.util.stream.Collectors;
 
 public class InsertQueryBuilder {
-    private final EntityTable entityTable;
-    private final EntityColumns entityColumns;
 
-    public InsertQueryBuilder(EntityTable entityTable, EntityColumns entityColumns) {
-        this.entityTable = entityTable;
-        this.entityColumns = entityColumns;
-    }
-
-    public String getInsertQuery(Object object) {
+    public String getInsertQuery(EntityTable entityTable, EntityColumns entityColumns, Object object) {
         String tableName = entityTable.getTableName();
-        String tableColumns = columnsClause();
-        String tableValues = valueClause(object);
+        String tableColumns = columnsClause(entityColumns);
+        String tableValues = valueClause(entityColumns,object);
         return String.format("insert into %s (%s) VALUES (%s)", tableName, tableColumns, tableValues);
     }
 
-    private String columnsClause() {
+    private String columnsClause(EntityColumns entityColumns) {
         return entityColumns.getColumns().stream()
                 .filter(column -> !column.isGeneratedValue())
                 .filter(column -> !column.isTransient())
@@ -30,7 +23,7 @@ public class InsertQueryBuilder {
                 .collect(Collectors.joining(", "));
     }
 
-    private String valueClause(Object object) {
+    private String valueClause(EntityColumns entityColumns, Object object) {
         return entityColumns.getColumns().stream()
                 .filter(column -> !column.isGeneratedValue())
                 .filter(column -> !column.isTransient())

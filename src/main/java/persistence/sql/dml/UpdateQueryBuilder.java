@@ -7,24 +7,19 @@ import java.util.stream.Collectors;
 
 public class UpdateQueryBuilder {
 
-    private final EntityTable entityTable;
-    private final EntityColumns entityColumns;
-
-    public UpdateQueryBuilder(EntityTable entityTable, EntityColumns entityColumns) {
-        this.entityTable = entityTable;
-        this.entityColumns = entityColumns;
+    public UpdateQueryBuilder() {
     }
 
-    public String update(Object object, Object idValue) {
+    public String update(EntityTable entityTable, EntityColumns entityColumns, Object object, Object idValue) {
         String tableName = entityTable.getTableName();
         String idField = entityColumns.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);
-        String setColumns = getSetColumns(object);
+        String setColumns = getSetColumns(entityColumns,object);
 
         return String.format("update %s set %s where %s = %s", tableName, setColumns, idField, formattedIdValue);
     }
 
-    private String getSetColumns(Object object) {
+    private String getSetColumns(EntityColumns entityColumns, Object object) {
         return entityColumns.getColumns().stream()
                 .filter(entityColumn -> !entityColumn.isPrimaryKey())
                 .filter(entityColumn -> !entityColumn.isTransient())

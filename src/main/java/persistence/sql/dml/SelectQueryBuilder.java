@@ -7,29 +7,21 @@ import persistence.sql.entity.EntityTable;
 import java.util.stream.Collectors;
 
 public class SelectQueryBuilder {
-    private final EntityTable entityTable;
-    private final EntityColumns entityColumns;
 
-
-    public SelectQueryBuilder(EntityTable entityTable, EntityColumns entityColumns) {
-        this.entityTable = entityTable;
-        this.entityColumns = entityColumns;
-    }
-
-    public String findAll() {
+    public String findAll(EntityTable entityTable, EntityColumns entityColumns) {
         String tableName = entityTable.getTableName();
-        String tableColumns = getTableColumns();
+        String tableColumns = getTableColumns(entityColumns);
         return String.format("select %s FROM %s", tableColumns, tableName);
     }
 
-    public String findById(Object idValue) {
-        String selectQuery = findAll();
+    public String findById(EntityTable entityTable, EntityColumns entityColumns, Object idValue) {
+        String selectQuery = findAll(entityTable, entityColumns);
         String idField = entityColumns.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);
         return String.format("%s where %s = %s", selectQuery, idField, formattedIdValue);
     }
 
-    private String getTableColumns() {
+    private String getTableColumns(EntityColumns entityColumns) {
         return entityColumns.getColumns()
                 .stream()
                 .filter(entityColumn -> !entityColumn.isTransient())
