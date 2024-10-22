@@ -9,4 +9,4 @@ Step1
     - [x] 2-1 : Select 기능
     - [x] 2-2 : Update 기능
     - [x] 2-3 : Insert 기능
-    - [x] 2-4 : Delete 기능ㅇ
+    - [x] 2-4 : Delete 기능
