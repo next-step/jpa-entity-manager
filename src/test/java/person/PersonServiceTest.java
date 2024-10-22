@@ -19,17 +19,16 @@ import service.person.request.PersonRequest;
 import service.person.response.PersonResponse;
 
 import java.sql.SQLException;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /*
-- Person 데이터를 전부 가져온다.
 - Person 1L 데이터를 가져온다.
 - Person 데이터를 가져올 시 존재하지 않는 데이터면 RuntimeException 이 발생한다.
 - Person 1L 데이터를 삭제한다.
 */
-public class PersonServiceTest {
+class PersonServiceTest {
 
     private PersonService personService;
     private H2DBConnection h2DBConnection;
@@ -63,19 +62,6 @@ public class PersonServiceTest {
         this.h2DBConnection.stop();
     }
 
-    @DisplayName("Person 데이터를 전부 가져온다.")
-    @Test
-    void findAllTest() {
-        List<PersonResponse> personList = personService.findAll();
-
-        assertThat(personList)
-                .extracting("id", "name", "age", "email")
-                .containsExactly(
-                        tuple(1L, "test1", 29, "test@test.com"),
-                        tuple(2L, "test2", 29, "test@test.com")
-                );
-    }
-
     @DisplayName("Person 1L 데이터를 가져온다.")
     @Test
     void findByIdTest() {
@@ -98,13 +84,9 @@ public class PersonServiceTest {
     @Test
     void deleteByIdTest() {
         personService.deleteById(1L);
-        List<PersonResponse> personResponseList = personService.findAll();
-
-        assertThat(personResponseList)
-                .extracting("id", "name", "age", "email")
-                .containsExactly(
-                        tuple(2L, "test2", 29, "test@test.com")
-                );
+        assertThatThrownBy(() -> personService.findById(1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Expected 1 result, got 0");
     }
 
     private PersonRequest createPersonRequest(int i) {

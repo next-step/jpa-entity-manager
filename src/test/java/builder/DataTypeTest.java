@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 /*
 - 변수 데이터타입에 따른 컬럼 데이터타입을 가져온다.
 */
-public class DataTypeTest {
+class DataTypeTest {
 
     @DisplayName("변수 데이터타입에 따른 컬럼 데이터타입을 가져온다.")
     @ParameterizedTest

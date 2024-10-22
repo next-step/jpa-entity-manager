@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 - deleteById 쿼리 문자열 생성하기
 - Object를 받아 deleteById 쿼리 문자열 생성한다.
 */
-public class H2QDMLBuilderTest {
+class H2QDMLBuilderTest {
 
     @DisplayName("Insert 쿼리 문자열 생성하기")
     @Test
