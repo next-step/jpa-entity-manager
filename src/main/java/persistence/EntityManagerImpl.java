@@ -1,7 +1,5 @@
 package persistence;
 
-import java.util.List;
-
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityPersister entityPersister;
@@ -16,18 +14,13 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> List<T> findAll(Class<T> clazz) {
-        return this.entityPersister.findAll(clazz);
-    }
-
-    @Override
     public void persist(Object entityInstance) {
         this.entityPersister.persist(entityInstance);
     }
 
     @Override
-    public void update(Object entityInstance) {
-        this.entityPersister.update(entityInstance);
+    public void merge(Object entityInstance) {
+        this.entityPersister.merge(entityInstance);
     }
 
     @Override

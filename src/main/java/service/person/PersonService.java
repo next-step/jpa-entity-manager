@@ -5,8 +5,6 @@ import persistence.EntityManager;
 import service.person.request.PersonRequest;
 import service.person.response.PersonResponse;
 
-import java.util.List;
-
 public class PersonService {
 
     private final EntityManager entityManager;
@@ -18,12 +16,6 @@ public class PersonService {
     //Person을 저장한다.
     public void save(PersonRequest personRequest) {
         entityManager.persist(personRequest.toEntity());
-    }
-
-    //Person을 가져온다.
-    public List<PersonResponse> findAll() {
-        List<Person> personList = entityManager.findAll(Person.class);
-        return personList.stream().map(PersonResponse::of).toList();
     }
 
     //id로 Person을 가져온다.

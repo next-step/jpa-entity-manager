@@ -31,19 +31,9 @@ public class EntityPersister {
             return clazz.cast(persistObject);
         }
         Object findObject = jdbcTemplate.queryForObject(selectByIdQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz, id)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
+
         this.persistenceContext.insertEntity(new EntityInfo<>(id, findObject.getClass()), findObject);
         return clazz.cast(findObject);
-    }
-
-    //데이터 리스트를 조회한다.
-    public <T> List<T> findAll(Class<T> clazz) {
-        List<T> list = jdbcTemplate.query(selectAllQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
-        for (T findObject : list) {
-            DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(findObject);
-            EntityInfo<T> entityObject = new EntityInfo<>(dmlBuilderData.getId(), clazz);
-            this.persistenceContext.insertEntity(entityObject, findObject);
-        }
-        return list;
     }
 
     //데이터를 반영한다.
@@ -54,7 +44,7 @@ public class EntityPersister {
     }
 
     //데이터를 수정한다.
-    public void update(Object entityInstance) {
+    public void merge(Object entityInstance) {
         confirmEntityDataExist(entityInstance);
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
         jdbcTemplate.execute(updateQueryBuilder.buildQuery(dmlBuilderData));
@@ -66,7 +56,7 @@ public class EntityPersister {
         DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder();
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
         jdbcTemplate.execute(queryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(entityInstance)));
-        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.deleteEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()));
     }
 
     //조회되는 데이터가 존재하는지 확인한다.
