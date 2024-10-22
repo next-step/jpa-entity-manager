@@ -1,36 +1,23 @@
 package persistence.sql.entity;
 
-import jakarta.persistence.Column;
 import jdbc.JdbcTemplate;
+import persistence.sql.dml.SelectQueryBuilder;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 
 public class EntityLoader {
-
     private final JdbcTemplate jdbcTemplate;
 
     public EntityLoader(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
     }
 
-    public <T> T loadEntity(Class<T> clazz, String query) {
-        return jdbcTemplate.queryForObject(query, new EntityRowMapper<>(clazz));
-    }
+    public <T> T loadEntity(Class<T> clazz, Long id) {
+        EntityTable entityTable = EntityTable.from(clazz);
+        EntityColumns entityColumns = EntityColumns.from(clazz);
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
 
-    public void load(String query) {
-         jdbcTemplate.execute(query);
-    }
-
-    private String getColumnName(Field field) {
-        Column annotation = field.getAnnotation(Column.class);
-        if (annotation == null) {
-            return field.getName();
-        }
-        if (!annotation.name().isEmpty()) {
-            return annotation.name();
-        }
-
-        return field.getName();
+        String selectQuery = selectQueryBuilder.findById(entityTable, entityColumns, id);
+        return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
     }
 }
