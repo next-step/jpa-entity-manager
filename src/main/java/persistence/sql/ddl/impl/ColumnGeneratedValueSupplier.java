@@ -16,6 +16,10 @@ public record ColumnGeneratedValueSupplier(short priority) implements QueryColum
             GenerationType.IDENTITY, GenerationType.AUTO
     );
 
+    private static boolean appendableAutoIncrement(GeneratedValue anno) {
+        return anno != null && ALLOW_AUTO_INCREMENT_STRATEGY.contains(anno.strategy());
+    }
+
     @Override
     public boolean supported(FieldNode fieldNode) {
         return fieldNode.getAnnotation(GeneratedValue.class) != null;
@@ -29,9 +33,5 @@ public record ColumnGeneratedValueSupplier(short priority) implements QueryColum
         }
 
         return "";
-    }
-
-    private static boolean appendableAutoIncrement(GeneratedValue anno) {
-        return anno != null && ALLOW_AUTO_INCREMENT_STRATEGY.contains(anno.strategy());
     }
 }
