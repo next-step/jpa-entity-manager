@@ -68,7 +68,7 @@ public class TestPersistenceConfig {
     }
 
     private EntityPersister entityPersister() throws SQLException {
-        return new DefaultEntityPersister(database(), nameConverter(), rowMapperFactory());
+        return new DefaultEntityPersister(database(), nameConverter());
     }
 
     private PersistenceContext persistenceContext() {
