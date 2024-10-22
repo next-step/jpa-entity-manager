@@ -5,17 +5,11 @@ import java.util.Map;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
-    private Map<EntityInfo<?>, Object> entityMap = new HashMap<>();
+    private final Map<EntityInfo<?>, Object> entityMap = new HashMap<>();
 
     @Override
     public Object findEntity(EntityInfo<?> entityObject) {
         return entityMap.get(entityObject);
-    }
-
-    @Override
-    public void updateEntity(EntityInfo<?> entityObject, Object object) {
-        deleteEntity(entityObject);
-        this.entityMap.put(entityObject, object);
     }
 
     @Override

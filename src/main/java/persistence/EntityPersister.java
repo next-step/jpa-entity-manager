@@ -13,6 +13,11 @@ public class EntityPersister {
     private final PersistenceContext persistenceContext;
     private final JdbcTemplate jdbcTemplate;
 
+    private final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
+    private final SelectAllQueryBuilder selectAllQueryBuilder = new SelectAllQueryBuilder();
+    private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+    private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+
     public EntityPersister(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate) {
         this.persistenceContext = persistenceContext;
         this.jdbcTemplate = jdbcTemplate;
@@ -20,42 +25,40 @@ public class EntityPersister {
 
     //데이터를 조회한다.
     public <T> T find(Class<T> clazz, Long id) {
-        EntityInfo<T> entityObject = EntityInfo.createEntityInfo(id, clazz);
+        EntityInfo<T> entityObject = new EntityInfo<>(id, clazz);
         Object persistObject = this.persistenceContext.findEntity(entityObject);
         if (persistObject != null) {
             return clazz.cast(persistObject);
         }
-        SelectByIdQueryBuilder queryBuilder = new SelectByIdQueryBuilder();
-        Object findObject = jdbcTemplate.queryForObject(queryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz, id)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
-        this.persistenceContext.insertEntity(EntityInfo.createEntityInfo(id, findObject.getClass()), findObject);
+        Object findObject = jdbcTemplate.queryForObject(selectByIdQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz, id)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
+        this.persistenceContext.insertEntity(new EntityInfo<>(id, findObject.getClass()), findObject);
         return clazz.cast(findObject);
     }
 
     //데이터 리스트를 조회한다.
     public <T> List<T> findAll(Class<T> clazz) {
-        SelectAllQueryBuilder queryBuilder = new SelectAllQueryBuilder();
-        List<T> list = jdbcTemplate.query(queryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
+        List<T> list = jdbcTemplate.query(selectAllQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
         for (T findObject : list) {
-            confirmExistPersistContext(findObject, clazz);
+            DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(findObject);
+            EntityInfo<T> entityObject = new EntityInfo<>(dmlBuilderData.getId(), clazz);
+            this.persistenceContext.insertEntity(entityObject, findObject);
         }
         return list;
     }
 
     //데이터를 반영한다.
     public void persist(Object entityInstance) {
-        InsertQueryBuilder queryBuilder = new InsertQueryBuilder();
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        jdbcTemplate.execute(queryBuilder.buildQuery(dmlBuilderData));
-        this.persistenceContext.insertEntity(EntityInfo.createEntityInfo(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        jdbcTemplate.execute(insertQueryBuilder.buildQuery(dmlBuilderData));
+        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     //데이터를 수정한다.
     public void update(Object entityInstance) {
         confirmEntityDataExist(entityInstance);
-        UpdateQueryBuilder queryBuilder = new UpdateQueryBuilder();
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        jdbcTemplate.execute(queryBuilder.buildQuery(dmlBuilderData));
-        this.persistenceContext.updateEntity(EntityInfo.createEntityInfo(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        jdbcTemplate.execute(updateQueryBuilder.buildQuery(dmlBuilderData));
+        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     //데이터를 제거한다.
@@ -63,7 +66,7 @@ public class EntityPersister {
         DeleteQueryBuilder queryBuilder = new DeleteQueryBuilder();
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
         jdbcTemplate.execute(queryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(entityInstance)));
-        this.persistenceContext.updateEntity(EntityInfo.createEntityInfo(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     //조회되는 데이터가 존재하는지 확인한다.
@@ -78,18 +81,4 @@ public class EntityPersister {
             throw new RuntimeException(DATA_NOT_EXIST_MESSAGE + entityInstance.getClass().getSimpleName());
         }
     }
-
-    //영속성 컨텍스트에 Entity 가 이미 조회됐는지 여부를 확인하고 update 혹은 insert 해준다.
-    private <T> void confirmExistPersistContext(T findObject, Class<T> clazz) {
-        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(findObject);
-        EntityInfo<T> entityObject = EntityInfo.createEntityInfo(dmlBuilderData.getId(), clazz);
-        Object persistObject = this.persistenceContext.findEntity(entityObject);
-
-        if (persistObject != null) {
-            this.persistenceContext.updateEntity(entityObject, findObject);
-        } else {
-            this.persistenceContext.insertEntity(entityObject, findObject);
-        }
-    }
-
 }
