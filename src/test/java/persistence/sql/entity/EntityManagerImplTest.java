@@ -42,7 +42,7 @@ class EntityManagerImplTest {
         jdbcTemplate.execute(tableQuery);
         jdbcTemplate.execute(insertQuery);
 
-        entityPersister = new EntityPersister(Person.class);
+        entityPersister = new EntityPersister(Person.class, server.getConnection());
         persistenceContext = new PersistenceContextImpl();
 
         entityManager = new EntityManagerImpl(entityPersister, persistenceContext, server.getConnection());

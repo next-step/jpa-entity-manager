@@ -19,21 +19,21 @@ public class EntityManagerImpl implements EntityManager {
             return persistenceContext.getEntity(clazz, id);
         }
 
-        String selectQuery = entityPersister.select(id);
-        return entityLoader.loadEntity(clazz, selectQuery);
+        T entity = entityPersister.select(clazz, id);
+        if (entity != null) {
+            persistenceContext.addEntity(entity, id);
+        }
+        return entity;
     }
 
     @Override
     public Object persist(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
         if (idValue == null) {
-            String insertQuery = entityPersister.insert(entity);
-            entityLoader.load(insertQuery);
+            entityPersister.insert(entity);
             idValue = entityPersister.getIdValue(entity);
         }
-        String updateQuery = entityPersister.update(entity);
-        entityLoader.load(updateQuery);
-
+        entityPersister.update(entity);
         persistenceContext.addEntity(entity, idValue);
         return entity;
     }
@@ -41,23 +41,19 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void remove(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
-        if (idValue == null) {
-            return;
+        if (idValue != null && persistenceContext.containsEntity(entity.getClass(), idValue)) {
+            entityPersister.delete(entity);
+            persistenceContext.removeEntity(entity.getClass(), idValue);
         }
-
-        String deleteQuery = entityPersister.delete(entity);
-        entityLoader.load(deleteQuery);
-
-        persistenceContext.removeEntity(entity.getClass(), idValue);
     }
 
     @Override
     public Object update(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
-        String updateQuery = entityPersister.update(entity);
-        entityLoader.load(updateQuery);
-
-        persistenceContext.addEntity(entity.getClass(), idValue);
+        if (persistenceContext.containsEntity(entity.getClass(), idValue)) {
+            entityPersister.update(entity);
+            persistenceContext.addEntity(entity.getClass(), idValue);
+        }
         return entity;
     }
 
