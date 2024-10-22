@@ -1,8 +1,11 @@
 package persistence.entity;
 
 import jdbc.RowMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.sql.Queryable;
 import persistence.sql.definition.TableDefinition;
+import persistence.sql.definition.TableId;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -43,4 +46,5 @@ public class EntityRowMapper<T> implements RowMapper<T> {
             throw new SQLException("Failed to map row to " + clazz.getName(), e);
         }
     }
+
 }

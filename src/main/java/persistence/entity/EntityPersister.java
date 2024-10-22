@@ -1,14 +1,17 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.sql.Queryable;
 import persistence.sql.definition.TableDefinition;
+import persistence.sql.definition.TableId;
 import persistence.sql.dml.query.DeleteByIdQueryBuilder;
 import persistence.sql.dml.query.InsertQueryBuilder;
 import persistence.sql.dml.query.UpdateQueryBuilder;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +19,21 @@ import java.util.stream.Collectors;
 
 public class EntityPersister {
     private static final Long DEFAULT_ID_VALUE = 0L;
+
+    private final Logger logger = LoggerFactory.getLogger(EntityPersister.class);
     private final HashMap<Class<?>, TableDefinition> tableDefinitions;
     private final JdbcTemplate jdbcTemplate;
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.tableDefinitions = new HashMap<>();
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public boolean hasId(Object entity) {
+        putTableDefinitionIfAbsent(entity);
+
+        final TableDefinition tableDefinition = tableDefinitions.get(entity.getClass());
+        return tableDefinition.hasId(entity);
     }
 
     public Serializable getEntityId(Object entity) {
@@ -35,23 +47,37 @@ public class EntityPersister {
         return DEFAULT_ID_VALUE;
     }
 
-    public EntityKey insert(Object entity) {
+    public Object insert(Object entity) {
         putTableDefinitionIfAbsent(entity);
 
-        final TableDefinition tableDefinition = tableDefinitions.get(entity.getClass());
-        final Object id = getId(tableDefinition, entity);
-        tableDefinition.getTableId().bindValue(entity, id);
-
         final String query = new InsertQueryBuilder(entity).build();
-        final Long insertedId = jdbcTemplate.insertAndReturnKey(query);
-        return createEntityKey(entity, insertedId);
+        final Serializable id = jdbcTemplate.insertAndReturnKey(query);
+        copyId(id, entity);
+        return entity;
     }
 
-    private EntityKey createEntityKey(Object entity, Long id) {
-        final EntityKey entityKey = new EntityKey(id, entity.getClass());
+    public void copyId(Serializable id, Object to) {
+        try {
+            final Class<?> entityClass = to.getClass();
+            final TableDefinition tableDefinition = new TableDefinition(entityClass);
+            final TableId tableId = tableDefinition.getTableId();
 
-        entityKey.bindId(entity);
-        return entityKey;
+            final Field objectDeclaredField = entityClass.getDeclaredField(tableId.getDeclaredName());
+
+            final boolean wasAccessible = objectDeclaredField.canAccess(to);
+            if (!wasAccessible) {
+                objectDeclaredField.setAccessible(true);
+            }
+
+            objectDeclaredField.set(to, id);
+
+            if (!wasAccessible) {
+                objectDeclaredField.setAccessible(false);
+            }
+
+        } catch (ReflectiveOperationException e) {
+            logger.error("Failed to copy row to {}", to.getClass().getName(), e);
+        }
     }
 
     public void update(Object entity, List<String> targetColumns) {
@@ -81,25 +107,4 @@ public class EntityPersister {
         String query = new DeleteByIdQueryBuilder(entity).build();
         jdbcTemplate.execute(query);
     }
-
-    @Nullable
-    private Object getId(TableDefinition tableDefinition, Object entity) {
-        if (tableDefinition.getTableId().idRequired()) {
-            if (tableDefinition.hasId(entity)) {
-                return getEntityId(entity);
-            }
-
-            throw new IllegalStateException("Identifier of entity "
-                    + tableDefinition.getTableName()
-                    + " must be manually assigned before calling 'persist()'");
-        }
-
-        if (tableDefinition.hasId(entity)) {
-            throw new IllegalStateException(
-                    "detached entity passed to persist: " + tableDefinition.getTableName()
-            );
-        }
-        return 0L;
-    }
-
 }

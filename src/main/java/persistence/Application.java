@@ -101,7 +101,7 @@ public class Application {
     }
 
     private static void update(EntityManager em, Person person) {
-        em.update(person);
+        em.merge(person);
         logger.info("Data updated successfully!");
     }
 

@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
@@ -24,14 +25,18 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        if (persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
-            return;
+        if (entityPersister.hasId(entity)) {
+            throw new IllegalArgumentException("Entity already persisted");
         }
 
-        final EntityKey entityKey = entityPersister.insert(entity);
+        final Object saved = entityPersister.insert(entity);
+        final EntityKey entityKey = new EntityKey(
+                entityPersister.getEntityId(saved),
+                saved.getClass()
+        );
 
-        persistenceContext.addEntity(entityKey, entity);
-        persistenceContext.addDatabaseSnapshot(entityKey, entity);
+        persistenceContext.addEntity(entityKey, saved);
+        persistenceContext.addDatabaseSnapshot(entityKey, saved);
     }
 
     @Override
@@ -46,10 +51,10 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void update(Object entity) {
-        if (!persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
-            persist(entity);
-            return;
+    public void merge(Object entity) {
+        if (!persistenceContext.hasEntity(entity, entityPersister.getEntityId(entity))) {
+            throw new IllegalStateException("Can not find entity in persistence context: "
+                    + entity.getClass().getSimpleName());
         }
 
         final EntityKey entityKey = new EntityKey(

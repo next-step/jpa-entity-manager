@@ -12,5 +12,5 @@ public interface PersistenceContext {
 
     void removeEntity(EntityKey entityKey);
 
-    boolean isManagedEntity(Object entity, Object id);
+    boolean hasEntity(Object entity, Object id);
 }

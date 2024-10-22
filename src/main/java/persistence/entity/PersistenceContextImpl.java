@@ -36,7 +36,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public boolean isManagedEntity(Object entity, Object id) {
+    public boolean hasEntity(Object entity, Object id) {
         final EntityKey entityKey = new EntityKey((Serializable) id, entity.getClass());
         return managedEntities.containsKey(entityKey);
     }
