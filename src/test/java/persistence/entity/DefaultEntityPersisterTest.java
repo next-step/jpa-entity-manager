@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import database.H2ConnectionFactory;
+import jdbc.InstanceFactory;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,9 +67,10 @@ class DefaultEntityPersisterTest {
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         insertData(entity);
         final EntityWithId updatedEntity = new EntityWithId(entity.getId(), "Jackson", 20, "test2@email.com");
+        final Object snapshot = new InstanceFactory<>(entity.getClass()).copy(entity);
 
         // when
-        entityPersister.update(updatedEntity);
+        entityPersister.update(updatedEntity, snapshot);
 
         // then
         final EntityWithId managedEntity = entityLoader.load(entity.getClass(), entity.getId());

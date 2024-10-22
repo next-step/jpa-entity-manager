@@ -1,5 +1,6 @@
 package jdbc;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class InstanceFactory<T> {
@@ -8,17 +9,41 @@ public class InstanceFactory<T> {
 
     private final Class<T> clazz;
 
-    InstanceFactory(Class<T> clazz) {
+    public InstanceFactory(Class<T> clazz) {
         this.clazz = clazz;
     }
 
-    T createInstance() {
+    public T createInstance() {
         try {
             return clazz.getDeclaredConstructor().newInstance();
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(NO_DEFAULT_CONSTRUCTOR_FAILED_MESSAGE);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new IllegalStateException(INSTANCE_CREATION_FAILED_MESSAGE);
+        }
+    }
+
+    public T copy(Object instance) {
+        try {
+            final T newInstance = clazz.getDeclaredConstructor().newInstance();
+            for (Field field : clazz.getDeclaredFields()) {
+                mapField(field, instance, newInstance);
+            }
+            return newInstance;
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(NO_DEFAULT_CONSTRUCTOR_FAILED_MESSAGE);
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new IllegalStateException(INSTANCE_CREATION_FAILED_MESSAGE);
+        }
+    }
+
+    private void mapField(Field field, Object instance, T newInstance) {
+        try {
+            field.setAccessible(true);
+            final Object value = field.get(instance);
+            field.set(newInstance, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -2,23 +2,13 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
-import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.dialect.Dialect;
-import persistence.dialect.H2Dialect;
 import persistence.example.Person;
-import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -29,32 +19,32 @@ public class Application {
             final DatabaseServer server = new H2();
             server.start();
 
-            final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-            final Dialect dialect = new H2Dialect();
-
-            final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
-            jdbcTemplate.execute(createQueryBuilder.create());
-
-            final Person entity = new Person("Jaden", 30, "test@email.com", 1);
-            final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
-            jdbcTemplate.execute(insertQueryBuilder.insert(entity));
-
-            final Person updatedEntity = new Person(1L, "Jackson", 20, "test2@email.com");
-            final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
-            jdbcTemplate.execute(updateQueryBuilder.update(updatedEntity));
-
-            final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
-            final List<Person> people = jdbcTemplate.query(selectQueryBuilder.findAll(Person.class), new PersonRowMapper());
-            logger.debug(people.toString());
-
-            final Person person = jdbcTemplate.queryForObject(selectQueryBuilder.findById(Person.class, 1), new PersonRowMapper());
-            logger.debug(person.toString());
-
-            final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-            jdbcTemplate.execute(deleteQueryBuilder.delete(updatedEntity));
-
-            final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
-            jdbcTemplate.execute(dropQueryBuilder.drop());
+//            final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
+//            final Dialect dialect = new H2Dialect();
+//
+//            final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
+//            jdbcTemplate.execute(createQueryBuilder.create());
+//
+//            final Person entity = new Person("Jaden", 30, "test@email.com", 1);
+//            final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+//            jdbcTemplate.execute(insertQueryBuilder.insert(entity));
+//
+//            final Person updatedEntity = new Person(1L, "Jackson", 20, "test2@email.com");
+//            final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
+//            jdbcTemplate.execute(updateQueryBuilder.update(updatedEntity));
+//
+//            final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+//            final List<Person> people = jdbcTemplate.query(selectQueryBuilder.findAll(Person.class), new PersonRowMapper());
+//            logger.debug(people.toString());
+//
+//            final Person person = jdbcTemplate.queryForObject(selectQueryBuilder.findById(Person.class, 1), new PersonRowMapper());
+//            logger.debug(person.toString());
+//
+//            final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+//            jdbcTemplate.execute(deleteQueryBuilder.delete(updatedEntity));
+//
+//            final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
+//            jdbcTemplate.execute(dropQueryBuilder.drop());
 
             server.stop();
         } catch (Exception e) {

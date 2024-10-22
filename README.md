@@ -24,5 +24,5 @@
 - [x] 요구 사항 2 - EntityManager, Persistence Context 책임 전가
 
 ### 🚀 3단계 - Persistence Context, Dirty Check
-- [ ] 요구 사항1 - 만들었던 PersistenceContext 에서 효율적인 메모리 관리를 위한 기능 구현 (1차 캐싱)
-- [ ] 요구 사항2 - 더티체킹 구현
+- [x] 요구 사항1 - 만들었던 PersistenceContext 에서 효율적인 메모리 관리를 위한 기능 구현 (1차 캐싱)
+- [x] 요구 사항2 - 더티체킹 구현

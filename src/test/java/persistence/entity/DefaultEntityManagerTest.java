@@ -39,9 +39,9 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 조회한다.")
     void find() {
         // given
-        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
-        insertData(entity);
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
 
         // when
         final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
@@ -61,8 +61,8 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 저장한다.")
     void persist() {
         // given
-        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
         entityManager.persist(entity);
@@ -80,12 +80,32 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 수정한다.")
+    @DisplayName("엔티티를 삭제한다.")
+    void remove() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
+
+        // when
+        entityManager.remove(entity);
+
+        // then
+        assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Expected 1 result, got");
+    }
+
+    @Test
+    @DisplayName("더티체킹으로 엔티티를 수정한다.")
     void update() {
         // given
-        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
-        insertData(entity);
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
+        entity.setName("Yang");
+        entity.setAge(35);
+        entity.setEmail("test2@email.com");
 
         // when
         entityManager.update(entity);
@@ -102,30 +122,13 @@ class DefaultEntityManagerTest {
         );
     }
 
-    @Test
-    @DisplayName("엔티티를 삭제한다.")
-    void remove() {
-        // given
-        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
-        insertData(entity);
-        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
-
-        // when
-        entityManager.remove(entity);
-
-        // then
-        assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Expected 1 result, got");
-    }
-
     private void createTable() {
         final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(EntityWithId.class, new H2Dialect());
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
-    private void insertData(EntityWithId entity) {
-        entityPersister.insert(entity);
+    private void insertData(EntityWithId entity, EntityManager entityManager) {
+        entityManager.persist(entity);
     }
 
     private void dropTable() {

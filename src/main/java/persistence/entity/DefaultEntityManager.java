@@ -5,6 +5,7 @@ import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
+import persistence.sql.meta.EntityTable;
 
 import java.util.Objects;
 
@@ -47,14 +48,16 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public void update(Object entity) {
-        entityPersister.update(entity);
-        persistenceContext.addEntity(entity);
-    }
-
-    @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
+    }
+
+    @Override
+    public void update(Object entity) {
+        final EntityTable entityTable = new EntityTable(entity);
+        final Object snapshot = persistenceContext.getSnapshot(entity.getClass(), entityTable.getIdValue());
+        entityPersister.update(entity, snapshot);
+        persistenceContext.addEntity(entity);
     }
 }

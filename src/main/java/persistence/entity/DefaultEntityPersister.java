@@ -27,8 +27,8 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public void update(Object entity) {
-        jdbcTemplate.execute(updateQueryBuilder.update(entity));
+    public void update(Object entity, Object snapshot) {
+        jdbcTemplate.execute(updateQueryBuilder.update(entity, snapshot));
     }
 
     @Override
