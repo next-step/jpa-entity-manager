@@ -21,15 +21,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultEntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
-    private EntityPersister entityPersister;
     private EntityLoader entityLoader;
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
-        entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(),
-                new DeleteQueryBuilder());
         entityLoader = new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder());
+        entityManager = DefaultEntityManager.of(jdbcTemplate);
 
         createTable();
     }
@@ -43,6 +42,8 @@ class DefaultEntityPersisterTest {
     @DisplayName("엔티티를 저장한다.")
     void insert() {
         // given
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(),
+                new UpdateQueryBuilder(), new DeleteQueryBuilder());
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
@@ -64,6 +65,8 @@ class DefaultEntityPersisterTest {
     @DisplayName("엔티티를 수정한다.")
     void update() {
         // given
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(),
+                new UpdateQueryBuilder(), new DeleteQueryBuilder());
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         insertData(entity);
         final EntityWithId updatedEntity = new EntityWithId(entity.getId(), "Jackson", 20, "test2@email.com");
@@ -88,6 +91,8 @@ class DefaultEntityPersisterTest {
     @DisplayName("엔티티를 삭제한다.")
     void delete() {
         // given
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(),
+                new UpdateQueryBuilder(), new DeleteQueryBuilder());
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         insertData(entity);
 
@@ -106,7 +111,7 @@ class DefaultEntityPersisterTest {
     }
 
     private void insertData(EntityWithId entity) {
-        entityPersister.insert(entity);
+        entityManager.persist(entity);
     }
 
     private void dropTable() {

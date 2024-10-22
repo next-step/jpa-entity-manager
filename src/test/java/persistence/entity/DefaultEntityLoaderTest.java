@@ -10,23 +10,19 @@ import persistence.dialect.H2Dialect;
 import persistence.fixture.EntityWithId;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultEntityLoaderTest {
     private JdbcTemplate jdbcTemplate;
-    private EntityPersister entityPersister;
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
-        entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(),
-                new DeleteQueryBuilder());
+        entityManager = DefaultEntityManager.of(jdbcTemplate);
 
         createTable();
     }
@@ -40,9 +36,9 @@ class DefaultEntityLoaderTest {
     @DisplayName("엔티티를 로드한다.")
     void load() {
         // given
+        final EntityLoader entityLoader = new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder());
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         insertData(entity);
-        final EntityLoader entityLoader = new DefaultEntityLoader(jdbcTemplate, new SelectQueryBuilder());
 
         // when
         final EntityWithId managedEntity = entityLoader.load(entity.getClass(), entity.getId());
@@ -64,7 +60,7 @@ class DefaultEntityLoaderTest {
     }
 
     private void insertData(EntityWithId entity) {
-        entityPersister.insert(entity);
+        entityManager.persist(entity);
     }
 
     private void dropTable() {

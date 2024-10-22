@@ -10,22 +10,16 @@ import persistence.dialect.H2Dialect;
 import persistence.fixture.EntityWithId;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultEntityManagerTest {
     private JdbcTemplate jdbcTemplate;
-    private EntityPersister entityPersister;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
-        entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(), new UpdateQueryBuilder(),
-                new DeleteQueryBuilder());
 
         createTable();
     }
@@ -53,7 +47,7 @@ class DefaultEntityManagerTest {
                 () -> assertThat(managedEntity.getName()).isEqualTo(entity.getName()),
                 () -> assertThat(managedEntity.getAge()).isEqualTo(entity.getAge()),
                 () -> assertThat(managedEntity.getEmail()).isEqualTo(entity.getEmail()),
-                () -> assertThat(managedEntity.getIndex()).isNull()
+                () -> assertThat(managedEntity.getIndex()).isNotNull()
         );
     }
 
