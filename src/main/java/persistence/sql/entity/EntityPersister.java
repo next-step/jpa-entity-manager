@@ -12,22 +12,26 @@ import java.sql.Connection;
 
 public class EntityPersister {
 
-    private final String entityName;
     private final EntityTable entityTable;
     private final EntityColumns entityColumns;
     private final JdbcTemplate jdbcTemplate;
 
+    private final UpdateQueryBuilder updateQueryBuilder;
+    private final InsertQueryBuilder insertQueryBuilder;
+    private final DeleteQueryBuilder deleteQueryBuilder;
+
     public EntityPersister(Class<?> clazz, Connection connection) {
-        this.entityName = clazz.getSimpleName();
         this.entityTable = EntityTable.from(clazz);
         this.entityColumns = EntityColumns.from(clazz);
         this.jdbcTemplate = new JdbcTemplate(connection);
 
+        this.updateQueryBuilder = new UpdateQueryBuilder();
+        this.insertQueryBuilder = new InsertQueryBuilder();
+        this.deleteQueryBuilder = new DeleteQueryBuilder();
     }
 
     public boolean update(Object entity) {
         try {
-            UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
             String updateQuery = updateQueryBuilder.update(entityTable, entityColumns, entity, getIdValue(entity));
             jdbcTemplate.execute(updateQuery);
             return true;
@@ -38,21 +42,13 @@ public class EntityPersister {
     }
 
     public void insert(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
         String insertQuery = insertQueryBuilder.getInsertQuery(entityTable, entityColumns, entity);
         jdbcTemplate.execute(insertQuery);
     }
 
     public void delete(Object entity) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         String deleteQuery = deleteQueryBuilder.delete(entityTable, entityColumns, getIdValue(entity));
         jdbcTemplate.execute(deleteQuery);
-    }
-
-    public <T> T select(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
-        String selectQuery = selectQueryBuilder.findById(entityTable, entityColumns, id);
-        return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
     }
 
     public Long getIdValue(Object entity) {
