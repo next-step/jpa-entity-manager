@@ -1,25 +1,26 @@
 package persistence.sql.dml.impl;
 
 import jakarta.persistence.EntityExistsException;
+import persistence.sql.EntityLoaderFactory;
 import persistence.sql.clause.Clause;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.EntityManager;
 import persistence.sql.dml.MetadataLoader;
+import persistence.sql.loader.EntityLoader;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class DefaultEntityManager implements EntityManager {
-    private static final Logger logger = Logger.getLogger(DefaultEntityManager.class.getName());
-
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
+    private final EntityLoaderFactory entityLoaderFactory;
 
     public DefaultEntityManager(PersistenceContext persistenceContext, EntityPersister entityPersister) {
         this.persistenceContext = persistenceContext;
         this.entityPersister = entityPersister;
+        this.entityLoaderFactory = EntityLoaderFactory.getInstance();
     }
 
     @Override
@@ -27,21 +28,22 @@ public class DefaultEntityManager implements EntityManager {
         if (entity == null) {
             throw new IllegalArgumentException("Entity must not be null");
         }
-        MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
 
-        if (!isNew(entity, loader)) {
+        if (!isNew(entity)) {
             throw new EntityExistsException("Entity already exists");
         }
 
-        Object id = entityPersister.insert(entity, loader);
-        updatePrimaryKeyValue(entity, id, loader);
+        Object id = entityPersister.insert(entity);
         persistenceContext.add(id, entity);
 
         return entity;
     }
 
-    private <T> boolean isNew(Object entity, MetadataLoader<T> loader) {
+    private <T> boolean isNew(Object entity) {
         try {
+            EntityLoader<?> entityLoader = entityLoaderFactory.getLoader(entity.getClass());
+            MetadataLoader<?> loader = entityLoader.getMetadataLoader();
+
             Field primaryKeyField = loader.getPrimaryKeyField();
             primaryKeyField.setAccessible(true);
             Object idValue = primaryKeyField.get(entity);
@@ -63,13 +65,13 @@ public class DefaultEntityManager implements EntityManager {
         }
         MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
 
-        if (isNew(entity, loader)) {
+        if (isNew(entity)) {
             return persist(entity);
         }
 
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
-        entityPersister.update(entity, loader);
+        entityPersister.update(entity);
         persistenceContext.merge(id, entity);
 
         return entity;
@@ -81,9 +83,7 @@ public class DefaultEntityManager implements EntityManager {
             throw new IllegalArgumentException("Entity must not be null");
         }
 
-        MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
-
-        entityPersister.delete(entity, loader);
+        entityPersister.delete(entity);
         persistenceContext.delete(entity);
     }
 
@@ -93,32 +93,21 @@ public class DefaultEntityManager implements EntityManager {
             throw new IllegalArgumentException("Primary key must not be null");
         }
 
-        MetadataLoader<T> loader = new SimpleMetadataLoader<>(returnType);
         T foundEntity = persistenceContext.get(returnType, primaryKey);
 
         if (foundEntity != null) {
             return foundEntity;
         }
 
-        return entityPersister.select(returnType, primaryKey, loader);
+        EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(returnType);
+
+        return entityLoader.load(primaryKey);
     }
 
     @Override
     public <T> List<T> findAll(Class<T> entityClass) {
-        MetadataLoader<T> loader = new SimpleMetadataLoader<>(entityClass);
+        EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(entityClass);
 
-        return entityPersister.selectAll(entityClass, loader);
-    }
-
-    private void updatePrimaryKeyValue(Object entity, Object id, MetadataLoader<?> loader) {
-        Field primaryKeyField = loader.getPrimaryKeyField();
-        primaryKeyField.setAccessible(true);
-
-        try {
-            primaryKeyField.set(entity, id);
-        } catch (IllegalAccessException e) {
-            logger.severe("Failed to set primary key value");
-            throw new RuntimeException(e);
-        }
+        return entityLoader.loadAll();
     }
 }

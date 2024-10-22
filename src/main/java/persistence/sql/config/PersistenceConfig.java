@@ -16,9 +16,6 @@ import persistence.sql.dml.Database;
 import persistence.sql.dml.EntityManager;
 import persistence.sql.dml.impl.DefaultDatabase;
 import persistence.sql.dml.impl.DefaultEntityManager;
-import sample.application.PersonRowMapper;
-import sample.application.RowMapperFactory;
-import sample.domain.PersonV3;
 
 import java.sql.SQLException;
 import java.util.SortedSet;
@@ -68,7 +65,7 @@ public class PersistenceConfig {
     }
 
     private EntityPersister entityPersister() throws SQLException {
-        return new DefaultEntityPersister(database(), nameConverter(), rowMapperFactory());
+        return new DefaultEntityPersister(database(), nameConverter());
     }
 
     private PersistenceContext persistenceContext() {
@@ -85,10 +82,5 @@ public class PersistenceConfig {
             return databaseServer;
         }
         return databaseServer;
-    }
-
-    public RowMapperFactory rowMapperFactory() {
-        return new RowMapperFactory()
-                .addRowMapper(PersonV3.class, new PersonRowMapper());
     }
 }
