@@ -8,14 +8,14 @@ public interface EntityManager {
      *
      * @param entity 저장할 엔티티
      */
-    <T> void persist(T entity);
+    <T> T persist(T entity);
 
     /**
      * 엔티티를 수정한다.
      *
      * @param entity 수정할 엔티티
      */
-    <T> void merge(T entity);
+    <T> T merge(T entity);
 
     /**
      * 엔티티를 삭제한다.

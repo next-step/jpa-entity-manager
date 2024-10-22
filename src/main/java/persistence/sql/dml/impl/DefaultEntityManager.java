@@ -23,7 +23,7 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public <T> void persist(T entity) {
+    public <T> T persist(T entity) {
         if (entity == null) {
             throw new IllegalArgumentException("Entity must not be null");
         }
@@ -36,6 +36,8 @@ public class DefaultEntityManager implements EntityManager {
         Object id = entityPersister.insert(entity, loader);
         updatePrimaryKeyValue(entity, id, loader);
         persistenceContext.add(id, entity);
+
+        return entity;
     }
 
     private <T> boolean isNew(Object entity, MetadataLoader<T> loader) {
@@ -49,26 +51,28 @@ public class DefaultEntityManager implements EntityManager {
 
             return find(loader.getEntityType(), idValue) == null;
         } catch (IllegalAccessException e) {
-            return false;
+            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
     }
 
     @Override
-    public <T> void merge(T entity) {
+    public <T> T merge(T entity) {
         if (entity == null) {
             throw new IllegalArgumentException("Entity must not be null");
         }
         MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
 
         if (isNew(entity, loader)) {
-            persist(entity);
-            return;
+            return persist(entity);
         }
 
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
         entityPersister.update(entity, loader);
         persistenceContext.merge(id, entity);
+
+        return entity;
     }
 
     @Override
