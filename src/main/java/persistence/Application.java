@@ -39,14 +39,9 @@ public class Application {
 
             // test insert and select
             insert(em, person1);
-            insert(em, person1);
             insert(em, person2);
             insert(em, person3);
-            try {
-                insert(em, new Person(6L, "d", 1, "aaa", 1));
-            } catch (Exception e) {
-                logger.error("expect error", e);
-            }
+
             selectAll(jdbcTemplate, testClass);
             select(em, 1L);
             select(em, 2L);
@@ -56,8 +51,8 @@ public class Application {
             selectAll(jdbcTemplate, testClass);
 
             logger.info("Update person2");
-
-            update(em, new Person(2L, "b", 25, "ddd@gmail.com", 5));
+            person2.setName("dddd");
+            update(em, person2);
             selectAll(jdbcTemplate, testClass);
             drop(jdbcTemplate);
 
@@ -82,7 +77,7 @@ public class Application {
     }
 
     private static void selectAll(JdbcTemplate jdbcTemplate, Class<?> testClass) {
-        String query = new SelectAllQueryBuilder(testClass).build();
+        String query = new SelectAllQueryBuilder().build(testClass);
         List<Person> people = jdbcTemplate.query(query, new EntityRowMapper<>(Person.class));
 
         for (Person person : people) {

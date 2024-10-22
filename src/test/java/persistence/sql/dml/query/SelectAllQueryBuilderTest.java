@@ -10,7 +10,7 @@ class SelectAllQueryBuilderTest {
     @Test
     @DisplayName("Should build select all query")
     void shouldBuildSelectAllQuery() {
-        String query = new SelectAllQueryBuilder(Person.class).build();
+        String query = new SelectAllQueryBuilder().build(Person.class);
 
         assertThat(query).isEqualTo("SELECT * FROM users;");
     }
