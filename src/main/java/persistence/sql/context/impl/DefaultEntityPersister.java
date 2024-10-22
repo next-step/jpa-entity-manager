@@ -1,47 +1,51 @@
 package persistence.sql.context.impl;
 
-import jdbc.RowMapper;
+import persistence.sql.EntityLoaderFactory;
 import persistence.sql.QueryBuilderFactory;
-import persistence.sql.clause.Clause;
+import persistence.sql.clause.DeleteQueryClauses;
 import persistence.sql.clause.InsertColumnValueClause;
 import persistence.sql.clause.UpdateQueryClauses;
-import persistence.sql.clause.WhereConditionalClause;
 import persistence.sql.common.util.NameConverter;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.data.QueryType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.MetadataLoader;
-import sample.application.RowMapperFactory;
+import persistence.sql.loader.EntityLoader;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class DefaultEntityPersister implements EntityPersister {
-    private static final Logger logger = Logger.getLogger(DefaultEntityPersister.class.getName());
-
     private final Database database;
     private final NameConverter nameConverter;
-    private final RowMapperFactory rowMapperFactory;
 
-
-    public DefaultEntityPersister(Database database, NameConverter nameConverter, RowMapperFactory rowMapperFactory) {
+    public DefaultEntityPersister(Database database, NameConverter nameConverter) {
         this.database = database;
         this.nameConverter = nameConverter;
-        this.rowMapperFactory = rowMapperFactory;
+    }
+
+    private static <T> MetadataLoader<?> getMetadataLoader(T entity) {
+        EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
+        return entityLoader.getMetadataLoader();
     }
 
     @Override
-    public <T> Object insert(T entity, MetadataLoader<?> loader) {
+    public <T> Object insert(T entity) {
+        MetadataLoader<?> loader = getMetadataLoader(entity);
+
         InsertColumnValueClause clause = InsertColumnValueClause.newInstance(entity, nameConverter);
 
         String insertQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.INSERT, loader, clause);
-        return database.executeUpdate(insertQuery);
+        Object id = database.executeUpdate(insertQuery);
+        updatePrimaryKeyValue(entity, id, loader);
+
+        return entity;
     }
 
     @Override
-    public <T> void update(T entity, MetadataLoader<?> loader) {
+    public <T> void update(T entity) {
+        EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
+        MetadataLoader<?> loader = entityLoader.getMetadataLoader();
+
         UpdateQueryClauses updateQueryClauses = UpdateQueryClauses.builder(nameConverter)
                 .where(entity, loader)
                 .setColumnValues(entity, loader)
@@ -53,60 +57,29 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> void delete(T entity, MetadataLoader<?> loader) {
-        Field pkField = loader.getPrimaryKeyField();
-        Object extractedValue = Clause.extractValue(pkField, entity);
-        String value = Clause.toColumnValue(extractedValue);
+    public <T> void delete(T entity) {
+        EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
+        MetadataLoader<?> loader = entityLoader.getMetadataLoader();
 
-        WhereConditionalClause clause = WhereConditionalClause.builder()
-                .column(loader.getColumnName(pkField, nameConverter))
-                .eq(value);
+        DeleteQueryClauses deleteQueryClauses = DeleteQueryClauses.builder(nameConverter)
+                .where(entity, loader)
+                .build();
 
-        String removeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.DELETE, loader, clause);
+        String removeQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.DELETE, loader,
+                deleteQueryClauses.clauseArrays());
+
         database.executeUpdate(removeQuery);
     }
 
-    @Override
-    public <T> T select(Class<T> entityType, Object primaryKey, MetadataLoader<?> loader) {
-        String value = Clause.toColumnValue(primaryKey);
+    private void updatePrimaryKeyValue(Object entity, Object id, MetadataLoader<?> loader) {
+        Field primaryKeyField = loader.getPrimaryKeyField();
+        primaryKeyField.setAccessible(true);
 
-        WhereConditionalClause clause = WhereConditionalClause.builder()
-                .column(loader.getColumnName(loader.getPrimaryKeyField(), nameConverter))
-                .eq(value);
-
-        String selectQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.SELECT, loader, clause);
-
-        RowMapper<T> rowMapper = rowMapperFactory.getRowMapper(entityType);
-        if (rowMapper == null) {
-            throw new IllegalStateException("RowMapper not found for entity type: " + entityType);
+        try {
+            primaryKeyField.set(entity, id);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return database.executeQuery(selectQuery, resultSet -> {
-            if (resultSet.next()) {
-                return rowMapper.mapRow(resultSet);
-            }
-
-            return null;
-        });
-    }
-
-    @Override
-    public <T> List<T> selectAll(Class<T> entityType, MetadataLoader<?> loader) {
-        String selectAllQuery = QueryBuilderFactory.getInstance().buildQuery(QueryType.SELECT, loader);
-
-        RowMapper<T> rowMapper = rowMapperFactory.getRowMapper(entityType);
-
-        if (rowMapper == null) {
-            throw new IllegalStateException("RowMapper not found for entity type: " + entityType);
-        }
-
-        return database.executeQuery(selectAllQuery, resultSet -> {
-            List<T> entities = new ArrayList<>();
-            while (resultSet.next()) {
-                entities.add(rowMapper.mapRow(resultSet));
-            }
-
-            return entities;
-        });
     }
 }

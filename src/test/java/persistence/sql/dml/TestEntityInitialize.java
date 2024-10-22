@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.config.TestPersistenceConfig;
+import persistence.sql.EntityLoaderFactory;
 import persistence.sql.QueryBuilderFactory;
 import persistence.sql.config.PersistenceConfig;
 import persistence.sql.data.QueryType;
@@ -20,6 +21,14 @@ public class TestEntityInitialize {
     DatabaseServer server;
     Set<EntityNode<?>> nodes;
 
+    private static void initEntityLoaderFactory(Set<EntityNode<?>> nodes, Database database) {
+        EntityLoaderFactory factory = EntityLoaderFactory.getInstance();
+
+        for (EntityNode<?> node : nodes) {
+            factory.addLoader(node.entityClass(), database);
+        }
+    }
+
     @BeforeEach
     void init() {
         try {
@@ -30,6 +39,7 @@ public class TestEntityInitialize {
 
             TableScanner tableScanner = config.tableScanner();
             nodes = tableScanner.scan("persistence.sql.fixture");
+            initEntityLoaderFactory(nodes, database);
 
             QueryBuilderFactory factory = QueryBuilderFactory.getInstance();
             for (EntityNode<?> node : nodes) {
