@@ -25,14 +25,13 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T, ID> T add(ID id, T entity) {
+    public <T, ID> void add(ID id, T entity) {
         KeyHolder key = new KeyHolder(entity.getClass(), id);
         if (context.containsKey(key)) {
-            return (T) context.get(key);
+            return;
         }
 
-        return (T) context.put(key, entity);
+        context.put(key, entity);
     }
 
     @Override
