@@ -100,13 +100,4 @@ public class TableId implements Queryable {
     public Object getValue(Object entity) {
         return columnDefinition.getValue(entity);
     }
-
-    @Override
-    public void bindValue(Object entity, Object value) {
-        columnDefinition.bindValue(entity, value);
-    }
-
-    public boolean idRequired() {
-        return strategy.idRequired();
-    }
 }

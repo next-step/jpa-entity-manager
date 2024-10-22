@@ -14,9 +14,4 @@ public class AutoKeyGenerationStrategy implements PrimaryKeyGenerationStrategy {
     public boolean supports(TableId pk) {
         return pk.generationType().equals(GenerationType.AUTO);
     }
-
-    @Override
-    public boolean idRequired() {
-        return true;
-    }
 }

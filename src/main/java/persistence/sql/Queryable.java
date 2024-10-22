@@ -10,8 +10,6 @@ public interface Queryable {
 
     Object getValue(Object entity);
 
-    void bindValue(Object entity, Object value);
-
     String getColumnName();
 
     String getDeclaredName();

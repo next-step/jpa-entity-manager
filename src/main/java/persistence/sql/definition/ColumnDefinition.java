@@ -14,13 +14,11 @@ public class ColumnDefinition {
     private final String columnName;
     private final SqlType sqlType;
     private final String declaredName;
-    private final Class<?> declaredType;
     private final boolean nullable;
     private final int length;
 
     public ColumnDefinition(Field field) {
         this.declaredName = field.getName();
-        this.declaredType = field.getType();
         this.columnName = determineColumnName(field);
         this.sqlType = determineColumnType(field);
         this.nullable = determineColumnNullable(field);
@@ -85,10 +83,6 @@ public class ColumnDefinition {
         return declaredName;
     }
 
-    public Class<?> getDeclaredType() {
-        return declaredType;
-    }
-
     public boolean hasValue(Object entity) {
         final Field[] declaredFields = entity.getClass().getDeclaredFields();
         final Field targetField = getMatchingField(declaredFields);
@@ -102,26 +96,6 @@ public class ColumnDefinition {
 
         return findValueFromObject(entity, targetField)
                 .orElseThrow(() -> new NoSuchElementException("Value is null"));
-    }
-
-    public void bindValue(Object entity, Object value) {
-        final Field[] declaredFields = entity.getClass().getDeclaredFields();
-        final Field targetField = getMatchingField(declaredFields);
-
-        boolean wasAccessible = targetField.canAccess(entity);
-        try {
-            if (!wasAccessible) {
-                targetField.setAccessible(true);
-            }
-
-            targetField.set(entity, value);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Cannot access field value", e);
-        } finally {
-            if (!wasAccessible) {
-                targetField.setAccessible(false);
-            }
-        }
     }
 
     private Field getMatchingField(Field[] declaredFields) {

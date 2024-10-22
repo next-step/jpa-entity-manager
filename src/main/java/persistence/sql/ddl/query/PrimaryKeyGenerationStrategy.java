@@ -6,6 +6,4 @@ public interface PrimaryKeyGenerationStrategy {
     String generatePrimaryKeySQL(TableId pk);
 
     boolean supports(TableId pk);
-
-    boolean idRequired();
 }

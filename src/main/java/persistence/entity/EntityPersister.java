@@ -55,7 +55,7 @@ public class EntityPersister {
         return entity;
     }
 
-    public void copyId(Serializable id, Object to) {
+    private void copyId(Serializable id, Object to) {
         try {
             final Class<?> entityClass = to.getClass();
             final TableDefinition tableDefinition = new TableDefinition(entityClass);
