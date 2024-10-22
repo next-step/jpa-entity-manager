@@ -25,7 +25,7 @@ public class SelectQuery {
     }
 
 
-    public String findById(Long id) {
+    public String findById(Object id) {
         if (id == null) {
             throw new IllegalArgumentException("id가 존재하지 않습니다.");
         }

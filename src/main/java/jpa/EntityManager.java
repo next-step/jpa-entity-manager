@@ -1,4 +1,4 @@
-package persistence.sql.entity;
+package jpa;
 
 public interface EntityManager {
 

@@ -31,7 +31,7 @@ public class EntityColumnValue {
         }
     }
 
-    public String getValue() {
+    public Object getValue() {
         field.setAccessible(true);
         try {
             Object fieldObject = field.get(object);
@@ -40,7 +40,7 @@ public class EntityColumnValue {
                 return null;
             }
 
-            return String.valueOf(fieldObject);
+            return fieldObject;
         } catch (IllegalAccessException e) {
             throw new RuntimeException("해당 객체에 접근할 수 없습니다.");
         }

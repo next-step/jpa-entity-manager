@@ -1,6 +1,8 @@
 package sql.entity;
 
 import jdbc.JdbcTemplate;
+import jpa.EntityPersisterImpl;
+import jpa.PersistenceContextImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import persistence.sql.Dialect;
@@ -8,8 +10,8 @@ import persistence.sql.H2Dialect;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.Person;
 import persistence.sql.ddl.QueryBuilder;
-import persistence.sql.entity.EntityManager;
-import persistence.sql.entity.EntityManagerImpl;
+import jpa.EntityManager;
+import jpa.EntityManagerImpl;
 import persistence.sql.model.EntityColumnValue;
 import sql.ddl.JdbcServerExtension;
 import sql.ddl.JdbcServerTest;
@@ -23,7 +25,7 @@ class EntityManagerImplTest {
 
     private static final Dialect dialect = new H2Dialect();
     private static final JdbcTemplate jdbcTemplate = JdbcServerExtension.getJdbcTemplate();
-    private static final EntityManager entityManager = new EntityManagerImpl(jdbcTemplate);
+    private static final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(new PersistenceContextImpl(), jdbcTemplate));
 
     @BeforeAll
     static void init() {
@@ -49,6 +51,7 @@ class EntityManagerImplTest {
         EntityColumnValue ageColumnValue = new EntityColumnValue(ageField, savedPerson);
         EntityColumnValue emailColumnValue = new EntityColumnValue(emailField, savedPerson);
 
+
         assertThat(entityColumnValue.getValue()).isEqualTo(name);
     }
 
@@ -67,9 +70,11 @@ class EntityManagerImplTest {
         entityManager.update(insertedPerson);
 
 
+        Person updatedPerson = entityManager.find(Person.class, 1L);
+
         Field emailField = insertedPerson.getClass().getDeclaredField("email");
         EntityColumnValue emailColumnValue = new EntityColumnValue(emailField, insertedPerson);
 
-//        assertThat(emailColumnValue.getValue()).isEqualTo(updateEmail);
+        assertThat(emailColumnValue.getValue()).isEqualTo(updateEmail);
     }
 }
