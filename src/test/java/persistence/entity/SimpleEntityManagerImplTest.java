@@ -16,11 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.domain.Person;
+import persistence.sql.simpleEntity.SimpleEntityManager;
+import persistence.sql.simpleEntity.SimpleEntityManagerImpl;
 import persistence.sql.ddl.PersistentEntity;
 
-class EntityManagerImplTest {
+class SimpleEntityManagerImplTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(EntityManagerImplTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimpleEntityManagerImplTest.class);
     private static JdbcTemplate jdbcTemplate;
     private static DatabaseServer server;
 
@@ -45,7 +47,7 @@ class EntityManagerImplTest {
     @Test
     @DisplayName("find 구현해보기 && persist 구현해보기")
     void findTest() throws IllegalAccessException {
-        EntityManager<Person, Long> entityManager = new EntityManagerImpl<>(Person.class, jdbcTemplate);
+        SimpleEntityManager<Person, Long> entityManager = new SimpleEntityManagerImpl<>(Person.class, jdbcTemplate);
         Person person = Person.builder()
             .name("John")
             .age(20)
@@ -66,7 +68,7 @@ class EntityManagerImplTest {
     @Test
     @DisplayName("remove 구현해보기")
     void persistTest() throws IllegalAccessException {
-        EntityManager<Person, Long> entityManager = new EntityManagerImpl<>(Person.class,
+        SimpleEntityManager<Person, Long> entityManager = new SimpleEntityManagerImpl<>(Person.class,
             jdbcTemplate);
         Person person = Person.builder()
             .name("John")
@@ -84,7 +86,7 @@ class EntityManagerImplTest {
     @Test
     @DisplayName("update 구현해보기")
     void updateTest() throws IllegalAccessException {
-        EntityManager<Person, Long> entityManager = new EntityManagerImpl<>(Person.class,
+        SimpleEntityManager<Person, Long> entityManager = new SimpleEntityManagerImpl<>(Person.class,
             jdbcTemplate);
         Person person = Person.builder()
             .name("John")

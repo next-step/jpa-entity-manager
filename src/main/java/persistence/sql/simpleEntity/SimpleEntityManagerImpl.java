@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.sql.simpleEntity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
@@ -7,12 +7,12 @@ import persistence.sql.dml.GenericRowMapper;
 import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.UpdateQuery;
 
-public class EntityManagerImpl<T, ID> implements EntityManager<T, ID> {
+public class SimpleEntityManagerImpl<T, ID> implements SimpleEntityManager<T, ID> {
 
     private final Class<T> entityClass;
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityManagerImpl(Class<T> entityClass, JdbcTemplate jdbcTemplate) {
+    public SimpleEntityManagerImpl(Class<T> entityClass, JdbcTemplate jdbcTemplate) {
         this.entityClass = entityClass;
         this.jdbcTemplate = jdbcTemplate;
     }
