@@ -61,4 +61,12 @@ public class Metadata {
         }
         return idValue.toString();
     }
+
+    public EntityTable getEntityTable() {
+        return entityTable;
+    }
+
+    public EntityColumns getEntityColumns() {
+        return entityColumns;
+    }
 }

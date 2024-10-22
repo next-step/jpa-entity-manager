@@ -1,38 +1,32 @@
 package persistence.sql.dml;
 
-import jakarta.persistence.Transient;
-import persistence.sql.Metadata;
+import persistence.sql.entity.EntityColumn;
+import persistence.sql.entity.EntityColumns;
+import persistence.sql.entity.EntityTable;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class SelectQueryBuilder {
-    private final Metadata metadata;
 
-    public SelectQueryBuilder(Class<?> clazz) {
-        this.metadata = new Metadata(clazz);
-    }
-
-    public String findAll(Class<?> clazz) {
-        Metadata metadata = new Metadata(clazz);
-        String tableName = metadata.getTableName();
-        String tableColumns = getTableColumns(clazz);
+    public String findAll(EntityTable entityTable, EntityColumns entityColumns) {
+        String tableName = entityTable.getTableName();
+        String tableColumns = getTableColumns(entityColumns);
         return String.format("select %s FROM %s", tableColumns, tableName);
     }
 
-    private String getTableColumns(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
-                .map(metadata::getFieldName)
-                .collect(Collectors.joining(", "));
-    }
-
-    public String findById(Class<?> clazz, Object idValue) {
-        Metadata metadata = new Metadata(clazz);
-        String selectQuery = findAll(clazz);
-        String idField = metadata.getIdFieldName();
+    public String findById(EntityTable entityTable, EntityColumns entityColumns, Object idValue) {
+        String selectQuery = findAll(entityTable, entityColumns);
+        String idField = entityColumns.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);
         return String.format("%s where %s = %s", selectQuery, idField, formattedIdValue);
+    }
+
+    private String getTableColumns(EntityColumns entityColumns) {
+        return entityColumns.getColumns()
+                .stream()
+                .filter(entityColumn -> !entityColumn.isTransient())
+                .map(EntityColumn::getColumnName)
+                .collect(Collectors.joining(", "));
     }
 
     private String getFormattedId(Object idValue) {

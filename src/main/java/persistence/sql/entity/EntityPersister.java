@@ -28,7 +28,7 @@ public class EntityPersister {
     public boolean update(Object entity) {
         try {
             UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
-            String updateQuery = updateQueryBuilder.update(entity, getIdValue(entity));
+            String updateQuery = updateQueryBuilder.update(entityTable, entityColumns, entity, getIdValue(entity));
             jdbcTemplate.execute(updateQuery);
             return true;
 
@@ -38,20 +38,20 @@ public class EntityPersister {
     }
 
     public void insert(Object entity) {
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(entity.getClass());
-        String insertQuery = insertQueryBuilder.getInsertQuery(entity);
+        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+        String insertQuery = insertQueryBuilder.getInsertQuery(entityTable, entityColumns, entity);
         jdbcTemplate.execute(insertQuery);
     }
 
     public void delete(Object entity) {
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
-        String deleteQuery = deleteQueryBuilder.delete(entity.getClass(), getIdValue(entity));
+        String deleteQuery = deleteQueryBuilder.delete(entityTable, entityColumns, getIdValue(entity));
         jdbcTemplate.execute(deleteQuery);
     }
 
     public <T> T select(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
+        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
+        String selectQuery = selectQueryBuilder.findById(entityTable, entityColumns, id);
         return jdbcTemplate.queryForObject(selectQuery, new EntityRowMapper<>(clazz));
     }
 

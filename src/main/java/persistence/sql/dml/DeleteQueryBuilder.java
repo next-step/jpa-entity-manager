@@ -1,12 +1,13 @@
 package persistence.sql.dml;
 
-import persistence.sql.Metadata;
+import persistence.sql.entity.EntityColumns;
+import persistence.sql.entity.EntityTable;
 
 public class DeleteQueryBuilder {
-    public String delete(Class<?> clazz, Object idValue) {
-        Metadata metadata = new Metadata(clazz);
-        String tableName = metadata.getTableName();
-        String idField = metadata.getIdFieldName();
+
+    public String delete(EntityTable entityTable, EntityColumns entityColumns, Object idValue) {
+        String tableName = entityTable.getTableName();
+        String idField = entityColumns.getIdFieldName();
         String formattedIdValue = getFormattedId(idValue);
         return String.format("delete FROM %s where %s = %s", tableName, idField, formattedIdValue);
     }
