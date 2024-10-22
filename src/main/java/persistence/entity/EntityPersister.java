@@ -8,36 +8,39 @@ import persistence.sql.dml.query.DeleteByIdQueryBuilder;
 import persistence.sql.dml.query.InsertQueryBuilder;
 import persistence.sql.dml.query.UpdateQueryBuilder;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EntityPersister {
     private static final Long DEFAULT_ID_VALUE = 0L;
-    private final TableDefinition tableDefinition;
+    private final HashMap<Class<?>, TableDefinition> tableDefinitions;
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityPersister(Class<?> clazz,
-                           JdbcTemplate jdbcTemplate) {
-        this.tableDefinition = new TableDefinition(clazz);
+    public EntityPersister(JdbcTemplate jdbcTemplate) {
+        this.tableDefinitions = new HashMap<>();
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Long getEntityId(Object entity) {
-        if (alreadyHasId(entity)) {
-            return (Long) tableDefinition.tableId().getValue(entity);
+    public Serializable getEntityId(Object entity) {
+        putTableDefinitionIfAbsent(entity);
+
+        final TableDefinition tableDefinition = tableDefinitions.get(entity.getClass());
+        if (tableDefinition.hasId(entity)) {
+            return tableDefinition.getIdValue(entity);
         }
 
         return DEFAULT_ID_VALUE;
     }
 
-    public boolean alreadyHasId(Object entity) {
-        return tableDefinition.tableId().hasValue(entity);
-    }
-
     public EntityKey insert(Object entity) {
+        putTableDefinitionIfAbsent(entity);
+
+        final TableDefinition tableDefinition = tableDefinitions.get(entity.getClass());
         final Object id = getId(tableDefinition, entity);
-        tableDefinition.tableId().bindValue(entity, id);
+        tableDefinition.getTableId().bindValue(entity, id);
 
         final String query = new InsertQueryBuilder(entity).build();
         final Long insertedId = jdbcTemplate.insertAndReturnKey(query);
@@ -52,6 +55,9 @@ public class EntityPersister {
     }
 
     public void update(Object entity, List<String> targetColumns) {
+        putTableDefinitionIfAbsent(entity);
+
+        final TableDefinition tableDefinition = tableDefinitions.get(entity.getClass());
         final Map<String, Object> modified = tableDefinition.withoutIdColumns().stream()
                 .filter(column -> targetColumns.contains(column.getName()))
                 .collect(
@@ -65,30 +71,32 @@ public class EntityPersister {
         jdbcTemplate.execute(query);
     }
 
+    private void putTableDefinitionIfAbsent(Object entity) {
+        if (!tableDefinitions.containsKey(entity.getClass())) {
+            tableDefinitions.put(entity.getClass(), new TableDefinition(entity.getClass()));
+        }
+    }
+
     public void delete(Object entity) {
         String query = new DeleteByIdQueryBuilder(entity).build();
         jdbcTemplate.execute(query);
     }
 
-    public TableDefinition getTableDefinition() {
-        return tableDefinition;
-    }
-
     @Nullable
     private Object getId(TableDefinition tableDefinition, Object entity) {
-        if (tableDefinition.tableId().idRequired()) {
-            if (alreadyHasId(entity)) {
+        if (tableDefinition.getTableId().idRequired()) {
+            if (tableDefinition.hasId(entity)) {
                 return getEntityId(entity);
             }
 
             throw new IllegalStateException("Identifier of entity "
-                    + tableDefinition.tableName()
+                    + tableDefinition.getTableName()
                     + " must be manually assigned before calling 'persist()'");
         }
 
-        if (alreadyHasId(entity)) {
+        if (tableDefinition.hasId(entity)) {
             throw new IllegalStateException(
-                    "detached entity passed to persist: " + tableDefinition.tableName()
+                    "detached entity passed to persist: " + tableDefinition.getTableName()
             );
         }
         return 0L;

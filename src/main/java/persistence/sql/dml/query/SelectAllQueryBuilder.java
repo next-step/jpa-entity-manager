@@ -10,7 +10,7 @@ public class SelectAllQueryBuilder {
         final TableDefinition tableDefinition = new TableDefinition(entityClass);
 
         query.append("SELECT * FROM ");
-        query.append(tableDefinition.tableName());
+        query.append(tableDefinition.getTableName());
         query.append(";");
     }
 

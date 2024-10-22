@@ -3,16 +3,16 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 import java.util.List;
-import java.util.Objects;
 
 public class EntityManagerImpl implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
     private final PersistenceContext persistenceContext;
+    private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate, PersistenceContext persistenceContext) {
-        this.jdbcTemplate = jdbcTemplate;
+    public EntityManagerImpl(JdbcTemplate jdbcTemplate,
+                             PersistenceContext persistenceContext) {
         this.persistenceContext = persistenceContext;
+        this.entityPersister = new EntityPersister(jdbcTemplate);
         this.entityLoader = new EntityLoader(jdbcTemplate, persistenceContext);
     }
 
@@ -24,7 +24,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         if (persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
             return;
         }
@@ -37,7 +36,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
                 entityPersister.getEntityId(entity),
                 entity.getClass()
@@ -49,7 +47,6 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void update(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         if (!persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
             persist(entity);
             return;

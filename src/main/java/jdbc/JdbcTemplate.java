@@ -2,6 +2,7 @@ package jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,15 +42,22 @@ public class JdbcTemplate {
         }
     }
 
-    public Long insertAndReturnKey(final String sql) {
-        try (final Statement statement = connection.createStatement()) {
+    public long insertAndReturnKey(String sql) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-            try (final ResultSet resultSet = statement.getGeneratedKeys()) {
-                resultSet.next();
-                return resultSet.getLong(1);
-            }
+            return getGeneratedKey(statement);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private long getGeneratedKey(Statement statement) throws SQLException {
+        try (ResultSet resultSet = statement.getGeneratedKeys()) {
+            if (resultSet.next()) {
+                return resultSet.getLong(1);
+            } else {
+                throw new SQLException("No generated key returned");
+            }
         }
     }
 

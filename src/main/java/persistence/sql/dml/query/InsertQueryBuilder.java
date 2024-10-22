@@ -16,7 +16,7 @@ public class InsertQueryBuilder {
         final List<? extends Queryable> targetColumns = tableDefinition.hasValueColumns(entity);
 
         query.append("INSERT INTO ");
-        query.append(tableDefinition.tableName());
+        query.append(tableDefinition.getTableName());
 
         query.append(" (");
         query.append(columnsClause(targetColumns));

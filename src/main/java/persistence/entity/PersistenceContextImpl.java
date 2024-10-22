@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,11 +37,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public boolean isManagedEntity(Object entity, Object id) {
-        if (id == null) {
-            return false;
-        }
-
-        final EntityKey entityKey = new EntityKey((Long) id, entity.getClass());
+        final EntityKey entityKey = new EntityKey((Serializable) id, entity.getClass());
         return managedEntities.containsKey(entityKey);
     }
 }

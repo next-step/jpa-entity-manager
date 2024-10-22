@@ -3,7 +3,6 @@ package persistence.sql.dml.query;
 import persistence.sql.definition.TableDefinition;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class UpdateQueryBuilder {
@@ -14,10 +13,10 @@ public class UpdateQueryBuilder {
     public UpdateQueryBuilder(Object entity) {
         query = new StringBuilder();
         tableDefinition = new TableDefinition(entity.getClass());
-        idValue = tableDefinition.tableId().hasValue(entity) ? tableDefinition.tableId().getValueAsString(entity) : null;
+        idValue = tableDefinition.getTableId().hasValue(entity) ? tableDefinition.getTableId().getValueAsString(entity) : null;
 
         query.append("UPDATE ");
-        query.append(tableDefinition.tableName());
+        query.append(tableDefinition.getTableName());
     }
 
     public UpdateQueryBuilder columns(Map<String, Object> columns) {
@@ -43,7 +42,7 @@ public class UpdateQueryBuilder {
         }
 
         query.append(" WHERE ");
-        query.append(tableDefinition.tableId().getName()).append(" = ");
+        query.append(tableDefinition.getTableId().getName()).append(" = ");
         query.append(idValue);
         query.append(";");
 

@@ -6,10 +6,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class EntityKey {
-    private final Long id;
+    private final Serializable id;
     private final Class<?> entityClass;
 
-    public EntityKey(Long id, Class<?> entityClass) {
+    public EntityKey(Serializable id, Class<?> entityClass) {
         this.id = Objects.requireNonNull(id);;
         this.entityClass = entityClass;
     }
@@ -40,6 +40,6 @@ public class EntityKey {
 
     public void bindId(Object entity) {
         final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
-        tableDefinition.tableId().bindValue(entity, this.id);
+        tableDefinition.getTableId().bindValue(entity, this.id);
     }
 }

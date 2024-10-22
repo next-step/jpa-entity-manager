@@ -9,7 +9,7 @@ public class DeleteByIdQueryBuilder {
     public DeleteByIdQueryBuilder(Object entity) {
         query = new StringBuilder();
         final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
-        final TableId tableId = tableDefinition.tableId();
+        final TableId tableId = tableDefinition.getTableId();
 
         if (!tableId.hasValue(entity)) {
             throw new IllegalArgumentException("Entity does not have an ID value");
@@ -17,7 +17,7 @@ public class DeleteByIdQueryBuilder {
         final Object idValue = tableId.getValueAsString(entity);
 
         query.append("DELETE FROM ");
-        query.append(tableDefinition.tableName());
+        query.append(tableDefinition.getTableName());
         query.append(" WHERE ");
         query.append(tableId.getName()).append(" = ");
         query.append(idValue).append(";");

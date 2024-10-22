@@ -7,6 +7,7 @@ import jakarta.persistence.Transient;
 import org.jetbrains.annotations.NotNull;
 import persistence.sql.Queryable;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -76,11 +77,19 @@ public class TableDefinition {
         }
     }
 
-    public TableId tableId() {
+    public TableId getTableId() {
         return tableId;
     }
 
-    public String tableName() {
+    public Serializable getIdValue(Object entity) {
+        return (Serializable) tableId.getValue(entity);
+    }
+
+    public boolean hasId(Object entity) {
+        return tableId.hasValue(entity);
+    }
+
+    public String getTableName() {
         return tableName;
     }
 

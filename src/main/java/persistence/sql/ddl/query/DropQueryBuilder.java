@@ -10,7 +10,7 @@ public class DropQueryBuilder {
         TableDefinition tableDefinition = new TableDefinition(entityClass);
 
         query.append("DROP TABLE ");
-        query.append(tableDefinition.tableName());
+        query.append(tableDefinition.getTableName());
         query.append(" if exists;");
     }
 

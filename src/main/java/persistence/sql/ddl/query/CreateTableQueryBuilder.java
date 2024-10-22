@@ -12,12 +12,12 @@ public class CreateTableQueryBuilder {
 
         TableDefinition tableDefinition = new TableDefinition(entityClass);
 
-        query.append("CREATE TABLE ").append(tableDefinition.tableName());
+        query.append("CREATE TABLE ").append(tableDefinition.getTableName());
         query.append(" (");
 
         tableDefinition.withIdColumns().forEach(column -> column.applyToCreateTableQuery(query, dialect));
 
-        definePrimaryKey(tableDefinition.tableId(), query);
+        definePrimaryKey(tableDefinition.getTableId(), query);
 
         query.append(");");
     }
