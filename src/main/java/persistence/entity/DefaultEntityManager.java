@@ -10,6 +10,8 @@ import persistence.sql.meta.EntityTable;
 import java.util.Objects;
 
 public class DefaultEntityManager implements EntityManager {
+    public static final String NOT_PERSISTENCE_CONTEXT_ENTITY_FAILD_MESSAGE = "영속성 컨텍스트에서 관리되는 엔티티가 아닙니다.";
+
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
@@ -57,6 +59,11 @@ public class DefaultEntityManager implements EntityManager {
     public void update(Object entity) {
         final EntityTable entityTable = new EntityTable(entity);
         final Object snapshot = persistenceContext.getSnapshot(entity.getClass(), entityTable.getIdValue());
+
+        if (Objects.isNull(snapshot)) {
+            throw new IllegalStateException(NOT_PERSISTENCE_CONTEXT_ENTITY_FAILD_MESSAGE);
+        }
+
         entityPersister.update(entity, snapshot);
         persistenceContext.addEntity(entity);
     }

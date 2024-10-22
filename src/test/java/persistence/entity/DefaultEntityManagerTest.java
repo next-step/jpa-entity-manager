@@ -116,6 +116,20 @@ class DefaultEntityManagerTest {
         );
     }
 
+    @Test
+    @DisplayName("영속성 컨텍스트에서 관리되지 않는 엔티티로 더티체킹하면 예외를 발생한다.")
+    void update_exception() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+
+
+        // when & then
+        assertThatThrownBy(() -> entityManager.update(entity))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(DefaultEntityManager.NOT_PERSISTENCE_CONTEXT_ENTITY_FAILD_MESSAGE);
+    }
+
     private void createTable() {
         final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(EntityWithId.class, new H2Dialect());
         jdbcTemplate.execute(createQueryBuilder.create());
