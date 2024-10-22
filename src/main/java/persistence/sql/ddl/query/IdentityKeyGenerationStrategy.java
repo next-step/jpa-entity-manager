@@ -16,7 +16,7 @@ public class IdentityKeyGenerationStrategy implements PrimaryKeyGenerationStrate
     }
 
     @Override
-    public boolean shouldFetchId() {
+    public boolean idRequired() {
         return false;
     }
 }

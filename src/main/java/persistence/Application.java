@@ -30,20 +30,24 @@ public class Application {
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
             final EntityManager em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
 
-            Person person1 = new Person(1L, "a", 10, "aaa@gmail.com", 1);
-            Person person2 = new Person(2L, "b", 20, "bbb@gmail.com", 2);
-            Person person3 = new Person(3L, "c", 30, "ccc@gmail.com", 3);
+            Person person1 = new Person("a", 10, "aaa@gmail.com", 1);
+            Person person2 = new Person("b", 20, "bbb@gmail.com", 2);
+            Person person3 = new Person("c", 30, "ccc@gmail.com", 3);
 
             // create table
             create(jdbcTemplate, testClass);
 
             // test insert and select
             insert(em, person1);
+            insert(em, person1);
             insert(em, person2);
             insert(em, person3);
-            Long lastId = jdbcTemplate.getLastId("users");
-            logger.info("Last id: {}", lastId);
-//            selectAll(jdbcTemplate, testClass);
+            try {
+                insert(em, new Person(6L, "d", 1, "aaa", 1));
+            } catch (Exception e) {
+                logger.error("expect error", e);
+            }
+            selectAll(jdbcTemplate, testClass);
 //            select(em, 1L);
 //            select(em, 2L);
 //            select(em, 3L);

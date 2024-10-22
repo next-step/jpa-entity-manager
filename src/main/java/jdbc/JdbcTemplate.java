@@ -53,8 +53,4 @@ public class JdbcTemplate {
         }
     }
 
-    public Long getLastId(final String tableName) {
-        final String sql = "SELECT MAX(id) FROM " + tableName + ";";
-        return queryForObject(sql, resultSet -> resultSet.getLong(1));
-    }
 }

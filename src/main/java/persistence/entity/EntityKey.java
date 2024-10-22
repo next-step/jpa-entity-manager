@@ -6,10 +6,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class EntityKey {
-    private final Serializable id;
+    private final Long id;
     private final Class<?> entityClass;
 
-    public EntityKey(Serializable id, Class<?> entityClass) {
+    public EntityKey(Long id, Class<?> entityClass) {
         this.id = Objects.requireNonNull(id);;
         this.entityClass = entityClass;
     }

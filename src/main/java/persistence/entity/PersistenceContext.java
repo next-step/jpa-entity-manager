@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 public interface PersistenceContext {
@@ -12,7 +13,7 @@ public interface PersistenceContext {
 
     void addDatabaseSnapshot(EntityKey entityKey, Object entity);
 
-    List<String> dirtyCheck(EntityKey entityKey, Object entity);
-
     void removeEntity(EntityKey entityKey);
+
+    boolean isManagedEntity(Object entity, Object id);
 }

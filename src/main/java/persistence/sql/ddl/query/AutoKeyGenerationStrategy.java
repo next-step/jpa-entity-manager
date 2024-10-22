@@ -16,7 +16,7 @@ public class AutoKeyGenerationStrategy implements PrimaryKeyGenerationStrategy {
     }
 
     @Override
-    public boolean shouldFetchId() {
+    public boolean idRequired() {
         return true;
     }
 }

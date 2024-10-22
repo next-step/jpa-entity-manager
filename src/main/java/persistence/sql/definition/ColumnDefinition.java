@@ -14,11 +14,13 @@ public class ColumnDefinition {
     private final String name;
     private final SqlType sqlType;
     private final String declaredName;
+    private final Class<?> declaredType;
     private final boolean nullable;
     private final int length;
 
     public ColumnDefinition(Field field) {
         this.declaredName = field.getName();
+        this.declaredType = field.getType();
         this.name = determineColumnName(field);
         this.sqlType = determineColumnType(field);
         this.nullable = determineColumnNullable(field);
@@ -79,8 +81,12 @@ public class ColumnDefinition {
         return nullable;
     }
 
-    public String declaredName() {
+    public String getDeclaredName() {
         return declaredName;
+    }
+
+    public Class<?> getDeclaredType() {
+        return declaredType;
     }
 
     public boolean hasValue(Object entity) {
@@ -90,7 +96,7 @@ public class ColumnDefinition {
         return findValueFromObject(entity, targetField).isPresent();
     }
 
-    public Object valueAsString(Object entity) {
+    public Object getValue(Object entity) {
         final Field[] declaredFields = entity.getClass().getDeclaredFields();
         final Field targetField = getMatchingField(declaredFields);
 
@@ -120,7 +126,7 @@ public class ColumnDefinition {
 
     private Field getMatchingField(Field[] declaredFields) {
         for (Field field : declaredFields) {
-            if (field.getName().equals(declaredName())) {
+            if (field.getName().equals(getDeclaredName())) {
                 return field;
             }
         }

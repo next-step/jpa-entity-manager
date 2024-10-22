@@ -10,49 +10,54 @@ import persistence.sql.dml.query.UpdateQueryBuilder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class EntityPersister {
-    private static final String DEFAULT_ID_VALUE = "0";
+    private static final Long DEFAULT_ID_VALUE = 0L;
     private final TableDefinition tableDefinition;
+    private final PersistenceContext persistenceContext;
     private final JdbcTemplate jdbcTemplate;
 
     public EntityPersister(Class<?> clazz,
+                           PersistenceContext persistenceContext,
                            JdbcTemplate jdbcTemplate) {
         this.tableDefinition = new TableDefinition(clazz);
+        this.persistenceContext = persistenceContext;
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Object getEntityId(Object entity) {
-        return tableDefinition.tableId().getValue(entity);
+    public Long getEntityId(Object entity) {
+        if (alreadyHasId(entity)) {
+            return (Long) tableDefinition.tableId().getValue(entity);
+        }
+
+        return DEFAULT_ID_VALUE;
     }
 
     public boolean alreadyHasId(Object entity) {
         return tableDefinition.tableId().hasValue(entity);
     }
 
-    public boolean isNew(Object entity) {
-        final boolean hasNullId = tableDefinition.tableId().hasValue(entity);
-        return hasNullId || isIdDefaultValue(tableDefinition.tableId().getValue(entity));
-    }
-
     public void update(Object entity, List<String> targetColumns) {
         final Map<String, Object> modified = tableDefinition.withoutIdColumns().stream()
                 .filter(column -> targetColumns.contains(column.getName()))
-                .collect(Collectors.toMap(Queryable::getName, column -> column.hasValue(entity) ? column.getValue(entity) : "null"));
+                .collect(Collectors.toMap(Queryable::getName, column -> column.hasValue(entity) ? column.getValueAsString(entity) : "null"));
 
         final String query = new UpdateQueryBuilder(entity).columns(modified).build();
         jdbcTemplate.execute(query);
     }
 
     public EntityKey insert(Object entity) {
-        final Object id = decideId(tableDefinition, entity);
+        final Object id = getId(tableDefinition, entity);
         tableDefinition.tableId().bindValue(entity, id);
 
         final String query = new InsertQueryBuilder(entity).build();
         final Long insertedId = jdbcTemplate.insertAndReturnKey(query);
-        final EntityKey entityKey = new EntityKey(insertedId, entity.getClass());
+        return createEntityKey(entity, insertedId);
+    }
+
+    private EntityKey createEntityKey(Object entity, Long id) {
+        final EntityKey entityKey = new EntityKey(id, entity.getClass());
 
         entityKey.bindId(entity);
         return entityKey;
@@ -68,31 +73,23 @@ public class EntityPersister {
     }
 
     @Nullable
-    private Object decideId(TableDefinition tableDefinition, Object entity) {
-        if (tableDefinition.tableId().shouldFetchId()) {
+    private Object getId(TableDefinition tableDefinition, Object entity) {
+         if (tableDefinition.tableId().idRequired()) {
             if (alreadyHasId(entity)) {
                 return getEntityId(entity);
             }
 
-            return jdbcTemplate.getLastId(tableDefinition.tableName()) + 1;
+            throw new IllegalStateException("Identifier of entity "
+                    + tableDefinition.tableName()
+                    + " must be manually assigned before calling 'persist()'");
         }
 
-        return 0;
+        if (alreadyHasId(entity)) {
+            throw new IllegalStateException(
+                    "detached entity passed to persist: " + tableDefinition.tableName()
+            );
+        }
+        return 0L;
     }
 
-    private boolean isIdDefaultValue(Object id) {
-        if (id instanceof Long) {
-            return (Long) id == 0L;
-        }
-
-        if (id instanceof Integer) {
-            return (Integer) id == 0;
-        }
-
-        if (id instanceof String) {
-            return id.equals(DEFAULT_ID_VALUE);
-        }
-
-        return false;
-    }
 }

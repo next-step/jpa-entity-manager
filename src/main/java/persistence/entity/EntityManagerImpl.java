@@ -2,7 +2,6 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
@@ -18,13 +17,17 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        final EntityKey entityKey = new EntityKey((Serializable) id, clazz);
+        final EntityKey entityKey = new EntityKey((Long) id, clazz);
         return entityLoader.loadEntity(clazz, entityKey);
     }
 
     @Override
     public void persist(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), persistenceContext, jdbcTemplate);
+        if (persistenceContext.isManagedEntity(entity, entityPersister.getEntityId(entity))) {
+            return;
+        }
+
         final EntityKey entityKey = entityPersister.insert(entity);
 
         persistenceContext.addEntity(entityKey, entity);
@@ -33,9 +36,9 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), persistenceContext, jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
-                (Serializable) entityPersister.getEntityId(entity),
+                (Long) entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
@@ -45,23 +48,19 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void update(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
-        if (entityPersister.isNew(entity)) {
-            persist(entity);
-            return;
-        }
-
+        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), persistenceContext, jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
-                (Serializable) entityPersister.getEntityId(entity),
+                entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
         final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
         if (entitySnapshot == null) {
-            throw new IllegalStateException("Not Managed Entity");
+            throw new IllegalStateException("Entity is not managed");
         }
+        final Object managedEntity = persistenceContext.getEntity(entityKey);
 
-        List<String> dirtyColumns = persistenceContext.dirtyCheck(entityKey, entity);
+        List<String> dirtyColumns = entitySnapshot.getDirtyColumns(managedEntity);
         entityPersister.update(entity, dirtyColumns);
         persistenceContext.addEntity(entityKey, entity);
         persistenceContext.addDatabaseSnapshot(entityKey, entity);

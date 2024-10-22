@@ -7,5 +7,5 @@ public interface PrimaryKeyGenerationStrategy {
 
     boolean supports(TableId pk);
 
-    boolean shouldFetchId();
+    boolean idRequired();
 }

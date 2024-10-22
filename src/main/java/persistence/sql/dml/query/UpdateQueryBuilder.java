@@ -13,7 +13,7 @@ public class UpdateQueryBuilder {
     public UpdateQueryBuilder(Object entity) {
         query = new StringBuilder();
         tableDefinition = new TableDefinition(entity.getClass());
-        idValue = tableDefinition.tableId().hasValue(entity) ? tableDefinition.tableId().getValue(entity) : null;
+        idValue = tableDefinition.tableId().hasValue(entity) ? tableDefinition.tableId().getValueAsString(entity) : null;
 
         query.append("UPDATE ");
         query.append(tableDefinition.tableName());

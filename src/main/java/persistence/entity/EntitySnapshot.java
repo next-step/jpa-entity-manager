@@ -16,7 +16,7 @@ public class EntitySnapshot {
         final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
         final List<? extends Queryable> columns = tableDefinition.withoutIdColumns();
         for (Queryable column : columns) {
-            columnSnapshots.put(column.getName(), column.hasValue(entity) ? column.getValue(entity) : null);
+            columnSnapshots.put(column.getName(), column.hasValue(entity) ? column.getValueAsString(entity) : null);
         }
     }
 
@@ -25,7 +25,7 @@ public class EntitySnapshot {
         final List<? extends Queryable> columns = tableDefinition.withoutIdColumns();
         return columns.stream()
                 .filter(column -> {
-                    final Object currentValue = column.hasValue(entity) ? column.getValue(entity) : null;
+                    final Object currentValue = column.hasValue(entity) ? column.getValueAsString(entity) : null;
                     final Object snapshotValue = columnSnapshots.get(column.getName());
                     return !Objects.equals(currentValue, snapshotValue);
                 })

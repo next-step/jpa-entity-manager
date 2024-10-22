@@ -14,7 +14,7 @@ public class DeleteByIdQueryBuilder {
         if (!tableId.hasValue(entity)) {
             throw new IllegalArgumentException("Entity does not have an ID value");
         }
-        final Object idValue = tableId.getValue(entity);
+        final Object idValue = tableId.getValueAsString(entity);
 
         query.append("DELETE FROM ");
         query.append(tableDefinition.tableName());

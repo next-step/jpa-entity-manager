@@ -6,7 +6,9 @@ public interface Queryable {
 
     boolean hasValue(Object entity);
 
-    String getValue(Object entity);
+    String getValueAsString(Object entity);
+
+    Object getValue(Object entity);
 
     void bindValue(Object entity, Object value);
 

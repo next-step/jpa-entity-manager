@@ -30,14 +30,19 @@ public class TableColumn implements Queryable {
     }
 
     @Override
-    public String getValue(Object entity) {
-        final Object value = columnDefinition.valueAsString(entity);
+    public String getValueAsString(Object entity) {
+        final Object value = columnDefinition.getValue(entity);
 
         if (value instanceof String) {
             return "'" + value + "'";
         }
 
         return value.toString();
+    }
+
+    @Override
+    public Object getValue(Object entity) {
+        return columnDefinition.getValue(entity);
     }
 
     @Override
@@ -52,7 +57,7 @@ public class TableColumn implements Queryable {
 
     @Override
     public String getDeclaredName() {
-        return columnDefinition.declaredName();
+        return columnDefinition.getDeclaredName();
     }
 
 }
