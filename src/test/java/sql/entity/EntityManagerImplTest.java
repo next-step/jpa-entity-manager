@@ -72,7 +72,7 @@ class EntityManagerImplTest {
 
         Person updatedPerson = entityManager.find(Person.class, 1L);
 
-        Field emailField = insertedPerson.getClass().getDeclaredField("email");
+        Field emailField = updatedPerson.getClass().getDeclaredField("email");
         EntityColumnValue emailColumnValue = new EntityColumnValue(emailField, insertedPerson);
 
         assertThat(emailColumnValue.getValue()).isEqualTo(updateEmail);
