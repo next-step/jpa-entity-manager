@@ -4,29 +4,29 @@ import persistence.sql.Dialect;
 import persistence.sql.definition.TableDefinition;
 import persistence.sql.definition.TableId;
 
-public class CreateQueryBuilder {
-    private final Dialect dialect;
+public class CreateTableQueryBuilder {
+    private final StringBuilder query;
 
-    public CreateQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
-    }
+    public CreateTableQueryBuilder(Dialect dialect, Class<?> entityClass) {
+        this.query = new StringBuilder();
 
-    public String build(Class<?> entityClass) {
         TableDefinition tableDefinition = new TableDefinition(entityClass);
-        StringBuilder query = new StringBuilder();
 
-        query.append("CREATE TABLE ").append(tableDefinition.tableName());
+        query.append("CREATE TABLE ").append(tableDefinition.getTableName());
         query.append(" (");
 
         tableDefinition.withIdColumns().forEach(column -> column.applyToCreateTableQuery(query, dialect));
 
-        definePrimaryKey(tableDefinition.tableId(), query);
+        definePrimaryKey(tableDefinition.getTableId(), query);
 
         query.append(");");
+    }
+
+    public String build() {
         return query.toString();
     }
 
     private void definePrimaryKey(TableId pk, StringBuilder query) {
-        query.append("PRIMARY KEY (").append(pk.getName()).append(")");
+        query.append("PRIMARY KEY (").append(pk.getColumnName()).append(")");
     }
 }

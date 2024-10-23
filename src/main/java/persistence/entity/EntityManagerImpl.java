@@ -2,46 +2,44 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
-import java.io.Serializable;
-
 public class EntityManagerImpl implements EntityManager {
-    private final JdbcTemplate jdbcTemplate;
     private final PersistenceContext persistenceContext;
+    private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
 
-    public EntityManagerImpl(JdbcTemplate jdbcTemplate, PersistenceContext persistenceContext) {
-        this.jdbcTemplate = jdbcTemplate;
+    public EntityManagerImpl(JdbcTemplate jdbcTemplate,
+                             PersistenceContext persistenceContext) {
         this.persistenceContext = persistenceContext;
+        this.entityPersister = new EntityPersister(jdbcTemplate);
         this.entityLoader = new EntityLoader(jdbcTemplate, persistenceContext);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        final EntityKey entityKey = new EntityKey((Serializable) id, clazz);
+        final EntityKey entityKey = new EntityKey((Long) id, clazz);
         return entityLoader.loadEntity(clazz, entityKey);
     }
 
     @Override
     public void persist(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
-        final EntityKey entityKey = new EntityKey(
-                (Serializable) entityPersister.getEntityId(entity),
-                entity.getClass()
-        );
-
-        if (persistenceContext.getEntity(entityKey) != null) {
-            return;
+        if (entityPersister.hasId(entity)) {
+            throw new IllegalArgumentException("Entity already persisted");
         }
 
-        entityPersister.insert(entity);
-        persistenceContext.addEntity(entityKey, entity);
+        final Object saved = entityPersister.insert(entity);
+        final EntityKey entityKey = new EntityKey(
+                entityPersister.getEntityId(saved),
+                saved.getClass()
+        );
+
+        persistenceContext.addEntity(entityKey, saved);
+        persistenceContext.addDatabaseSnapshot(entityKey, saved);
     }
 
     @Override
     public void remove(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
         final EntityKey entityKey = new EntityKey(
-                (Serializable) entityPersister.getEntityId(entity),
+                entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
@@ -50,14 +48,25 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void update(Object entity) {
-        final EntityPersister entityPersister = new EntityPersister(entity.getClass(), jdbcTemplate);
+    public <T> T merge(T entity) {
+        if (!persistenceContext.hasEntity(entity, entityPersister.getEntityId(entity))) {
+            throw new IllegalStateException("Can not find entity in persistence context: "
+                    + entity.getClass().getSimpleName());
+        }
+
         final EntityKey entityKey = new EntityKey(
-                (Serializable) entityPersister.getEntityId(entity),
+                entityPersister.getEntityId(entity),
                 entity.getClass()
         );
 
-        entityPersister.update(entity);
+        final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
+
+        if (entitySnapshot.hasDirtyColumns(persistenceContext.getEntity(entityKey))) {
+            entityPersister.update(entity);
+        }
+
         persistenceContext.addEntity(entityKey, entity);
+        persistenceContext.addDatabaseSnapshot(entityKey, entity);
+        return entity;
     }
 }

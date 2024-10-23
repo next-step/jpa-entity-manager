@@ -3,36 +3,48 @@ package persistence.sql.dml.query;
 import persistence.sql.Queryable;
 import persistence.sql.definition.TableDefinition;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UpdateQueryBuilder {
-    public String build(Object entity) {
-        final Class<?> entityClass = entity.getClass();
-        final TableDefinition tableDefinition = new TableDefinition(entityClass);
-        final List<? extends Queryable> targetColumns = tableDefinition.withIdColumns();
-
-        StringBuilder query = new StringBuilder();
-        query.append("UPDATE ");
-        query.append(tableDefinition.tableName());
+    private void columnClause(StringBuilder query, Map<String, Object> columns) {
+        if (columns == null || columns.isEmpty()) {
+            throw new IllegalArgumentException("Columns cannot be null or empty");
+        }
 
         query.append(" SET ");
-        String columnClause = columnClause(tableDefinition, entity, query);
+        String columnClause = columns.entrySet().stream()
+                .map(entry -> entry.getKey() + " = " + entry.getValue())
+                .reduce((column1, column2) -> column1 + ", " + column2).orElse("");
         query.append(columnClause);
+    }
+
+    public String build(Object entity) {
+        final TableDefinition tableDefinition = new TableDefinition(entity.getClass());
+        final Serializable idValue = tableDefinition.getIdValue(entity);
+
+        final StringBuilder query = new StringBuilder("UPDATE ").append(tableDefinition.getTableName());
+        columnClause(
+                query,
+                tableDefinition.withoutIdColumns().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        Queryable::getColumnName,
+                                        column -> column.hasValue(entity) ? column.getValueAsString(entity) : "null",
+                                        (value1, value2) -> value2,
+                                        LinkedHashMap::new
+                                )
+                        )
+
+        );
 
         query.append(" WHERE ");
-        query.append(tableDefinition.tableId().getName()).append(" = ");
-        query.append(tableDefinition.tableId().getValue(entity));
+        query.append(tableDefinition.getTableId().getColumnName()).append(" = ");
+        query.append(idValue);
         query.append(";");
 
         return query.toString();
     }
-
-    private static String columnClause(TableDefinition tableDefinition, Object entity, StringBuilder query) {
-        return tableDefinition.withoutIdColumns().stream()
-                .map(column -> {
-                    final String columnValue = column.hasValue(entity) ? column.getValue(entity) : "null";
-                    return column.getName() + " = " + columnValue;
-                }).reduce((column1, column2) -> column1 + ", " + column2).orElse("");
-    }
-
 }

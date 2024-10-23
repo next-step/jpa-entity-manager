@@ -8,7 +8,8 @@ public class EntityKey {
     private final Class<?> entityClass;
 
     public EntityKey(Serializable id, Class<?> entityClass) {
-        this.id = id;
+        this.id = Objects.requireNonNull(id);
+        ;
         this.entityClass = entityClass;
     }
 

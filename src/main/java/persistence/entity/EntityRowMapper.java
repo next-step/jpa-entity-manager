@@ -23,7 +23,7 @@ public class EntityRowMapper<T> implements RowMapper<T> {
             T instance = clazz.getDeclaredConstructor().newInstance();
 
             for (Queryable field : tableDefinition.withIdColumns()) {
-                final String databaseColumnName = field.getName();
+                final String databaseColumnName = field.getColumnName();
                 final Field objectDeclaredField = clazz.getDeclaredField(field.getDeclaredName());
 
                 final boolean wasAccessible = objectDeclaredField.canAccess(instance);
@@ -43,4 +43,5 @@ public class EntityRowMapper<T> implements RowMapper<T> {
             throw new SQLException("Failed to map row to " + clazz.getName(), e);
         }
     }
+
 }

@@ -6,9 +6,11 @@ public interface Queryable {
 
     boolean hasValue(Object entity);
 
-    String getValue(Object entity);
+    String getValueAsString(Object entity);
 
-    String getName();
+    Object getValue(Object entity);
+
+    String getColumnName();
 
     String getDeclaredName();
 }

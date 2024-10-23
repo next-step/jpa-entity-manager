@@ -15,7 +15,7 @@ public class TableColumn implements Queryable {
     @Override
     public void applyToCreateTableQuery(StringBuilder query, Dialect dialect) {
         final String type = dialect.translateType(columnDefinition);
-        query.append(columnDefinition.getName()).append(" ").append(type);
+        query.append(columnDefinition.getColumnName()).append(" ").append(type);
 
         if (columnDefinition.isNotNullable()) {
             query.append(" NOT NULL");
@@ -30,8 +30,8 @@ public class TableColumn implements Queryable {
     }
 
     @Override
-    public String getValue(Object entity) {
-        final Object value = columnDefinition.valueAsString(entity);
+    public String getValueAsString(Object entity) {
+        final Object value = columnDefinition.getValue(entity);
 
         if (value instanceof String) {
             return "'" + value + "'";
@@ -41,13 +41,18 @@ public class TableColumn implements Queryable {
     }
 
     @Override
-    public String getName() {
-        return columnDefinition.getName();
+    public Object getValue(Object entity) {
+        return columnDefinition.getValue(entity);
+    }
+
+    @Override
+    public String getColumnName() {
+        return columnDefinition.getColumnName();
     }
 
     @Override
     public String getDeclaredName() {
-        return columnDefinition.declaredName();
+        return columnDefinition.getDeclaredName();
     }
 
 }

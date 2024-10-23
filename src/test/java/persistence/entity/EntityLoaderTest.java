@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.Dialect;
 import persistence.sql.H2Dialect;
-import persistence.sql.ddl.query.CreateQueryBuilder;
+import persistence.sql.ddl.query.CreateTableQueryBuilder;
 import persistence.sql.ddl.query.DropQueryBuilder;
 
 import java.sql.SQLException;
@@ -65,8 +65,8 @@ class EntityLoaderTest {
         Dialect dialect = new H2Dialect();
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        String createTestEntity1TableQuery = new CreateQueryBuilder(dialect).build(EntityLoaderTestEntity1.class);
-        String createTestEntity2TableQuery = new CreateQueryBuilder(dialect).build(EntityLoaderTestEntity2.class);
+        String createTestEntity1TableQuery = new CreateTableQueryBuilder(dialect, EntityLoaderTestEntity1.class).build();
+        String createTestEntity2TableQuery = new CreateTableQueryBuilder(dialect, EntityLoaderTestEntity2.class).build();
 
         jdbcTemplate.execute(createTestEntity1TableQuery);
         jdbcTemplate.execute(createTestEntity2TableQuery);
@@ -76,8 +76,8 @@ class EntityLoaderTest {
     void tearDown() throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        String dropTestEntity1TableQuery = new DropQueryBuilder().build(EntityLoaderTestEntity1.class);
-        String dropTestEntity2TableQuery = new DropQueryBuilder().build(EntityLoaderTestEntity2.class);
+        String dropTestEntity1TableQuery = new DropQueryBuilder(EntityLoaderTestEntity1.class).build();
+        String dropTestEntity2TableQuery = new DropQueryBuilder(EntityLoaderTestEntity2.class).build();
 
         jdbcTemplate.execute(dropTestEntity1TableQuery);
         jdbcTemplate.execute(dropTestEntity2TableQuery);
@@ -94,7 +94,7 @@ class EntityLoaderTest {
         EntityLoaderTestEntity1 entity1 = new EntityLoaderTestEntity1(1L, 30);
         EntityLoaderTestEntity1 entity2 = new EntityLoaderTestEntity1(2L, 40);
 
-        EntityPersister entityPersister = new EntityPersister(EntityLoaderTestEntity1.class, jdbcTemplate);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
         entityPersister.insert(entity1);
         entityPersister.insert(entity2);
 
@@ -156,7 +156,7 @@ class EntityLoaderTest {
         EntityLoaderTestEntity2 entity1 = new EntityLoaderTestEntity2(1L, "John");
         EntityLoaderTestEntity2 entity2 = new EntityLoaderTestEntity2(2L, "Jane");
 
-        EntityPersister entityPersister = new EntityPersister(EntityLoaderTestEntity2.class, jdbcTemplate);
+        EntityPersister entityPersister = new EntityPersister(jdbcTemplate);
         entityPersister.insert(entity1);
         entityPersister.insert(entity2);
 

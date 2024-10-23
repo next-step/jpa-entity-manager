@@ -11,7 +11,7 @@ import persistence.entity.EntityRowMapper;
 import persistence.entity.PersistenceContextImpl;
 import persistence.sql.H2Dialect;
 import persistence.sql.Person;
-import persistence.sql.ddl.query.CreateQueryBuilder;
+import persistence.sql.ddl.query.CreateTableQueryBuilder;
 import persistence.sql.ddl.query.DropQueryBuilder;
 import persistence.sql.dml.query.SelectAllQueryBuilder;
 
@@ -30,9 +30,9 @@ public class Application {
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
             final EntityManager em = new EntityManagerImpl(jdbcTemplate, new PersistenceContextImpl());
 
-            Person person1 = new Person(1L, "a", 10, "aaa@gmail.com", 1);
-            Person person2 = new Person(2L, "b", 20, "bbb@gmail.com", 2);
-            Person person3 = new Person(3L, "c", 30, "ccc@gmail.com", 3);
+            Person person1 = new Person("a", 10, "aaa@gmail.com", 1);
+            Person person2 = new Person("b", 20, "bbb@gmail.com", 2);
+            Person person3 = new Person("c", 30, "ccc@gmail.com", 3);
 
             // create table
             create(jdbcTemplate, testClass);
@@ -41,17 +41,18 @@ public class Application {
             insert(em, person1);
             insert(em, person2);
             insert(em, person3);
+
             selectAll(jdbcTemplate, testClass);
             select(em, 1L);
             select(em, 2L);
             select(em, 3L);
-
             logger.info("Remove person1");
             remove(em, person1);
             selectAll(jdbcTemplate, testClass);
 
             logger.info("Update person2");
-            update(em, new Person(2L, "b", 25, "ddd@gmail.com", 5));
+            person2.setName("dddd");
+            update(em, person2);
             selectAll(jdbcTemplate, testClass);
             drop(jdbcTemplate);
 
@@ -64,21 +65,19 @@ public class Application {
     }
 
     private static void create(JdbcTemplate jdbcTemplate, Class<?> testClass) {
-        CreateQueryBuilder createQuery = new CreateQueryBuilder(new H2Dialect());
-        jdbcTemplate.execute(createQuery.build(testClass));
+        CreateTableQueryBuilder createQuery = new CreateTableQueryBuilder(new H2Dialect(), testClass);
+        jdbcTemplate.execute(createQuery.build());
     }
 
     private static void drop(JdbcTemplate jdbcTemplate) {
-        DropQueryBuilder dropQuery = new DropQueryBuilder();
-        String build = dropQuery.build(Person.class);
+        DropQueryBuilder dropQuery = new DropQueryBuilder(Person.class);
+        String build = dropQuery.build();
         logger.info("Drop query: {}", build);
         jdbcTemplate.execute(build);
     }
 
     private static void selectAll(JdbcTemplate jdbcTemplate, Class<?> testClass) {
-        SelectAllQueryBuilder selectAllQuery = new SelectAllQueryBuilder();
-        String query = selectAllQuery.build(testClass);
-
+        String query = new SelectAllQueryBuilder().build(testClass);
         List<Person> people = jdbcTemplate.query(query, new EntityRowMapper<>(Person.class));
 
         for (Person person : people) {
@@ -97,7 +96,7 @@ public class Application {
     }
 
     private static void update(EntityManager em, Person person) {
-        em.update(person);
+        em.merge(person);
         logger.info("Data updated successfully!");
     }
 

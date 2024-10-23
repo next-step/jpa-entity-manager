@@ -11,7 +11,7 @@ import java.util.Optional;
 public class ColumnDefinition {
     private static final int DEFAULT_LENGTH = 255;
 
-    private final String name;
+    private final String columnName;
     private final SqlType sqlType;
     private final String declaredName;
     private final boolean nullable;
@@ -19,7 +19,7 @@ public class ColumnDefinition {
 
     public ColumnDefinition(Field field) {
         this.declaredName = field.getName();
-        this.name = determineColumnName(field);
+        this.columnName = determineColumnName(field);
         this.sqlType = determineColumnType(field);
         this.nullable = determineColumnNullable(field);
         this.length = determineColumnLength(field);
@@ -59,8 +59,8 @@ public class ColumnDefinition {
         return field.getAnnotation(Column.class).nullable();
     }
 
-    public String getName() {
-        return name;
+    public String getColumnName() {
+        return columnName;
     }
 
     public SqlType getSqlType() {
@@ -79,7 +79,7 @@ public class ColumnDefinition {
         return nullable;
     }
 
-    public String declaredName() {
+    public String getDeclaredName() {
         return declaredName;
     }
 
@@ -90,7 +90,7 @@ public class ColumnDefinition {
         return findValueFromObject(entity, targetField).isPresent();
     }
 
-    public Object valueAsString(Object entity) {
+    public Object getValue(Object entity) {
         final Field[] declaredFields = entity.getClass().getDeclaredFields();
         final Field targetField = getMatchingField(declaredFields);
 
@@ -100,7 +100,7 @@ public class ColumnDefinition {
 
     private Field getMatchingField(Field[] declaredFields) {
         for (Field field : declaredFields) {
-            if (field.getName().equals(declaredName())) {
+            if (field.getName().equals(getDeclaredName())) {
                 return field;
             }
         }

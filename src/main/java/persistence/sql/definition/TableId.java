@@ -12,6 +12,7 @@ import persistence.sql.ddl.query.PrimaryKeyGenerationStrategy;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class TableId implements Queryable {
 
@@ -58,19 +59,19 @@ public class TableId implements Queryable {
     }
 
     @Override
-    public String getName() {
-        return columnDefinition.getName();
+    public String getColumnName() {
+        return columnDefinition.getColumnName();
     }
 
     @Override
     public String getDeclaredName() {
-        return columnDefinition.declaredName();
+        return columnDefinition.getDeclaredName();
     }
 
     @Override
     public void applyToCreateTableQuery(StringBuilder query, Dialect dialect) {
         final String type = dialect.translateType(columnDefinition);
-        query.append(columnDefinition.getName()).append(" ").append(type);
+        query.append(columnDefinition.getColumnName()).append(" ").append(type);
 
         if (columnDefinition.isNotNullable()) {
             query.append(" NOT NULL");
@@ -81,12 +82,12 @@ public class TableId implements Queryable {
 
     @Override
     public boolean hasValue(Object entity) {
-        return columnDefinition.hasValue(entity);
+        return columnDefinition.hasValue(entity) && !Objects.equals(getValueAsString(entity), "0");
     }
 
     @Override
-    public String getValue(Object entity) {
-        final Object value = columnDefinition.valueAsString(entity);
+    public String getValueAsString(Object entity) {
+        final Object value = columnDefinition.getValue(entity);
 
         if (value instanceof String) {
             return "'" + value + "'";
@@ -95,4 +96,8 @@ public class TableId implements Queryable {
         return value.toString();
     }
 
+    @Override
+    public Object getValue(Object entity) {
+        return columnDefinition.getValue(entity);
+    }
 }

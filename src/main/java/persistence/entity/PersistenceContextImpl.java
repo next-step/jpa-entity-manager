@@ -1,10 +1,12 @@
 package persistence.entity;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> managedEntities = new HashMap<>();
+    private final Map<EntityKey, EntitySnapshot> entitySnapshots = new HashMap<>();
 
     @Override
     public Object getEntity(EntityKey entityKey) {
@@ -12,15 +14,30 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
+    public EntitySnapshot getDatabaseSnapshot(EntityKey entityKey, Object entity) {
+        return entitySnapshots.get(entityKey);
+    }
+
+    @Override
     public void addEntity(EntityKey entityKey, Object entity) {
-        if (managedEntities.containsKey(entityKey)) {
-            return;
-        }
         managedEntities.put(entityKey, entity);
+    }
+
+    @Override
+    public void addDatabaseSnapshot(EntityKey entityKey, Object entity) {
+        final EntitySnapshot entitySnapshot = new EntitySnapshot(entity);
+        entitySnapshots.put(entityKey, entitySnapshot);
     }
 
     @Override
     public void removeEntity(EntityKey entityKey) {
         managedEntities.remove(entityKey);
+        entitySnapshots.remove(entityKey);
+    }
+
+    @Override
+    public boolean hasEntity(Object entity, Object id) {
+        final EntityKey entityKey = new EntityKey((Serializable) id, entity.getClass());
+        return managedEntities.containsKey(entityKey);
     }
 }
