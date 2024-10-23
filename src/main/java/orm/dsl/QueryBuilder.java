@@ -29,6 +29,10 @@ public class QueryBuilder implements QueryProvider {
         this.queryRunner = queryRunner;
     }
 
+    public JpaSettings getSettings() {
+        return settings;
+    }
+
     public <E> CreateTableStep createTable(Class<E> entityClass) {
         return new DialectStatementLocator(dialect(), queryRunner)
                 .createTable(new TableEntity<>(entityClass, settings));

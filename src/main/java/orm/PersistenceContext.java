@@ -2,13 +2,15 @@ package orm;
 
 public interface PersistenceContext {
 
-    Object getEntity(EntityKey entityKey);
+    <T> T getEntity(Class<T> entityClazz, Object id);
 
-    void addEntity(EntityKey entityKey, Object object);
+    <T> T addEntity(T entity);
 
     boolean containsEntity(EntityKey key);
 
-    void removeEntity(EntityKey entityKey);
+    void updateEntity(Object entity);
+
+    void removeEntity(Object entity);
 
     void clear();
 }

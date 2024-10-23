@@ -6,38 +6,18 @@ import orm.settings.JpaSettings;
 
 public class SessionImpl implements EntityManager {
 
-    private final QueryBuilder queryBuilder;
     private final JpaSettings settings;
 
     private final StatefulPersistenceContext persistenceContext;
 
     public SessionImpl(QueryBuilder queryBuilder) {
-        this.queryBuilder = queryBuilder;
         this.settings = JpaSettings.ofDefault();
-        this.persistenceContext = new StatefulPersistenceContext();
+        this.persistenceContext = new StatefulPersistenceContext(queryBuilder);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        final EntityKey entityKey = new EntityKey(clazz, id);
-        Object persistedEntity = persistenceContext.getEntity(entityKey);
-        if (persistedEntity != null) {
-            return castEntity(clazz, persistedEntity);
-        }
-
-        T entity = queryBuilder.selectFrom(clazz).findById(id)
-                .fetchOne(new DefaultRowMapper<>(clazz));
-
-        persistenceContext.addEntity(entityKey, entity);
-        return entity;
-    }
-
-    private <T> T castEntity(Class<T> clazz, Object persistedEntity) {
-        if (!clazz.isInstance(persistedEntity)) {
-            throw new IllegalArgumentException("Invalid type for persisted entity");
-        }
-
-        return clazz.cast(persistedEntity);
+        return persistenceContext.getEntity(clazz, id);
     }
 
     /**
@@ -51,25 +31,17 @@ public class SessionImpl implements EntityManager {
      */
     @Override
     public <T> T persist(T entity) {
-        var tableEntity = new TableEntity<>(entity, settings);
-        final T persistedEntity = queryBuilder.insertInto(tableEntity)
-                .value(tableEntity.getEntity())
-                .returnAsEntity();
-
-        persistenceContext.addEntity(new EntityKey(tableEntity), tableEntity.getEntity());
-        return persistedEntity;
+        return persistenceContext.addEntity(entity);
     }
 
     @Override
     public <T> T update(T entity) {
-        queryBuilder.update(entity).byId().execute();
+        persistenceContext.updateEntity(entity);
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        var tableEntity = new TableEntity<>(entity, settings);
-        persistenceContext.removeEntity(new EntityKey(tableEntity));
-        queryBuilder.deleteFrom(tableEntity).byId().execute();
+        persistenceContext.removeEntity(entity);
     }
 }

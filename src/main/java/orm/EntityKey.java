@@ -18,6 +18,10 @@ public class EntityKey implements Serializable {
         this.idValue = id;
     }
 
+    public Object getIdValue() {
+        return idValue;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;

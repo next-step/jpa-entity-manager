@@ -10,6 +10,7 @@ import orm.dsl.condition.EqualCondition;
 import orm.dsl.step.dml.ConditionForFetchStep;
 import orm.dsl.step.dml.SelectFromStep;
 import orm.exception.NotYetImplementedException;
+import orm.row_mapper.DefaultRowMapper;
 
 import java.util.List;
 
@@ -79,8 +80,7 @@ public abstract class SelectImpl<E> implements SelectFromStep<E>{
 
     @Override
     public E fetchOne() {
-        throw new NotYetImplementedException("아직 구현 안되었습니다. 2-2에 진행");
-//        return queryExecutor.execute(build(), tableEntity.getTableClass());
+        return queryRunner.fetchOne(extractSql(), new DefaultRowMapper<>(tableEntity.getTableClass()));
     }
 
     @Override
