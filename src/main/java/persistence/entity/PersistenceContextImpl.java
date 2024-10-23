@@ -40,4 +40,6 @@ public class PersistenceContextImpl implements PersistenceContext {
         final EntityKey entityKey = new EntityKey((Serializable) id, entity.getClass());
         return !managedEntities.containsKey(entityKey);
     }
+
+
 }

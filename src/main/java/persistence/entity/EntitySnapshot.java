@@ -24,13 +24,14 @@ public class EntitySnapshot {
         return column.hasValue(entity) ? column.getValueAsString(entity) : null;
     }
 
-    public boolean hasDirtyColumns(Object entity) {
+    public boolean hasDirtyColumns(EntitySnapshot entitySnapshot, Object managedEntity) {
         final List<? extends Queryable> columns = tableDefinition.withoutIdColumns();
         return columns.stream()
                 .anyMatch(column -> {
-                    final Object entityValue = getNullableValue(entity, column);
-                    final Object snapshotValue = columnSnapshots.get(column.getColumnName());
-                    return !Objects.equals(entityValue, snapshotValue);
-                });
+                            final Object entityValue = getNullableValue(managedEntity, column);
+                            final Object snapshotValue = entitySnapshot.columnSnapshots.get(column.getColumnName());
+                            return !Objects.equals(entityValue, snapshotValue);
+                        }
+                );
     }
 }
