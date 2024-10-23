@@ -8,4 +8,6 @@ public interface PersistenceContext {
     void removeEntity(Class<?> clazz, Long id);
 
     boolean containsEntity(Class<?> clazz, Long id);
+
+    Object getDatabaseSnapshot(Long id, Object entity);
 }
