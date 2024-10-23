@@ -70,8 +70,8 @@ public class QueryIntegrationTest {
         QueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
         jdbcTemplate.execute(createQueryBuilder.build());
 
-        InsertQuery insertQueryBuilder = new InsertQuery(person);
-        jdbcTemplate.execute(insertQueryBuilder.makeQuery());
+        InsertQuery insertQueryBuilder = InsertQuery.getInstance();
+        jdbcTemplate.execute(insertQueryBuilder.makeQuery(person));
     }
 
     @Test
@@ -85,11 +85,11 @@ public class QueryIntegrationTest {
         final Integer age = 11;
         final String email = "email@test.com";
         Person person = new Person(name, age, email, null);
-        InsertQuery insertQueryBuilder = new InsertQuery(person);
-        jdbcTemplate.execute(insertQueryBuilder.makeQuery());
+        InsertQuery insertQueryBuilder = InsertQuery.getInstance();
+        jdbcTemplate.execute(insertQueryBuilder.makeQuery(person));
 
-        SelectQuery selectQueryBuilder = new SelectQuery(Person.class);
-        Person findByIdPerson = jdbcTemplate.queryForObject(selectQueryBuilder.findById(1L), resultSet -> {
+        SelectQuery selectQuery = SelectQuery.getInstance();
+        Person findByIdPerson = jdbcTemplate.queryForObject(selectQuery.findById(Person.class, 1L), resultSet -> {
             long id = resultSet.getLong("id");
             int old = resultSet.getInt("old");
             String getEmail = resultSet.getString("email");
@@ -97,8 +97,8 @@ public class QueryIntegrationTest {
             return new Person(id, nickname, old, getEmail);
         });
 
-        DeleteQuery deleteQueryBuilder = new DeleteQuery(findByIdPerson);
-        jdbcTemplate.execute(deleteQueryBuilder.makeQuery());
+        DeleteQuery deleteQueryBuilder = DeleteQuery.getInstance();
+        jdbcTemplate.execute(deleteQueryBuilder.makeQuery(findByIdPerson));
     }
 
 }

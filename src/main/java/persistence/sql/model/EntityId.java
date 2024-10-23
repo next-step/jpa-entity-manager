@@ -15,14 +15,25 @@ public class EntityId {
         this.clazz = clazz;
     }
 
-    public EntityColumnName getIdColumnName() {
+    public String getIdValue(Object object) {
         Field idField = getIdField();
-        return new EntityColumnName(idField);
-    }
 
-    public EntityColumnValue getIdValue(Object object) {
-        Field idField = getIdField();
-        return new EntityColumnValue(idField, object);
+        idField.setAccessible(true);
+        try {
+            Object fieldObject = idField.get(object);
+
+            if (idField.get(object) instanceof String) {
+                return String.format("'%s'", fieldObject);
+            }
+
+            if (idField.get(object) == null) {
+                return null;
+            }
+
+            return String.valueOf(fieldObject);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("해당 객체에 접근할 수 없습니다.");
+        }
     }
 
     private Field getIdField() {

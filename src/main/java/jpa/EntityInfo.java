@@ -1,5 +1,7 @@
 package jpa;
 
+import java.util.Objects;
+
 public class EntityInfo<T> {
 
     private final Class<T> clazz;
@@ -22,5 +24,10 @@ public class EntityInfo<T> {
 
         EntityInfo<?> otherEntityInfo = (EntityInfo<?>) obj;
         return clazz.equals(otherEntityInfo.clazz) && id.equals(otherEntityInfo.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz, id);
     }
 }

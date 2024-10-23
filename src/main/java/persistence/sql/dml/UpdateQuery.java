@@ -17,23 +17,29 @@ import java.util.stream.Collectors;
 
 public class UpdateQuery {
 
-    private final Object object;
+    private UpdateQuery() {
+    }
 
-    public UpdateQuery(Object object) {
+    private static class UpdateQueryHolder {
+        public static final UpdateQuery INSTANCE = new UpdateQuery();
+    }
+
+    public static UpdateQuery getInstance() {
+        return UpdateQueryHolder.INSTANCE;
+    }
+
+    public String makeQuery(Object object) {
         if (object == null) {
             throw new RequiredObjectException(ExceptionMessage.REQUIRED_OBJECT);
         }
-        this.object = object;
-    }
 
-    public String makeQuery() {
         TableName tableName = new TableName(object.getClass());
 
         String tableNameValue = tableName.getValue();
-        return String.format("UPDATE %s SET %s WHERE %s", tableNameValue, makeSetClause(), makeWhereClause(object));
+        return String.format("UPDATE %s SET %s WHERE %s", tableNameValue, makeSetClause(object), makeWhereClause(object));
     }
 
-    private String makeSetClause() {
+    private String makeSetClause(Object object) {
         List<Field> fields = Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(GeneratedValue.class))

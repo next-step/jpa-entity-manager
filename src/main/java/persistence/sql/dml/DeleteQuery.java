@@ -9,10 +9,19 @@ import persistence.sql.model.TableName;
 public class DeleteQuery {
 
     private static final String SPACE = " ";
-    private final Object object;
-    private final Class<?> clazz;
 
-    public DeleteQuery(Object object) {
+    private DeleteQuery() {
+    }
+
+    private static class DeleteQueryHolder {
+        public static final DeleteQuery INSTANCE = new DeleteQuery();
+    }
+
+    public static DeleteQuery getInstance() {
+        return DeleteQueryHolder.INSTANCE;
+    }
+
+    public String makeQuery(Object object) {
         if (object == null) {
             throw new RequiredObjectException(ExceptionMessage.REQUIRED_OBJECT);
         }
@@ -21,11 +30,7 @@ public class DeleteQuery {
             throw new IllegalArgumentException("잘못된 Object 타입입니다.");
         }
 
-        this.clazz = object.getClass();
-        this.object = object;
-    }
-
-    public String makeQuery() {
+        Class<?> clazz = object.getClass();
         TableName tableName = new TableName(clazz);
 
         StringBuilder deleteStringBuilder = new StringBuilder();
