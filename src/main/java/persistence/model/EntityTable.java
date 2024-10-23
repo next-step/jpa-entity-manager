@@ -15,13 +15,9 @@ public class EntityTable {
     }
 
     public static EntityTable build(Class<?> entityClass) {
-        return new EntityTable(getName(entityClass));
-    }
+        String tableName = ReflectionUtil.getTableName(entityClass);
 
-    private static String getName(Class<?> entityClass) {
-        return ReflectionUtil.getAnnotationIfPresent(entityClass, Table.class)
-                .map(Table::name)
-                .orElse(entityClass.getSimpleName());
+        return new EntityTable(tableName);
     }
 
     public String getName() {
