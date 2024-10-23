@@ -6,6 +6,9 @@ import persistence.model.EntityPrimaryKey;
 import persistence.sql.dml.DmlQueryBuilder;
 
 public class EntityManagerImpl implements EntityManager {
+    private final EntityPersister entityPersister;
+
+    // XXX: loader가 생기면 DmlQueryBuilder와 JdbcTemplate도 제거?
     private final DmlQueryBuilder queryBuilder;
 
     private final JdbcTemplate jdbcTemplate;
@@ -13,10 +16,12 @@ public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
 
     public EntityManagerImpl(
+            EntityPersister entityPersister,
             DmlQueryBuilder queryBuilder,
             JdbcTemplate jdbcTemplate,
             PersistenceContext persistenceContext
     ) {
+        this.entityPersister = entityPersister;
         this.queryBuilder = queryBuilder;
         this.jdbcTemplate = jdbcTemplate;
         this.persistenceContext = persistenceContext;
@@ -37,15 +42,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        jdbcTemplate.execute(queryBuilder.buildInsertQuery(entity));
-
+        entityPersister.insert(entity);
         persistenceContext.addEntity(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        jdbcTemplate.execute(queryBuilder.buildDeleteQuery(entity));
-
+        entityPersister.delete(entity);
         persistenceContext.removeEntity(entity);
     }
 
@@ -56,7 +59,7 @@ public class EntityManagerImpl implements EntityManager {
         Object existingEntity = persistenceContext.getEntity(entityClass, entityId);
 
         if (existingEntity != null) {
-            jdbcTemplate.execute(queryBuilder.buildUpdateQuery(entity));
+            entityPersister.update(entity);
         } else {
             persist(entity);
         }

@@ -8,7 +8,7 @@
     public interface PersistenceContext {}
   ```
 
-- [ ] 요구 사항 2 - EntityPersister 구현
+- [x] 요구 사항 2 - EntityPersister 구현
   ```java
     public class EntityPersister {
 

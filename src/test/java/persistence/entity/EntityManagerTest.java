@@ -26,6 +26,8 @@ public class EntityManagerTest {
 
     JdbcTemplate jdbcTemplate;
 
+    EntityPersister entityPersister;
+
     EntityManager entityManager;
 
     @BeforeEach
@@ -36,7 +38,9 @@ public class EntityManagerTest {
         ddlQueryBuilder = new DdlQueryBuilder(dialect);
         PersistenceContext persistenceContext = new PersistenceContextImpl();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
-        entityManager = new EntityManagerImpl(dmlQueryBuilder, jdbcTemplate, persistenceContext);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
+
+        entityManager = new EntityManagerImpl(entityPersister, dmlQueryBuilder, jdbcTemplate, persistenceContext);
 
         jdbcTemplate.execute(ddlQueryBuilder.buildCreateTableQuery(PersonWithTransientAnnotation.class));
     }
