@@ -21,7 +21,7 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     }
 
     @Override
-    public T mapRow(ResultSet resultSet) {
+    public T mapRow(ResultSet resultSet) throws SQLException, IllegalAccessException {
         final T entity = new InstanceFactory<>(clazz).createInstance();
         final List<Field> fields = getPersistentFields();
 
@@ -38,13 +38,9 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
                 .toList();
     }
 
-    private void mapField(ResultSet resultSet, T entity, Field field, int columnIndex) {
-        try {
-            final Object value = resultSet.getObject(columnIndex);
-            field.setAccessible(true);
-            field.set(entity, value);
-        } catch (SQLException | IllegalAccessException e) {
-            logger.error(e.getMessage(), e);
-        }
+    private void mapField(ResultSet resultSet, T entity, Field field, int columnIndex) throws SQLException, IllegalAccessException {
+        final Object value = resultSet.getObject(columnIndex);
+        field.setAccessible(true);
+        field.set(entity, value);
     }
 }

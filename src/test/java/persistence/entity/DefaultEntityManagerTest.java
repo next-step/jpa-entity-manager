@@ -6,7 +6,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.dialect.Dialect;
 import persistence.dialect.H2Dialect;
 import persistence.fixture.EntityWithId;
 import persistence.sql.ddl.CreateQueryBuilder;
@@ -17,16 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultEntityManagerTest {
     private JdbcTemplate jdbcTemplate;
-    private EntityPersister entityPersister;
-    private Dialect dialect;
-    private EntityWithId entity;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new JdbcTemplate(H2ConnectionFactory.getConnection());
-        entityPersister = new DefaultEntityPersister(jdbcTemplate);
-        dialect = new H2Dialect();
-        entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         createTable();
     }
@@ -40,8 +33,9 @@ class DefaultEntityManagerTest {
     @DisplayName("엔티티를 조회한다.")
     void find() {
         // given
-        insertData();
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
 
         // when
         final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
@@ -53,7 +47,7 @@ class DefaultEntityManagerTest {
                 () -> assertThat(managedEntity.getName()).isEqualTo(entity.getName()),
                 () -> assertThat(managedEntity.getAge()).isEqualTo(entity.getAge()),
                 () -> assertThat(managedEntity.getEmail()).isEqualTo(entity.getEmail()),
-                () -> assertThat(managedEntity.getIndex()).isNull()
+                () -> assertThat(managedEntity.getIndex()).isNotNull()
         );
     }
 
@@ -62,6 +56,7 @@ class DefaultEntityManagerTest {
     void persist() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
         entityManager.persist(entity);
@@ -79,11 +74,32 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 수정한다.")
+    @DisplayName("엔티티를 삭제한다.")
+    void remove() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
+
+        // when
+        entityManager.remove(entity);
+
+        // then
+        assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Expected 1 result, got");
+    }
+
+    @Test
+    @DisplayName("더티체킹으로 엔티티를 수정한다.")
     void update() {
         // given
-        insertData();
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
+        entity.setName("Yang");
+        entity.setAge(35);
+        entity.setEmail("test2@email.com");
 
         // when
         entityManager.update(entity);
@@ -101,32 +117,30 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 삭제한다.")
-    void remove() {
+    @DisplayName("영속성 컨텍스트에서 관리되지 않는 엔티티로 더티체킹하면 예외를 발생한다.")
+    void update_exception() {
         // given
-        insertData();
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
-        // when
-        entityManager.remove(entity);
 
-        // then
-        assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Expected 1 result, got");
+        // when & then
+        assertThatThrownBy(() -> entityManager.update(entity))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(DefaultEntityManager.NOT_PERSISTENCE_CONTEXT_ENTITY_FAILD_MESSAGE);
     }
 
     private void createTable() {
-        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(entity.getClass(), dialect);
+        final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(EntityWithId.class, new H2Dialect());
         jdbcTemplate.execute(createQueryBuilder.create());
     }
 
-    private void insertData() {
-        entityPersister.insert(entity);
+    private void insertData(EntityWithId entity, EntityManager entityManager) {
+        entityManager.persist(entity);
     }
 
     private void dropTable() {
-        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entity.getClass());
+        final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(EntityWithId.class);
         jdbcTemplate.execute(dropQueryBuilder.drop());
     }
 }

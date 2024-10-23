@@ -6,4 +6,6 @@ public interface PersistenceContext {
     <T> T getEntity(Class<T> entityType, Object id);
 
     void removeEntity(Object entity);
+
+    <T> T getSnapshot(Class<T> entityType, Object id);
 }

@@ -69,4 +69,12 @@ public class EntityTable {
         }
         return String.valueOf(id);
     }
+
+    public int getColumnCount() {
+        return getEntityColumns().size();
+    }
+
+    public EntityColumn getEntityColumn(int index) {
+        return getEntityColumns().get(index);
+    }
 }

@@ -6,15 +6,16 @@ import persistence.sql.dml.SelectQueryBuilder;
 
 public class DefaultEntityLoader implements EntityLoader {
     private final JdbcTemplate jdbcTemplate;
+    private final SelectQueryBuilder selectQueryBuilder;
 
-    public DefaultEntityLoader(JdbcTemplate jdbcTemplate) {
+    public DefaultEntityLoader(JdbcTemplate jdbcTemplate, SelectQueryBuilder selectQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.selectQueryBuilder = selectQueryBuilder;
     }
 
     @Override
-    public <T> T find(Class<T> entityType, Object id) {
-        final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(entityType);
-        final String sql = selectQueryBuilder.findById(id);
+    public <T> T load(Class<T> entityType, Object id) {
+        final String sql = selectQueryBuilder.findById(entityType, id);
         return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(entityType));
     }
 }

@@ -10,21 +10,18 @@ public class SelectQueryBuilder {
     private static final String FIND_ALL_QUERY_TEMPLATE = "SELECT %s FROM %s";
     private static final String FIND_BY_ID_QUERY_TEMPLATE = "SELECT %s FROM %s WHERE %s";
 
-    private final EntityTable entityTable;
-
-    public SelectQueryBuilder(Class<?> entityType) {
-        this.entityTable = new EntityTable(entityType);
+    public String findAll(Class<?> entityType) {
+        final EntityTable entityTable = new EntityTable(entityType);
+        return FIND_ALL_QUERY_TEMPLATE.formatted(getColumnClause(entityTable), entityTable.getTableName());
     }
 
-    public String findAll() {
-        return FIND_ALL_QUERY_TEMPLATE.formatted(getColumnClause(), entityTable.getTableName());
+    public String findById(Class<?> entityType, Object id) {
+        final EntityTable entityTable = new EntityTable(entityType);
+        return FIND_BY_ID_QUERY_TEMPLATE.formatted(getColumnClause(entityTable), entityTable.getTableName(),
+                entityTable.getWhereClause(id));
     }
 
-    public String findById(Object id) {
-        return FIND_BY_ID_QUERY_TEMPLATE.formatted(getColumnClause(), entityTable.getTableName(), entityTable.getWhereClause(id));
-    }
-
-    private String getColumnClause() {
+    private String getColumnClause(EntityTable entityTable) {
         final List<String> columnDefinitions = entityTable.getEntityColumns()
                 .stream()
                 .map(EntityColumn::getColumnName)
