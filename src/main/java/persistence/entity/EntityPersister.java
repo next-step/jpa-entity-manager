@@ -12,6 +12,7 @@ import persistence.sql.dml.query.UpdateQueryBuilder;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Map;
 
 public class EntityPersister {
     private static final Long DEFAULT_ID_VALUE = 0L;
@@ -20,7 +21,7 @@ public class EntityPersister {
     private static final DeleteByIdQueryBuilder deleteByIdQueryBuilder = new DeleteByIdQueryBuilder();
 
     private final Logger logger = LoggerFactory.getLogger(EntityPersister.class);
-    private final HashMap<Class<?>, TableDefinition> tableDefinitions;
+    private final Map<Class<?>, TableDefinition> tableDefinitions;
     private final JdbcTemplate jdbcTemplate;
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
@@ -51,31 +52,31 @@ public class EntityPersister {
 
         final String query = insertQueryBuilder.build(entity);
         final Serializable id = jdbcTemplate.insertAndReturnKey(query);
-        copyId(id, entity);
+        bindId(id, entity);
         return entity;
     }
 
-    private void copyId(Serializable id, Object to) {
+    private void bindId(Serializable id, Object entity) {
         try {
-            final Class<?> entityClass = to.getClass();
+            final Class<?> entityClass = entity.getClass();
             final TableDefinition tableDefinition = new TableDefinition(entityClass);
             final TableId tableId = tableDefinition.getTableId();
 
             final Field objectDeclaredField = entityClass.getDeclaredField(tableId.getDeclaredName());
 
-            final boolean wasAccessible = objectDeclaredField.canAccess(to);
+            final boolean wasAccessible = objectDeclaredField.canAccess(entity);
             if (!wasAccessible) {
                 objectDeclaredField.setAccessible(true);
             }
 
-            objectDeclaredField.set(to, id);
+            objectDeclaredField.set(entity, id);
 
             if (!wasAccessible) {
                 objectDeclaredField.setAccessible(false);
             }
 
         } catch (ReflectiveOperationException e) {
-            logger.error("Failed to copy row to {}", to.getClass().getName(), e);
+            logger.error("Failed to copy row to {}", entity.getClass().getName(), e);
         }
     }
 

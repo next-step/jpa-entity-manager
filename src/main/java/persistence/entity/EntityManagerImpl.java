@@ -49,7 +49,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        if (!persistenceContext.hasEntity(entity, entityPersister.getEntityId(entity))) {
+        if (persistenceContext.isEntityAbsent(entity, entityPersister.getEntityId(entity))) {
             throw new IllegalStateException("Can not find entity in persistence context: "
                     + entity.getClass().getSimpleName());
         }

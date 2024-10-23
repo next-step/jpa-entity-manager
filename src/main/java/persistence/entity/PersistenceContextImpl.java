@@ -36,8 +36,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public boolean hasEntity(Object entity, Object id) {
+    public boolean isEntityAbsent(Object entity, Object id) {
         final EntityKey entityKey = new EntityKey((Serializable) id, entity.getClass());
-        return managedEntities.containsKey(entityKey);
+        return !managedEntities.containsKey(entityKey);
     }
 }
