@@ -17,7 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import sample.domain.Person;
 
-class EntityManagerImplTest {
+class DefaultEntityManagerTest {
 
     private DatabaseServer server;
 
@@ -40,7 +40,7 @@ class EntityManagerImplTest {
         Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
         insert(person, new JdbcTemplate(server.getConnection()));
 
-        EntityManager entityManager = new EntityManagerImpl(server.getConnection());
+        EntityManager entityManager = new DefaultEntityManager(server.getConnection());
         Person findPerson = entityManager.find(Person.class, 1L);
 
         assertAll("조회한 Entity 필드값 검증",
@@ -54,7 +54,7 @@ class EntityManagerImplTest {
     @DisplayName("[성공] Person Entity 저장")
     void persist() throws SQLException {
         Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
-        EntityManager entityManager = new EntityManagerImpl(server.getConnection());
+        EntityManager entityManager = new DefaultEntityManager(server.getConnection());
         assertDoesNotThrow(() -> entityManager.persist(person));
     }
 
@@ -64,7 +64,7 @@ class EntityManagerImplTest {
         Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
         insert(person, new JdbcTemplate(server.getConnection()));
 
-        EntityManager entityManager = new EntityManagerImpl(server.getConnection());
+        EntityManager entityManager = new DefaultEntityManager(server.getConnection());
         assertDoesNotThrow(() -> entityManager.remove(person));
     }
 

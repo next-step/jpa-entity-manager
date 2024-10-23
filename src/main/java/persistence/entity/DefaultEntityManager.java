@@ -12,11 +12,11 @@ import persistence.sql.dml.query.builder.DeleteQueryBuilder;
 import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
 
-public class EntityManagerImpl implements EntityManager {
+public class DefaultEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityManagerImpl(Connection connection) {
+    public DefaultEntityManager(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
     }
 
