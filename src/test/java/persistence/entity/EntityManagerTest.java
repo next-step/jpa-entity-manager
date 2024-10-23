@@ -13,8 +13,7 @@ import persistence.fixture.PersonWithTransientAnnotation;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EntityManagerTest {
     DatabaseServer databaseServer;
@@ -35,8 +34,9 @@ public class EntityManagerTest {
         dialect = DialectFactory.create(databaseServer.getClass());
         dmlQueryBuilder = new DmlQueryBuilder(dialect);
         ddlQueryBuilder = new DdlQueryBuilder(dialect);
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
-        entityManager = new EntityManagerImpl(dmlQueryBuilder, jdbcTemplate);
+        entityManager = new EntityManagerImpl(dmlQueryBuilder, jdbcTemplate, persistenceContext);
 
         jdbcTemplate.execute(ddlQueryBuilder.buildCreateTableQuery(PersonWithTransientAnnotation.class));
     }
@@ -133,10 +133,10 @@ public class EntityManagerTest {
     }
 
     @Nested
-    @DisplayName("update 테스트")
-    class UpdateTest {
+    @DisplayName("merge 테스트")
+    class MergeTest {
         @Test
-        @DisplayName("주어진 엔티티를 디비에서 업데이트한다.")
+        @DisplayName("저장된 엔티티라면 디비에서 업데이트한다.")
         void succeedToUpdate() {
             // given
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
@@ -146,7 +146,7 @@ public class EntityManagerTest {
 
             // when
             person.setAge(30);
-            entityManager.update(person);
+            entityManager.merge(person);
 
             // then
             PersonWithTransientAnnotation foundPerson = entityManager.findById(PersonWithTransientAnnotation.class, 1L);
@@ -154,15 +154,15 @@ public class EntityManagerTest {
         }
 
         @Test
-        @DisplayName("PK가 없는 엔티티 객체를 업데이트하려 하면 에러가 발생한다.")
-        void failToUpdate() {
+        @DisplayName("저장된 엔티티가 아니라면 새로 저장한다.")
+        void succeedToAddNew() {
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
-                    "홍길동", 20, "test@test.com", 1
+                    1L, "홍길동", 20, "test@test.com", 1
             );
 
-            assertThrows(ColumnInvalidException.class, () -> {
-                entityManager.update(person);
-            });
+            entityManager.merge(person);
+
+            assertNotNull(entityManager.findById(PersonWithTransientAnnotation.class, 1L));
         }
     }
 }

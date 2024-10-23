@@ -7,5 +7,5 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    void update(Object entity);
+    void merge(Object entity);
 }
