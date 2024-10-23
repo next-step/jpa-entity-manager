@@ -88,6 +88,22 @@ class DefaultEntityPersisterTest {
     }
 
     @Test
+    @DisplayName("변경된 필드가 없는 엔티티로 엔티티를 수정하면 예외를 발생한다.")
+    void update_exception() {
+        // given
+        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(),
+                new UpdateQueryBuilder(), new DeleteQueryBuilder());
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity);
+        final Object snapshot = new InstanceFactory<>(entity.getClass()).copy(entity);
+
+        // when & then
+        assertThatThrownBy(() -> entityPersister.update(entity, snapshot))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(DefaultEntityPersister.NOT_CHANGED_MESSAGE);
+    }
+
+    @Test
     @DisplayName("엔티티를 삭제한다.")
     void delete() {
         // given
