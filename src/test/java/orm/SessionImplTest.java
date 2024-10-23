@@ -13,9 +13,8 @@ import static steps.Steps.테이블_생성;
 public class SessionImplTest extends PluggableH2test {
 
 
-    // TODO: 추후 Hibernate 1차 캐시를 구현하면 newPerson 객체와 person 객체의 equality뿐 아리나 identity 까지 같아야 한다. (아직은 다름)
     @Test
-    @DisplayName("insert 후 find 메서드를 사용하면 엔티티 Object의 Equality만 유지된다.")
+    @DisplayName("insert 후 find 메서드를 사용하면 엔티티 Object의 Equality와 Identity 모두 유지된다.")
     void find_테스트() {
         runInH2Db(jdbcTemplate -> {
 
@@ -31,6 +30,7 @@ public class SessionImplTest extends PluggableH2test {
 
             // then
             assertThat(person)
+                    .isSameAs(newPerson)
                     .satisfies(p -> { // Equality 검증
                         assertThat(p.getId()).isEqualTo(1L);
                         assertThat(p.getAge()).isEqualTo(30);
