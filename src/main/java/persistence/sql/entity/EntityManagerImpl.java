@@ -1,6 +1,7 @@
 package persistence.sql.entity;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
@@ -22,11 +23,12 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public Object persist(Object entity) {
+    public Object persist(Object entity) throws SQLException {
         Long idValue = entityPersister.getIdValue(entity);
         if (idValue == null) {
             entityPersister.insert(entity);
             idValue = entityPersister.getIdValue(entity);
+            entityPersister.setIdValue(entity,idValue);
         }
         if (idValue != null) {
             entityPersister.update(entity);

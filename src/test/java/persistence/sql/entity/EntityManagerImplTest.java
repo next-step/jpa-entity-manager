@@ -73,7 +73,7 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("EntityManager의 persist구현")
-    void entityManager_persist() {
+    void entityManager_persist() throws SQLException {
         Person expectPerson = new Person(2L, "yang2", 25, "rhfpdk92@naver.com");
 
         entityManager.persist(expectPerson);
@@ -92,13 +92,11 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("EntityManager의 persist시 idValue가 null인 경우 id값이 자동으로 생성된다")
-    void entityManager_persist_with_null_id() {
+    void entityManager_persist_with_null_id() throws SQLException {
         long expectedId = 2L;
         Person expectPerson = new Person(null, "yang2", 25, "rhfpdk92@naver.com");
 
-        entityManager.persist(expectPerson);
-
-        Person resultPerson = entityManager.find(Person.class, expectedId);
+        Person resultPerson =(Person) entityManager.persist(expectPerson);
 
         assertThat(resultPerson.getId()).isEqualTo(expectedId);
     }
@@ -106,7 +104,7 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("EntityManager의 remove구현")
-    void entityManager_remove() {
+    void entityManager_remove() throws SQLException {
         Person expectPerson = new Person(2L, "yang2", 25, "rhfpdk92@naver.com");
 
         entityManager.persist(expectPerson);
@@ -117,7 +115,7 @@ class EntityManagerImplTest {
 
     //    @Test
     @DisplayName("EntityManager의 update구현")
-    void entityManager_update() {
+    void entityManager_update() throws SQLException {
         Person person = new Person(2L, "yang2", 25, "rhfpdk92@naver.com");
         Person updatePerson = new Person(2L, "yang3", 233, "rhfpdk92@gmail.com");
 
