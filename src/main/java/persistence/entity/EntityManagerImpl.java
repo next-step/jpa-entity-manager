@@ -21,12 +21,12 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> T find(Class<T> clazz, Object primaryKey) {
         SelectQuery query = new SelectQuery(clazz);
         String queryString = SelectQueryBuilder.builder(new H2Dialect())
                 .select(query.columnNames())
                 .from(query.tableName())
-                .where(List.of(new WhereCondition("id", "=", id)))
+                .where(List.of(new WhereCondition("id", "=", primaryKey)))
                 .build();
         return jdbcTemplate.queryForObject(queryString, new EntityRowMapper<>(clazz));
     }
