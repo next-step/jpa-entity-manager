@@ -37,10 +37,8 @@ public class DefaultEntityPersister implements EntityPersister {
 
     @Override
     public void update(Object entity, Object snapshot) {
-        final EntityTable entityTable = new EntityTable(entity);
-        final EntityTable snapshotEntityTable = new EntityTable(snapshot);
-        final List<EntityColumn> dirtiedEntityColumns = getDirtiedEntityColumns(entityTable, snapshotEntityTable);
-        jdbcTemplate.execute(updateQueryBuilder.update(entityTable, dirtiedEntityColumns));
+        final List<EntityColumn> dirtiedEntityColumns = getDirtiedEntityColumns(entity, snapshot);
+        jdbcTemplate.execute(updateQueryBuilder.update(entity, dirtiedEntityColumns));
     }
 
     @Override
@@ -48,7 +46,9 @@ public class DefaultEntityPersister implements EntityPersister {
         jdbcTemplate.execute(deleteQueryBuilder.delete(entity));
     }
 
-    private List<EntityColumn> getDirtiedEntityColumns(EntityTable entityTable, EntityTable snapshotEntityTable) {
+    private List<EntityColumn> getDirtiedEntityColumns(Object entity, Object snapshot) {
+        final EntityTable entityTable = new EntityTable(entity);
+        final EntityTable snapshotEntityTable = new EntityTable(snapshot);
         final List<EntityColumn> dirtiedEntityColumns = IntStream.range(0, entityTable.getColumnCount())
                 .filter(i -> isDirtied(entityTable.getEntityColumn(i), snapshotEntityTable.getEntityColumn(i)))
                 .mapToObj(entityTable::getEntityColumn)
