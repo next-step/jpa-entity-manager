@@ -1,3 +1,9 @@
+# Step 1 - EntityPersister 구현
+
+## TODO
+[ ] 1.0 - PersistenceContext 구현
+[ ] 1.1 - EntityPersister 구현
+
 ## 요구 사항 1 - Persistence Context 구현
 
 ```Java
