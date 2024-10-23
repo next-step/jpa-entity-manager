@@ -1,7 +1,7 @@
 # jpa-entity-manager
 
 ## step 1
-- [ ] 요구 사항 1 - Persistence Context 구현
+- [x] 요구 사항 1 - Persistence Context 구현
   ```java
     public interface EntityManager {}
 
