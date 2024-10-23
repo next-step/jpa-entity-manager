@@ -47,7 +47,7 @@ public class EntityManagerImpl implements EntityManager {
         String queryString = DeleteQueryBuilder.builder(new H2Dialect())
                 .delete(query.tableName())
                 .build();
-
+        jdbcTemplate.execute(queryString);
     }
 
 }
