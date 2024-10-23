@@ -1,10 +1,12 @@
 package persistence.sql.context.impl;
 
 import jakarta.persistence.Id;
+import persistence.sql.EntityLoaderFactory;
 import persistence.sql.context.KeyHolder;
 import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.MetadataLoader;
 import persistence.sql.dml.impl.SimpleMetadataLoader;
+import persistence.sql.loader.EntityLoader;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<KeyHolder, Object> context = new HashMap<>();
+    private final Map<KeyHolder, Object> snapshot = new HashMap<>();
 
     @Override
     public <T, ID> T get(Class<T> entityType, ID id) {
@@ -27,37 +30,29 @@ public class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public <T, ID> void add(ID id, T entity) {
         KeyHolder key = new KeyHolder(entity.getClass(), id);
-        if (context.containsKey(key)) {
-            return;
-        }
 
         context.put(key, entity);
-    }
-
-    @Override
-    public <T, ID> void merge(ID id, T entity) {
-        KeyHolder key = new KeyHolder(entity.getClass(), id);
-        Object origin = context.get(key);
-        if (origin == null) {
-            add(id, entity);
-            return;
-        }
-
-        if (!isEntityChanged(entity, origin)) {
-            return;
-        }
-
-        overwriteEntity(entity, origin);
+        createSnapshot(key, entity);
     }
 
     @Override
     public <T> void delete(T entity) {
         KeyHolder key = new KeyHolder(entity.getClass(), entity);
         context.remove(key);
+        snapshot.remove(key);
     }
 
-    private boolean isEntityChanged(Object entity, Object snapshot) {
-        return !entity.equals(snapshot);
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T, ID> T getDatabaseSnapshot(ID id, T entity) {
+        KeyHolder key = new KeyHolder(entity.getClass(), entity);
+        Object snapshotEntity = snapshot.get(key);
+
+        if (snapshotEntity != null) {
+            return (T) snapshotEntity;
+        }
+
+        return null;
     }
 
     private <T> void overwriteEntity(T entity, Object origin) {
@@ -73,6 +68,24 @@ public class DefaultPersistenceContext implements PersistenceContext {
             field.set(origin, value);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("Illegal access to field: " + field.getName());
+        }
+    }
+
+    private <T> void createSnapshot(KeyHolder key, T entity) {
+        try {
+            EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
+            MetadataLoader<?> loader = entityLoader.getMetadataLoader();
+
+            Object snapshotEntity = loader.getNoArgConstructor().newInstance();
+            for (int i = 0; i < loader.getColumnCount(); i++) {
+                Field field = loader.getField(i);
+                field.setAccessible(true);
+                field.set(snapshotEntity, field.get(entity));
+            }
+
+            snapshot.put(key, snapshotEntity);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to create snapshot entity");
         }
     }
 }

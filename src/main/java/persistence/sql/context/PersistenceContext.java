@@ -6,7 +6,7 @@ public interface PersistenceContext {
 
     <T, ID> void add(ID id, T entity);
 
-    <T, ID> void merge(ID id, T entity);
-
     <T> void delete(T entity);
+
+    <T, ID> T getDatabaseSnapshot(ID id, T entity);
 }

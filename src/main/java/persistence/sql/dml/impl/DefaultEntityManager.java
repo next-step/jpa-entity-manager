@@ -38,22 +38,16 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     private boolean isNew(Object entity) {
-        try {
-            EntityLoader<?> entityLoader = entityLoaderFactory.getLoader(entity.getClass());
-            MetadataLoader<?> loader = entityLoader.getMetadataLoader();
+        EntityLoader<?> entityLoader = entityLoaderFactory.getLoader(entity.getClass());
+        MetadataLoader<?> loader = entityLoader.getMetadataLoader();
 
-            Field primaryKeyField = loader.getPrimaryKeyField();
-            primaryKeyField.setAccessible(true);
-            Object idValue = primaryKeyField.get(entity);
-            if (idValue == null) {
-                return true;
-            }
-
-            return find(loader.getEntityType(), idValue) == null;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            throw new IllegalStateException(e);
+        Field primaryKeyField = loader.getPrimaryKeyField();
+        Object idValue = Clause.extractValue(primaryKeyField, entity);
+        if (idValue == null) {
+            return true;
         }
+
+        return find(loader.getEntityType(), idValue) == null;
     }
 
     @Override
@@ -70,8 +64,10 @@ public class DefaultEntityManager implements EntityManager {
 
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
-        entityPersister.update(entity);
-        persistenceContext.merge(id, entity);
+        T databaseSnapshot = persistenceContext.getDatabaseSnapshot(id, entity);
+
+        entityPersister.update(entity, databaseSnapshot);
+        persistenceContext.add(id, entity);
 
         return entity;
     }
@@ -100,13 +96,19 @@ public class DefaultEntityManager implements EntityManager {
 
         EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(returnType);
 
-        return entityLoader.load(primaryKey);
+        T loadedEntity = entityLoader.load(primaryKey);
+        persistenceContext.add(primaryKey, loadedEntity);
+
+        return loadedEntity;
     }
 
     @Override
     public <T> List<T> findAll(Class<T> entityClass) {
         EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(entityClass);
 
-        return entityLoader.loadAll();
+        List<T> loadedEntities = entityLoader.loadAll();
+        loadedEntities.forEach(entity -> persistenceContext.add(
+                Clause.extractValue(entityLoader.getMetadataLoader().getPrimaryKeyField(), entity), entity));
+        return loadedEntities;
     }
 }

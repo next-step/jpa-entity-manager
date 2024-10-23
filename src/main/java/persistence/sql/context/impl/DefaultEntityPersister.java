@@ -42,7 +42,7 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> void update(T entity) {
+    public <T> void update(T entity, T snapshotEntity) {
         EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
         MetadataLoader<?> loader = entityLoader.getMetadataLoader();
 

@@ -1,8 +1,9 @@
 package persistence.sql.context;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public record KeyHolder(Class<?> entityType, Object key) {
+public record KeyHolder(Class<?> entityType, Object key) implements Serializable {
     public KeyHolder {
         if (entityType == null || key == null) {
             throw new IllegalArgumentException("entityType and key must not be null");
