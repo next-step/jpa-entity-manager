@@ -88,7 +88,7 @@ public class DmlQueryBuilder {
         return deleteSql + " " + findOption.joinWhereClauses(dialect) + ";";
     }
 
-    public String buildSelectByIdQuery(Class<?> entityClass, Long id) {
+    public String buildSelectByIdQuery(Class<?> entityClass, Object id) {
         EntityTable table = EntityFactory.createEmptySchema(entityClass);
 
         EntityColumn conditionColumn = table.getColumn("id");

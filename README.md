@@ -19,5 +19,5 @@
         public void delete(parameters는 자유롭게);
         
         // ...
-      }
-    ```
+    }
+  ```

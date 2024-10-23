@@ -28,7 +28,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T findById(Class<T> clazz, Long id) {
+    public <T> T findById(Class<T> clazz, Object id) {
         T entity = persistenceContext.getEntity(clazz, id);
         if (entity != null) {
             return entity;

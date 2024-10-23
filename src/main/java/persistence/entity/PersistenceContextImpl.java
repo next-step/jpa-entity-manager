@@ -17,7 +17,6 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void addEntity(Object entityObject) {
         EntityKey cacheKey = createEntityKey(entityObject);
-        System.out.println("after add : " + cacheKey);
         entityCache.put(cacheKey, entityObject);
     }
 

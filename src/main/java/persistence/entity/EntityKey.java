@@ -1,13 +1,15 @@
 package persistence.entity;
 
+import persistence.model.EntityPrimaryKey;
+
 import java.util.Objects;
 
 public class EntityKey {
     private final Class<?> entityClass;
 
-    private final Object pk;
+    private final EntityPrimaryKey pk;
 
-    public EntityKey(Class<?> entityClass, Object pk) {
+    public EntityKey(Class<?> entityClass, EntityPrimaryKey pk) {
         this.entityClass = entityClass;
         this.pk = pk;
     }
