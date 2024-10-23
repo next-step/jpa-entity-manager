@@ -41,5 +41,4 @@ public class PersistenceContextImpl implements PersistenceContext {
         return !managedEntities.containsKey(entityKey);
     }
 
-
 }

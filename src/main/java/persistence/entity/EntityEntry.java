@@ -29,10 +29,6 @@ public class EntityEntry {
         return new EntityEntry(Status.LOADING, id, persistenceContext);
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
     public boolean isManaged() {
         return status.isManaged();
     }

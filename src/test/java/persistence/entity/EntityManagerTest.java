@@ -96,6 +96,23 @@ public class EntityManagerTest {
     }
 
     @Test
+    @DisplayName("같은 엔티티에대해 저장이 여러번 호출되면 예외가 발생하지 않는다.")
+    void testPersistManyTimes() throws Exception {
+        EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()), new PersistenceContextImpl());
+        EntityManagerTestEntityWithIdentityId entity = new EntityManagerTestEntityWithIdentityId(null, "john_doe", 30);
+
+        entityManager.persist(entity);
+        entityManager.persist(entity);
+
+        EntityManagerTestEntityWithIdentityId persistedEntity = entityManager.find(EntityManagerTestEntityWithIdentityId.class, 1L);
+        assertAll(
+                () -> assertThat(persistedEntity.id).isEqualTo(1L),
+                () -> assertThat(persistedEntity.name).isEqualTo("john_doe"),
+                () -> assertThat(persistedEntity.age).isEqualTo(30)
+        );
+    }
+
+    @Test
     @DisplayName("EntityManager.update()를 통해 엔티티를 수정한다.")
     void testMerge() throws Exception {
         EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()), new PersistenceContextImpl());
@@ -127,5 +144,21 @@ public class EntityManagerTest {
 
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> entityManager.merge(entity));
         assertThat(e.getMessage()).isEqualTo("Can not find entity in persistence context: EntityManagerTestEntityWithIdentityId");
+    }
+
+    @Test
+    @DisplayName("EntityManager.remove()를 통해 엔티티를 삭제한다.")
+    void testRemove() throws Exception {
+        EntityManager entityManager = new EntityManagerImpl(new JdbcTemplate(server.getConnection()), new PersistenceContextImpl());
+        EntityManagerTestEntityWithIdentityId entity = new EntityManagerTestEntityWithIdentityId(null, "john_doe", 30);
+        entityManager.persist(entity);
+
+        entityManager.remove(entity);
+
+        RuntimeException e = assertThrows(
+                RuntimeException.class,
+                () -> entityManager.find(EntityManagerTestEntityWithIdentityId.class, 1L)
+        );
+        assertThat(e.getMessage()).isEqualTo("Expected 1 result, got 0");
     }
 }
