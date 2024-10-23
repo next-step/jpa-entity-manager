@@ -21,7 +21,7 @@ public class PersistenceContextTest {
     class GetEntityTest {
         @Test
         @DisplayName("PK를 통해 영속 상태의 엔티티를 조회할 수 있다.")
-        void testGetEntityByPK() throws NoSuchFieldException, IllegalAccessException {
+        void testGetEntityByPK() {
             // given
             persistenceContext.addEntity(entity);
 
@@ -34,7 +34,7 @@ public class PersistenceContextTest {
 
         @Test
         @DisplayName("PK에 해당하는 영속 상태의 엔티티가 없다면 null을 반환한다.")
-        void testGetNullByPK() throws NoSuchFieldException, IllegalAccessException {
+        void testGetNullByPK() {
             // given
             persistenceContext.addEntity(entity);
 
@@ -50,7 +50,7 @@ public class PersistenceContextTest {
     class AddEntityTest {
         @Test
         @DisplayName("엔티티를 영속 상태로 저장한다.")
-        void testAddEntity() throws NoSuchFieldException, IllegalAccessException {
+        void testAddEntity() {
             Object beforeAddEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, 1L);
 
             // given
@@ -71,7 +71,7 @@ public class PersistenceContextTest {
     class RemoveEntityTest {
         @Test
         @DisplayName("영속상태에 있는 엔티티를 제거한다.")
-        void testRemoveEntity() throws NoSuchFieldException, IllegalAccessException {
+        void testRemoveEntity() {
             // given
             persistenceContext.addEntity(entity);
             Object beforeRemoveEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, 1L);
@@ -90,7 +90,7 @@ public class PersistenceContextTest {
 
         @Test
         @DisplayName("제거하려는 엔티티가 저장되어 있지 않다면, 제거를 시도해도 기존 영속 객체들엔 아무 영향도 끼치지 않는다.")
-        void testRemoveEntityNoAffect() throws NoSuchFieldException, IllegalAccessException {
+        void testRemoveEntityNoAffect() {
             // given
             persistenceContext.addEntity(entity);
             Object beforeRemoveEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, 1L);
