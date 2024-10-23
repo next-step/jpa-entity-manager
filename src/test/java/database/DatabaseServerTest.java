@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DatabaseServerTest {
+class DatabaseServerTest {
 
 
     @DisplayName("DB연결을 확인한다.")
