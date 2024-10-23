@@ -1,1 +1,16 @@
 # jpa-entity-manager
+- [ ] EntityManager
+    - [ ] find
+    - [ ] persist
+    - [ ] remove
+    - [ ] merge
+- [ ] PersistenceContext
+    - [ ] Entity 조회
+      - 동일한 트랜잭션 내에서 동일한 엔티티를 조회하면 데이터베이스에 다시 접근하지 않고 메모리에서 가져온다.
+    - [ ] Entity 추가
+      - 신규 Entity 를 관리 대상에 추가한다.
+    - [ ] Entity 삭제
+- [ ] EntityPersister
+    - [ ] update
+    - [ ] insert
+    - [ ] delete
