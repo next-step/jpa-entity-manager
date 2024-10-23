@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import sample.domain.Person;
 import persistence.exception.NotExistException;
 import persistence.sql.ddl.fixture.PersonWithEntityIdFixture;
 import persistence.sql.ddl.fixture.PersonWithEntityNamePropertyFixture;

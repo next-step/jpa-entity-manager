@@ -1,9 +1,9 @@
-package persistence.sql.dml.repository;
+package sample.repository;
 
 import java.sql.Connection;
 import java.util.List;
 import jdbc.JdbcTemplate;
-import persistence.entity.Person;
+import sample.domain.Person;
 import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.query.SelectQuery;
 import persistence.sql.dml.query.WhereCondition;

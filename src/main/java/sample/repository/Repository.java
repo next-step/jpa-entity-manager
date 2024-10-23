@@ -1,4 +1,4 @@
-package persistence.sql.dml.repository;
+package sample.repository;
 
 import java.util.List;
 

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import sample.domain.Person;
 import persistence.sql.dialect.H2Dialect;
 import persistence.sql.metadata.TableName;
 

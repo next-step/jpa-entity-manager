@@ -1,4 +1,4 @@
-package persistence;
+package sample;
 
 import database.DatabaseServer;
 import database.H2;

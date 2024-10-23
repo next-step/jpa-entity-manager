@@ -11,7 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.Person;
+import sample.domain.Person;
 import persistence.sql.ddl.query.CreateQuery;
 import persistence.sql.ddl.query.DropQuery;
 import persistence.sql.ddl.query.builder.CreateQueryBuilder;
