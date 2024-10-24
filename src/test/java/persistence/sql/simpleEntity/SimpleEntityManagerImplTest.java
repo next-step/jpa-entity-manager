@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.sql.simpleEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.domain.Person;
-import persistence.sql.simpleEntity.SimpleEntityManager;
-import persistence.sql.simpleEntity.SimpleEntityManagerImpl;
 import persistence.sql.ddl.PersistentEntity;
 
 class SimpleEntityManagerImplTest {
