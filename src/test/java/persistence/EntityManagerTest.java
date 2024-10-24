@@ -59,7 +59,7 @@ class EntityManagerTest {
         Person person = createPerson(1);
         this.entityManager.persist(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityInfo<>(person.getId(), person.getClass())))
+        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
     }
@@ -71,7 +71,7 @@ class EntityManagerTest {
         this.entityManager.persist(person);
         this.entityManager.remove(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityInfo<>(person.getId(), person.getClass()))).isNull();
+        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass()))).isNull();
     }
 
     @DisplayName("update 실행하면 영속성컨텍스트 데이터도 수정된다.")
@@ -83,7 +83,7 @@ class EntityManagerTest {
         person.changeEmail("changed@test.com");
         this.entityManager.merge(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityInfo<>(person.getId(), person.getClass())))
+        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "changed@test.com");
     }

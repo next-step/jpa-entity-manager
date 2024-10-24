@@ -23,13 +23,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        EntityInfo<T> entityObject = new EntityInfo<>(id, clazz);
+        EntityKey<T> entityObject = new EntityKey<>(id, clazz);
         Object persistObject = this.persistenceContext.findEntity(entityObject);
         if (persistObject != null) {
             return clazz.cast(persistObject);
         }
         T findObject = this.entityLoader.find(clazz, id);
-        this.persistenceContext.insertEntity(new EntityInfo<>(id, findObject.getClass()), findObject);
+        this.persistenceContext.insertEntity(new EntityKey<>(id, findObject.getClass()), findObject);
         return findObject;
     }
 
@@ -37,20 +37,20 @@ public class EntityManagerImpl implements EntityManager {
     public void persist(Object entityInstance) {
         this.entityPersister.persist(entityInstance);
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.insertEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
     public void merge(Object entityInstance) {
         this.entityPersister.merge(entityInstance);
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.insertEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
     public void remove(Object entityInstance) {
         this.entityPersister.remove(entityInstance);
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.persistenceContext.deleteEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()));
+        this.persistenceContext.deleteEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()));
     }
 }
