@@ -8,4 +8,6 @@ public interface PersistenceContext {
 
     void remove(EntityInfo<?> entityInfo);
 
+    boolean contain(EntityInfo<?> entityInfo);
+
 }

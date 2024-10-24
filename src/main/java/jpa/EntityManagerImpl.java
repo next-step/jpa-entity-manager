@@ -1,24 +1,26 @@
 package jpa;
 
-import jdbc.JdbcTemplate;
-import persistence.sql.dml.DeleteQuery;
-import persistence.sql.dml.InsertQuery;
-import persistence.sql.dml.SelectQuery;
-import persistence.sql.dml.UpdateQuery;
-import persistence.sql.entity.EntityRowMapper;
-
-import java.util.Objects;
-
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
+    private final PersistenceContext persistenceContext;
+    private final EntityLoader entityLoader;
 
-    public EntityManagerImpl(EntityPersister entityPersister) {
+    public EntityManagerImpl(EntityPersister entityPersister, EntityLoader entityLoader) {
         this.entityPersister = entityPersister;
+        this.entityLoader = entityLoader;
+        this.persistenceContext = new PersistenceContextImpl();
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return entityPersister.find(clazz, id);
+        EntityInfo<?> entityInfo = new EntityInfo<>(clazz, id);
+        if (persistenceContext.contain(entityInfo)) {
+            return clazz.cast(persistenceContext.get(entityInfo));
+        }
+
+        T entity = entityLoader.find(clazz, id);
+        persistenceContext.add(new EntityInfo<>(entity.getClass(), id), entity);
+        return entity;
     }
 
     @Override

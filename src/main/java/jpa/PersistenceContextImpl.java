@@ -29,4 +29,9 @@ public class PersistenceContextImpl implements PersistenceContext {
         entityMap.remove(entityInfo);
     }
 
+    @Override
+    public boolean contain(EntityInfo<?> entityInfo) {
+        return entityMap.containsKey(entityInfo);
+    }
+
 }

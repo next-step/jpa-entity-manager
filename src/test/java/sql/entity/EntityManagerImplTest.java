@@ -1,8 +1,7 @@
 package sql.entity;
 
 import jdbc.JdbcTemplate;
-import jpa.EntityPersisterImpl;
-import jpa.PersistenceContextImpl;
+import jpa.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import persistence.sql.Dialect;
@@ -10,8 +9,6 @@ import persistence.sql.H2Dialect;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.Person;
 import persistence.sql.ddl.QueryBuilder;
-import jpa.EntityManager;
-import jpa.EntityManagerImpl;
 import persistence.sql.model.EntityColumnValue;
 import sql.ddl.JdbcServerExtension;
 import sql.ddl.JdbcServerTest;
@@ -25,7 +22,9 @@ class EntityManagerImplTest {
 
     private static final Dialect dialect = new H2Dialect();
     private static final JdbcTemplate jdbcTemplate = JdbcServerExtension.getJdbcTemplate();
-    private static final EntityManager entityManager = new EntityManagerImpl(new EntityPersisterImpl(new PersistenceContextImpl(), jdbcTemplate));
+    private static final EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate);
+    private static final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+    private static final EntityManager entityManager = new EntityManagerImpl(entityPersister, entityLoader);
 
     @BeforeAll
     static void init() {
