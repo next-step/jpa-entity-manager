@@ -89,7 +89,7 @@ class EntityLoaderTest {
     void loadEntity() throws Exception {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
         PersistenceContext persistenceContext = new PersistenceContextImpl();
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, persistenceContext);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
 
         EntityLoaderTestEntity1 entity1 = new EntityLoaderTestEntity1(1L, 30);
         EntityLoaderTestEntity1 entity2 = new EntityLoaderTestEntity1(2L, 40);
@@ -109,40 +109,7 @@ class EntityLoaderTest {
                 () -> assertThat(loadedEntity1.id).isEqualTo(1L),
                 () -> assertThat(loadedEntity1.age).isEqualTo(30),
                 () -> assertThat(loadedEntity2.id).isEqualTo(2L),
-                () -> assertThat(loadedEntity2.age).isEqualTo(40),
-
-                () -> assertThat(persistenceContext.getEntity(entityKey1)).isEqualTo(loadedEntity1),
-                () -> assertThat(persistenceContext.getEntity(entityKey2)).isEqualTo(loadedEntity2)
-        );
-    }
-
-    @Test
-    @DisplayName("이미 영속성 컨텍스트에 존재하는 엔티티를 로드할 때, 영속성 컨텍스트에 존재하는 엔티티를 반환한다.")
-    void loadEntityFromPersistenceContext() throws Exception {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-        PersistenceContext persistenceContext = new PersistenceContextImpl();
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, persistenceContext);
-
-        EntityLoaderTestEntity1 entity1 = new EntityLoaderTestEntity1(1L, 30);
-        EntityLoaderTestEntity1 entity2 = new EntityLoaderTestEntity1(2L, 40);
-
-        EntityKey entityKey1 = new EntityKey(1L, EntityLoaderTestEntity1.class);
-        EntityKey entityKey2 = new EntityKey(2L, EntityLoaderTestEntity1.class);
-
-        persistenceContext.addEntity(entityKey1, entity1);
-        persistenceContext.addEntity(entityKey2, entity2);
-
-        EntityLoaderTestEntity1 loadedEntity1 = entityLoader.loadEntity(EntityLoaderTestEntity1.class, entityKey1);
-        EntityLoaderTestEntity1 loadedEntity2 = entityLoader.loadEntity(EntityLoaderTestEntity1.class, entityKey2);
-
-        assertAll(
-                () -> assertThat(loadedEntity1.id).isEqualTo(1L),
-                () -> assertThat(loadedEntity1.age).isEqualTo(30),
-                () -> assertThat(loadedEntity2.id).isEqualTo(2L),
-                () -> assertThat(loadedEntity2.age).isEqualTo(40),
-
-                () -> assertThat(persistenceContext.getEntity(entityKey1)).isEqualTo(loadedEntity1),
-                () -> assertThat(persistenceContext.getEntity(entityKey2)).isEqualTo(loadedEntity2)
+                () -> assertThat(loadedEntity2.age).isEqualTo(40)
         );
     }
 
@@ -151,7 +118,7 @@ class EntityLoaderTest {
     void loadEntityOtherClassType() throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
         PersistenceContext persistenceContext = new PersistenceContextImpl();
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, persistenceContext);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
 
         EntityLoaderTestEntity2 entity1 = new EntityLoaderTestEntity2(1L, "John");
         EntityLoaderTestEntity2 entity2 = new EntityLoaderTestEntity2(2L, "Jane");
@@ -171,10 +138,7 @@ class EntityLoaderTest {
                 () -> assertThat(loadedEntity1.id).isEqualTo(1L),
                 () -> assertThat(loadedEntity1.name).isEqualTo("John"),
                 () -> assertThat(loadedEntity2.id).isEqualTo(2L),
-                () -> assertThat(loadedEntity2.name).isEqualTo("Jane"),
-
-                () -> assertThat(persistenceContext.getEntity(entityKey1)).isEqualTo(loadedEntity1),
-                () -> assertThat(persistenceContext.getEntity(entityKey2)).isEqualTo(loadedEntity2)
+                () -> assertThat(loadedEntity2.name).isEqualTo("Jane")
         );
     }
 }

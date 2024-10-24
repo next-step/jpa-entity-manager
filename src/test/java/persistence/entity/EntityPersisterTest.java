@@ -123,7 +123,6 @@ class EntityPersisterTest {
     void shouldExecuteUpdate() {
         QueryTestEntityWithIdentityId entity = new QueryTestEntityWithIdentityId(1L, "John", 25);
         EntityPersister persister = new EntityPersister(jdbcTemplate);
-
         persister.insert(entity);
 
         QueryTestEntityWithIdentityId updatedEntity = new QueryTestEntityWithIdentityId(1L, "Chanho", 30);
