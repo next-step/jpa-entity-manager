@@ -47,4 +47,11 @@ public class Person {
         return email;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
