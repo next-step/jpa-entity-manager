@@ -1,6 +1,6 @@
-package persistence.entity;
+package persistence.sql.simpleEntity;
 
-public interface EntityManager<T, ID> {
+public interface SimpleEntityManager<T, ID> {
 
     T findById(ID id);
 

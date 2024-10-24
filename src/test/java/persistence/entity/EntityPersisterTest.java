@@ -18,9 +18,8 @@ import org.slf4j.LoggerFactory;
 import persistence.domain.Person;
 import persistence.sql.ddl.PersistentEntity;
 
-class EntityManagerImplTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(EntityManagerImplTest.class);
+class EntityPersisterTest {
+    private static final Logger logger = LoggerFactory.getLogger(EntityPersisterTest.class);
     private static JdbcTemplate jdbcTemplate;
     private static DatabaseServer server;
 
@@ -43,62 +42,61 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("find 구현해보기 && persist 구현해보기")
-    void findTest() throws IllegalAccessException {
-        EntityManager<Person, Long> entityManager = new EntityManagerImpl<>(Person.class, jdbcTemplate);
+    @DisplayName("find 구현해보기 && insert 구현해보기")
+    void findInsertTest() throws IllegalAccessException {
+        EntityPersister<Person> entityPersister = new EntityPersister<>(Person.class, jdbcTemplate);
         Person person = Person.builder()
-            .name("John")
-            .age(20)
-            .email("John@naver.com")
-            .build();
+                .name("John")
+                .age(20)
+                .email("john@naver.com")
+                .build();
 
-        entityManager.persist(person);
-        Person personOne = entityManager.findById(1L);
+        entityPersister.insert(person);
+        Person personOne = entityPersister.findById(1L);
 
         assertAll(
             () -> assertThat(personOne.getId()).isNotNull(),
             () -> assertThat(personOne.getName()).isEqualTo("John"),
             () -> assertThat(personOne.getAge()).isEqualTo(20),
-            () -> assertThat(personOne.getEmail()).isEqualTo("John@naver.com")
+            () -> assertThat(personOne.getEmail()).isEqualTo("john@naver.com")
         );
     }
 
     @Test
-    @DisplayName("remove 구현해보기")
-    void persistTest() throws IllegalAccessException {
-        EntityManager<Person, Long> entityManager = new EntityManagerImpl<>(Person.class,
-            jdbcTemplate);
+    @DisplayName("delete 구현해보기")
+    void deleteTest() throws IllegalAccessException {
+        EntityPersister<Person> entityPersister = new EntityPersister<>(Person.class, jdbcTemplate);
         Person person = Person.builder()
             .name("John")
             .age(20)
-            .email("John@naver.com")
+            .email("john@naver.com")
             .build();
-        entityManager.persist(person);
-        Person personOne = entityManager.findById(1L);
-        entityManager.remove(personOne);
+        entityPersister.insert(person);
+        Person personOne = entityPersister.findById(1L);
+        entityPersister.delete(personOne);
 
-        assertThatThrownBy(() -> entityManager.findById(1L)).isInstanceOf(RuntimeException.class)
+        assertThatThrownBy(() -> entityPersister.findById(1L)).isInstanceOf(RuntimeException.class)
             .hasMessageContaining("Expected 1 result, got 0");
     }
 
     @Test
     @DisplayName("update 구현해보기")
     void updateTest() throws IllegalAccessException {
-        EntityManager<Person, Long> entityManager = new EntityManagerImpl<>(Person.class,
-            jdbcTemplate);
+        EntityPersister<Person> entityPersister = new EntityPersister<>(Person.class, jdbcTemplate);
         Person person = Person.builder()
             .name("John")
             .age(20)
             .email("john@naver.com")
             .build();
-        entityManager.persist(person);
-        Person personOne = entityManager.findById(1L);
+        entityPersister.insert(person);
+        Person personOne = entityPersister.findById(1L);
 
         personOne.setName("Jane");
-        entityManager.update(personOne);
+        entityPersister.update(personOne);
 
-        Person updatedPerson = entityManager.findById(1L);
+        Person updatedPerson = entityPersister.findById(1L);
         assertThat(updatedPerson.getName()).isEqualTo("Jane");
+
     }
 
     @AfterEach
