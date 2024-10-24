@@ -31,6 +31,12 @@ class EntityLoaderTest {
         jdbcTemplate.execute(createQueryBuilder.build());
     }
 
+    @AfterEach
+    void tearDown() {
+        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
+        jdbcTemplate.execute(dropQueryBuilder.build());
+    }
+
     @Test
     void 조회() {
         String name = "이름";
@@ -50,9 +56,5 @@ class EntityLoaderTest {
         });
     }
 
-    @AfterEach
-    void tearDown() {
-        DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
-        jdbcTemplate.execute(dropQueryBuilder.build());
-    }
+
 }
