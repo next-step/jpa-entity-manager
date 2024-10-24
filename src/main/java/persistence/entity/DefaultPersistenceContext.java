@@ -25,7 +25,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         final EntityTable entityTable = new EntityTable(entity);
         addEntity(entity, entityTable);
         addSnapshot(entity, entityTable);
-        updateStatus(entity, EntityStatus.MANAGED);
+        createOrUpdateStatus(entity, EntityStatus.MANAGED);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         final EntityTable entityTable = new EntityTable(entity);
         entityRegistry.remove(entityTable.toEntityKey());
         entitySnapshotRegistry.remove(entityTable.toEntityKey());
-        updateStatus(entity, EntityStatus.GONE);
+        createOrUpdateStatus(entity, EntityStatus.GONE);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public void addToPersistQueue(Object entity) {
         persistQueue.offer(entity);
-        updateStatus(entity, EntityStatus.SAVING);
+        createOrUpdateStatus(entity, EntityStatus.SAVING);
     }
 
     @Override
     public void addToRemoveQueue(Object entity) {
         removeQueue.offer(entity);
-        updateStatus(entity, EntityStatus.DELETED);
+        createOrUpdateStatus(entity, EntityStatus.DELETED);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         entitySnapshotRegistry.put(entityTable.toEntityKey(), snapshot);
     }
 
-    private void updateStatus(Object entity, EntityStatus entityStatus) {
+    private void createOrUpdateStatus(Object entity, EntityStatus entityStatus) {
         final EntityEntry entityEntry = entityEntryRegistry.get(entity);
         if (Objects.isNull(entityEntry)) {
             final EntityEntry entityEntry1 = new EntityEntry(entityStatus);
