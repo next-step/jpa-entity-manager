@@ -75,6 +75,21 @@ class DefaultEntityManagerTest {
     }
 
     @Test
+    @DisplayName("영속화 불가능한 상태에서 엔티티를 영속화하면 예외를 발생한다.")
+    void persist_exception() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        insertData(entity, entityManager);
+
+        // when & then
+        assertThatThrownBy(() -> entityManager.persist(entity))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(DefaultEntityManager.NOT_PERSISTABLE_STATUS_FAILED_MESSAGE);
+
+    }
+
+    @Test
     @DisplayName("엔티티를 영송성 상태에서 제거한다.")
     void removeAndFlush() {
         // given
@@ -90,6 +105,21 @@ class DefaultEntityManagerTest {
         assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Expected 1 result, got");
+    }
+
+    @Test
+    @DisplayName("제거 불가능한 상태에서 엔티티를 제거하면 예외를 발생한다.")
+    void remove_exception() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
+        entityManager.persist(entity);
+
+        // when & then
+        assertThatThrownBy(() -> entityManager.remove(entity))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(DefaultEntityManager.NOT_REMOVABLE_STATUS_FAILED_MESSAGE);
+
     }
 
     @Test

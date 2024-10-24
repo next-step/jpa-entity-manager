@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class DefaultEntityManager implements EntityManager {
+    public static final String NOT_PERSISTABLE_STATUS_FAILED_MESSAGE = "엔티티가 영속화 가능한 상태가 아닙니다.";
+    public static final String NOT_REMOVABLE_STATUS_FAILED_MESSAGE = "엔티티가 제거 가능한 상태가 아닙니다.";
+
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
@@ -48,12 +51,21 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        persistenceContext.addToPersistQueue(entity);
+        final EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        if (Objects.nonNull(entityEntry) && !entityEntry.isPersistable()) {
+            throw new IllegalStateException(NOT_PERSISTABLE_STATUS_FAILED_MESSAGE);
+        }
 
+        persistenceContext.addToPersistQueue(entity);
     }
 
     @Override
     public void remove(Object entity) {
+        final EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
+        if (!entityEntry.isRemovable()) {
+            throw new IllegalStateException(NOT_REMOVABLE_STATUS_FAILED_MESSAGE);
+        }
+
         persistenceContext.addToRemoveQueue(entity);
     }
 

@@ -75,6 +75,11 @@ public class DefaultPersistenceContext implements PersistenceContext {
         return new ArrayList<>(entityRegistry.values());
     }
 
+    @Override
+    public EntityEntry getEntityEntry(Object entity) {
+        return entityEntryRegistry.get(entity);
+    }
+
     private void addEntity(Object entity, EntityTable entityTable) {
         entityRegistry.put(entityTable.toEntityKey(), entity);
     }

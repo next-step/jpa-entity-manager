@@ -21,4 +21,6 @@ public interface PersistenceContext {
     Queue<Object> getRemoveQueue();
 
     List<Object> getAllEntity();
+
+    EntityEntry getEntityEntry(Object entity);
 }
