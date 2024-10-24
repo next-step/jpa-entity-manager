@@ -17,16 +17,9 @@ import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+public class EntityPersisterTest {
 
-/*
-- Persist로 Person 저장 후 find로 조회한다.
-- remove 실행한다.
-- update 실행한다.
-- update 실행할 시 존재하지 않은 데이터라면 예외를 발생시킨다.
-*/
-class EntityManagerTest {
-
-    private EntityManager em;
+    private EntityPersister entityPersister;
     private H2DBConnection h2DBConnection;
     private JdbcTemplate jdbcTemplate;
 
@@ -41,7 +34,7 @@ class EntityManagerTest {
 
         jdbcTemplate.execute(createQuery);
 
-        this.em = new EntityManagerImpl(new EntityPersister(new PersistenceContextImpl(), jdbcTemplate));
+        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     //정확한 테스트를 위해 메소드마다 테이블 DROP 후 DB종료
@@ -57,9 +50,9 @@ class EntityManagerTest {
     @Test
     void findTest() {
         Person person = createPerson(1);
-        this.em.persist(person);
+        this.entityPersister.persist(person);
 
-        Person findPerson = this.em.find(Person.class, person.getId());
+        Person findPerson = this.entityPersister.find(Person.class, person.getId());
 
         assertThat(findPerson)
                 .extracting("id", "name", "age", "email")
@@ -70,36 +63,36 @@ class EntityManagerTest {
     @Test
     void removeTest() {
         Person person = createPerson(1);
-        this.em.persist(person);
-        this.em.remove(person);
+        this.entityPersister.persist(person);
+        this.entityPersister.remove(person);
 
-        assertThatThrownBy(() -> this.em.find(Person.class, person.getId()))
+        assertThatThrownBy(() -> this.entityPersister.find(Person.class, person.getId()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Expected 1 result, got 0");
     }
 
-    @DisplayName("update 실행한다.")
+    @DisplayName("merge 실행한다.")
     @Test
     void updateTest() {
         Person person = createPerson(1);
-        this.em.persist(person);
+        this.entityPersister.persist(person);
 
         person.changeEmail("changed@test.com");
-        this.em.merge(person);
+        this.entityPersister.merge(person);
 
-        Person findPerson = this.em.find(Person.class, person.getId());
+        Person findPerson = this.entityPersister.find(Person.class, person.getId());
 
         assertThat(findPerson)
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "changed@test.com");
     }
 
-    @DisplayName("update 실행할 시 존재하지 않은 데이터라면 예외를 발생시킨다.")
+    @DisplayName("merge 실행할 시 존재하지 않은 데이터라면 예외를 발생시킨다.")
     @Test
     void updateThrowExceptionTest() {
         Person person = createPerson(1);
 
-        assertThatThrownBy(() -> this.em.merge(person))
+        assertThatThrownBy(() -> this.entityPersister.merge(person))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("데이터가 존재하지 않습니다. : Person");
     }
