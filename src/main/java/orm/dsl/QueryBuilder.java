@@ -58,11 +58,6 @@ public class QueryBuilder implements QueryProvider {
                 .insert(new TableEntity<>(entityClass, settings));
     }
 
-    public <E> InsertIntoStep<E> insertInto(TableEntity<E> entityClass) {
-        return new DialectStatementLocator(dialect(), queryRunner)
-                .insert(entityClass);
-    }
-
     public <E> DeleteFromStep deleteFrom(Class<E> entityClass) {
         return new DialectStatementLocator(dialect(), queryRunner)
                 .deleteFrom(new TableEntity<>(entityClass, settings));
@@ -71,11 +66,6 @@ public class QueryBuilder implements QueryProvider {
     public <E> DeleteFromStep deleteFrom(E entityClass) {
         return new DialectStatementLocator(dialect(), queryRunner)
                 .deleteFrom(new TableEntity<>(entityClass, settings));
-    }
-
-    public <E> DeleteFromStep deleteFrom(TableEntity<E> entityClass) {
-        return new DialectStatementLocator(dialect(), queryRunner)
-                .deleteFrom(entityClass);
     }
 
     public <E> UpdateStep<E> update(E entityClass) {

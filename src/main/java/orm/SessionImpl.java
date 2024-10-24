@@ -6,12 +6,9 @@ import orm.settings.JpaSettings;
 
 public class SessionImpl implements EntityManager {
 
-    private final JpaSettings settings;
-
     private final StatefulPersistenceContext persistenceContext;
 
     public SessionImpl(QueryBuilder queryBuilder) {
-        this.settings = JpaSettings.ofDefault();
         this.persistenceContext = new StatefulPersistenceContext(queryBuilder);
     }
 
