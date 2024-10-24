@@ -30,7 +30,7 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 조회한다.")
+    @DisplayName("엔티티를 로드한다.")
     void find() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
@@ -52,14 +52,15 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 저장한다.")
-    void persist() {
+    @DisplayName("엔티티를 영속화한다.")
+    void persistAndFlush() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
         entityManager.persist(entity);
+        entityManager.flush();
 
         // then
         final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
@@ -74,8 +75,8 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 삭제한다.")
-    void remove() {
+    @DisplayName("엔티티를 영송성 상태에서 제거한다.")
+    void removeAndFlush() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
@@ -83,6 +84,7 @@ class DefaultEntityManagerTest {
 
         // when
         entityManager.remove(entity);
+        entityManager.flush();
 
         // then
         assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
@@ -91,8 +93,8 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("더티체킹으로 엔티티를 수정한다.")
-    void update() {
+    @DisplayName("엔티티를 업데이트한다.")
+    void updateAndFlush() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
@@ -102,7 +104,7 @@ class DefaultEntityManagerTest {
         entity.setEmail("test2@email.com");
 
         // when
-        entityManager.update(entity);
+        entityManager.flush();
 
         // then
         final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
@@ -116,20 +118,6 @@ class DefaultEntityManagerTest {
         );
     }
 
-    @Test
-    @DisplayName("영속성 컨텍스트에서 관리되지 않는 엔티티로 더티체킹하면 예외를 발생한다.")
-    void update_exception() {
-        // given
-        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
-        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
-
-
-        // when & then
-        assertThatThrownBy(() -> entityManager.update(entity))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(DefaultEntityManager.NOT_PERSISTENCE_CONTEXT_ENTITY_FAILD_MESSAGE);
-    }
-
     private void createTable() {
         final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(EntityWithId.class, new H2Dialect());
         jdbcTemplate.execute(createQueryBuilder.create());
@@ -137,6 +125,7 @@ class DefaultEntityManagerTest {
 
     private void insertData(EntityWithId entity, EntityManager entityManager) {
         entityManager.persist(entity);
+        entityManager.flush();
     }
 
     private void dropTable() {

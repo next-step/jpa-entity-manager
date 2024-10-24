@@ -62,7 +62,7 @@ class DefaultPersistenceContextTest {
         final EntityStatus entityStatus = getEntityStatus(persistenceContext, entity);
         assertAll(
                 () -> assertThat(managedEntity).isNull(),
-                () -> assertThat(entityStatus).isEqualTo(EntityStatus.DELETED)
+                () -> assertThat(entityStatus).isEqualTo(EntityStatus.GONE)
         );
     }
 

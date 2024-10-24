@@ -61,6 +61,7 @@ class DefaultEntityLoaderTest {
 
     private void insertData(EntityWithId entity) {
         entityManager.persist(entity);
+        entityManager.flush();
     }
 
     private void dropTable() {

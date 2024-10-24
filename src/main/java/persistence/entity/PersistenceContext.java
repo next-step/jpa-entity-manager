@@ -1,5 +1,8 @@
 package persistence.entity;
 
+import java.util.List;
+import java.util.Queue;
+
 public interface PersistenceContext {
     void addEntity(Object entry);
 
@@ -8,4 +11,14 @@ public interface PersistenceContext {
     void removeEntity(Object entity);
 
     <T> T getSnapshot(Class<T> entityType, Object id);
+
+    void addToPersistQueue(Object entity);
+
+    void addToRemoveQueue(Object entity);
+
+    Queue<Object> getPersistQueue();
+
+    Queue<Object> getRemoveQueue();
+
+    List<Object> getAllEntity();
 }
