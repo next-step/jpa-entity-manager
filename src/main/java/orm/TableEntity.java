@@ -77,6 +77,10 @@ public class TableEntity<E> {
         return id;
     }
 
+    public Object getIdValue() {
+        return id.getFieldValue();
+    }
+
     public boolean hasIdValue() {
         return id.getFieldValue() != null;
     }

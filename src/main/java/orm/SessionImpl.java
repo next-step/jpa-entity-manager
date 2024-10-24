@@ -6,23 +6,20 @@ import orm.settings.JpaSettings;
 
 public class SessionImpl implements EntityManager {
 
-    private final QueryBuilder queryBuilder;
-    private final JpaSettings settings;
+    private final StatefulPersistenceContext persistenceContext;
 
     public SessionImpl(QueryBuilder queryBuilder) {
-        this.queryBuilder = queryBuilder;
-        this.settings = JpaSettings.ofDefault();
+        this.persistenceContext = new StatefulPersistenceContext(queryBuilder);
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long id) {
-        return queryBuilder.selectFrom(clazz).findById(id)
-                .fetchOne(new DefaultRowMapper<>(clazz));
+    public <T> T find(Class<T> clazz, Object id) {
+        return persistenceContext.getEntity(clazz, id);
     }
 
     /**
      * 엔티티 저장
-     *
+     * <p>
      * 엔티티메니저에서는 bulk insert가 불가능 하지만
      * QueryBuilder 를 직접 쓰면 가능함.
      *
@@ -31,19 +28,17 @@ public class SessionImpl implements EntityManager {
      */
     @Override
     public <T> T persist(T entity) {
-        return queryBuilder.insertInto(entity)
-                .value(entity)
-                .returnAsEntity();
+        return persistenceContext.addEntity(entity);
     }
 
     @Override
     public <T> T update(T entity) {
-        queryBuilder.update(entity).byId().execute();
+        persistenceContext.updateEntity(entity);
         return entity;
     }
 
     @Override
     public void remove(Object entity) {
-        queryBuilder.deleteFrom(entity).byId().execute();
+        persistenceContext.removeEntity(entity);
     }
 }
