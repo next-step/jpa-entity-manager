@@ -8,8 +8,8 @@
 - [X] 영속성 컨텍스트에 저장되어있는 Entity 객체를 제거한다.
 
 ### 2단계 - EntityLoader 구현
-- [ ] EntityLoader를 생성한다.
-- [ ] EntityPersister의 책임을 EntityLoader로 인가한다.
-- [ ] Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.
-- [ ] remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.
-- [ ] update 실행하면 영속성컨텍스트 데이터도 수정된다.
+- [X] EntityLoader를 생성한다.
+- [X] EntityPersister의 책임을 EntityLoader로 인가한다.
+- [X] Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.
+- [X] remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.
+- [X] update 실행하면 영속성컨텍스트 데이터도 수정된다.
