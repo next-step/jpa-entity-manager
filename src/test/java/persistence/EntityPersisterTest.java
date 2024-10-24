@@ -15,18 +15,14 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/*
-- Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.
-- remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.
-- update 실행하면 영속성컨텍스트 데이터도 수정된다.
-*/
-class EntityManagerTest {
+public class EntityPersisterTest {
 
-    private EntityManager entityManager;
+    private EntityLoader entityLoader;
+    private EntityPersister entityPersister;
     private H2DBConnection h2DBConnection;
     private JdbcTemplate jdbcTemplate;
-    private PersistenceContext persistenceContext;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -39,9 +35,8 @@ class EntityManagerTest {
 
         jdbcTemplate.execute(createQuery);
 
-        this.persistenceContext = new PersistenceContextImpl();
-
-        this.entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
+        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     //정확한 테스트를 위해 메소드마다 테이블 DROP 후 DB종료
@@ -53,39 +48,55 @@ class EntityManagerTest {
         this.h2DBConnection.stop();
     }
 
-    @DisplayName("Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.")
+    @DisplayName("Persist로 Person 저장한다.")
     @Test
     void findTest() {
         Person person = createPerson(1);
-        this.entityManager.persist(person);
+        this.entityPersister.persist(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
+        Person findPerson = this.entityLoader.find(Person.class, person.getId());
+
+        assertThat(findPerson)
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
     }
 
-    @DisplayName("remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.")
+    @DisplayName("remove 실행한다.")
     @Test
     void removeTest() {
         Person person = createPerson(1);
-        this.entityManager.persist(person);
-        this.entityManager.remove(person);
+        this.entityPersister.persist(person);
+        this.entityPersister.remove(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass()))).isNull();
+        assertThatThrownBy(() -> this.entityLoader.find(Person.class, person.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Expected 1 result, got 0");
     }
 
-    @DisplayName("update 실행하면 영속성컨텍스트 데이터도 수정된다.")
+    @DisplayName("merge 실행한다.")
     @Test
     void updateTest() {
         Person person = createPerson(1);
-        this.entityManager.persist(person);
+        this.entityPersister.persist(person);
 
         person.changeEmail("changed@test.com");
-        this.entityManager.merge(person);
+        this.entityPersister.merge(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
+        Person findPerson = this.entityLoader.find(Person.class, person.getId());
+
+        assertThat(findPerson)
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "changed@test.com");
+    }
+
+    @DisplayName("merge 실행할 시 존재하지 않은 데이터라면 예외를 발생시킨다.")
+    @Test
+    void updateThrowExceptionTest() {
+        Person person = createPerson(1);
+
+        assertThatThrownBy(() -> this.entityPersister.merge(person))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("데이터가 존재하지 않습니다. : Person");
     }
 
     private Person createPerson(int i) {

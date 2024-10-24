@@ -15,15 +15,18 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 
 /*
 - Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.
 - remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.
 - update 실행하면 영속성컨텍스트 데이터도 수정된다.
 */
-class EntityManagerTest {
+class EntityLoaderTest {
 
-    private EntityManager entityManager;
+    private EntityPersister entityPersister;
+    private EntityLoader entityLoader;
     private H2DBConnection h2DBConnection;
     private JdbcTemplate jdbcTemplate;
     private PersistenceContext persistenceContext;
@@ -41,7 +44,8 @@ class EntityManagerTest {
 
         this.persistenceContext = new PersistenceContextImpl();
 
-        this.entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
+        this.entityLoader = new EntityLoader(jdbcTemplate);
     }
 
     //정확한 테스트를 위해 메소드마다 테이블 DROP 후 DB종료
@@ -57,35 +61,11 @@ class EntityManagerTest {
     @Test
     void findTest() {
         Person person = createPerson(1);
-        this.entityManager.persist(person);
+        this.entityPersister.persist(person);
 
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
+        assertThat(this.entityLoader.find(Person.class, 1L))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
-    }
-
-    @DisplayName("remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.")
-    @Test
-    void removeTest() {
-        Person person = createPerson(1);
-        this.entityManager.persist(person);
-        this.entityManager.remove(person);
-
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass()))).isNull();
-    }
-
-    @DisplayName("update 실행하면 영속성컨텍스트 데이터도 수정된다.")
-    @Test
-    void updateTest() {
-        Person person = createPerson(1);
-        this.entityManager.persist(person);
-
-        person.changeEmail("changed@test.com");
-        this.entityManager.merge(person);
-
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
-                .extracting("id", "name", "age", "email")
-                .contains(1L, "test1", 29, "changed@test.com");
     }
 
     private Person createPerson(int i) {

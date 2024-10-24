@@ -2,10 +2,10 @@ package persistence;
 
 public interface PersistenceContext {
 
-    Object findEntity(EntityInfo<?> entityObject);
+    Object findEntity(EntityKey<?> entityObject);
 
-    void insertEntity(EntityInfo<?> entityObject, Object object);
+    void insertEntity(EntityKey<?> entityObject, Object object);
 
-    void deleteEntity(EntityInfo<?> entityObject);
+    void deleteEntity(EntityKey<?> entityObject);
 
 }
