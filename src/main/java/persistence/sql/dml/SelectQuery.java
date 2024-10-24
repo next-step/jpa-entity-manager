@@ -8,27 +8,37 @@ import persistence.sql.model.TableName;
 public class SelectQuery {
 
     private static final String SPACE = " ";
+    private SelectQuery() {
+    }
 
-    private final Class<?> clazz;
+    private static class SelectQueryHolder {
+        public static final SelectQuery INSTANCE = new SelectQuery();
+    }
 
-    public SelectQuery(Class<?> clazz) {
+    public static SelectQuery getInstance() {
+        return SelectQueryHolder.INSTANCE;
+    }
+
+    public String findAll(Class<?> clazz) {
         if (clazz == null) {
             throw new RequiredClassException(ExceptionMessage.REQUIRED_CLASS);
         }
-        this.clazz = clazz;
-    }
 
-    public String findAll() {
         TableName tableName = new TableName(clazz);
         EntityColumnNames entityColumnNames = new EntityColumnNames(clazz);
         return String.format("SELECT %s FROM %s", entityColumnNames.getColumnNames(), tableName.getValue());
     }
 
 
-    public String findById(Long id) {
+    public String findById(Class<?> clazz, Object id) {
+        if (clazz == null) {
+            throw new RequiredClassException(ExceptionMessage.REQUIRED_CLASS);
+        }
+
         if (id == null) {
             throw new IllegalArgumentException("id가 존재하지 않습니다.");
         }
+
         TableName tableName = new TableName(clazz);
         EntityColumnNames entityColumnNames = new EntityColumnNames(clazz);
 

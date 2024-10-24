@@ -13,21 +13,21 @@ class SelectQueryTest {
 
     @Test
     void SELECT_쿼리_조회() {
-        SelectQuery h2SelectQueryBuilder = new SelectQuery(Person.class);
-        assertThat(h2SelectQueryBuilder.findAll()).isEqualTo("SELECT id, nick_name, old, email FROM users");
+        SelectQuery selectQuery = SelectQuery.getInstance();
+        assertThat(selectQuery.findAll(Person.class)).isEqualTo("SELECT id, nick_name, old, email FROM users");
     }
 
     @Test
     void 매개변수_NULL로_예외_발생() {
-        assertThatThrownBy(() -> new SelectQuery(null))
+        assertThatThrownBy(() -> SelectQuery.getInstance().findAll(null))
                 .isInstanceOf(RequiredClassException.class)
                 .hasMessage(ExceptionMessage.REQUIRED_CLASS.getMessage());
     }
 
     @Test
     void 아이디로_조회_쿼리() {
-        SelectQuery h2SelectQueryBuilder = new SelectQuery(Person.class);
-        assertThat(h2SelectQueryBuilder.findById(1L)).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id=1");
+        SelectQuery selectQuery = SelectQuery.getInstance();
+        assertThat(selectQuery.findById(Person.class, 1L)).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id=1");
     }
 
 }

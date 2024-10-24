@@ -14,26 +14,32 @@ import java.util.stream.Collectors;
 
 public class InsertQuery {
 
-    private final Object object;
+    private InsertQuery() {
+    }
 
-    public InsertQuery(Object object) {
+    private static class InsertQueryHolder {
+        public static final InsertQuery INSTANCE = new InsertQuery();
+    }
+
+    public static InsertQuery getInstance() {
+        return InsertQueryHolder.INSTANCE;
+    }
+
+    public String makeQuery(Object object) {
         if (object == null) {
             throw new RequiredObjectException(ExceptionMessage.REQUIRED_OBJECT);
         }
-        this.object = object;
-    }
 
-    public String makeQuery() {
         TableName tableName = new TableName(object.getClass());
 
         String tableNameValue = tableName.getValue();
-        String columnClause = columnsClause(object.getClass());
+        String columnClause = columnsClause(object);
         String valueClause = valueClause(object);
         return String.format("INSERT INTO %s (%s) VALUES (%s)", tableNameValue, columnClause, valueClause);
     }
 
-    private String columnsClause(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
+    private String columnsClause(Object object) {
+        return Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(GeneratedValue.class))
                 .map(field -> new EntityColumnName(field).getValue())

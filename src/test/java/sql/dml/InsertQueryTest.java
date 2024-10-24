@@ -20,8 +20,8 @@ class InsertQueryTest {
         final String email = "email@test.com";
         Person person = new Person(name, age, email, null);
 
-        InsertQuery insertQueryBuilder = new InsertQuery(person);
-        String sql = insertQueryBuilder.makeQuery();
+        InsertQuery insertQuery = InsertQuery.getInstance();
+        String sql = insertQuery.makeQuery(person);
 
         assertThat(sql).isEqualTo("INSERT INTO users (nick_name, old, email) VALUES ('이름', 11, 'email@test.com')");
     }
@@ -29,7 +29,7 @@ class InsertQueryTest {
     @ParameterizedTest
     @NullSource
     void 매개변수_값이_Null_일때(Object object) {
-        assertThatThrownBy(() -> new InsertQuery(object))
+        assertThatThrownBy(() -> InsertQuery.getInstance().makeQuery(object))
                 .isInstanceOf(RequiredObjectException.class)
                 .hasMessage(ExceptionMessage.REQUIRED_OBJECT.getMessage());
     }
