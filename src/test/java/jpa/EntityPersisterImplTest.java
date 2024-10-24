@@ -21,7 +21,9 @@ class EntityPersisterImplTest {
 
     private static final Dialect dialect = new H2Dialect();
     private static final JdbcTemplate jdbcTemplate = JdbcServerExtension.getJdbcTemplate();
-    private static final EntityPersister entityPersister = new EntityPersisterImpl(new PersistenceContextImpl(), jdbcTemplate);
+    private static final PersistenceContext persistenceContext = new PersistenceContextImpl();
+    private static final EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+    private static final EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate);
 
     @BeforeEach
     void setUp() {
@@ -35,13 +37,13 @@ class EntityPersisterImplTest {
         Person person = new Person("테스터", 20, "test@email.com", 1);
         entityPersister.insert(person);
 
-        Person insertedPerson = entityPersister.find(Person.class, 1L);
+        Person insertedPerson = entityLoader.find(Person.class, 1L);
         String updateEmail = "test@naver.com";
         insertedPerson.setEmail(updateEmail);
         entityPersister.update(insertedPerson);
 
 
-        Person updatedPerson = entityPersister.find(Person.class, 1L);
+        Person updatedPerson = entityLoader.find(Person.class, 1L);
 
         Field emailField = updatedPerson.getClass().getDeclaredField("email");
         EntityColumnValue emailColumnValue = new EntityColumnValue(emailField, insertedPerson);
@@ -58,7 +60,7 @@ class EntityPersisterImplTest {
         Person person = new Person(name, age, email, index);
         entityPersister.insert(person);
 
-        Person savedPerson = entityPersister.find(Person.class, 1L);
+        Person savedPerson = entityLoader.find(Person.class, 1L);
         Field nameField = savedPerson.getClass().getDeclaredField("name");
 
         EntityColumnValue entityColumnValue = new EntityColumnValue(nameField, savedPerson);

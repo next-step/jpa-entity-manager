@@ -18,7 +18,6 @@ public class EntityRowMapper<T> implements RowMapper<T> {
         this.clazz = clazz;
     }
 
-
     @Override
     public T mapRow(ResultSet resultSet) {
         try {

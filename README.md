@@ -10,3 +10,6 @@ Step1
     - [x] 2-2 : Update 기능
     - [x] 2-3 : Insert 기능
     - [x] 2-4 : Delete 기능
+step2
+ - [x] 1 : DataLoader 구현
+ - [x] 2 : EntityManager, Persistence Context 책임 전가

@@ -1,7 +1,6 @@
 package jpa;
 
 public interface EntityPersister {
-    <T> T find(Class<T> clazz, Object id);
 
     void update(Object entity);
 
