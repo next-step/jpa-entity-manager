@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 - drop쿼리를 생성한다.
 - drop쿼리를 생성할시 @Entity가 없다면 예외를 발생시킨다.
 */
-public class H2DDLBuilderTest {
+class H2DDLBuilderTest {
 
     @DisplayName("create 쿼리 생성시 Entity어노테이션이 존재하지 않으면 예외를 발생시킨다.")
     @Test

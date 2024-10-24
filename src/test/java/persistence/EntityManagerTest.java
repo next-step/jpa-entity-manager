@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 - update 실행한다.
 - update 실행할 시 존재하지 않은 데이터라면 예외를 발생시킨다.
 */
-public class EntityManagerTest {
+class EntityManagerTest {
 
     private EntityManager em;
     private H2DBConnection h2DBConnection;
@@ -41,7 +41,7 @@ public class EntityManagerTest {
 
         jdbcTemplate.execute(createQuery);
 
-        this.em = new EntityManagerImpl(jdbcTemplate);
+        this.em = new EntityManagerImpl(new EntityPersister(new PersistenceContextImpl(), jdbcTemplate));
     }
 
     //정확한 테스트를 위해 메소드마다 테이블 DROP 후 DB종료
@@ -85,7 +85,7 @@ public class EntityManagerTest {
         this.em.persist(person);
 
         person.changeEmail("changed@test.com");
-        this.em.update(person);
+        this.em.merge(person);
 
         Person findPerson = this.em.find(Person.class, person.getId());
 
@@ -99,7 +99,7 @@ public class EntityManagerTest {
     void updateThrowExceptionTest() {
         Person person = createPerson(1);
 
-        assertThatThrownBy(() -> this.em.update(person))
+        assertThatThrownBy(() -> this.em.merge(person))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("데이터가 존재하지 않습니다. : Person");
     }
