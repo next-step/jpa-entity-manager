@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class EntityEntry {
     private Status status;
-    private final Serializable id;
+    private Serializable id;
     private final PersistenceContext persistenceContext;
 
     private EntityEntry(Status status, Serializable id, PersistenceContext persistenceContext) {
@@ -58,7 +58,17 @@ public class EntityEntry {
         throw new IllegalArgumentException("Invalid status transition from: " + this.status + " to: " + status);
     }
 
-    public boolean hasDirtyColumns(EntitySnapshot entitySnapshot, Object managedEntity) {
+    public boolean hasDirtyColumns(EntityKey entityKey) {
+        final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey);
+        final Object managedEntity = persistenceContext.getEntity(entityKey);
         return entitySnapshot.hasDirtyColumns(entitySnapshot, managedEntity);
+    }
+
+    public Object getEntity(EntityKey entityKey) {
+        return persistenceContext.getEntity(entityKey);
+    }
+
+    public Serializable getId() {
+        return id;
     }
 }

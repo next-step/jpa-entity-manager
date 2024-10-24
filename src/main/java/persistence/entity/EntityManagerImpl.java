@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;
-    private final Map<Class<?>, EntityEntry> entityEntries;
+    private final Map<EntityKey, EntityEntry> entityEntries;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate,
                              PersistenceContext persistenceContext) {
@@ -23,10 +24,10 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Object id) {
         final EntityKey entityKey = new EntityKey((Long) id, clazz);
-        final EntityEntry entityEntry = createEntry(entityKey);
+        final EntityEntry entityEntry = getEntityEntry(entityKey);
 
         if (entityEntry.isManaged()) {
-            return clazz.cast(persistenceContext.getEntity(entityKey));
+            return clazz.cast(entityEntry.getEntity(entityKey));
         }
 
         final T loaded = entityLoader.loadEntity(clazz, entityKey);
@@ -34,12 +35,12 @@ public class EntityManagerImpl implements EntityManager {
         entityEntry.addEntity(entityKey, loaded);
         entityEntry.addDatabaseSnapshot(entityKey, loaded);
         entityEntry.updateStatus(Status.MANAGED);
-        putEntry(loaded, entityEntry);
+        putEntry(entityKey, entityEntry);
 
         return loaded;
     }
 
-    private EntityEntry createEntry(EntityKey entityKey) {
+    private EntityEntry getEntityEntry(EntityKey entityKey) {
         final Object entity = persistenceContext.getEntity(entityKey);
         if (entity == null) {
             return EntityEntry.loading(entityKey.getId(), persistenceContext);
@@ -50,7 +51,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final EntityEntry entityEntry = createEntry(entity);
+        final EntityEntry entityEntry = getEntityEntry(entity);
         if (entityEntry.isManaged()) {
             return;
         }
@@ -59,46 +60,40 @@ public class EntityManagerImpl implements EntityManager {
             throw new IllegalArgumentException("Entity already persisted");
         }
 
-        final Object saved = entityPersister.insert(entity);
-        final EntityKey entityKey = new EntityKey(
-                entityPersister.getEntityId(saved),
-                saved.getClass()
-        );
+        entityPersister.insert(entity);
+        final EntityKey entityKey = new EntityKey(entityPersister.getEntityId(entity), entity.getClass());
 
-        entityEntry.addEntity(entityKey, saved);
-        entityEntry.addDatabaseSnapshot(entityKey, saved);
+        entityEntry.addEntity(entityKey, entity);
+        entityEntry.addDatabaseSnapshot(entityKey, entity);
         entityEntry.updateStatus(Status.MANAGED);
-        putEntry(entity, entityEntry);
+        putEntry(entityKey, entityEntry);
     }
 
-    private EntityEntry createEntry(Object entity) {
+    private EntityEntry getEntityEntry(Object entity) {
         if (!entityPersister.hasId(entity)) {
             return EntityEntry.inSaving(persistenceContext);
         }
 
-        final EntityKey entityKey = new EntityKey(entityPersister.getEntityId(entity), entity.getClass());
-        final Object managedEntity = persistenceContext.getEntity(entityKey);
+        final Serializable id = entityPersister.getEntityId(entity);
+        final EntityEntry entityEntry = entityEntries.get(new EntityKey(id, entity.getClass()));
 
-        if (managedEntity == null) {
-            return EntityEntry.deleted(entityKey.getId(), persistenceContext);
+        if (entityEntry == null) {
+            return EntityEntry.deleted(id, persistenceContext);
         }
 
-        return EntityEntry.managed(entityKey.getId(), persistenceContext);
+        return entityEntry;
     }
 
-    private void putEntry(Object entity, EntityEntry entityEntry) {
-        entityEntries.put(entity.getClass(), entityEntry);
+    private void putEntry(EntityKey entityKey, EntityEntry entityEntry) {
+        entityEntries.put(entityKey, entityEntry);
     }
 
     @Override
     public void remove(Object entity) {
-        final EntityEntry entityEntry = entityEntries.get(entity.getClass());
+        final EntityKey entityKey = new EntityKey(entityPersister.getEntityId(entity), entity.getClass());
+        final EntityEntry entityEntry = entityEntries.get(entityKey);
         checkManagedEntity(entity, entityEntry);
 
-        final EntityKey entityKey = new EntityKey(
-                entityPersister.getEntityId(entity),
-                entity.getClass()
-        );
 
         entityPersister.delete(entity);
         entityEntry.removeEntity(entityKey);
@@ -107,14 +102,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        final EntityEntry entityEntry = entityEntries.get(entity.getClass());
+        final EntityKey entityKey = new EntityKey(entityPersister.getEntityId(entity), entity.getClass());
+        final EntityEntry entityEntry = entityEntries.get(entityKey);
         checkManagedEntity(entity, entityEntry);
 
-        final EntityKey entityKey = new EntityKey(entityPersister.getEntityId(entity), entity.getClass());
-        final EntitySnapshot entitySnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
-        final Object managedEntity = persistenceContext.getEntity(entityKey);
 
-        if (entityEntry.hasDirtyColumns(entitySnapshot, managedEntity)) {
+        if (entityEntry.hasDirtyColumns(entityKey)) {
             entityPersister.update(entity);
         }
 
