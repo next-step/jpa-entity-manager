@@ -1,30 +1,32 @@
 package persistence;
 
+import jdbc.JdbcTemplate;
+
 public class EntityManagerImpl implements EntityManager {
 
-    private final EntityPersister entityPersister;
+    private final EntityLoader entityLoader;
 
-    public EntityManagerImpl(EntityPersister entityPersister) {
-        this.entityPersister = entityPersister;
+    public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
+        this.entityLoader = new EntityLoader(jdbcTemplate);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return this.entityPersister.find(clazz, id);
+        return this.entityLoader.find(clazz, id);
     }
 
     @Override
     public void persist(Object entityInstance) {
-        this.entityPersister.persist(entityInstance);
+        this.entityLoader.persist(entityInstance);
     }
 
     @Override
     public void merge(Object entityInstance) {
-        this.entityPersister.merge(entityInstance);
+        this.entityLoader.merge(entityInstance);
     }
 
     @Override
     public void remove(Object entityInstance) {
-        this.entityPersister.remove(entityInstance);
+        this.entityLoader.remove(entityInstance);
     }
 }
