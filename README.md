@@ -26,3 +26,6 @@
 ### 🚀 3단계 - Persistence Context, Dirty Check
 - [x] 요구 사항1 - 만들었던 PersistenceContext 에서 효율적인 메모리 관리를 위한 기능 구현 (1차 캐싱)
 - [x] 요구 사항2 - 더티체킹 구현
+
+### 🚀 4단계 - EntityEntry
+- [x] 요구 사항 1 - Entity 의 라이프 사이클 관리 작업 수행 시 엔터티의 상태를 추가해보자

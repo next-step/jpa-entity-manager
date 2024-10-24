@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultPersistenceContextTest {
     @Test
@@ -22,8 +23,12 @@ class DefaultPersistenceContextTest {
         persistenceContext.addEntity(entity);
 
         // then
-        final Object managedEntity = getEntityManagedEntity(persistenceContext, entity.getClass(), entity.getId());
-        assertThat(managedEntity).isEqualTo(entity);
+        final Object managedEntity = getManagedEntity(persistenceContext, entity.getClass(), entity.getId());
+        final EntityStatus entityStatus = getEntityStatus(persistenceContext, entity);
+        assertAll(
+                () -> assertThat(managedEntity).isEqualTo(entity),
+                () -> assertThat(entityStatus).isEqualTo(EntityStatus.MANAGED)
+        );
     }
 
     @Test
@@ -53,14 +58,27 @@ class DefaultPersistenceContextTest {
         persistenceContext.removeEntity(entity);
 
         // then
-        final Object managedEntity = getEntityManagedEntity(persistenceContext, entity.getClass(), entity.getId());
-        assertThat(managedEntity).isNull();
+        final Object managedEntity = getManagedEntity(persistenceContext, entity.getClass(), entity.getId());
+        final EntityStatus entityStatus = getEntityStatus(persistenceContext, entity);
+        assertAll(
+                () -> assertThat(managedEntity).isNull(),
+                () -> assertThat(entityStatus).isEqualTo(EntityStatus.GONE)
+        );
     }
 
-    private Object getEntityManagedEntity(PersistenceContext persistenceContext, Class<?> clazz, Object id) throws NoSuchFieldException, IllegalAccessException {
+    private Object getManagedEntity(PersistenceContext persistenceContext, Class<?> clazz, Object id)
+            throws NoSuchFieldException, IllegalAccessException {
         final Field field = persistenceContext.getClass().getDeclaredField("entityRegistry");
         field.setAccessible(true);
         final Map<EntityKey, Object> entityRegistry = (Map<EntityKey, Object>) field.get(persistenceContext);
         return entityRegistry.get(new EntityKey(clazz, id));
+    }
+
+    private EntityStatus getEntityStatus(PersistenceContext persistenceContext, Object entity)
+            throws NoSuchFieldException, IllegalAccessException {
+        final Field field = persistenceContext.getClass().getDeclaredField("entityEntryRegistry");
+        field.setAccessible(true);
+        final Map<Object, EntityEntry> entityEntryRegistry = (Map<Object, EntityEntry>) field.get(persistenceContext);
+        return entityEntryRegistry.get(entity).getEntityStatus();
     }
 }

@@ -9,13 +9,14 @@ import java.util.stream.Collectors;
 public class UpdateQueryBuilder {
     private static final String QUERY_TEMPLATE = "UPDATE %s SET %s WHERE %s";
 
-    public String update(EntityTable entityTable, List<EntityColumn> dirtiedEntityColumns) {
-        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(dirtiedEntityColumns),
+    public String update(Object entity, List<EntityColumn> entityColumns) {
+        final EntityTable entityTable = new EntityTable(entity);
+        return QUERY_TEMPLATE.formatted(entityTable.getTableName(), getSetClause(entityColumns),
                 entityTable.getWhereClause());
     }
 
-    private String getSetClause(List<EntityColumn> dirtiedEntityColumns) {
-        final List<String> columnDefinitions = dirtiedEntityColumns.stream()
+    private String getSetClause(List<EntityColumn> entityColumns) {
+        final List<String> columnDefinitions = entityColumns.stream()
                 .map(this::getSetClause)
                 .collect(Collectors.toList());
 

@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import database.H2ConnectionFactory;
-import jdbc.InstanceFactory;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,7 @@ import persistence.sql.dml.DeleteQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
+import persistence.sql.meta.EntityTable;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,10 +70,10 @@ class DefaultEntityPersisterTest {
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         insertData(entity);
         final EntityWithId updatedEntity = new EntityWithId(entity.getId(), "Jackson", 20, "test2@email.com");
-        final Object snapshot = new InstanceFactory<>(entity.getClass()).copy(entity);
+        final EntityTable entityTable = new EntityTable(updatedEntity);
 
         // when
-        entityPersister.update(updatedEntity, snapshot);
+        entityPersister.update(entity, entityTable.getEntityColumns());
 
         // then
         final EntityWithId managedEntity = entityLoader.load(entity.getClass(), entity.getId());
@@ -85,22 +85,6 @@ class DefaultEntityPersisterTest {
                 () -> assertThat(managedEntity.getEmail()).isEqualTo(updatedEntity.getEmail()),
                 () -> assertThat(managedEntity.getIndex()).isNull()
         );
-    }
-
-    @Test
-    @DisplayName("변경된 필드가 없는 엔티티로 엔티티를 수정하면 예외를 발생한다.")
-    void update_exception() {
-        // given
-        final EntityPersister entityPersister = new DefaultEntityPersister(jdbcTemplate, new InsertQueryBuilder(),
-                new UpdateQueryBuilder(), new DeleteQueryBuilder());
-        final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
-        insertData(entity);
-        final Object snapshot = new InstanceFactory<>(entity.getClass()).copy(entity);
-
-        // when & then
-        assertThatThrownBy(() -> entityPersister.update(entity, snapshot))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage(DefaultEntityPersister.NOT_CHANGED_MESSAGE);
     }
 
     @Test
@@ -128,6 +112,7 @@ class DefaultEntityPersisterTest {
 
     private void insertData(EntityWithId entity) {
         entityManager.persist(entity);
+        entityManager.flush();
     }
 
     private void dropTable() {
