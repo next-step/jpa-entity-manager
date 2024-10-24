@@ -13,6 +13,10 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
+    protected Connection getConnection() {
+        return this.connection;
+    }
+
     public void execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
