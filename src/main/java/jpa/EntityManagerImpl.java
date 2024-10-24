@@ -1,5 +1,7 @@
 package jpa;
 
+import persistence.sql.model.EntityId;
+
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final PersistenceContext persistenceContext;
@@ -26,16 +28,31 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Object entity) {
         entityPersister.insert(entity);
-    }
-
-    @Override
-    public void remove(Object entity) {
-        entityPersister.delete(entity);
+        addPersistenceContext(entity);
     }
 
     @Override
     public void update(Object entity) {
         entityPersister.update(entity);
+        addPersistenceContext(entity);
+    }
+
+    private void addPersistenceContext(Object entity) {
+        EntityId entityId = new EntityId(entity.getClass());
+        String idValue = entityId.getIdValue(entity);
+        persistenceContext.add(new EntityInfo<>(entity.getClass(), idValue), entity);
+    }
+
+    @Override
+    public void remove(Object entity) {
+        entityPersister.delete(entity);
+        removePersistenceContext(entity);
+    }
+
+    private void removePersistenceContext(Object entity) {
+        EntityId entityId = new EntityId(entity.getClass());
+        String idValue = entityId.getIdValue(entity);
+        persistenceContext.remove(new EntityInfo<>(entity.getClass(), idValue));
     }
 
 }
