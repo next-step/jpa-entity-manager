@@ -1,49 +1,22 @@
 package persistence;
 
 import builder.dml.DMLBuilderData;
+import builder.dml.builder.SelectByIdQueryBuilder;
+import jdbc.EntityMapper;
 import jdbc.JdbcTemplate;
 
 public class EntityLoader {
 
-    private final PersistenceContext persistenceContext;
-    private final EntityPersister entityPersister;
+    private final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
+    private final JdbcTemplate jdbcTemplate;
 
     public EntityLoader(JdbcTemplate jdbcTemplate) {
-        this.persistenceContext = new PersistenceContextImpl();
-        this.entityPersister = new EntityPersister(jdbcTemplate);
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    public EntityLoader(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate) {
-        this.persistenceContext = persistenceContext;
-        this.entityPersister = new EntityPersister(jdbcTemplate);
-    }
-
+    //데이터를 조회한다.
     public <T> T find(Class<T> clazz, Long id) {
-        EntityInfo<T> entityObject = new EntityInfo<>(id, clazz);
-        Object persistObject = this.persistenceContext.findEntity(entityObject);
-        if (persistObject != null) {
-            return clazz.cast(persistObject);
-        }
-        T findObject = this.entityPersister.find(clazz, id);
-        this.persistenceContext.insertEntity(new EntityInfo<>(id, findObject.getClass()), findObject);
-        return findObject;
+        return jdbcTemplate.queryForObject(selectByIdQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz, id)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
     }
 
-    public void persist(Object entityInstance) {
-        this.entityPersister.persist(entityInstance);
-        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
-    }
-
-    public void merge(Object entityInstance) {
-        this.entityPersister.merge(entityInstance);
-        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
-    }
-
-    public void remove(Object entityInstance) {
-        this.entityPersister.remove(entityInstance);
-        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.persistenceContext.deleteEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()));
-    }
 }

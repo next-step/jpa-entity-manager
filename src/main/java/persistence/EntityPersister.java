@@ -13,18 +13,12 @@ public class EntityPersister {
     private final static String DATA_NOT_EXIST_MESSAGE = "데이터가 존재하지 않습니다. : ";
     private final JdbcTemplate jdbcTemplate;
 
-    private final SelectByIdQueryBuilder selectByIdQueryBuilder = new SelectByIdQueryBuilder();
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
     private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder();
     private final DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-    //데이터를 조회한다.
-    public <T> T find(Class<T> clazz, Long id) {
-        return jdbcTemplate.queryForObject(selectByIdQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz, id)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
     }
 
     //데이터를 반영한다.

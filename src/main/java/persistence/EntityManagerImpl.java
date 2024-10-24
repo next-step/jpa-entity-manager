@@ -1,32 +1,56 @@
 package persistence;
 
+import builder.dml.DMLBuilderData;
 import jdbc.JdbcTemplate;
 
 public class EntityManagerImpl implements EntityManager {
 
     private final EntityLoader entityLoader;
+    private final EntityPersister entityPersister;
+    private final PersistenceContext persistenceContext;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate) {
         this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
+        this.persistenceContext = new PersistenceContextImpl();
+    }
+
+    public EntityManagerImpl(PersistenceContext persistenceContext, JdbcTemplate jdbcTemplate) {
+        this.entityLoader = new EntityLoader(jdbcTemplate);
+        this.entityPersister = new EntityPersister(jdbcTemplate);
+        this.persistenceContext = persistenceContext;
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        return this.entityLoader.find(clazz, id);
+        EntityInfo<T> entityObject = new EntityInfo<>(id, clazz);
+        Object persistObject = this.persistenceContext.findEntity(entityObject);
+        if (persistObject != null) {
+            return clazz.cast(persistObject);
+        }
+        T findObject = this.entityLoader.find(clazz, id);
+        this.persistenceContext.insertEntity(new EntityInfo<>(id, findObject.getClass()), findObject);
+        return findObject;
     }
 
     @Override
     public void persist(Object entityInstance) {
-        this.entityLoader.persist(entityInstance);
+        this.entityPersister.persist(entityInstance);
+        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
+        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
     public void merge(Object entityInstance) {
-        this.entityLoader.merge(entityInstance);
+        this.entityPersister.merge(entityInstance);
+        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
+        this.persistenceContext.insertEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
     public void remove(Object entityInstance) {
-        this.entityLoader.remove(entityInstance);
+        this.entityPersister.remove(entityInstance);
+        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
+        this.persistenceContext.deleteEntity(new EntityInfo<>(dmlBuilderData.getId(), entityInstance.getClass()));
     }
 }
