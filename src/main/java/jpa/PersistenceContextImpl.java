@@ -25,18 +25,18 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public Object get(EntityInfo<?> entityInfo) {
-        return entityMap.get(entityInfo);
+    public <T> T get(Class<T> clazz, Long id) {
+        EntityInfo<?> entityInfo = new EntityInfo<>(clazz, id);
+        Object object = entityMap.get(entityInfo);
+        if (object == null) {
+            return null;
+        }
+        return clazz.cast(object);
     }
 
     @Override
     public void remove(Object entity) {
         entityMap.remove(makeEntityInfo(entity));
-    }
-
-    @Override
-    public boolean contain(EntityInfo<?> entityInfo) {
-        return entityMap.containsKey(entityInfo);
     }
 
     @Override

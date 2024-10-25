@@ -13,9 +13,9 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        EntityInfo<?> entityInfo = new EntityInfo<>(clazz, id);
-        if (persistenceContext.contain(entityInfo)) {
-            return clazz.cast(persistenceContext.get(entityInfo));
+        T entityPersistenceContext = persistenceContext.get(clazz, id);
+        if (entityPersistenceContext != null) {
+            return entityPersistenceContext;
         }
 
         T entity = entityLoader.find(clazz, id);

@@ -4,11 +4,9 @@ public interface PersistenceContext {
 
     void add(Object entity);
 
-    Object get(EntityInfo<?> entityInfo);
+    <T> T get(Class<T> clazz, Long id);
 
     void remove(Object entity);
-
-    boolean contain(EntityInfo<?> entityInfo);
 
     void update(Object entity);
 

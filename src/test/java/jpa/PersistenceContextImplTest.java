@@ -32,8 +32,7 @@ class PersistenceContextImplTest {
         PersistenceContext persistenceContext = new PersistenceContextImpl();
         persistenceContext.add(person);
 
-        EntityInfo<Person> entityInfo = new EntityInfo<>(Person.class, id);
-        Person persistencePerson = Person.class.cast(persistenceContext.get(entityInfo));
+        Person persistencePerson = persistenceContext.get(Person.class, id);
 
         assertAll(() -> {
             assertThat(persistencePerson.getId()).isEqualTo(id);
@@ -56,7 +55,7 @@ class PersistenceContextImplTest {
 
         persistenceContext.remove(person);
 
-        assertThat(persistenceContext.contain(new EntityInfo<>(Person.class, id))).isFalse();
+        assertThat(persistenceContext.get(Person.class, id)).isNull();
     }
 
     @Test
@@ -73,7 +72,7 @@ class PersistenceContextImplTest {
         String updateEmail = "update@gmail.com";
         person.setEmail(updateEmail);
         persistenceContext.update(person);
-        Person updatedPerson = Person.class.cast(persistenceContext.get(new EntityInfo<>(Person.class, id)));
+        Person updatedPerson = persistenceContext.get(Person.class, id);
 
         assertThat(updatedPerson.getEmail()).isEqualTo(updateEmail);
     }

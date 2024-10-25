@@ -47,8 +47,6 @@ class EntityManagerImplTest {
         Field emailField = savedPerson.getClass().getDeclaredField("email");
 
         EntityColumnValue entityColumnValue = new EntityColumnValue(nameField, savedPerson);
-        EntityColumnValue ageColumnValue = new EntityColumnValue(ageField, savedPerson);
-        EntityColumnValue emailColumnValue = new EntityColumnValue(emailField, savedPerson);
 
 
         assertThat(entityColumnValue.getValue()).isEqualTo(name);
