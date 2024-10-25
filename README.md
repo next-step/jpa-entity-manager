@@ -19,4 +19,4 @@
 - [X] 영속성 컨텍스트에서 스냅샷을 가져온다.
 - [X] SnapShot에 저장된 객체와 비교하여 DirtyChecking을 한다.
 - [X] SnapShot에 저장된 객체와 비교하여 DirtyChecking을 할시, 데이터가 다른점이 없으면 예외를 발생시킨다.
-- [ ] DirtyCheck를 하여 쿼리를 생성한다.
+- [X] DirtyCheck를 하여 쿼리를 생성한다.
