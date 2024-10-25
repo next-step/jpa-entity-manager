@@ -13,6 +13,7 @@ import persistence.sql.dml.MetadataLoader;
 import persistence.sql.loader.EntityLoader;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 
 public class DefaultEntityPersister implements EntityPersister {
     private final Database database;
@@ -48,7 +49,7 @@ public class DefaultEntityPersister implements EntityPersister {
 
         UpdateQueryClauses updateQueryClauses = UpdateQueryClauses.builder(nameConverter)
                 .where(entity, loader)
-                .setColumnValues(entity, loader)
+                .setColumnValues(entity, snapshotEntity, loader)
                 .build();
 
         String mergeQuery = QueryBuilderFactory.getInstance()
@@ -69,6 +70,11 @@ public class DefaultEntityPersister implements EntityPersister {
                 deleteQueryClauses.clauseArrays());
 
         database.executeUpdate(removeQuery);
+    }
+
+    @Override
+    public Connection getConnection() {
+        return database.getConnection();
     }
 
     private void updatePrimaryKeyValue(Object entity, Object id, MetadataLoader<?> loader) {

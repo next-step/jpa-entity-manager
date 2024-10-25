@@ -8,19 +8,32 @@ import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.EntityManager;
 import persistence.sql.dml.MetadataLoader;
 import persistence.sql.loader.EntityLoader;
+import persistence.sql.transaction.Transaction;
+import persistence.sql.transaction.impl.EntityTransaction;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.util.List;
 
 public class DefaultEntityManager implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityPersister entityPersister;
     private final EntityLoaderFactory entityLoaderFactory;
+    private Transaction transaction;
+
 
     public DefaultEntityManager(PersistenceContext persistenceContext, EntityPersister entityPersister) {
         this.persistenceContext = persistenceContext;
         this.entityPersister = entityPersister;
         this.entityLoaderFactory = EntityLoaderFactory.getInstance();
+        this.transaction = new EntityTransaction(this);
+    }
+
+    @Override
+    public Transaction getTransaction() {
+        Connection connection = entityPersister.getConnection();
+        transaction.connect(connection);
+        return transaction;
     }
 
     @Override
@@ -55,7 +68,8 @@ public class DefaultEntityManager implements EntityManager {
         if (entity == null) {
             throw new IllegalArgumentException("Entity must not be null");
         }
-        MetadataLoader<?> loader = new SimpleMetadataLoader<>(entity.getClass());
+        EntityLoader<?> entityLoader = entityLoaderFactory.getLoader(entity.getClass());
+        MetadataLoader<?> loader = entityLoader.getMetadataLoader();
 
         if (isNew(entity)) {
             persist(entity);
@@ -77,9 +91,13 @@ public class DefaultEntityManager implements EntityManager {
         if (entity == null) {
             throw new IllegalArgumentException("Entity must not be null");
         }
+        EntityLoader<?> entityLoader = entityLoaderFactory.getLoader(entity.getClass());
+        MetadataLoader<?> loader = entityLoader.getMetadataLoader();
+
+        Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
         entityPersister.delete(entity);
-        persistenceContext.delete(entity);
+        persistenceContext.delete(entity, id);
     }
 
     @Override
@@ -97,7 +115,9 @@ public class DefaultEntityManager implements EntityManager {
         EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(returnType);
 
         T loadedEntity = entityLoader.load(primaryKey);
-        persistenceContext.add(primaryKey, loadedEntity);
+        if (loadedEntity != null) {
+            persistenceContext.add(primaryKey, loadedEntity);
+        }
 
         return loadedEntity;
     }
@@ -110,5 +130,12 @@ public class DefaultEntityManager implements EntityManager {
         loadedEntities.forEach(entity -> persistenceContext.add(
                 Clause.extractValue(entityLoader.getMetadataLoader().getPrimaryKeyField(), entity), entity));
         return loadedEntities;
+    }
+
+    @Override
+    public void onFlush() {
+        if (persistenceContext.isDirty()) {
+            persistenceContext.getDirtyEntities().forEach(this::merge);
+        }
     }
 }
