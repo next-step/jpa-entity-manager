@@ -2,10 +2,17 @@ package persistence.sql.dml;
 
 import jdbc.RowMapper;
 
+import java.sql.Connection;
+
 /**
  * 데이터베이스를 나타내는 인터페이스
  */
 public interface Database {
+    /**
+     * 데이터베이스와의 연결을 반환한다.
+     */
+    Connection getConnection();
+
     /**
      * INSERT, UPDATE, DELETE 등의 쿼리를 실행한다.
      *

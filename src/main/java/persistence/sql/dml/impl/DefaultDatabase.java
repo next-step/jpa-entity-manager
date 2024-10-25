@@ -17,6 +17,16 @@ public class DefaultDatabase implements Database {
     }
 
     @Override
+    public Connection getConnection() {
+        try {
+            return server.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public Object executeUpdate(String query) {
         try (Connection connection = server.getConnection();
              Statement statement = connection.createStatement()) {

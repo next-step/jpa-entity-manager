@@ -1,6 +1,6 @@
 package persistence.sql.transaction;
 
-public interface PlatformTransactionManager {
+public interface TransactionManager {
 
     void startTransaction();
 
