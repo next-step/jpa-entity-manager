@@ -3,10 +3,10 @@ package persistence.sql.dml;
 import persistence.sql.ddl.TableName;
 import persistence.sql.dml.querybuilder.QueryBuilder;
 
-public class FindQuery {
+public class FindByIdQuery {
     private final Class<?> entityClass;
 
-    public FindQuery(Class<?> entityClass) {
+    public FindByIdQuery(Class<?> entityClass) {
         this.entityClass = entityClass;
     }
 
@@ -18,10 +18,4 @@ public class FindQuery {
             .build();
     }
 
-    public String generateFindAllQuery() {
-        return new QueryBuilder()
-            .select("*")
-            .from(new TableName(entityClass).getTableName())
-            .build();
-    }
 }

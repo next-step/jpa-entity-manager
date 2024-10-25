@@ -2,24 +2,26 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
-import persistence.sql.dml.FindQuery;
+import persistence.sql.dml.FindByIdQuery;
 import jdbc.EntityLoader;
 import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.UpdateQuery;
 
 public class EntityPersister<T> {
 
-    private final Class<T> entityClass;
     private final JdbcTemplate jdbcTemplate;
+    private final FindByIdQuery findByIdQuery;
+    private final EntityLoader<T> entityLoader;
 
     public EntityPersister(Class<T> entityClass, JdbcTemplate jdbcTemplate) {
-        this.entityClass = entityClass;
         this.jdbcTemplate = jdbcTemplate;
+        this.findByIdQuery = new FindByIdQuery(entityClass);
+        this.entityLoader = new EntityLoader<>(entityClass);
     }
 
     public T findById(Object primaryKey) {
-        String sql = new FindQuery(entityClass).generateFindByIdQuery(primaryKey);
-        return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
+        String sql = findByIdQuery.generateFindByIdQuery(primaryKey);
+        return jdbcTemplate.queryForObject(sql, entityLoader);
     }
 
     public void update(Object entity) throws IllegalAccessException {

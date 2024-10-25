@@ -22,13 +22,13 @@ public class JpaRepositoryImpl<T, ID> implements JpaRepository<T, ID> {
 
     @Override
     public T findById(ID id) {
-        String sql = new FindQuery(entityClass).generateFindByIdQuery(id);
+        String sql = new FindByIdQuery(entityClass).generateFindByIdQuery(id);
         return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
     }
 
     @Override
     public List<T> findAll() {
-        String sql = new FindQuery(entityClass).generateFindAllQuery();
+        String sql = new FindAllQuery(entityClass).generateQuery();
         return jdbcTemplate.query(sql, new EntityLoader<>(entityClass));
     }
 
