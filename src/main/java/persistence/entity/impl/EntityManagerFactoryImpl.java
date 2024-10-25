@@ -4,7 +4,7 @@ package persistence.entity.impl;
 import database.DatabaseServer;
 import java.sql.SQLException;
 import persistence.entity.EntityManagerFactory;
-import persistence.entity.EntityManger;
+import persistence.entity.EntityManager;
 
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
@@ -15,7 +15,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
     }
 
     @Override
-    public EntityManger createEntityManager() throws SQLException {
+    public EntityManager createEntityManager() throws SQLException {
         return new EntityManagerImpl(databaseServer.getConnection());
     }
 

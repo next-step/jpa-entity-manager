@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.domain.Person;
 import persistence.entity.EntityManagerFactory;
-import persistence.entity.EntityManger;
+import persistence.entity.EntityManager;
 import persistence.sql.ddl.PersistentEntity;
 
 class EntityManagerImplTest {
@@ -49,7 +49,7 @@ class EntityManagerImplTest {
     @DisplayName("find 구현해보기")
     void findTest() throws SQLException, IllegalAccessException {
         EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
-        EntityManger em = entityManagerFactory.createEntityManager();
+        EntityManager em = entityManagerFactory.createEntityManager();
 
         em.getTransaction().beginTransaction();
 
@@ -76,7 +76,7 @@ class EntityManagerImplTest {
     @DisplayName("remove 구현해보기")
     void removeTest() throws SQLException, IllegalAccessException {
         EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
-        EntityManger em = entityManagerFactory.createEntityManager();
+        EntityManager em = entityManagerFactory.createEntityManager();
 
         em.getTransaction().beginTransaction();
 
@@ -101,7 +101,7 @@ class EntityManagerImplTest {
     @DisplayName("update 구현해보기")
     void updateTest() throws SQLException, IllegalAccessException {
         EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
-        EntityManger em = entityManagerFactory.createEntityManager();
+        EntityManager em = entityManagerFactory.createEntityManager();
 
         em.getTransaction().beginTransaction();
 
