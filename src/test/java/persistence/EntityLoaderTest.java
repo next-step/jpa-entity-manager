@@ -4,6 +4,7 @@ import builder.ddl.DDLBuilderData;
 import builder.ddl.builder.CreateQueryBuilder;
 import builder.ddl.builder.DropQueryBuilder;
 import builder.ddl.dataType.DB;
+import builder.dml.DMLBuilderData;
 import database.H2DBConnection;
 import entity.Person;
 import jdbc.JdbcTemplate;
@@ -61,7 +62,7 @@ class EntityLoaderTest {
     @Test
     void findTest() {
         Person person = createPerson(1);
-        this.entityPersister.persist(person);
+        this.entityPersister.persist(DMLBuilderData.createDMLBuilderData(person));
 
         assertThat(this.entityLoader.find(Person.class, 1L))
                 .extracting("id", "name", "age", "email")

@@ -4,6 +4,7 @@ import builder.ddl.DDLBuilderData;
 import builder.ddl.builder.CreateQueryBuilder;
 import builder.ddl.builder.DropQueryBuilder;
 import builder.ddl.dataType.DB;
+import builder.dml.DMLBuilderData;
 import database.H2DBConnection;
 import entity.Person;
 import jdbc.JdbcTemplate;
@@ -52,7 +53,7 @@ public class EntityPersisterTest {
     @Test
     void findTest() {
         Person person = createPerson(1);
-        this.entityPersister.persist(person);
+        this.entityPersister.persist(DMLBuilderData.createDMLBuilderData(person));
 
         Person findPerson = this.entityLoader.find(Person.class, person.getId());
 
@@ -65,8 +66,8 @@ public class EntityPersisterTest {
     @Test
     void removeTest() {
         Person person = createPerson(1);
-        this.entityPersister.persist(person);
-        this.entityPersister.remove(person);
+        this.entityPersister.persist(DMLBuilderData.createDMLBuilderData(person));
+        this.entityPersister.remove(DMLBuilderData.createDMLBuilderData(person));
 
         assertThatThrownBy(() -> this.entityLoader.find(Person.class, person.getId()))
                 .isInstanceOf(RuntimeException.class)
@@ -77,10 +78,10 @@ public class EntityPersisterTest {
     @Test
     void updateTest() {
         Person person = createPerson(1);
-        this.entityPersister.persist(person);
+        this.entityPersister.persist(DMLBuilderData.createDMLBuilderData(person));
 
         person.changeEmail("changed@test.com");
-        this.entityPersister.merge(person);
+        this.entityPersister.merge(DMLBuilderData.createDMLBuilderData(person));
 
         Person findPerson = this.entityLoader.find(Person.class, person.getId());
 
@@ -94,7 +95,7 @@ public class EntityPersisterTest {
     void updateThrowExceptionTest() {
         Person person = createPerson(1);
 
-        assertThatThrownBy(() -> this.entityPersister.merge(person))
+        assertThatThrownBy(() -> this.entityPersister.merge(DMLBuilderData.createDMLBuilderData(person)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("데이터가 존재하지 않습니다. : Person");
     }

@@ -15,11 +15,15 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
 /*
 - Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.
 - remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.
 - update 실행하면 영속성컨텍스트 데이터도 수정된다.
+- SnapShot에 저장된 객체와 비교하여 DirtyChecking을 한다.
+- SnapShot에 저장된 객체와 비교하여 DirtyChecking을 할시, 데이터가 다른점이 없으면 예외를 발생시킨다.
 */
 class EntityManagerTest {
 
@@ -58,8 +62,8 @@ class EntityManagerTest {
     void findTest() {
         Person person = createPerson(1);
         this.entityManager.persist(person);
-
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
+        Object object = this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass()));
+        assertThat(object)
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
     }
@@ -80,12 +84,45 @@ class EntityManagerTest {
         Person person = createPerson(1);
         this.entityManager.persist(person);
 
-        person.changeEmail("changed@test.com");
-        this.entityManager.merge(person);
+        Person changedPerson = person.changeEmail("changed@test.com");
+        this.entityManager.merge(changedPerson);
 
-        assertThat(this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass())))
+        Object persons = this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass()));
+
+        assertThat(persons)
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "changed@test.com");
+    }
+
+    @DisplayName("SnapShot에 저장된 객체와 비교하여 DirtyChecking을 한다.")
+    @Test
+    void checkDirtyCheck() {
+        Person person = createPerson(1);
+        EntityKey<?> entityKey = new EntityKey<>(person.getId(), Person.class);
+
+        this.persistenceContext.insertEntity(entityKey, person);
+
+        Person changedPerson = person.changeEmail("changed@test.com");
+
+        this.persistenceContext.addDatabaseSnapshot(entityKey, changedPerson);
+
+        assertThat(this.entityManager.checkDirtyCheck(person).getColumns())
+                .extracting("columnName", "columnValue")
+                .contains(tuple("email", "changed@test.com"));
+    }
+
+    @DisplayName("SnapShot에 저장된 객체와 비교하여 DirtyChecking을 할시, 데이터가 다른점이 없으면 예외를 발생시킨다.")
+    @Test
+    void checkDirtyCheckThrowException() {
+        Person person = createPerson(1);
+        EntityKey<?> entityKey = new EntityKey<>(person.getId(), Person.class);
+
+        this.persistenceContext.insertEntity(entityKey, person);
+        this.persistenceContext.addDatabaseSnapshot(entityKey, person);
+
+        assertThatThrownBy(() ->  this.entityManager.checkDirtyCheck(person))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("SnapShot과 다른점이 없습니다.");
     }
 
     private Person createPerson(int i) {
