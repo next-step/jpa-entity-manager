@@ -84,8 +84,8 @@ class EntityManagerTest {
         Person person = createPerson(1);
         this.entityManager.persist(person);
 
-        Person changedPerson = person.changeEmail("changed@test.com");
-        this.entityManager.merge(changedPerson);
+        person.changeEmail("changed@test.com");
+        this.entityManager.merge(person);
 
         Object persons = this.persistenceContext.findEntity(new EntityKey<>(person.getId(), person.getClass()));
 
@@ -102,9 +102,9 @@ class EntityManagerTest {
 
         this.persistenceContext.insertEntity(entityKey, person);
 
-        Person changedPerson = person.changeEmail("changed@test.com");
+        person.changeEmail("changed@test.com");
 
-        this.persistenceContext.addDatabaseSnapshot(entityKey, changedPerson);
+        this.persistenceContext.addDatabaseSnapshot(entityKey, person);
 
         assertThat(this.entityManager.checkDirtyCheck(person).getColumns())
                 .extracting("columnName", "columnValue")
