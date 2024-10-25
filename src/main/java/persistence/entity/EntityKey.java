@@ -7,12 +7,14 @@ public class EntityKey implements Serializable {
 
     private Long longTypeId;
     private String stringTypeId;
+    private int hashCode;
 
     public EntityKey() {}
 
     public EntityKey(Long longTypeId, String stringTypeId) {
         this.longTypeId = longTypeId;
         this.stringTypeId = stringTypeId;
+        this.hashCode = Objects.hash(longTypeId, stringTypeId);
     }
 
     // equals()와 hashCode()를 반드시 구현
@@ -26,7 +28,7 @@ public class EntityKey implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(longTypeId, stringTypeId);
+        return hashCode;
     }
 
     @Override
