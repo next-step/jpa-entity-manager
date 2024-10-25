@@ -1,7 +1,5 @@
 package jpa;
 
-import persistence.sql.model.EntityId;
-
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final PersistenceContext persistenceContext;

@@ -39,6 +39,15 @@ public class PersistenceContextImpl implements PersistenceContext {
         return entityMap.containsKey(entityInfo);
     }
 
+    @Override
+    public void update(Object entity) {
+        EntityInfo<?> entityInfo = makeEntityInfo(entity);
+        if (!entityMap.containsKey(entityInfo)) {
+            entityMap.put(entityInfo, entity);
+        }
+        entityMap.put(entityInfo, entity);
+    }
+
     private EntityInfo<?> makeEntityInfo(Object entity) {
         EntityId entityId = new EntityId(entity.getClass());
         String idValue = entityId.getIdValue(entity);

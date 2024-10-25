@@ -10,4 +10,6 @@ public interface PersistenceContext {
 
     boolean contain(EntityInfo<?> entityInfo);
 
+    void update(Object entity);
+
 }
