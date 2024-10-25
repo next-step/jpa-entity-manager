@@ -1,16 +1,15 @@
-package persistence.sql.dml;
+package jdbc;
 
 import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
-import jdbc.RowMapper;
 import persistence.sql.ddl.ColumnName;
 
-public class GenericRowMapper<T> implements RowMapper<T> {
+public class EntityLoader<T> implements RowMapper<T> {
 
     private final Class<T> type;
 
-    public GenericRowMapper(Class<T> type) {
+    public EntityLoader(Class<T> type) {
         this.type = type;
     }
 

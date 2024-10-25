@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import java.util.List;
+import jdbc.EntityLoader;
 import jdbc.JdbcTemplate;
 
 public class JpaRepositoryImpl<T, ID> implements JpaRepository<T, ID> {
@@ -22,13 +23,13 @@ public class JpaRepositoryImpl<T, ID> implements JpaRepository<T, ID> {
     @Override
     public T findById(ID id) {
         String sql = new FindQuery(entityClass).generateFindByIdQuery(id);
-        return jdbcTemplate.queryForObject(sql, new GenericRowMapper<>(entityClass));
+        return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
     }
 
     @Override
     public List<T> findAll() {
         String sql = new FindQuery(entityClass).generateFindAllQuery();
-        return jdbcTemplate.query(sql, new GenericRowMapper<>(entityClass));
+        return jdbcTemplate.query(sql, new EntityLoader<>(entityClass));
     }
 
     @Override

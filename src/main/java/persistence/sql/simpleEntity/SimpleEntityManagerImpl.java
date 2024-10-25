@@ -3,7 +3,7 @@ package persistence.sql.simpleEntity;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
 import persistence.sql.dml.FindQuery;
-import persistence.sql.dml.GenericRowMapper;
+import jdbc.EntityLoader;
 import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.UpdateQuery;
 
@@ -20,7 +20,7 @@ public class SimpleEntityManagerImpl<T, ID> implements SimpleEntityManager<T, ID
     @Override
     public T findById(ID id) {
         String sql = new FindQuery(entityClass).generateFindByIdQuery(id);
-        return jdbcTemplate.queryForObject(sql, new GenericRowMapper<>(entityClass));
+        return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
     }
 
     @Override

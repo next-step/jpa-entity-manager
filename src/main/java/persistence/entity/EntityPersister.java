@@ -3,7 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
 import persistence.sql.dml.FindQuery;
-import persistence.sql.dml.GenericRowMapper;
+import jdbc.EntityLoader;
 import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.UpdateQuery;
 
@@ -19,7 +19,7 @@ public class EntityPersister<T> {
 
     public T findById(Object primaryKey) {
         String sql = new FindQuery(entityClass).generateFindByIdQuery(primaryKey);
-        return jdbcTemplate.queryForObject(sql, new GenericRowMapper<>(entityClass));
+        return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
     }
 
     public void update(Object entity) throws IllegalAccessException {
