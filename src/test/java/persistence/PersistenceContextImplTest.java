@@ -47,7 +47,7 @@ class PersistenceContextImplTest {
     void addDatabaseSnapshotTest() {
         PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
         Person person = createPerson(1);
-        IntStream.range(1,3).forEach(i -> persistenceContext.addDatabaseSnapshot(new EntityKey<>(i, Person.class), person));
+        IntStream.range(1,3).forEach(i -> persistenceContext.insertDatabaseSnapshot(new EntityKey<>(i, Person.class), person));
 
         assertThat(persistenceContext.findEntity(new EntityKey<>(2, Person.class))).isNull();
     }
@@ -57,8 +57,8 @@ class PersistenceContextImplTest {
     void getDatabaseSnapshotTest() {
         PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
         Person person = createPerson(1);
-        persistenceContext.addDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class), person);
-        assertThat(persistenceContext.getDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class)))
+        persistenceContext.insertDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class), person);
+        assertThat(persistenceContext.findDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class)))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
     }

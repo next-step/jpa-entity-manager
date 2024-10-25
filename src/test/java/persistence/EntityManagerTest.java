@@ -104,7 +104,7 @@ class EntityManagerTest {
 
         person.changeEmail("changed@test.com");
 
-        this.persistenceContext.addDatabaseSnapshot(entityKey, person);
+        this.persistenceContext.insertDatabaseSnapshot(entityKey, person);
 
         assertThat(this.entityManager.checkDirtyCheck(person).getColumns())
                 .extracting("columnName", "columnValue")
@@ -118,7 +118,7 @@ class EntityManagerTest {
         EntityKey<?> entityKey = new EntityKey<>(person.getId(), Person.class);
 
         this.persistenceContext.insertEntity(entityKey, person);
-        this.persistenceContext.addDatabaseSnapshot(entityKey, person);
+        this.persistenceContext.insertDatabaseSnapshot(entityKey, person);
 
         assertThatThrownBy(() ->  this.entityManager.checkDirtyCheck(person))
                 .isInstanceOf(IllegalStateException.class)
