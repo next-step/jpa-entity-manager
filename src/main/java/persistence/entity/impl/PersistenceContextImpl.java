@@ -23,7 +23,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey) {
         EntityKey entityKey = new EntityKey((Long) primaryKey, entityClass.getName());
-        T entity = (T) persistedEntities.findEntity(entityKey);
+        T entity = entityClass.cast(persistedEntities.findEntity(entityKey));
 
         if (entity != null) {
             return entity;
