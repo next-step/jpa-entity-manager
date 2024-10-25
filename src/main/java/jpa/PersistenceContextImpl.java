@@ -1,5 +1,8 @@
 package jpa;
 
+import org.jetbrains.annotations.NotNull;
+import persistence.sql.model.EntityId;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,7 +15,9 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void add(EntityInfo<?> entityInfo, Object entity) {
+    public void add(Object entity) {
+        EntityInfo<?> entityInfo = makeEntityInfo(entity);
+
         if (entityMap.containsKey(entityInfo)) {
             return;
         }
@@ -25,8 +30,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void remove(EntityInfo<?> entityInfo) {
-        entityMap.remove(entityInfo);
+    public void remove(Object entity) {
+        entityMap.remove(makeEntityInfo(entity));
     }
 
     @Override
@@ -34,4 +39,9 @@ public class PersistenceContextImpl implements PersistenceContext {
         return entityMap.containsKey(entityInfo);
     }
 
+    private EntityInfo<?> makeEntityInfo(Object entity) {
+        EntityId entityId = new EntityId(entity.getClass());
+        String idValue = entityId.getIdValue(entity);
+        return new EntityInfo<>(entity.getClass(), idValue);
+    }
 }

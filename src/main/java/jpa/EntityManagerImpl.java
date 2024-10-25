@@ -21,38 +21,28 @@ public class EntityManagerImpl implements EntityManager {
         }
 
         T entity = entityLoader.find(clazz, id);
-        persistenceContext.add(new EntityInfo<>(entity.getClass(), id), entity);
+        persistenceContext.add(entity);
         return entity;
     }
 
     @Override
     public void persist(Object entity) {
         entityPersister.insert(entity);
-        addPersistenceContext(entity);
+        persistenceContext.add(entity);
     }
 
     @Override
     public void update(Object entity) {
         entityPersister.update(entity);
-        addPersistenceContext(entity);
+        persistenceContext.add(entity);
     }
 
-    private void addPersistenceContext(Object entity) {
-        EntityId entityId = new EntityId(entity.getClass());
-        String idValue = entityId.getIdValue(entity);
-        persistenceContext.add(new EntityInfo<>(entity.getClass(), idValue), entity);
-    }
 
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
-        removePersistenceContext(entity);
+        persistenceContext.remove(entity);
     }
 
-    private void removePersistenceContext(Object entity) {
-        EntityId entityId = new EntityId(entity.getClass());
-        String idValue = entityId.getIdValue(entity);
-        persistenceContext.remove(new EntityInfo<>(entity.getClass(), idValue));
-    }
 
 }

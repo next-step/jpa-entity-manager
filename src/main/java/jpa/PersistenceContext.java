@@ -2,11 +2,11 @@ package jpa;
 
 public interface PersistenceContext {
 
-    void add(EntityInfo<?> entityInfo, Object entity);
+    void add(Object entity);
 
     Object get(EntityInfo<?> entityInfo);
 
-    void remove(EntityInfo<?> entityInfo);
+    void remove(Object entity);
 
     boolean contain(EntityInfo<?> entityInfo);
 
