@@ -1,14 +1,15 @@
 package persistence.entity.impl;
 
 import java.sql.Connection;
+import jdbc.JdbcTemplate;
 import jdbc.TransactionalJdbcTemplate;
-import persistence.entity.EntityManger;
+import persistence.entity.EntityManager;
 import persistence.entity.PersistenceContext;
 
-public class EntityManagerImpl implements EntityManger {
+public class EntityManagerImpl implements EntityManager {
 
     private final PersistenceContext persistenceContext;
-    private final TransactionalJdbcTemplate transactionalJdbcTemplate;
+    private final JdbcTemplate transactionalJdbcTemplate;
 
     public EntityManagerImpl(Connection connection) {
         this.transactionalJdbcTemplate = new TransactionalJdbcTemplate(connection);
@@ -41,12 +42,8 @@ public class EntityManagerImpl implements EntityManger {
     }
 
     @Override
-    public void detach(Object entity) {
-    }
-
-    @Override
     public TransactionalJdbcTemplate getTransaction() {
-        return this.transactionalJdbcTemplate;
+        return (TransactionalJdbcTemplate) this.transactionalJdbcTemplate;
     }
 
 }
