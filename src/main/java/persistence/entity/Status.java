@@ -6,7 +6,7 @@ public enum Status {
     MANAGED {
         @Override
         Set<Status> getValidStatusTransitions() {
-            return Set.of(DELETED, GONE);
+            return Set.of(MANAGED, DELETED, GONE);
         }
     },
     READ_ONLY {

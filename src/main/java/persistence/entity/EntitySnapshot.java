@@ -24,12 +24,12 @@ public class EntitySnapshot {
         return column.hasValue(entity) ? column.getValueAsString(entity) : null;
     }
 
-    public boolean hasDirtyColumns(EntitySnapshot entitySnapshot, Object managedEntity) {
+    public boolean hasDirtyColumns(Object managedEntity) {
         final List<? extends Queryable> columns = tableDefinition.withoutIdColumns();
         return columns.stream()
                 .anyMatch(column -> {
                             final Object entityValue = getNullableValue(managedEntity, column);
-                            final Object snapshotValue = entitySnapshot.columnSnapshots.get(column.getColumnName());
+                            final Object snapshotValue = this.columnSnapshots.get(column.getColumnName());
                             return !Objects.equals(entityValue, snapshotValue);
                         }
                 );

@@ -12,7 +12,7 @@ class EntityEntryTest {
     @Test
     @DisplayName("Saving -> Managed")
     void updateStatus1() {
-        EntityEntry entityEntry = EntityEntry.inSaving(null);
+        EntityEntry entityEntry = EntityEntry.inSaving();
 
         entityEntry.updateStatus(Status.MANAGED);
 
@@ -25,7 +25,7 @@ class EntityEntryTest {
     @Test
     @DisplayName("Loading -> Managed")
     void updateStatus2() {
-        EntityEntry entityEntry = EntityEntry.loading(1, null);
+        EntityEntry entityEntry = EntityEntry.loading(1);
 
         entityEntry.updateStatus(Status.MANAGED);
 
@@ -35,7 +35,7 @@ class EntityEntryTest {
     @Test
     @DisplayName("Managed -> Loading")
     void updateStatus3() {
-        EntityEntry entityEntry = EntityEntry.managed(1, null);
+        EntityEntry entityEntry = EntityEntry.managed(1);
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> entityEntry.updateStatus(Status.LOADING));
         assertThat(e).hasMessage("Invalid status transition from: MANAGED to: LOADING");
@@ -44,7 +44,7 @@ class EntityEntryTest {
     @Test
     @DisplayName("Managed -> Deleted")
     void updateStatus4() {
-        EntityEntry entityEntry = EntityEntry.managed(1, null);
+        EntityEntry entityEntry = EntityEntry.managed(1);
 
         entityEntry.updateStatus(Status.DELETED);
         assertThat(entityEntry.isManaged()).isFalse();

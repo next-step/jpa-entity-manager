@@ -92,7 +92,7 @@ public class EntityManagerTest {
         EntityManagerTestEntityWithIdentityId entity = new EntityManagerTestEntityWithIdentityId(1L, "john_doe", 30);
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> entityManager.persist(entity));
-        assertThat(e.getMessage()).isEqualTo("Entity already persisted");
+        assertThat(e.getMessage()).isEqualTo("No Entity Entry with id: 1");
     }
 
     @Test
@@ -159,6 +159,6 @@ public class EntityManagerTest {
                 RuntimeException.class,
                 () -> entityManager.find(EntityManagerTestEntityWithIdentityId.class, 1L)
         );
-        assertThat(e.getMessage()).isEqualTo("Expected 1 result, got 0");
+        assertThat(e.getMessage()).isEqualTo("Entity is not managed: EntityManagerTestEntityWithIdentityId");
     }
 }

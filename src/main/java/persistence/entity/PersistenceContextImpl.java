@@ -7,10 +7,16 @@ import java.util.Map;
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> managedEntities = new HashMap<>();
     private final Map<EntityKey, EntitySnapshot> entitySnapshots = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityEntries = new HashMap<>();
 
     @Override
     public Object getEntity(EntityKey entityKey) {
         return managedEntities.get(entityKey);
+    }
+
+    @Override
+    public EntityEntry getEntityEntry(EntityKey entityKey) {
+        return entityEntries.get(entityKey);
     }
 
     @Override
@@ -39,6 +45,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     public boolean isEntityAbsent(Object entity, Object id) {
         final EntityKey entityKey = new EntityKey((Serializable) id, entity.getClass());
         return !managedEntities.containsKey(entityKey);
+    }
+
+    @Override
+    public void addEntry(EntityKey entityKey, EntityEntry entityEntry) {
+        entityEntries.put(entityKey, entityEntry);
     }
 
 }
