@@ -5,9 +5,9 @@ import java.util.Objects;
 public class EntityInfo<T> {
 
     private final Class<T> clazz;
-    private final Object id;
+    private final Long id;
 
-    public EntityInfo(Class<T> clazz, Object id) {
+    public EntityInfo(Class<T> clazz, Long id) {
         this.clazz = clazz;
         this.id = id;
     }
@@ -18,7 +18,7 @@ public class EntityInfo<T> {
             return true;
         }
 
-        if (obj instanceof EntityInfo) {
+        if (!(obj instanceof EntityInfo)) {
             return false;
         }
 
