@@ -2,7 +2,7 @@ package persistence.entity;
 
 import jdbc.TransactionalJdbcTemplate;
 
-public interface EntityManger {
+public interface EntityManager {
 
     <T> T find(Class<T> entityClass, Object primaryKey);
 
@@ -13,8 +13,6 @@ public interface EntityManger {
     void update(Object entity) throws IllegalAccessException;
 
     void flush() throws IllegalAccessException;
-
-    void detach(Object entity);
 
     TransactionalJdbcTemplate getTransaction();
 
