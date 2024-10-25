@@ -2,7 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
-import persistence.sql.dml.FindByIdQuery;
+import persistence.sql.dml.FindQuery;
 import persistence.sql.dml.GenericRowMapper;
 import persistence.sql.dml.InsertQuery;
 import persistence.sql.dml.UpdateQuery;
@@ -18,7 +18,7 @@ public class EntityPersister<T> {
     }
 
     public T findById(Object primaryKey) {
-        String sql = new FindByIdQuery<>(entityClass, primaryKey).generateQuery();
+        String sql = new FindQuery(entityClass).generateFindByIdQuery(primaryKey);
         return jdbcTemplate.queryForObject(sql, new GenericRowMapper<>(entityClass));
     }
 
