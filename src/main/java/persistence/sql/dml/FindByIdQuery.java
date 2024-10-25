@@ -12,7 +12,7 @@ public class FindByIdQuery implements SqlQuery {
         this.entityClass = entityClass;
     }
 
-    public String generateFindByIdQuery(Object id) {
+    public String generateQuery(Object id) {
         return new QueryBuilder()
             .select("*")
             .from(new TableName(entityClass).getTableName())

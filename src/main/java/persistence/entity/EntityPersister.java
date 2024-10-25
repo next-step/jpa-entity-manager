@@ -30,7 +30,7 @@ public class EntityPersister<T> {
 
     public T findById(Object primaryKey) {
         FindByIdQuery findByIdQuery = sqlQueries.getSqlQuery(FIND_BY_ID);
-        String sql = findByIdQuery.generateFindByIdQuery(primaryKey);
+        String sql = findByIdQuery.generateQuery(primaryKey);
         return jdbcTemplate.queryForObject(sql, entityLoader);
     }
 

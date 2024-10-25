@@ -27,7 +27,7 @@ public class SimpleEntityManagerImpl<T, ID> implements SimpleEntityManager<T, ID
 
     @Override
     public T findById(ID id) {
-        String sql = findByIdQuery.generateFindByIdQuery(id);
+        String sql = findByIdQuery.generateQuery(id);
         return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
     }
 

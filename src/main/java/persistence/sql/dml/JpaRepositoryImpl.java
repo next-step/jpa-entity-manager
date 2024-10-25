@@ -36,7 +36,7 @@ public class JpaRepositoryImpl<T, ID> implements JpaRepository<T, ID> {
 
     @Override
     public T findById(ID id) {
-        String sql = findByIdQuery.generateFindByIdQuery(id);
+        String sql = findByIdQuery.generateQuery(id);
         return jdbcTemplate.queryForObject(sql, entityLoader);
     }
 
