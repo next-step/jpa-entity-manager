@@ -12,7 +12,11 @@ public interface PersistenceContext {
 
     <T, ID> T getDatabaseSnapshot(ID id, T entity);
 
+    <T, ID> void createDatabaseSnapshot(ID id, T entity);
+
     boolean isDirty();
 
     List<Object> getDirtyEntities();
+
+    void cleanup();
 }

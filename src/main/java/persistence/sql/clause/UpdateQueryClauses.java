@@ -44,18 +44,12 @@ public record UpdateQueryClauses(List<Clause> clauses) {
         }
 
         public Builder where(Object entity, MetadataLoader<?> loader) {
-            WhereConditionalClause.builder()
+            WhereConditionalClause whereClause = WhereConditionalClause.builder()
                     .column(loader.getColumnName(loader.getPrimaryKeyField(), nameConverter))
                     .eq(Clause.toColumnValue(Clause.extractValue(loader.getPrimaryKeyField(), entity)));
-            return this;
-        }
 
-        public Builder setColumnValues(Object entity, MetadataLoader<?> loader) {
-            List<Field> fields = loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class));
+            clauses.add(whereClause);
 
-            for (Field field : fields) {
-                clauses.add(SetValueClause.newInstance(field, entity, loader.getColumnName(field, nameConverter)));
-            }
             return this;
         }
 

@@ -11,6 +11,7 @@ import java.sql.Statement;
 
 public class DefaultDatabase implements Database {
     private final DatabaseServer server;
+    private Connection connection;
 
     public DefaultDatabase(DatabaseServer dataSource) {
         this.server = dataSource;
@@ -19,7 +20,12 @@ public class DefaultDatabase implements Database {
     @Override
     public Connection getConnection() {
         try {
-            return server.getConnection();
+
+            if(connection == null || connection.isClosed()) {
+                connection = server.getConnection();
+            }
+
+            return connection;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -28,9 +34,8 @@ public class DefaultDatabase implements Database {
 
     @Override
     public Object executeUpdate(String query) {
-        try (Connection connection = server.getConnection();
-             Statement statement = connection.createStatement()) {
-
+        try {
+            Statement statement = getConnection().createStatement();
             statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -43,18 +48,34 @@ public class DefaultDatabase implements Database {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to execute update: " + query, e);
+        } finally {
+            closeConsiderConnection();
         }
     }
 
     @Override
     public <T> T executeQuery(String query, RowMapper<T> rowMapper) {
-        try (Connection connection = server.getConnection()) {
-            ResultSet resultSet = connection.createStatement().executeQuery(query);
+        try {
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
 
             return rowMapper.mapRow(resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to execute query: " + query, e);
+        } finally {
+            closeConsiderConnection();
+        }
+    }
+
+    private void closeConsiderConnection() {
+        try {
+            if (connection != null && connection.getAutoCommit()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

@@ -36,7 +36,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
         KeyHolder key = new KeyHolder(entity.getClass(), id);
 
         context.put(key, entity);
-        createSnapshot(key, entity);
     }
 
     @Override
@@ -60,11 +59,13 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public boolean isDirty() {
-        if (snapshot.isEmpty()) {
-            return false;
-        }
+    public <T, ID> void createDatabaseSnapshot(ID id, T entity) {
+        KeyHolder key = new KeyHolder(entity.getClass(), id);
+        createSnapshot(key, entity);
+    }
 
+    @Override
+    public boolean isDirty() {
         return context.entrySet().stream()
                 .anyMatch(dirtyFilteringPredicate());
     }
@@ -84,7 +85,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
             Object entity = entry.getValue();
             Object snapshotEntity = snapshot.get(key);
 
-            return entity != null && snapshotEntity != null && isDirty(entity, snapshotEntity);
+            return snapshotEntity == null || isDirty(entity, snapshotEntity);
         };
     }
 
@@ -108,6 +109,12 @@ public class DefaultPersistenceContext implements PersistenceContext {
         });
 
         return !fields.isEmpty();
+    }
+
+    @Override
+    public void cleanup() {
+        context.clear();
+        snapshot.clear();
     }
 
     private <T> void overwriteEntity(T entity, Object origin) {

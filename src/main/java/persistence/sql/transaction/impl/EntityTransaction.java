@@ -77,7 +77,9 @@ public class EntityTransaction implements Transaction {
     @Override
     public void cleanup() {
         try {
-            connection.setAutoCommit(true);
+            if (connection != null && !connection.isClosed()) {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -161,4 +161,22 @@ class DefaultEntityManagerTest extends TestEntityInitialize {
         persons = entityManager.findAll(TestPerson.class);
         assertThat(persons).isEmpty();
     }
+
+    @Test
+    @DisplayName("transaction 상태를 on으로 바꾼 경우 dirty checking이 활성화된다.")
+    void testDirtyChecking() {
+        // given
+        TestPerson person = new TestPerson("catsbi", 55, "casbi@naver.com", 123);
+        entityManager.persist(person);
+
+        // when
+        entityManager.getTransaction().begin();
+        TestPerson foundPerson = entityManager.find(TestPerson.class, 1L);
+        foundPerson.setName("newCatsbi");
+        entityManager.getTransaction().commit();
+
+        //given
+        TestPerson loadedEntity = entityManager.find(TestPerson.class, 1L);
+        assertThat(loadedEntity.getName()).isEqualTo("newCatsbi");
+    }
 }

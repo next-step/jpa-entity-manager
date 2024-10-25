@@ -48,6 +48,9 @@ public class DefaultEntityManager implements EntityManager {
 
         Object id = entityPersister.insert(entity);
         persistenceContext.add(id, entity);
+        if (!transaction.isActive()) {
+            persistenceContext.createDatabaseSnapshot(id, entity);
+        }
     }
 
     private boolean isNew(Object entity) {
@@ -117,6 +120,7 @@ public class DefaultEntityManager implements EntityManager {
         T loadedEntity = entityLoader.load(primaryKey);
         if (loadedEntity != null) {
             persistenceContext.add(primaryKey, loadedEntity);
+            persistenceContext.createDatabaseSnapshot(primaryKey, loadedEntity);
         }
 
         return loadedEntity;
@@ -137,5 +141,6 @@ public class DefaultEntityManager implements EntityManager {
         if (persistenceContext.isDirty()) {
             persistenceContext.getDirtyEntities().forEach(this::merge);
         }
+        persistenceContext.cleanup();
     }
 }
