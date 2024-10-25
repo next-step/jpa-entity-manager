@@ -1,6 +1,7 @@
 package persistence;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void insertEntity(EntityKey<?> entityKey, Object object) {
-        this.entityMap.put(entityKey, object);
+        this.entityMap.put(entityKey, deepCopy(object));
     }
 
     @Override
@@ -26,12 +27,31 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void addDatabaseSnapshot(EntityKey<?> entityKey, Object object) {
-        this.snapShotMap.put(entityKey, object);
+        this.snapShotMap.put(entityKey, deepCopy(object));
     }
 
     @Override
     public Object getDatabaseSnapshot(EntityKey<?> entityKey) {
         return this.snapShotMap.get(entityKey);
+    }
+
+    private Object deepCopy(Object original) {
+        if (original == null) return null;
+
+        try {
+            Class<?> clazz = original.getClass();
+            Object copy = clazz.getDeclaredConstructor().newInstance();
+
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+
+                Object value = field.get(original);
+                field.set(copy, value);
+            }
+            return copy;
+        } catch (Exception e) {
+            throw new RuntimeException("Deep copy failed", e);
+        }
     }
 
 }

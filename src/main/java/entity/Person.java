@@ -40,8 +40,8 @@ public class Person {
     public Person() {
     }
 
-    public Person changeEmail(String email) {
-        return new Person(this.id, this.name, this.age, email, this.index);
+    public void changeEmail(String email) {
+        this.email = email;
     }
 
     public Long getId() {

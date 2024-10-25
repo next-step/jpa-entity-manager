@@ -36,6 +36,7 @@ public class EntityManagerImpl implements EntityManager {
         }
         T findObject = this.entityLoader.find(clazz, id);
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(findObject);
+
         this.persistenceContext.insertEntity(new EntityKey<>(id, findObject.getClass()), dmlBuilderData);
         this.persistenceContext.addDatabaseSnapshot(new EntityKey<>(id, findObject.getClass()), findObject);
         return findObject;
@@ -46,6 +47,7 @@ public class EntityManagerImpl implements EntityManager {
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
         this.entityPersister.persist(dmlBuilderData);
         this.persistenceContext.insertEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.addDatabaseSnapshot(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
