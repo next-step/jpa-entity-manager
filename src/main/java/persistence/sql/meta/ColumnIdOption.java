@@ -5,9 +5,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Objects;
 
 public class ColumnIdOption {
+    private static final List<GenerationType> ID_GENERATION_FROM_DATABASE_TYPES = List.of(GenerationType.IDENTITY);
+
     private final boolean isId;
     private final GenerationType generationType;
 
@@ -58,4 +61,10 @@ public class ColumnIdOption {
     }
 
 
+    public boolean isIdGenerationFromDatabase() {
+        if (!isGenerationValue()) {
+            return false;
+        }
+        return ID_GENERATION_FROM_DATABASE_TYPES.contains(generationType);
+    }
 }

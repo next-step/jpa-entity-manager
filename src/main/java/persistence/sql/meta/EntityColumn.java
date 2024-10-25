@@ -57,10 +57,6 @@ public class EntityColumn {
         return columnValue.value();
     }
 
-    public String getValueWithQuotes() {
-        return columnValue.valueWithQuotes();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,5 +70,13 @@ public class EntityColumn {
     @Override
     public int hashCode() {
         return Objects.hash(type, columnName, columnLength, columnIdOption, columnOption, columnValue);
+    }
+
+    public String getValueWithQuotes() {
+        return columnValue.valueWithQuotes();
+    }
+
+    public boolean isIdGenerationFromDatabase() {
+        return columnIdOption.isIdGenerationFromDatabase();
     }
 }

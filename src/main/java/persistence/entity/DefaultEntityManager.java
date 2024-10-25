@@ -56,6 +56,11 @@ public class DefaultEntityManager implements EntityManager {
             throw new IllegalStateException(NOT_PERSISTABLE_STATUS_FAILED_MESSAGE);
         }
 
+        if (persistImmediately(entity)) {
+            return;
+        }
+
+        persistenceContext.addEntity(entity);
         persistenceContext.addToPersistQueue(entity);
     }
 
@@ -66,35 +71,44 @@ public class DefaultEntityManager implements EntityManager {
             throw new IllegalStateException(NOT_REMOVABLE_STATUS_FAILED_MESSAGE);
         }
 
+        persistenceContext.removeEntity(entity);
         persistenceContext.addToRemoveQueue(entity);
     }
 
     @Override
     public void flush() {
-        persist();
-        delete();
-        update();
+        persistAll();
+        deleteAll();
+        updateAll();
     }
 
-    private void persist() {
+    private boolean persistImmediately(Object entity) {
+        final EntityTable entityTable = new EntityTable(entity);
+        if (entityTable.isIdGenerationFromDatabase()) {
+            entityPersister.insert(entity);
+            persistenceContext.addEntity(entity);
+            return true;
+        }
+        return false;
+    }
+
+    private void persistAll() {
         final Queue<Object> persistQueue = persistenceContext.getPersistQueue();
         while (!persistQueue.isEmpty()) {
             final Object entity = persistQueue.poll();
             entityPersister.insert(entity);
-            persistenceContext.addEntity(entity);
         }
     }
 
-    private void delete() {
+    private void deleteAll() {
         final Queue<Object> removeQueue = persistenceContext.getRemoveQueue();
         while (!removeQueue.isEmpty()) {
             final Object entity = removeQueue.poll();
             entityPersister.delete(entity);
-            persistenceContext.removeEntity(entity);
         }
     }
 
-    private void update() {
+    private void updateAll() {
         persistenceContext.getAllEntity()
                 .forEach(this::update);
     }

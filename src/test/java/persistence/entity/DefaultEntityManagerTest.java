@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.H2Dialect;
 import persistence.fixture.EntityWithId;
+import persistence.fixture.EntityWithOnlyId;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 
@@ -53,17 +54,39 @@ class DefaultEntityManagerTest {
 
     @Test
     @DisplayName("엔티티를 영속화한다.")
-    void persistAndFlush() {
+    void persist() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
 
         // when
         entityManager.persist(entity);
-        entityManager.flush();
 
         // then
         final EntityWithId managedEntity = entityManager.find(entity.getClass(), entity.getId());
+        assertAll(
+                () -> assertThat(managedEntity).isNotNull(),
+                () -> assertThat(managedEntity.getId()).isNotNull(),
+                () -> assertThat(managedEntity.getName()).isEqualTo(entity.getName()),
+                () -> assertThat(managedEntity.getAge()).isEqualTo(entity.getAge()),
+                () -> assertThat(managedEntity.getEmail()).isEqualTo(entity.getEmail()),
+                () -> assertThat(managedEntity.getIndex()).isNotNull()
+        );
+    }
+
+    @Test
+    @DisplayName("엔티티를 영속성 컨텍스트에 등록하고 flush() 한다.")
+    void persistAndFlush() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithOnlyId entity = new EntityWithOnlyId(1L, "Jaden", 30, "test@email.com", 1);
+
+        // when
+        entityManager.persist(entity);
+        entityManager.flush();
+
+        // then
+        final EntityWithOnlyId managedEntity = entityManager.find(entity.getClass(), entity.getId());
         assertAll(
                 () -> assertThat(managedEntity).isNotNull(),
                 () -> assertThat(managedEntity.getId()).isNotNull(),
@@ -90,7 +113,7 @@ class DefaultEntityManagerTest {
     }
 
     @Test
-    @DisplayName("엔티티를 영송성 상태에서 제거한다.")
+    @DisplayName("엔티티를 영속성 상태에서 제거한다.")
     void removeAndFlush() {
         // given
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
@@ -114,6 +137,8 @@ class DefaultEntityManagerTest {
         final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
         final EntityWithId entity = new EntityWithId("Jaden", 30, "test@email.com", 1);
         entityManager.persist(entity);
+        entityManager.remove(entity);
+        entityManager.flush();
 
         // when & then
         assertThatThrownBy(() -> entityManager.remove(entity))
@@ -155,7 +180,6 @@ class DefaultEntityManagerTest {
 
     private void insertData(EntityWithId entity, EntityManager entityManager) {
         entityManager.persist(entity);
-        entityManager.flush();
     }
 
     private void dropTable() {
