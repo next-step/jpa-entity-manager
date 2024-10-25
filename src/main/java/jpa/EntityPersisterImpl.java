@@ -7,6 +7,7 @@ import persistence.sql.dml.SelectQuery;
 import persistence.sql.dml.UpdateQuery;
 import persistence.sql.entity.EntityRowMapper;
 import persistence.sql.model.EntityId;
+import persistence.sql.model.EntityIdInjector;
 
 import java.util.Objects;
 
@@ -25,9 +26,12 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public void insert(Object entity) {
+    public <T> T insert(T entity) {
         InsertQuery insertQuery = InsertQuery.getInstance();
-        jdbcTemplate.execute(insertQuery.makeQuery(entity));
+        return EntityIdInjector.getInstance().inject(
+                entity,
+                jdbcTemplate.insertAndGetId(insertQuery.makeQuery(entity))
+        );
     }
 
     @Override

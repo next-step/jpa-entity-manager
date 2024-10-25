@@ -42,15 +42,15 @@ public class JdbcTemplate {
         }
     }
 
-    public <T> T insertAndGetId(final String sql, Class<T> idType) {
+    public Object insertAndGetId(final String sql) {
         try (final PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.executeUpdate();
             try (final ResultSet resultSet = statement.getGeneratedKeys()) {
                 if (resultSet.next()) {
-                    return resultSet.getObject(1, idType);
+                    return resultSet.getObject(1);
                 }
 
-                return null;
+                return 0L;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

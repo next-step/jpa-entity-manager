@@ -48,7 +48,6 @@ class EntityManagerImplTest {
 
         EntityColumnValue entityColumnValue = new EntityColumnValue(nameField, savedPerson);
 
-
         assertThat(entityColumnValue.getValue()).isEqualTo(name);
     }
 

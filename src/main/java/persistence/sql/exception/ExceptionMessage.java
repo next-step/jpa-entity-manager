@@ -7,7 +7,9 @@ public enum ExceptionMessage {
     NOT_SUPPORT_STRATEGY_TYPE("지원하지 않는 Strategy Type 입니다."),
     REQUIRED_ID("ID는 필수입니다."),
     REQUIRED_OBJECT("오브젝트는 필수입니다."),
-    REQUIRED_DEFAULT_CONSTRUCTOR("기본 생성자가 필요합니다.");
+    REQUIRED_DEFAULT_CONSTRUCTOR("기본 생성자가 필요합니다."),
+    COULD_NOT_ACCESS_FIELD("필드에 접근할 수 없습니다.");
+
 
     String message;
 
