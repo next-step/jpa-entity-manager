@@ -17,31 +17,34 @@ public class DMLBuilderData {
     private final static String EQUALS = "=";
 
     private final String tableName;
-    private final List<DMLColumnData> columns;
+    private List<DMLColumnData> columns;
+    private String pkName;
     private Object id;
+    private Class<?> clazz;
 
     private <T> DMLBuilderData(Class<T> clazz) {
         confirmEntityAnnotation(clazz);
+        this.clazz = clazz;
         this.tableName = getTableName(clazz);
         this.columns = getEntityColumnData(clazz);
     }
 
     private DMLBuilderData(Object entityInstance) {
-        confirmEntityAnnotation(entityInstance.getClass());
-        this.tableName = getTableName(entityInstance.getClass());
+        this.clazz = entityInstance.getClass();
+        confirmEntityAnnotation(this.clazz);
+        this.tableName = getTableName(this.clazz);
         this.columns = getInstanceColumnData(entityInstance);
-        this.id = getPkValue(this.columns);
+        this.id = getPkValue();
+        this.pkName = getPkName();
     }
 
     private <T> DMLBuilderData(Class<T> clazz, Object id) {
         confirmEntityAnnotation(clazz);
+        this.clazz = clazz;
         this.tableName = getTableName(clazz);
         this.columns = getEntityColumnData(clazz);
         this.id = id;
-    }
-
-    public static <T> DMLBuilderData createDMLBuilderData(Class<T> clazz) {
-        return new DMLBuilderData(clazz);
+        this.pkName = getPkName();
     }
 
     public static DMLBuilderData createDMLBuilderData(Object entityInstance) {
@@ -56,12 +59,20 @@ public class DMLBuilderData {
         return tableName;
     }
 
+    public Object getId() {
+        return id;
+    }
+
+    public String getPkNm() {
+        return this.pkName;
+    }
+
     public List<DMLColumnData> getColumns() {
         return columns;
     }
 
-    public Object getId() {
-        return id;
+    public Class<?> getClazz() {
+        return clazz;
     }
 
     public String wrapString() {
@@ -105,6 +116,11 @@ public class DMLBuilderData {
                 .orElseThrow(() -> new RuntimeException(PK_NOT_EXIST_MESSAGE));
     }
 
+    public DMLBuilderData changeColumns(List<DMLColumnData> columns) {
+        this.columns = columns;
+        return this;
+    }
+
     //Entity Class의 컬럼명과 컬럼데이터타입을 가져온다.
     private List<DMLColumnData> getEntityColumnData(Class<?> entityClass) {
         Field[] fields = entityClass.getDeclaredFields();
@@ -118,7 +134,7 @@ public class DMLBuilderData {
 
     //Entity 인스턴스의 컬럼명과 컬럼데이터타입, 컬럼데이터를 가져온다.
     private <T> List<DMLColumnData> getInstanceColumnData(T entityInstance) {
-        Field[] fields = entityInstance.getClass().getDeclaredFields();
+        Field[] fields = this.clazz.getDeclaredFields();
         List<DMLColumnData> DMLColumnDataList = new ArrayList<>();
         for (Field field : fields) {
             getInstancePrimaryKey(DMLColumnDataList, field, entityInstance);
@@ -199,8 +215,8 @@ public class DMLBuilderData {
     }
 
     //PkValue를 가져온다.
-    private Object getPkValue(List<DMLColumnData> DMLColumnDataList) {
-        return DMLColumnDataList.stream()
+    private Object getPkValue() {
+        return this.columns.stream()
                 .filter(DMLColumnData::isPrimaryKey)
                 .findFirst()
                 .map(DMLColumnData::getColumnValue)

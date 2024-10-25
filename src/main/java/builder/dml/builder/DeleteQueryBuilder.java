@@ -16,7 +16,7 @@ public class DeleteQueryBuilder {
     //delete 쿼리문을 생성한다.
     private String deleteByIdQuery(DMLBuilderData dmlBuilderData) {
         return DELETE_BY_ID_QUERY.replace(TABLE_NAME, dmlBuilderData.getTableName())
-                .replace(ENTITY_PK_NAME, dmlBuilderData.getPkName())
+                .replace(ENTITY_PK_NAME, dmlBuilderData.getPkNm())
                 .replace(VALUES, String.valueOf(dmlBuilderData.wrapString()));
     }
 

@@ -18,7 +18,7 @@ public class SelectByIdQueryBuilder {
     private String findByIdQuery(DMLBuilderData dmlBuilderData) {
         return FIND_BY_ID_QUERY.replace(TABLE_NAME, dmlBuilderData.getTableName())
                 .replace(COLUMN_NAMES, dmlBuilderData.getColumnNames())
-                .replace(ENTITY_PK_NAME, dmlBuilderData.getPkName())
+                .replace(ENTITY_PK_NAME, dmlBuilderData.getPkNm())
                 .replace(VALUES, String.valueOf(dmlBuilderData.wrapString()));
     }
 

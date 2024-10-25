@@ -19,7 +19,7 @@ public class UpdateQueryBuilder {
         // 최종 SQL 쿼리 생성
         return UPDATE_BY_ID_QUERY.replace(TABLE_NAME, dmlBuilderData.getTableName())
                 .replace(COLUMN_DEFINITIONS, dmlBuilderData.getColumnDefinitions())
-                .replace(ENTITY_PK_NAME, dmlBuilderData.getPkName())
+                .replace(ENTITY_PK_NAME, dmlBuilderData.getPkNm())
                 .replace(VALUES, String.valueOf(dmlBuilderData.wrapString()));
     }
 }
