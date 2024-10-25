@@ -1,5 +1,8 @@
 package persistence.entity;
 
+import java.util.Collection;
+import java.util.Set;
+
 public interface PersistenceContext {
 
     <T> T find(Class<T> entityClass, Object primaryKey);
@@ -10,6 +13,8 @@ public interface PersistenceContext {
 
     void update(Object entity) throws IllegalAccessException;
 
-    void flush() throws IllegalAccessException;
+    Set<Object> getPendingEntities();
+
+    Collection<Object> getPersistedEntities();
 
 }

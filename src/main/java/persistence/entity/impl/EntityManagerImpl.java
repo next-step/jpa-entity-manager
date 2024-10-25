@@ -4,6 +4,7 @@ import java.sql.Connection;
 import jdbc.JdbcTemplate;
 import jdbc.TransactionalJdbcTemplate;
 import persistence.entity.EntityManager;
+import persistence.entity.EntityPersister;
 import persistence.entity.PersistenceContext;
 
 public class EntityManagerImpl implements EntityManager {
@@ -38,7 +39,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void flush() throws IllegalAccessException {
-        persistenceContext.flush();
+        for (Object entity : persistenceContext.getPendingEntities()) {
+            new EntityPersister<>(entity.getClass(), transactionalJdbcTemplate).insert(entity);
+        }
+        for (Object entity : persistenceContext.getPersistedEntities()) {
+            new EntityPersister<>(entity.getClass(), transactionalJdbcTemplate).update(entity);
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package persistence.entity.impl;
 
+import java.util.Collection;
+import java.util.Set;
 import jdbc.JdbcTemplate;
 import persistence.entity.EntityKey;
 import persistence.entity.EntityPersister;
@@ -56,13 +58,13 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void flush() throws IllegalAccessException {
-        for (Object entity : pendingEntities.getEntities()) {
-            new EntityPersister<>(entity.getClass(), jdbcTemplate).insert(entity);
-        }
-        for (Object entity : persistedEntities.getEntities()) {
-            new EntityPersister<>(entity.getClass(), jdbcTemplate).update(entity);
-        }
+    public Set<Object> getPendingEntities() {
+        return pendingEntities.getEntities();
+    }
+
+    @Override
+    public Collection<Object> getPersistedEntities() {
+        return persistedEntities.getEntities();
     }
 
     private EntityKey getEntityKey(Object entity) {
