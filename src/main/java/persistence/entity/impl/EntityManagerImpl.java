@@ -1,7 +1,6 @@
 package persistence.entity.impl;
 
 import java.sql.Connection;
-import jdbc.JdbcTemplate;
 import jdbc.TransactionalJdbcTemplate;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityPersister;
@@ -10,7 +9,7 @@ import persistence.entity.PersistenceContext;
 public class EntityManagerImpl implements EntityManager {
 
     private final PersistenceContext persistenceContext;
-    private final JdbcTemplate transactionalJdbcTemplate;
+    private final TransactionalJdbcTemplate transactionalJdbcTemplate;
 
     public EntityManagerImpl(Connection connection) {
         this.transactionalJdbcTemplate = new TransactionalJdbcTemplate(connection);
@@ -49,7 +48,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public TransactionalJdbcTemplate getTransaction() {
-        return (TransactionalJdbcTemplate) this.transactionalJdbcTemplate;
+        return this.transactionalJdbcTemplate;
     }
 
 }
