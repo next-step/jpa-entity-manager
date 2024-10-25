@@ -8,20 +8,12 @@ import persistence.sql.ddl.EntityTableMetadata;
 import persistence.sql.ddl.ValidateEntity;
 import persistence.sql.dml.querybuilder.QueryBuilder;
 
-public class InsertQuery<T> {
+public class InsertQuery implements SqlQuery {
 
-    private final T entity;
-    private final EntityTableMetadata entityTableMetadata;
-
-    public InsertQuery(T entity) {
+    public String generateQuery(Object entity) throws IllegalAccessException {
         new ValidateEntity(entity.getClass());
-        this.entity = entity;
-        this.entityTableMetadata = new EntityTableMetadata(entity.getClass());
-    }
-
-    public String generateQuery() throws IllegalAccessException {
-        String tableName = entityTableMetadata.getTableName();
-        String columns = getColumns(entityTableMetadata.getColumnDefinitions());
+        String tableName = new EntityTableMetadata(entity.getClass()).getTableName();
+        String columns = getColumns(new EntityTableMetadata(entity.getClass()).getColumnDefinitions());
         String values = new ValueClause<>(entity).getClause();
 
         return generateInsertQuery(tableName, columns, values);

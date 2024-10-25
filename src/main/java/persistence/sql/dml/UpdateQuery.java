@@ -7,21 +7,13 @@ import persistence.sql.ddl.ColumnType;
 import persistence.sql.ddl.EntityTableMetadata;
 import persistence.sql.dml.querybuilder.QueryBuilder;
 
-public class UpdateQuery<T> {
+public class UpdateQuery implements SqlQuery {
 
-    private final T entity;
-    private final EntityTableMetadata entityTableMetadata;
-
-    public UpdateQuery(T entity) {
-        this.entity = entity;
-        this.entityTableMetadata = new EntityTableMetadata(entity.getClass());
-    }
-
-    public String generateQuery() throws IllegalAccessException {
-        String tableName = entityTableMetadata.getTableName();
-        String columns = getColumns(entityTableMetadata.getColumnDefinitions());
+    public String generateQuery(Object entity) throws IllegalAccessException {
+        String tableName = new EntityTableMetadata(entity.getClass()).getTableName();
+        String columns = getColumns(new EntityTableMetadata(entity.getClass()).getColumnDefinitions());
         String values = new ValueClause<>(entity).getClause();
-        Long id = new EntityId<T>(entity).getId();
+        Long id = new EntityId(entity).getId();
 
         return generateUpdateQuery(tableName, columns, values, id);
     }

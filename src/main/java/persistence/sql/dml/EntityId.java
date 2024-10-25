@@ -5,15 +5,15 @@ import java.lang.reflect.Field;
 import lombok.Getter;
 
 @Getter
-public class EntityId<T> {
+public class EntityId {
 
     private final long id;
 
-    public EntityId(T entity) {
+    public EntityId(Object entity) {
         this.id = getIdValue(entity);
     }
 
-    private long getIdValue(T entity) {
+    private long getIdValue(Object entity) {
         try {
             for (Field field : entity.getClass().getDeclaredFields()) {
                 if (field.isAnnotationPresent(Id.class)) {

@@ -4,18 +4,16 @@ import persistence.sql.ddl.TableName;
 import persistence.sql.ddl.ValidateEntity;
 import persistence.sql.dml.querybuilder.QueryBuilder;
 
-public class DeleteByIdQuery<ID> {
+public class DeleteByIdQuery implements SqlQuery {
 
     private final Class<?> entityClass;
-    private final ID id;
 
-    public DeleteByIdQuery(Class<?> entityClass, ID id) {
+    public DeleteByIdQuery(Class<?> entityClass) {
         new ValidateEntity(entityClass);
         this.entityClass = entityClass;
-        this.id = id;
     }
 
-    public String generateQuery() {
+    public String generateQuery(Object id) {
         return new QueryBuilder()
             .delete()
             .from(new TableName(entityClass).getTableName())

@@ -4,7 +4,7 @@ import persistence.sql.ddl.TableName;
 import persistence.sql.ddl.ValidateEntity;
 import persistence.sql.dml.querybuilder.QueryBuilder;
 
-public class FindAllQuery {
+public class FindAllQuery implements SqlQuery {
 
     private final Class<?> entityClass;
 

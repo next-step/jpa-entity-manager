@@ -10,34 +10,42 @@ import persistence.sql.dml.UpdateQuery;
 public class SimpleEntityManagerImpl<T, ID> implements SimpleEntityManager<T, ID> {
 
     private final Class<T> entityClass;
+    private final FindByIdQuery findByIdQuery;
+    private final InsertQuery insertQuery;
+    private final DeleteQuery deleteQuery;
+    private final UpdateQuery updateQuery;
     private final JdbcTemplate jdbcTemplate;
 
     public SimpleEntityManagerImpl(Class<T> entityClass, JdbcTemplate jdbcTemplate) {
         this.entityClass = entityClass;
+        this.findByIdQuery = new FindByIdQuery(entityClass);
+        this.insertQuery = new InsertQuery();
+        this.deleteQuery = new DeleteQuery();
+        this.updateQuery = new UpdateQuery();
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public T findById(ID id) {
-        String sql = new FindByIdQuery(entityClass).generateFindByIdQuery(id);
+        String sql = findByIdQuery.generateFindByIdQuery(id);
         return jdbcTemplate.queryForObject(sql, new EntityLoader<>(entityClass));
     }
 
     @Override
     public void persist(T entity) throws IllegalAccessException {
-        String sql = new InsertQuery<>(entity).generateQuery();
+        String sql = insertQuery.generateQuery(entity);
         jdbcTemplate.execute(sql);
     }
 
     @Override
     public void remove(T entity) {
-        String sql = new DeleteQuery<>(entity).generateQuery();
+        String sql = deleteQuery.generateQuery(entity);
         jdbcTemplate.execute(sql);
     }
 
     @Override
     public void update(T entity) throws IllegalAccessException {
-        String sql = new UpdateQuery<>(entity).generateQuery();
+        String sql = updateQuery.generateQuery(entity);
         jdbcTemplate.execute(sql);
     }
 
