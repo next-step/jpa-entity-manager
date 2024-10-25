@@ -26,12 +26,12 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addDatabaseSnapshot(EntityKey<?> entityKey, Object object) {
+    public void insertDatabaseSnapshot(EntityKey<?> entityKey, Object object) {
         this.snapShotMap.put(entityKey, deepCopy(object));
     }
 
     @Override
-    public Object getDatabaseSnapshot(EntityKey<?> entityKey) {
+    public Object findDatabaseSnapshot(EntityKey<?> entityKey) {
         return this.snapShotMap.get(entityKey);
     }
 

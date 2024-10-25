@@ -38,7 +38,7 @@ public class EntityManagerImpl implements EntityManager {
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(findObject);
 
         this.persistenceContext.insertEntity(new EntityKey<>(id, findObject.getClass()), dmlBuilderData);
-        this.persistenceContext.addDatabaseSnapshot(new EntityKey<>(id, findObject.getClass()), findObject);
+        this.persistenceContext.insertDatabaseSnapshot(new EntityKey<>(id, findObject.getClass()), findObject);
         return findObject;
     }
 
@@ -47,7 +47,7 @@ public class EntityManagerImpl implements EntityManager {
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
         this.entityPersister.persist(dmlBuilderData);
         this.persistenceContext.insertEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
-        this.persistenceContext.addDatabaseSnapshot(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.insertDatabaseSnapshot(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class EntityManagerImpl implements EntityManager {
         EntityKey<?> entityKey = new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass());
 
         Object persistenceObject = this.persistenceContext.findEntity(entityKey);
-        Object snapshotObject = this.persistenceContext.getDatabaseSnapshot(entityKey);
+        Object snapshotObject = this.persistenceContext.findDatabaseSnapshot(entityKey);
 
         List<DMLColumnData> differentColumns = getDifferentColumns(DMLBuilderData.createDMLBuilderData(persistenceObject), DMLBuilderData.createDMLBuilderData(snapshotObject));
 
@@ -80,8 +80,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private List<DMLColumnData> getDifferentColumns(DMLBuilderData persistenceBuilderData, DMLBuilderData snapShotBuilderData) {
-        Map<String, DMLColumnData> persistenceColumnMap = persistenceBuilderData.getColumns().stream()
-                .collect(Collectors.toMap(DMLColumnData::getColumnName, Function.identity()));
+        Map<String, DMLColumnData> persistenceColumnMap = convertDMLColumnDataMap(persistenceBuilderData);
 
         return snapShotBuilderData.getColumns().stream()
                 .filter(snapshotColumn -> {
@@ -89,6 +88,11 @@ public class EntityManagerImpl implements EntityManager {
                     return !snapshotColumn.getColumnValue().equals(persistenceColumn.getColumnValue());
                 })
                 .toList();
+    }
+
+    private Map<String, DMLColumnData> convertDMLColumnDataMap(DMLBuilderData dmlBuilderData) {
+        return dmlBuilderData.getColumns().stream()
+                .collect(Collectors.toMap(DMLColumnData::getColumnName, Function.identity()));
     }
 
     private void confirmDifferentColumnsIsEmpty(List<DMLColumnData> differentColumns) {
