@@ -9,19 +9,19 @@ import java.util.Objects;
 
 public class ColumnIdOption {
     private final boolean isId;
-    private final boolean isGenerationValue;
+    private final GenerationType generationType;
 
     public ColumnIdOption(Field field) {
         this.isId = isId(field);
-        this.isGenerationValue = isGenerationValue(field);
+        this.generationType = getGenerationType(field);
     }
 
     public boolean isId() {
         return isId;
     }
 
-    public boolean isGenerationValue() {
-        return isGenerationValue;
+    public GenerationType getGenerationType() {
+        return generationType;
     }
 
     @Override
@@ -29,27 +29,33 @@ public class ColumnIdOption {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ColumnIdOption that = (ColumnIdOption) o;
-        return isId == that.isId && isGenerationValue == that.isGenerationValue;
+        return isId == that.isId && generationType == that.generationType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isId, isGenerationValue);
+        return Objects.hash(isId, generationType);
+    }
+
+    public boolean isGenerationValue() {
+        return Objects.nonNull(generationType);
     }
 
     private boolean isId(Field field) {
         return field.isAnnotationPresent(Id.class);
     }
 
-    private boolean isGenerationValue(Field field) {
+    private GenerationType getGenerationType(Field field) {
         if (!isId) {
-            return false;
+            return null;
         }
 
         final GeneratedValue generatedValue = field.getAnnotation(GeneratedValue.class);
         if (Objects.isNull(generatedValue)) {
-            return false;
+            return null;
         }
-        return generatedValue.strategy() == GenerationType.IDENTITY;
+        return generatedValue.strategy();
     }
+
+
 }

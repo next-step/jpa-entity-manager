@@ -1,5 +1,6 @@
 package persistence.sql.meta;
 
+import jakarta.persistence.GenerationType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.fixture.EntityWithId;
@@ -25,6 +26,7 @@ class ColumnIdOptionTest {
         // then
         assertAll(
                 () -> assertThat(columnIdOption.isId()).isTrue(),
+                () -> assertThat(columnIdOption.getGenerationType()).isEqualTo(GenerationType.IDENTITY),
                 () -> assertThat(columnIdOption.isGenerationValue()).isTrue()
         );
     }
@@ -41,6 +43,7 @@ class ColumnIdOptionTest {
         // then
         assertAll(
                 () -> assertThat(columnIdOption.isId()).isTrue(),
+                () -> assertThat(columnIdOption.getGenerationType()).isNull(),
                 () -> assertThat(columnIdOption.isGenerationValue()).isFalse()
         );
     }
