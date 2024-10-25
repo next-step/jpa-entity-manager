@@ -1,6 +1,8 @@
 package persistence;
 
 
+import builder.dml.DMLBuilderData;
+
 public interface EntityManager {
 
     <T> T find(Class<T> clazz, Long id);
@@ -10,5 +12,7 @@ public interface EntityManager {
     void merge(Object entityInstance);
 
     void remove(Object entityInstance);
+
+    DMLBuilderData checkDirtyCheck(Object entityInstance);
 
 }
