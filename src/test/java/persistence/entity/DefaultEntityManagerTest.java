@@ -98,6 +98,24 @@ class DefaultEntityManagerTest {
     }
 
     @Test
+    @DisplayName("엔티티를 영속성 컨텍스트에 등록하고 flush() 한다.")
+    void persistAnRemoveAndFlush() {
+        // given
+        final EntityManager entityManager = DefaultEntityManager.of(jdbcTemplate);
+        final EntityWithOnlyId entity = new EntityWithOnlyId(1L, "Jaden", 30, "test@email.com", 1);
+
+        // when
+        entityManager.persist(entity);
+        entityManager.remove(entity);
+        entityManager.flush();
+
+        // then
+        assertThatThrownBy(() -> entityManager.find(entity.getClass(), entity.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Expected 1 result, got");
+    }
+
+    @Test
     @DisplayName("영속화 불가능한 상태에서 엔티티를 영속화하면 예외를 발생한다.")
     void persist_exception() {
         // given

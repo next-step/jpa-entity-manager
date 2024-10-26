@@ -50,7 +50,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public void addToPersistQueue(Object entity) {
         persistQueue.offer(entity);
-        createOrUpdateStatus(entity, EntityStatus.SAVING);
+        createOrUpdateStatus(entity, EntityStatus.MANAGED);
     }
 
     @Override

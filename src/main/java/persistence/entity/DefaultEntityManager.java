@@ -61,7 +61,7 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         persistenceContext.addEntity(entity);
-        persistenceContext.createOrUpdateStatus(entity, EntityStatus.SAVING);
+        persistenceContext.createOrUpdateStatus(entity, EntityStatus.MANAGED);
         persistenceContext.addToPersistQueue(entity);
     }
 
