@@ -16,7 +16,8 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        if (persistenceContext.containsEntity(clazz, id)) {
+        EntityKey entityKey = new EntityKey(id, clazz);
+        if (persistenceContext.containsEntity(entityKey)) {
             return persistenceContext.getEntity(clazz, id);
         }
         return entityLoader.loadEntity(clazz, id);

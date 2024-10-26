@@ -7,65 +7,58 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PersistenceContextImpl implements PersistenceContext {
-    private final Map<Class<?>, Map<Long, Object>> managedEntities = new HashMap<>();
-    private final Map<Class<?>, Map<Long, Object>> entitySnapshots = new HashMap<>();
+    private final Map<EntityKey, Object> managedEntities = new HashMap<>();
+    private final Map<EntityKey, Object> entitySnapshots = new HashMap<>();
 
     @Override
     public <T> T getEntity(Class<T> clazz, Long id) {
-        if (!containsEntity(clazz, id)) {
+        EntityKey entityKey = new EntityKey(id, clazz);
+        Object entity = managedEntities.get(entityKey);
+
+        if (!containsEntity(entityKey)) {
             return null;
         }
-        return clazz.cast(managedEntities.get(clazz).get(id));
+        return clazz.cast(entity);
     }
 
     @Override
     public void addEntity(Object entity, Long id) {
-        Class<?> clazz = entity.getClass();
-        Long idValue = getIdValue(entity);
-
-        Map<Long, Object> longObjectMap = managedEntities.computeIfAbsent(clazz, aClass -> new HashMap<>());
-        longObjectMap.put(idValue, entity);
+        EntityKey entityKey = new EntityKey(id, entity.getClass());
+        managedEntities.put(entityKey, entity);
 
         addSnapshot(id, entity);
     }
 
     @Override
     public void removeEntity(Class<?> clazz, Long id) {
-        if (containsEntity(clazz, id)) {
-            managedEntities.get(clazz).remove(id);
-        }
-
-        Map<Long, Object> entitySnapshot = entitySnapshots.get(clazz);
-        if (entitySnapshot != null) {
-            entitySnapshot.remove(id);
-        }
+        EntityKey entityKey = new EntityKey(id, clazz);
+        managedEntities.remove(entityKey);
+        entitySnapshots.remove(entityKey);
     }
 
     @Override
-    public boolean containsEntity(Class<?> clazz, Long id) {
-        return managedEntities.containsKey(clazz) && managedEntities.get(clazz).containsKey(id);
+    public boolean containsEntity(EntityKey entityKey) {
+        return managedEntities.containsKey(entityKey);
     }
 
     @Override
     public Object getDatabaseSnapshot(Long id, Object entity) {
-        Map<Long, Object> longObjectMap = entitySnapshots.get(entity.getClass());
-        if (longObjectMap != null) {
-            return longObjectMap.get(id);
-        }
-        return null;
+        EntityKey entityKey = new EntityKey(id, entity.getClass());
+        return entitySnapshots.get(entityKey);
     }
 
     @Override
     public void addSnapshot(Long id, Object entity) {
+        EntityKey entityKey = new EntityKey(id, entity.getClass());
+
         Object snapshot = copySnapshot(entity, id);
-        Map<Long, Object> longObjectMap = entitySnapshots.computeIfAbsent(entity.getClass(), aClass -> new HashMap<>());
-        longObjectMap.put(id, snapshot);
+        entitySnapshots.put(entityKey, snapshot);
     }
 
     @Override
     public boolean isDirty(Long id, Object currentEntity) {
-        Class<?> clazz = currentEntity.getClass();
-        Object entitySnapshot = entitySnapshots.getOrDefault(clazz, new HashMap<>()).get(id);
+        EntityKey entityKey = new EntityKey(id, currentEntity.getClass());
+        Object entitySnapshot = entitySnapshots.get(entityKey);
         return !currentEntity.equals(entitySnapshot);
     }
 

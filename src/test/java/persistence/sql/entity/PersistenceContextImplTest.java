@@ -25,7 +25,7 @@ class PersistenceContextImplTest {
     @DisplayName("PersistenceContext에서 getEntity메서드를 통해 엔티티를 반환한다.")
     void persistenceContext_find() {
         persistenceContext.addEntity(person, person.getId());
-        Person actual = persistenceContext.getEntity(Person.class, person.getId());
+        Person actual = persistenceContext.getEntity(person.getClass(), person.getId());
 
         assertEquals(person.getId(), actual.getId());
     }
@@ -35,8 +35,8 @@ class PersistenceContextImplTest {
     void persistenceContext_add() {
         Person expectPerson = new Person(2L, "hong", 33, "test@naver.com");
         persistenceContext.addEntity(expectPerson, expectPerson.getId());
-
-        assertTrue(persistenceContext.containsEntity(Person.class, 2L));
+        EntityKey entityKey = new EntityKey(2L, expectPerson.getClass());
+        assertTrue(persistenceContext.containsEntity(entityKey));
     }
 
     @Test
@@ -44,18 +44,22 @@ class PersistenceContextImplTest {
     void persistenceContext_remove() {
         persistenceContext.addEntity(person, person.getId());
         persistenceContext.removeEntity(Person.class, person.getId());
-
-        assertFalse(persistenceContext.containsEntity(Person.class, person.getId()));
+        EntityKey entityKey = new EntityKey(person.getId(), person.getClass());
+        assertFalse(persistenceContext.containsEntity(entityKey));
     }
 
     @Test
     @DisplayName("PersistenceContext의 containsEntity메서드를 통해 관리되고있는 엔티티인지 확인한다.")
     void persistenceContext_contains() {
+        Long notExistId = 2L;
+        EntityKey entityKey = new EntityKey(person.getId(), person.getClass());
+        EntityKey notExistEntityKey = new EntityKey(notExistId, person.getClass());
+
         persistenceContext.addEntity(person, person.getId());
 
         assertAll(
-                () -> assertTrue(persistenceContext.containsEntity(Person.class, 1L)),
-                () -> assertFalse(persistenceContext.containsEntity(Person.class, 2L))
+                () -> assertTrue(persistenceContext.containsEntity(entityKey)),
+                () -> assertFalse(persistenceContext.containsEntity(notExistEntityKey))
         );
     }
 
