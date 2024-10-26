@@ -63,7 +63,7 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     private <T> List<Field> getUpdateTargetFields(T entity, T snapshotEntity, MetadataLoader<?> loader) {
-        if (loader.isClassAnnotationPresent(DynamicUpdate.class)) {
+        if (loader.isClassAnnotationPresent(DynamicUpdate.class) && snapshotEntity != null) {
             return extractDiffFields(entity, snapshotEntity, loader);
         }
 
