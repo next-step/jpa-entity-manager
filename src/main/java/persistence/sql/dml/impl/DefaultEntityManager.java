@@ -85,6 +85,7 @@ public class DefaultEntityManager implements EntityManager {
 
         entityPersister.update(entity, databaseSnapshot);
         persistenceContext.add(id, entity);
+        persistenceContext.updateSnapshot(id, entity);
 
         return entity;
     }

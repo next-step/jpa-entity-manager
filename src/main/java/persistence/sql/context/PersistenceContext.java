@@ -19,4 +19,6 @@ public interface PersistenceContext {
     List<Object> getDirtyEntities();
 
     void cleanup();
+
+    <T> void updateSnapshot(Object id, T entity);
 }

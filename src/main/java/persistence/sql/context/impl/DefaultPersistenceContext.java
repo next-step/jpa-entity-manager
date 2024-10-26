@@ -65,6 +65,16 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
+    public <T> void updateSnapshot(Object id, T entity) {
+        KeyHolder key = new KeyHolder(entity.getClass(), id);
+        Object snapshotEntity = snapshot.get(key);
+
+        if (snapshotEntity != null) {
+            overwriteEntity(entity, snapshotEntity);
+        }
+    }
+
+    @Override
     public boolean isDirty() {
         return context.entrySet().stream()
                 .anyMatch(dirtyFilteringPredicate());
