@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import jakarta.persistence.EntityExistsException;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
 import persistence.model.EntityPrimaryKey;
@@ -26,20 +27,25 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T findById(Class<T> clazz, Object id) {
+    public <T> T find(Class<T> clazz, Object id) {
         T entity = persistenceContext.getEntity(clazz, id);
         if (entity != null) {
             return entity;
         }
 
         String selectQuery = queryBuilder.buildSelectByIdQuery(clazz, id);
-        return jdbcTemplate.queryForObject(selectQuery, resultSet ->
-                new RowMapperImpl<>(clazz).mapRow(resultSet)
-        );
+        try {
+            return jdbcTemplate.queryForObject(selectQuery, resultSet -> new RowMapperImpl<>(clazz).mapRow(resultSet));
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException("ENTITY NOT FOUND. id = " + id);
+        }
     }
 
     @Override
     public void persist(Object entity) {
+        if (isEntityExists(entity)) {
+            throw new EntityExistsException("ENTITY ALREADY EXISTS!");
+        }
         entityPersister.insert(entity);
         persistenceContext.addEntity(entity);
     }
@@ -52,14 +58,18 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void merge(Object entity) {
-        Class<?> entityClass = entity.getClass();
-        Object entityId = EntityPrimaryKey.build(entity).keyValue();
-        Object existingEntity = persistenceContext.getEntity(entityClass, entityId);
-
-        if (existingEntity != null) {
+        if (isEntityExists(entity)) {
             entityPersister.update(entity);
         } else {
             persist(entity);
         }
+    }
+
+    private Boolean isEntityExists(Object entity) {
+        Class<?> entityClass = entity.getClass();
+        Object entityId = EntityPrimaryKey.build(entity).keyValue();
+        Object existingEntity = persistenceContext.getEntity(entityClass, entityId);
+
+        return existingEntity != null;
     }
 }

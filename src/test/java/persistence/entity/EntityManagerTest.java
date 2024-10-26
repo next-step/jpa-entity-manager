@@ -2,6 +2,7 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import jakarta.persistence.EntityExistsException;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
 import persistence.model.exception.ColumnInvalidException;
@@ -52,8 +53,8 @@ public class EntityManagerTest {
     }
 
     @Nested
-    @DisplayName("findById 테스트")
-    class FindByIdTest {
+    @DisplayName("find 테스트")
+    class FindTest {
         @Test
         @DisplayName("Long 타입 id에 해당하는 엔티티를 구한다.")
         void succeedToFindById() {
@@ -64,7 +65,7 @@ public class EntityManagerTest {
             jdbcTemplate.execute(dmlQueryBuilder.buildInsertQuery(person));
 
             // when
-            PersonWithTransientAnnotation personFound = entityManager.findById(PersonWithTransientAnnotation.class, 1L);
+            PersonWithTransientAnnotation personFound = entityManager.find(PersonWithTransientAnnotation.class, 1L);
 
             // then
             assertEquals(1L, personFound.getId());
@@ -73,8 +74,8 @@ public class EntityManagerTest {
         @Test
         @DisplayName("해당하는 엔티티가 없다면 에러를 내뱉는다.")
         void failToFindById() {
-            assertThrows(RuntimeException.class, () -> {
-                entityManager.findById(PersonWithTransientAnnotation.class, 1L);
+            assertThrows(IllegalArgumentException.class, () -> {
+                entityManager.find(PersonWithTransientAnnotation.class, 1L);
             });
         }
     }
@@ -92,13 +93,28 @@ public class EntityManagerTest {
             entityManager.persist(person);
 
             // when
-            PersonWithTransientAnnotation foundPerson = entityManager.findById(
+            PersonWithTransientAnnotation foundPerson = entityManager.find(
                     PersonWithTransientAnnotation.class,
                     1L
             );
 
             // then
             assertEquals(foundPerson.getName(), person.getName());
+        }
+
+        @Test
+        @DisplayName("이미 존재하는 엔티티라면 에러를 뱉는다.")
+        void failToPersistForAlreadyExistingEntity() {
+            // given
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
+                    1L, "홍길동", 20, "test@test.com", 1
+            );
+            entityManager.persist(person);
+
+            // when, then
+            assertThrows(EntityExistsException.class, () -> {
+                entityManager.persist(person);
+            });
         }
     }
 
@@ -119,7 +135,7 @@ public class EntityManagerTest {
 
             // then
             assertThrows(RuntimeException.class, () -> {
-                entityManager.findById(PersonWithTransientAnnotation.class, 1L);
+                entityManager.find(PersonWithTransientAnnotation.class, 1L);
             });
         }
 
@@ -153,7 +169,7 @@ public class EntityManagerTest {
             entityManager.merge(person);
 
             // then
-            PersonWithTransientAnnotation foundPerson = entityManager.findById(PersonWithTransientAnnotation.class, 1L);
+            PersonWithTransientAnnotation foundPerson = entityManager.find(PersonWithTransientAnnotation.class, 1L);
             assertEquals(30, foundPerson.getAge());
         }
 
@@ -166,7 +182,7 @@ public class EntityManagerTest {
 
             entityManager.merge(person);
 
-            assertNotNull(entityManager.findById(PersonWithTransientAnnotation.class, 1L));
+            assertNotNull(entityManager.find(PersonWithTransientAnnotation.class, 1L));
         }
     }
 }

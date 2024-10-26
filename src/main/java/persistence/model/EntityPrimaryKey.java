@@ -21,21 +21,4 @@ public record EntityPrimaryKey(String keyName, Object keyValue, String entityTab
 
         return new EntityPrimaryKey(pkName, pkValue, entityTableName);
     }
-
-    @Override
-    public boolean equals(Object comparingObject) {
-        if (this == comparingObject) {
-            return true;
-        }
-        if (comparingObject == null || getClass() != comparingObject.getClass()) {
-            return false;
-        }
-
-        EntityPrimaryKey that = (EntityPrimaryKey) comparingObject;
-
-        return that.keyName.equals(keyName)
-                && that.entityTableName.equals(entityTableName)
-                && that.keyValue.equals(keyValue);
-    }
-
 }
