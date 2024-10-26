@@ -26,23 +26,6 @@ public record UpdateQueryClauses(List<Clause> clauses) {
             this.nameConverter = nameConverter;
         }
 
-        private static List<Field> extractDiffFields(Object entity, Object snapshotEntity, MetadataLoader<?> loader) {
-            return loader.getFieldAllByPredicate(field -> {
-                Object entityValue = Clause.extractValue(field, entity);
-                Object snapshotValue = Clause.extractValue(field, snapshotEntity);
-
-                if (entityValue == null && snapshotValue == null) {
-                    return false;
-                }
-
-                if (entityValue == null || snapshotValue == null) {
-                    return true;
-                }
-
-                return !entityValue.equals(snapshotValue);
-            });
-        }
-
         public Builder where(Object entity, MetadataLoader<?> loader) {
             WhereConditionalClause whereClause = WhereConditionalClause.builder()
                     .column(loader.getColumnName(loader.getPrimaryKeyField(), nameConverter))
@@ -53,10 +36,8 @@ public record UpdateQueryClauses(List<Clause> clauses) {
             return this;
         }
 
-        public Builder setColumnValues(Object entity, Object snapshotEntity, MetadataLoader<?> loader) {
-            List<Field> diffFields = extractDiffFields(entity, snapshotEntity, loader);
-
-            for (Field field : diffFields) {
+        public Builder setColumnValues(Object entity, List<Field> updateFields, MetadataLoader<?> loader) {
+            for (Field field : updateFields) {
                 clauses.add(SetValueClause.newInstance(field, entity, loader.getColumnName(field, nameConverter)));
             }
 

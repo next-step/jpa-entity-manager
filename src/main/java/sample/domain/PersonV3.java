@@ -1,9 +1,11 @@
 package sample.domain;
 
 import jakarta.persistence.*;
+import persistence.annoation.DynamicUpdate;
 
 @Table(name = "users")
 @Entity
+@DynamicUpdate
 public class PersonV3 {
 
     @Id

@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import persistence.sql.common.util.NameConverter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -78,4 +79,11 @@ public interface MetadataLoader<T> {
      * 엔티티 타입을 조회해 반환한다.
      */
     Class<T> getEntityType();
+
+    /**
+     * 클래스에 특정 어노테이션이 존재하는지 확인한다.
+     *
+     * @param targetAnno 확인할 클래스
+     */
+    boolean isClassAnnotationPresent(Class<? extends Annotation> targetAnno);
 }

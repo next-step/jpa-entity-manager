@@ -1,7 +1,10 @@
 package persistence.sql.context.impl;
 
+import jakarta.persistence.Id;
+import persistence.annoation.DynamicUpdate;
 import persistence.sql.EntityLoaderFactory;
 import persistence.sql.QueryBuilderFactory;
+import persistence.sql.clause.Clause;
 import persistence.sql.clause.DeleteQueryClauses;
 import persistence.sql.clause.InsertColumnValueClause;
 import persistence.sql.clause.UpdateQueryClauses;
@@ -14,6 +17,7 @@ import persistence.sql.loader.EntityLoader;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.util.List;
 
 public class DefaultEntityPersister implements EntityPersister {
     private final Database database;
@@ -47,14 +51,40 @@ public class DefaultEntityPersister implements EntityPersister {
         EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
         MetadataLoader<?> loader = entityLoader.getMetadataLoader();
 
+        List<Field> updateTargetFields = getUpdateTargetFields(entity, snapshotEntity, loader);
         UpdateQueryClauses updateQueryClauses = UpdateQueryClauses.builder(nameConverter)
                 .where(entity, loader)
-                .setColumnValues(entity, snapshotEntity, loader)
+                .setColumnValues(entity, updateTargetFields, loader)
                 .build();
 
         String mergeQuery = QueryBuilderFactory.getInstance()
                 .buildQuery(QueryType.UPDATE, loader, updateQueryClauses.clauseArrays());
         database.executeUpdate(mergeQuery);
+    }
+
+    private <T> List<Field> getUpdateTargetFields(T entity, T snapshotEntity, MetadataLoader<?> loader) {
+        if (loader.isClassAnnotationPresent(DynamicUpdate.class)) {
+            return extractDiffFields(entity, snapshotEntity, loader);
+        }
+
+        return loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class));
+    }
+
+    List<Field> extractDiffFields(Object entity, Object snapshotEntity, MetadataLoader<?> loader) {
+        return loader.getFieldAllByPredicate(field -> {
+            Object entityValue = Clause.extractValue(field, entity);
+            Object snapshotValue = Clause.extractValue(field, snapshotEntity);
+
+            if (entityValue == null && snapshotValue == null) {
+                return false;
+            }
+
+            if (entityValue == null || snapshotValue == null) {
+                return true;
+            }
+
+            return !entityValue.equals(snapshotValue);
+        });
     }
 
     @Override

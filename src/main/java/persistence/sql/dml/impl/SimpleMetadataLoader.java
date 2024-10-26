@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import persistence.sql.common.util.NameConverter;
 import persistence.sql.dml.MetadataLoader;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -140,6 +141,11 @@ public class SimpleMetadataLoader<T> implements MetadataLoader<T> {
     @Override
     public Class<T> getEntityType() {
         return clazz;
+    }
+
+    @Override
+    public boolean isClassAnnotationPresent(Class<? extends Annotation> targetAnno) {
+        return clazz.isAnnotationPresent(targetAnno);
     }
 
     private boolean isNotTransient(Field field) {
