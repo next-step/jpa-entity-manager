@@ -48,9 +48,7 @@ public class DefaultEntityManager implements EntityManager {
 
         Object id = entityPersister.insert(entity);
         persistenceContext.add(id, entity);
-        if (!transaction.isActive()) {
-            persistenceContext.createDatabaseSnapshot(id, entity);
-        }
+        persistenceContext.createDatabaseSnapshot(id, entity);
     }
 
     private boolean isNew(Object entity) {
