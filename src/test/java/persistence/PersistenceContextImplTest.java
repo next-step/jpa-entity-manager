@@ -58,7 +58,7 @@ class PersistenceContextImplTest {
         PersistenceContextImpl persistenceContext = new PersistenceContextImpl();
         Person person = createPerson(1);
         persistenceContext.insertDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class), person);
-        assertThat(persistenceContext.findDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class)))
+        assertThat(persistenceContext.getDatabaseSnapshot(new EntityKey<>(person.getId(), Person.class)))
                 .extracting("id", "name", "age", "email")
                 .contains(1L, "test1", 29, "test@test.com");
     }

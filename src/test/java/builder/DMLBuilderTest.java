@@ -28,7 +28,6 @@ import static org.assertj.core.groups.Tuple.tuple;
 - Object 인스턴스를 받아 UPDATE 쿼리 문자열 생성한다.
 - deleteById 쿼리 문자열 생성하기
 - Object를 받아 deleteById 쿼리 문자열 생성한다.
-- DirtyCheck를 하여 쿼리를 생성한다.
 */
 class DMLBuilderTest {
 
@@ -138,21 +137,4 @@ class DMLBuilderTest {
                 .isEqualTo("DELETE FROM users WHERE id = 1;");
     }
 
-    @DisplayName("DirtyCheck를 하여 쿼리를 생성한다.")
-    @Test
-    void buildDirtyCheckQueryTest() {
-        Person person = new Person(1L, "test", 29, "test@test.com");
-        EntityKey<?> entityKey = new EntityKey<>(person.getId(), Person.class);
-
-        this.persistenceContext.insertEntity(entityKey, person);
-
-        person.changeEmail("changed@test.com");
-
-        this.persistenceContext.insertDatabaseSnapshot(entityKey, person);
-
-        UpdateQueryBuilder queryBuilder = new UpdateQueryBuilder();
-
-        assertThat(queryBuilder.buildQuery(this.entityManager.checkDirtyCheck(person)))
-                .isEqualTo("UPDATE users SET email='changed@test.com' WHERE id = 1;");
-    }
 }

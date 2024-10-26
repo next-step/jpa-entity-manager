@@ -22,8 +22,7 @@ import static org.assertj.core.groups.Tuple.tuple;
 - Persist로 Person 저장 후 영속성 컨텍스트에 존재하는지 확인한다.
 - remove 실행하면 영속성 컨텍스트에 데이터가 제거된다.
 - update 실행하면 영속성컨텍스트 데이터도 수정된다.
-- SnapShot에 저장된 객체와 비교하여 DirtyChecking을 한다.
-- SnapShot에 저장된 객체와 비교하여 DirtyChecking을 할시, 데이터가 다른점이 없으면 예외를 발생시킨다.
+- update 실행하면 snapShot 데이터도 수정된다.
 */
 class EntityManagerTest {
 
@@ -94,35 +93,20 @@ class EntityManagerTest {
                 .contains(1L, "test1", 29, "changed@test.com");
     }
 
-    @DisplayName("SnapShot에 저장된 객체와 비교하여 DirtyChecking을 한다.")
+    @DisplayName("update 실행하면 snapShot 데이터도 수정된다.")
     @Test
-    void checkDirtyCheck() {
+    void updateSnapShotTest() {
         Person person = createPerson(1);
-        EntityKey<?> entityKey = new EntityKey<>(person.getId(), Person.class);
-
-        this.persistenceContext.insertEntity(entityKey, person);
+        this.entityManager.persist(person);
 
         person.changeEmail("changed@test.com");
+        this.entityManager.merge(person);
 
-        this.persistenceContext.insertDatabaseSnapshot(entityKey, person);
+        Object persons = this.persistenceContext.getDatabaseSnapshot(new EntityKey<>(person.getId(), person.getClass()));
 
-        assertThat(this.entityManager.checkDirtyCheck(person).getColumns())
-                .extracting("columnName", "columnValue")
-                .contains(tuple("email", "changed@test.com"));
-    }
-
-    @DisplayName("SnapShot에 저장된 객체와 비교하여 DirtyChecking을 할시, 데이터가 다른점이 없으면 예외를 발생시킨다.")
-    @Test
-    void checkDirtyCheckThrowException() {
-        Person person = createPerson(1);
-        EntityKey<?> entityKey = new EntityKey<>(person.getId(), Person.class);
-
-        this.persistenceContext.insertEntity(entityKey, person);
-        this.persistenceContext.insertDatabaseSnapshot(entityKey, person);
-
-        assertThatThrownBy(() ->  this.entityManager.checkDirtyCheck(person))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("SnapShot과 다른점이 없습니다.");
+        assertThat(persons)
+                .extracting("id", "name", "age", "email")
+                .contains(1L, "test1", 29, "changed@test.com");
     }
 
     private Person createPerson(int i) {

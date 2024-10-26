@@ -90,16 +90,6 @@ public class EntityPersisterTest {
                 .contains(1L, "test1", 29, "changed@test.com");
     }
 
-    @DisplayName("merge 실행할 시 존재하지 않은 데이터라면 예외를 발생시킨다.")
-    @Test
-    void updateThrowExceptionTest() {
-        Person person = createPerson(1);
-
-        assertThatThrownBy(() -> this.entityPersister.merge(DMLBuilderData.createDMLBuilderData(person)))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("데이터가 존재하지 않습니다. : Person");
-    }
-
     private Person createPerson(int i) {
         return new Person((long) i, "test" + i, 29, "test@test.com");
     }
