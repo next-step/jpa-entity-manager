@@ -5,7 +5,6 @@ import persistence.sql.dialect.Dialect;
 
 public class EqualClause implements Clause {
     private final EntityColumn targetColumn;
-
     private final Object findingValue;
 
     public EqualClause(EntityColumn targetColumn, Object findingValue) {

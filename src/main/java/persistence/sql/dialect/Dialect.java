@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 
 public abstract class Dialect {
     protected final String identifierQuote = "\"";
-
     protected final String valueQuote = "'";
-
     protected DataTypeRegistry dataTypeRegistry;
 
     protected Dialect(DataTypeRegistry dataTypeRegistry) {

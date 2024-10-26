@@ -1,13 +1,11 @@
 package persistence.model;
 
-import jakarta.persistence.Table;
 import persistence.model.util.ReflectionUtil;
 
 import java.util.List;
 
 public class EntityTable {
     private final String name;
-
     private final EntityTableColumns tableColumns = new EntityTableColumns();
 
     private EntityTable(String name) {

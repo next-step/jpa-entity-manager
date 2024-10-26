@@ -10,9 +10,7 @@ public class EntityManagerImpl implements EntityManager {
 
     // XXX: loader가 생기면 DmlQueryBuilder와 JdbcTemplate도 제거?
     private final DmlQueryBuilder queryBuilder;
-
     private final JdbcTemplate jdbcTemplate;
-
     private final PersistenceContext persistenceContext;
 
     public EntityManagerImpl(

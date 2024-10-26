@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PersistenceContextTest {
     PersistenceContext persistenceContext;
-
     PersonWithTransientAnnotation entity;
 
     @BeforeEach

@@ -6,7 +6,6 @@ import persistence.model.util.ReflectionUtil;
 import java.util.Map;
 
 public record EntityPrimaryKey(String keyName, Object keyValue, String entityTableName) {
-
     public static EntityPrimaryKey build(Object entityObject) {
         Class<?> entityClass = entityObject.getClass();
 

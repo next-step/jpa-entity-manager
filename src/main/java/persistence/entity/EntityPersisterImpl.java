@@ -5,7 +5,6 @@ import persistence.sql.dml.DmlQueryBuilder;
 
 public class EntityPersisterImpl implements EntityPersister {
     private final JdbcTemplate jdbcTemplate;
-
     private final DmlQueryBuilder dmlQueryBuilder;
 
     public EntityPersisterImpl(JdbcTemplate jdbcTemplate, DmlQueryBuilder dmlQueryBuilder) {

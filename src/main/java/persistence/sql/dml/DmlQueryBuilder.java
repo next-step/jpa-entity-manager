@@ -16,15 +16,10 @@ import java.util.stream.Collectors;
 
 public class DmlQueryBuilder {
     private final Dialect dialect;
-
     private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s);";
-
     private static final String DELETE_FORMAT = "DELETE FROM %s";
-
     private static final String SELECT_FORMAT = "SELECT %s FROM %s";
-
     private static final String SELECT_ALL = "*";
-
     private static final String UPDATE_FORMAT = "UPDATE %s";
 
     public DmlQueryBuilder(Dialect dialect) {

@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class EntityKey {
     private final Class<?> entityClass;
-
     private final EntityPrimaryKey pk;
 
     public EntityKey(Class<?> entityClass, EntityPrimaryKey pk) {
