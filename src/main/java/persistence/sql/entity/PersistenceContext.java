@@ -10,4 +10,8 @@ public interface PersistenceContext {
     boolean containsEntity(Class<?> clazz, Long id);
 
     Object getDatabaseSnapshot(Long id, Object entity);
+
+    void addSnapshot(Long id, Object entity);
+
+    boolean isDirty(Long id, Object currentEntity);
 }

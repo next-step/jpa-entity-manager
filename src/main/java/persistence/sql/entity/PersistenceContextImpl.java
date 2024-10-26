@@ -26,7 +26,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         Map<Long, Object> longObjectMap = managedEntities.computeIfAbsent(clazz, aClass -> new HashMap<>());
         longObjectMap.put(idValue, entity);
 
-        addSnapshot(entity, id);
+        addSnapshot(id, entity);
     }
 
     @Override
@@ -55,7 +55,21 @@ public class PersistenceContextImpl implements PersistenceContext {
         return null;
     }
 
-    private void addSnapshot(Object entity, Long id) {
+    @Override
+    public void addSnapshot(Long id, Object entity) {
+        Object snapshot = copySnapshot(entity, id);
+        Map<Long, Object> longObjectMap = entitySnapshots.computeIfAbsent(entity.getClass(), aClass -> new HashMap<>());
+        longObjectMap.put(id, snapshot);
+    }
+
+    @Override
+    public boolean isDirty(Long id, Object currentEntity) {
+        Class<?> clazz = currentEntity.getClass();
+        Object entitySnapshot = entitySnapshots.getOrDefault(clazz, new HashMap<>()).get(id);
+        return !currentEntity.equals(entitySnapshot);
+    }
+
+    private Object copySnapshot(Object entity, Long id) {
         Class<?> clazz = entity.getClass();
         Object snapshot;
         try {
@@ -69,8 +83,7 @@ public class PersistenceContextImpl implements PersistenceContext {
             throw new RuntimeException("스냅샷 생성 실패");
         }
 
-        Map<Long, Object> longObjectMap = entitySnapshots.computeIfAbsent(clazz, aClass -> new HashMap<>());
-        longObjectMap.put(id, snapshot);
+        return snapshot;
     }
 
     private Long getIdValue(Object entity) {

@@ -22,7 +22,7 @@ class PersistenceContextImplTest {
     }
 
     @Test
-    @DisplayName("PersistenceContext getEntity구현")
+    @DisplayName("PersistenceContext에서 getEntity메서드를 통해 엔티티를 반환한다.")
     void persistenceContext_find() {
         persistenceContext.addEntity(person, person.getId());
         Person actual = persistenceContext.getEntity(Person.class, person.getId());
@@ -31,7 +31,7 @@ class PersistenceContextImplTest {
     }
 
     @Test
-    @DisplayName("PersistenceContext add구현")
+    @DisplayName("PersistenceContext에서 addEntity메서드를 통해 엔티티를 추가한다.")
     void persistenceContext_add() {
         Person expectPerson = new Person(2L, "hong", 33, "test@naver.com");
         persistenceContext.addEntity(expectPerson, expectPerson.getId());
@@ -40,7 +40,7 @@ class PersistenceContextImplTest {
     }
 
     @Test
-    @DisplayName("PersistenceContext remove구현")
+    @DisplayName("PersistenceContext에서 removeEntity메서드를 통해 엔티티를 제거한다.")
     void persistenceContext_remove() {
         persistenceContext.addEntity(person, person.getId());
         persistenceContext.removeEntity(Person.class, person.getId());
@@ -49,13 +49,38 @@ class PersistenceContextImplTest {
     }
 
     @Test
-    @DisplayName("PersistenceContext contains구현")
+    @DisplayName("PersistenceContext의 containsEntity메서드를 통해 관리되고있는 엔티티인지 확인한다.")
     void persistenceContext_contains() {
         persistenceContext.addEntity(person, person.getId());
 
         assertAll(
                 () -> assertTrue(persistenceContext.containsEntity(Person.class, 1L)),
                 () -> assertFalse(persistenceContext.containsEntity(Person.class, 2L))
+        );
+    }
+
+    @Test
+    @DisplayName("PersistenceContext의 getDatabaseSnapshot메서드를 스냅샷을 가져온다.")
+    void persistenceContext_addSnapshot_and_getDatabaseSnapshot() {
+        persistenceContext.addSnapshot(person.getId(), person);
+
+        Person databaseSnapshot = (Person) persistenceContext.getDatabaseSnapshot(person.getId(), person);
+
+        assertTrue(databaseSnapshot.equals(person));
+    }
+
+    @Test
+    @DisplayName("엔티티의 변경이 있을시 isDirty메서드를 통해 더티체킹을 진행할 수 있따.")
+    void persistenceContext_isDirty() {
+        persistenceContext.addSnapshot(person.getId(), person);
+        boolean isDirty = persistenceContext.isDirty(person.getId(), person);
+
+        person = new Person(1L, "change name", 23, "rhfp@naver.com");
+        boolean changeDirty = persistenceContext.isDirty(person.getId(), person);
+
+        assertAll(
+                () -> assertFalse(isDirty),
+                () -> assertTrue(changeDirty)
         );
     }
 }

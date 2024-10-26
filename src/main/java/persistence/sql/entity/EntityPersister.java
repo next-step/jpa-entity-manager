@@ -76,7 +76,7 @@ public class EntityPersister {
             if (field.isAnnotationPresent(Id.class)) {
                 field.setAccessible(true);
                 try {
-                    field.set(entity, idValue);  // ID 값을 엔티티의 필드에 설정
+                    field.set(entity, idValue);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException("ID 값을 설정하는 중 오류 발생", e);
                 }

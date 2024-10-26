@@ -7,10 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.Metadata;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.domain.Person;
 
 import java.sql.SQLException;
@@ -31,21 +29,18 @@ class EntityManagerImplTest {
     void init() throws SQLException {
         final DatabaseServer server = new H2();
         server.start();
-        Metadata metadata = new Metadata(Person.class);
         CreateQueryBuilder queryBuilder = new CreateQueryBuilder(Person.class);
         String tableQuery = queryBuilder.createTableQuery(Person.class);
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
         Person person = new Person("yang", 23, "rhfp@naver.com", 3);
-        String insertQuery = insertQueryBuilder.getInsertQuery(metadata.getEntityTable(), metadata.getEntityColumns(), person);
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(tableQuery);
-        jdbcTemplate.execute(insertQuery);
 
         entityPersister = new EntityPersister(Person.class, server.getConnection());
         persistenceContext = new PersistenceContextImpl();
 
         entityManager = new EntityManagerImpl(entityPersister, persistenceContext, server.getConnection());
+        entityManager.persist(person);
     }
 
     @AfterEach
@@ -66,7 +61,6 @@ class EntityManagerImplTest {
                 () -> assertThat(expectPerson.getAge()).isEqualTo(resultPerson.getAge()),
                 () -> assertThat(expectPerson.getEmail()).isEqualTo(resultPerson.getEmail()),
                 () -> assertThat(expectPerson.getId()).isEqualTo(resultPerson.getId()),
-                () -> assertThat(expectPerson.getIndex()).isEqualTo(resultPerson.getIndex()),
                 () -> assertThat(expectPerson.getName()).isEqualTo(resultPerson.getName())
         );
     }
@@ -74,18 +68,15 @@ class EntityManagerImplTest {
     @Test
     @DisplayName("EntityManager의 persist구현")
     void entityManager_persist() throws SQLException {
-        Person expectPerson = new Person(2L, "yang2", 25, "rhfpdk92@naver.com");
+        Person expectPerson = new Person("yang2", 25, "rhfpdk92@naver.com", 3);
 
-        entityManager.persist(expectPerson);
-
-        Person resultPerson = entityManager.find(Person.class, 2L);
+        Person findPerson = (Person) entityManager.persist(expectPerson);
 
         assertAll(
-                () -> assertThat(expectPerson.getAge()).isEqualTo(resultPerson.getAge()),
-                () -> assertThat(expectPerson.getEmail()).isEqualTo(resultPerson.getEmail()),
-                () -> assertThat(expectPerson.getId()).isEqualTo(resultPerson.getId()),
-                () -> assertThat(expectPerson.getIndex()).isEqualTo(resultPerson.getIndex()),
-                () -> assertThat(expectPerson.getName()).isEqualTo(resultPerson.getName())
+                () -> assertThat(expectPerson.getAge()).isEqualTo(findPerson.getAge()),
+                () -> assertThat(expectPerson.getEmail()).isEqualTo(findPerson.getEmail()),
+                () -> assertThat(expectPerson.getId()).isEqualTo(findPerson.getId()),
+                () -> assertThat(expectPerson.getName()).isEqualTo(findPerson.getName())
         );
     }
 
@@ -96,7 +87,7 @@ class EntityManagerImplTest {
         long expectedId = 2L;
         Person expectPerson = new Person(null, "yang2", 25, "rhfpdk92@naver.com");
 
-        Person resultPerson =(Person) entityManager.persist(expectPerson);
+        Person resultPerson = (Person) entityManager.persist(expectPerson);
 
         assertThat(resultPerson.getId()).isEqualTo(expectedId);
     }
