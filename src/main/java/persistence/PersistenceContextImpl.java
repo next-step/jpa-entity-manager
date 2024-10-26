@@ -31,7 +31,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public Object findDatabaseSnapshot(EntityKey<?> entityKey) {
+    public Object getDatabaseSnapshot(EntityKey<?> entityKey) {
         return this.snapShotMap.get(entityKey);
     }
 

@@ -28,9 +28,9 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T find(Class<T> clazz, Long id) {
-        EntityKey<T> entityObject = new EntityKey<>(id, clazz);
-        Object persistObject = this.persistenceContext.findEntity(entityObject);
+    public <T> T find(Class<T> clazz, Object id) {
+        EntityKey<T> entitykey = new EntityKey<>(id, clazz);
+        Object persistObject = this.persistenceContext.findEntity(entitykey);
         if (persistObject != null) {
             return clazz.cast(persistObject);
         }
@@ -53,8 +53,17 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void merge(Object entityInstance) {
         DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        this.entityPersister.merge(dmlBuilderData);
+        this.entityLoader.find(dmlBuilderData.getClazz(), dmlBuilderData.getId());
+
+        DMLBuilderData diffBuilderData = checkDirtyCheck(dmlBuilderData);
+
+        if (diffBuilderData.getColumns().isEmpty()) {
+            return;
+        }
+
+        this.entityPersister.merge(checkDirtyCheck(dmlBuilderData));
         this.persistenceContext.insertEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
+        this.persistenceContext.insertDatabaseSnapshot(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()), entityInstance);
     }
 
     @Override
@@ -64,28 +73,23 @@ public class EntityManagerImpl implements EntityManager {
         this.persistenceContext.deleteEntity(new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass()));
     }
 
-    @Override
-    public DMLBuilderData checkDirtyCheck(Object entityInstance) {
-        DMLBuilderData dmlBuilderData = DMLBuilderData.createDMLBuilderData(entityInstance);
-        EntityKey<?> entityKey = new EntityKey<>(dmlBuilderData.getId(), entityInstance.getClass());
+    private DMLBuilderData checkDirtyCheck(DMLBuilderData entityBuilderData) {
+        EntityKey<?> entityKey = new EntityKey<>(entityBuilderData.getId(), entityBuilderData.getClazz());
 
-        Object persistenceObject = this.persistenceContext.findEntity(entityKey);
-        Object snapshotObject = this.persistenceContext.findDatabaseSnapshot(entityKey);
+        Object snapshotObject = this.persistenceContext.getDatabaseSnapshot(entityKey);
 
-        List<DMLColumnData> differentColumns = getDifferentColumns(DMLBuilderData.createDMLBuilderData(persistenceObject), DMLBuilderData.createDMLBuilderData(snapshotObject));
+        List<DMLColumnData> differentColumns = getDifferentColumns(entityBuilderData, DMLBuilderData.createDMLBuilderData(snapshotObject));
 
-        confirmDifferentColumnsIsEmpty(differentColumns);
-
-        return dmlBuilderData.changeColumns(differentColumns);
+        return entityBuilderData.changeColumns(differentColumns);
     }
 
-    private List<DMLColumnData> getDifferentColumns(DMLBuilderData persistenceBuilderData, DMLBuilderData snapShotBuilderData) {
-        Map<String, DMLColumnData> persistenceColumnMap = convertDMLColumnDataMap(persistenceBuilderData);
+    private List<DMLColumnData> getDifferentColumns(DMLBuilderData entityBuilderData, DMLBuilderData snapShotBuilderData) {
+        Map<String, DMLColumnData> snapShotColumnMap = convertDMLColumnDataMap(snapShotBuilderData);
 
-        return snapShotBuilderData.getColumns().stream()
-                .filter(snapshotColumn -> {
-                    DMLColumnData persistenceColumn = persistenceColumnMap.get(snapshotColumn.getColumnName());
-                    return !snapshotColumn.getColumnValue().equals(persistenceColumn.getColumnValue());
+        return entityBuilderData.getColumns().stream()
+                .filter(entityColumn -> {
+                    DMLColumnData persistenceColumn = snapShotColumnMap.get(entityColumn.getColumnName());
+                    return !entityColumn.getColumnValue().equals(persistenceColumn.getColumnValue());
                 })
                 .toList();
     }
@@ -93,11 +97,5 @@ public class EntityManagerImpl implements EntityManager {
     private Map<String, DMLColumnData> convertDMLColumnDataMap(DMLBuilderData dmlBuilderData) {
         return dmlBuilderData.getColumns().stream()
                 .collect(Collectors.toMap(DMLColumnData::getColumnName, Function.identity()));
-    }
-
-    private void confirmDifferentColumnsIsEmpty(List<DMLColumnData> differentColumns) {
-        if (differentColumns.isEmpty()) {
-            throw new IllegalStateException("SnapShot과 다른점이 없습니다.");
-        }
     }
 }

@@ -15,7 +15,7 @@ public class EntityLoader {
     }
 
     //데이터를 조회한다.
-    public <T> T find(Class<T> clazz, Long id) {
+    public <T> T find(Class<T> clazz, Object id) {
         return jdbcTemplate.queryForObject(selectByIdQueryBuilder.buildQuery(DMLBuilderData.createDMLBuilderData(clazz, id)), resultSet -> EntityMapper.mapRow(resultSet, clazz));
     }
 

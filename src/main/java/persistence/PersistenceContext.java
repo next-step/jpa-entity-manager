@@ -10,6 +10,6 @@ public interface PersistenceContext {
 
     void insertDatabaseSnapshot(EntityKey<?> entityKey, Object object);
 
-    Object findDatabaseSnapshot(EntityKey<?> entityKey);
+    Object getDatabaseSnapshot(EntityKey<?> entityKey);
 
 }

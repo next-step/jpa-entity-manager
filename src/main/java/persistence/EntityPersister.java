@@ -28,7 +28,6 @@ public class EntityPersister {
 
     //데이터를 수정한다.
     public void merge(DMLBuilderData dmlBuilderData) {
-        confirmEntityDataExist(dmlBuilderData);
         jdbcTemplate.execute(updateQueryBuilder.buildQuery(dmlBuilderData));
     }
 
@@ -37,16 +36,4 @@ public class EntityPersister {
         jdbcTemplate.execute(deleteQueryBuilder.buildQuery(dmlBuilderData));
     }
 
-    //조회되는 데이터가 존재하는지 확인한다.
-    private void confirmEntityDataExist(DMLBuilderData dmlBuilderData) {
-        SelectByIdQueryBuilder queryBuilder = new SelectByIdQueryBuilder();
-        try {
-            jdbcTemplate.queryForObject(
-                    queryBuilder.buildQuery(dmlBuilderData),
-                    resultSet -> EntityMapper.mapRow(resultSet, dmlBuilderData.getClazz())
-            );
-        } catch (RuntimeException e) {
-            throw new RuntimeException(DATA_NOT_EXIST_MESSAGE + dmlBuilderData.getClazz().getSimpleName());
-        }
-    }
 }
