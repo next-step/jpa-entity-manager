@@ -61,6 +61,7 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         persistenceContext.addEntity(entity);
+        persistenceContext.createOrUpdateStatus(entity, EntityStatus.SAVING);
         persistenceContext.addToPersistQueue(entity);
     }
 
@@ -87,6 +88,7 @@ public class DefaultEntityManager implements EntityManager {
         if (entityTable.isIdGenerationFromDatabase()) {
             entityPersister.insert(entity);
             persistenceContext.addEntity(entity);
+            persistenceContext.createOrUpdateStatus(entity, EntityStatus.MANAGED);
             return true;
         }
         return false;
@@ -97,6 +99,7 @@ public class DefaultEntityManager implements EntityManager {
         while (!persistQueue.isEmpty()) {
             final Object entity = persistQueue.poll();
             entityPersister.insert(entity);
+            persistenceContext.createOrUpdateStatus(entity, EntityStatus.MANAGED);
         }
     }
 

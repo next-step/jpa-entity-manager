@@ -23,4 +23,6 @@ public interface PersistenceContext {
     List<Object> getAllEntity();
 
     EntityEntry getEntityEntry(Object entity);
+
+    void createOrUpdateStatus(Object entity, EntityStatus entityStatus);
 }

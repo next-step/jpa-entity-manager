@@ -24,11 +24,7 @@ class DefaultPersistenceContextTest {
 
         // then
         final Object managedEntity = getManagedEntity(persistenceContext, entity.getClass(), entity.getId());
-        final EntityStatus entityStatus = getEntityStatus(persistenceContext, entity);
-        assertAll(
-                () -> assertThat(managedEntity).isEqualTo(entity),
-                () -> assertThat(entityStatus).isEqualTo(EntityStatus.MANAGED)
-        );
+        assertThat(managedEntity).isEqualTo(entity);
     }
 
     @Test

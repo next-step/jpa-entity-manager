@@ -25,7 +25,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
         final EntityTable entityTable = new EntityTable(entity);
         addEntity(entity, entityTable);
         addSnapshot(entity, entityTable);
-        createOrUpdateStatus(entity, EntityStatus.MANAGED);
     }
 
     @Override
@@ -80,16 +79,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
         return entityEntryRegistry.get(entity);
     }
 
-    private void addEntity(Object entity, EntityTable entityTable) {
-        entityRegistry.put(entityTable.toEntityKey(), entity);
-    }
-
-    private void addSnapshot(Object entity, EntityTable entityTable) {
-        final Object snapshot = new InstanceFactory<>(entity.getClass()).copy(entity);
-        entitySnapshotRegistry.put(entityTable.toEntityKey(), snapshot);
-    }
-
-    private void createOrUpdateStatus(Object entity, EntityStatus entityStatus) {
+    @Override
+    public void createOrUpdateStatus(Object entity, EntityStatus entityStatus) {
         final EntityEntry entityEntry = entityEntryRegistry.get(entity);
         if (Objects.isNull(entityEntry)) {
             final EntityEntry entityEntry1 = new EntityEntry(entityStatus);
@@ -97,5 +88,14 @@ public class DefaultPersistenceContext implements PersistenceContext {
             return;
         }
         entityEntry.updateStatus(entityStatus);
+    }
+
+    private void addEntity(Object entity, EntityTable entityTable) {
+        entityRegistry.put(entityTable.toEntityKey(), entity);
+    }
+
+    private void addSnapshot(Object entity, EntityTable entityTable) {
+        final Object snapshot = new InstanceFactory<>(entity.getClass()).copy(entity);
+        entitySnapshotRegistry.put(entityTable.toEntityKey(), snapshot);
     }
 }
