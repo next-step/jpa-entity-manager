@@ -76,4 +76,23 @@ class PersistenceContextImplTest {
 
         assertThat(updatedPerson.getEmail()).isEqualTo(updateEmail);
     }
+
+    @Test
+    void 데이터_생성_후_더티_체킹() {
+        Long id = 10L;
+        String name = "이름";
+        String email = "email@gmail.com";
+        int age = 10;
+
+        Person person = new Person(id, name, age, email);
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        persistenceContext.add(person);
+        persistenceContext.createDatabaseSnapshot(person);
+
+        String updateEmail = "test@test.com";
+        person.setEmail(updateEmail);
+        Person snapshotPerson = persistenceContext.getDatabaseSnapshot(person);
+        assertThat(snapshotPerson.getEmail()).isEqualTo(email);
+        assertThat(person.getEmail()).isEqualTo(updateEmail);;
+    }
 }

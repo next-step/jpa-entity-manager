@@ -1,8 +1,10 @@
 package jpa;
 
 import org.jetbrains.annotations.NotNull;
+import persistence.sql.model.DatabaseSnapshot;
 import persistence.sql.model.EntityId;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +12,7 @@ import java.util.Objects;
 public class PersistenceContextImpl implements PersistenceContext {
 
     private final Map<EntityInfo<?>, Object> entityMap = new HashMap<>();
+    private final Map<EntityInfo<?>, Object> snapshotMap = new HashMap<>();
 
     public PersistenceContextImpl() {
     }
@@ -17,7 +20,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void add(Object entity) {
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
-
+        snapshotMap.put(entityInfo, entity);
         if (entityMap.containsKey(entityInfo)) {
             return;
         }
@@ -27,11 +30,12 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T get(Class<T> clazz, Long id) {
         EntityInfo<?> entityInfo = new EntityInfo<>(clazz, id);
-        Object object = entityMap.get(entityInfo);
-        if (object == null) {
+        Object entity = entityMap.get(entityInfo);
+        snapshotMap.put(entityInfo, entity);
+        if (entity == null) {
             return null;
         }
-        return clazz.cast(object);
+        return clazz.cast(entity);
     }
 
     @Override
@@ -43,6 +47,21 @@ public class PersistenceContextImpl implements PersistenceContext {
     public void update(Object entity) {
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
         entityMap.put(entityInfo, entity);
+    }
+
+    @Override
+    public <T> T getDatabaseSnapshot(T entity) {
+        EntityInfo<?> entityInfo = makeEntityInfo(entity);
+        return (T) snapshotMap.get(entityInfo);
+    }
+
+    @Override
+    public void createDatabaseSnapshot(Object entity) {
+        DatabaseSnapshot databaseSnapshot = new DatabaseSnapshot(entity);
+        Object snapshotEntity = databaseSnapshot.getEntity();
+
+        EntityInfo<?> entityInfo = makeEntityInfo(entity);
+        snapshotMap.put(entityInfo, snapshotEntity);
     }
 
     private EntityInfo<?> makeEntityInfo(Object entity) {
