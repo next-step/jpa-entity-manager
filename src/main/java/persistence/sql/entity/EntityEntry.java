@@ -7,7 +7,6 @@ import persistence.sql.context.EntityPersister;
 import persistence.sql.context.KeyHolder;
 import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.MetadataLoader;
-import persistence.sql.dml.impl.SimpleMetadataLoader;
 import persistence.sql.entity.data.Status;
 import persistence.sql.loader.EntityLoader;
 
@@ -88,7 +87,7 @@ public class EntityEntry {
     }
 
     public void dirtyCheck() {
-        if (!isManagedStatus()) {
+        if (isNotManagedStatus()) {
             return;
         }
 
@@ -128,11 +127,11 @@ public class EntityEntry {
         }
     }
 
-    private boolean isManagedStatus() {
-        return Status.isManaged(status);
-    }
-
     public boolean isDirty() {
+        if (isNotManagedStatus()) {
+            return false;
+        }
+
         if (!(snapshot == null && entity == null) && snapshot == null || entity == null) {
             return true;
         }
@@ -153,5 +152,9 @@ public class EntityEntry {
         });
 
         return !fields.isEmpty();
+    }
+
+    private boolean isNotManagedStatus() {
+        return !Status.isManaged(status);
     }
 }

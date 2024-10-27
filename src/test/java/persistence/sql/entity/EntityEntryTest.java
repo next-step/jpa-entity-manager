@@ -59,8 +59,45 @@ class EntityEntryTest extends TestEntityInitialize {
         // when
         person.setName("newName");
         personEntry.dirtyCheck();
+        TestPerson loadedPerson = entityLoader.load(person.getId());
 
         //then
         assertThat(personEntry.isDirty()).isFalse();
+        assertThat(loadedPerson.getName()).isEqualTo("newName");
+    }
+
+    @Test
+    @DisplayName("dirtyCheck 함수는 Status가 미관리 상태이고, 엔티티가 변경된 경우 동기화 쿼리를 수행하지 않는다.")
+    void testDirtyCheckNoManagedStatus() {
+        // given
+        TestPerson person = new TestPerson("catsbi", 55, "casbi@naver.com", 123);
+        entityPersister.insert(person);
+        EntityEntry personEntry = EntityEntry.newEntry(entityPersister, persistenceContext, person, Status.GONE);
+        personEntry.dirtyCheck();
+
+        // when
+        person.setName("newName");
+        personEntry.dirtyCheck();
+        TestPerson loadedPerson = entityLoader.load(person.getId());
+
+        //then
+        assertThat(personEntry.isDirty()).isFalse();
+        assertThat(loadedPerson.getName()).isEqualTo("catsbi");
+    }
+
+    @Test
+    @DisplayName("dirtyCheck 함수는 Status가 삭제 상태일 경우 삭제 쿼리를 수행한다.")
+    void testDirtyCheckDeleteStatus() {
+        // given
+        TestPerson person = new TestPerson("catsbi", 55, "casbi@naver.com", 123);
+        entityPersister.insert(person);
+        EntityEntry personEntry = EntityEntry.newEntry(entityPersister, persistenceContext, person, Status.DELETED);
+
+        // when
+        personEntry.dirtyCheck();
+        TestPerson loadedPerson = entityLoader.load(person.getId());
+
+        //then
+        assertThat(loadedPerson).isNull();
     }
 }
