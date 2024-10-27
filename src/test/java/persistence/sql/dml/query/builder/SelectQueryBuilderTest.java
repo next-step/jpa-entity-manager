@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sample.domain.Person;
-import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.query.SelectQuery;
 import persistence.sql.dml.query.WhereCondition;
+import sample.domain.Person;
 
 public class SelectQueryBuilderTest {
 
@@ -16,7 +15,7 @@ public class SelectQueryBuilderTest {
     @DisplayName("[성공] Person Entity 테이블의 모든 컬럼에 대한 select query")
     void selectQuery() {
         SelectQuery query = new SelectQuery(Person.class);
-        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder(new H2Dialect())
+        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder()
                 .select(query.columnNames())
                 .from(query.tableName());
         String expectedQuery = """
@@ -28,7 +27,7 @@ public class SelectQueryBuilderTest {
     @DisplayName("[성공] Person Entity 테이블의 id 컬럼에 대한 select query")
     void selectQueryById() {
         SelectQuery query = new SelectQuery(Person.class);
-        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder(new H2Dialect())
+        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder()
                 .select(query.columnNames())
                 .from(query.tableName())
                 .where(List.of(new WhereCondition("id", "=", 1L)));

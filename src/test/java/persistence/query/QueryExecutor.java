@@ -29,7 +29,7 @@ public class QueryExecutor {
 
     public static void insert(Object object, JdbcTemplate jdbcTemplate) {
         InsertQuery insertQuery = new InsertQuery(object);
-        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.builder(new H2Dialect())
+        InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.builder()
                 .insert(insertQuery.tableName(), insertQuery.columns())
                 .values(insertQuery.columns());
         jdbcTemplate.execute(insertQueryBuilder.build());

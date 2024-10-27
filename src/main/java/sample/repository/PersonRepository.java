@@ -3,11 +3,10 @@ package sample.repository;
 import java.sql.Connection;
 import java.util.List;
 import jdbc.JdbcTemplate;
-import sample.domain.Person;
-import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.query.SelectQuery;
 import persistence.sql.dml.query.WhereCondition;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
+import sample.domain.Person;
 
 public class PersonRepository implements Repository<Person, Long> {
 
@@ -20,7 +19,7 @@ public class PersonRepository implements Repository<Person, Long> {
     @Override
     public List<Person> findAll() {
         SelectQuery query = new SelectQuery(Person.class);
-        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder(new H2Dialect())
+        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder()
                 .select(query.columnNames())
                 .from(query.tableName());
         String queryString = queryBuilder.build();
@@ -36,7 +35,7 @@ public class PersonRepository implements Repository<Person, Long> {
     @Override
     public Person findById(Long id) {
         SelectQuery query = new SelectQuery(Person.class);
-        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder(new H2Dialect())
+        SelectQueryBuilder queryBuilder = SelectQueryBuilder.builder()
                 .select(query.columnNames())
                 .from(query.tableName())
                 .where(List.of(new WhereCondition("id", "=", id)));

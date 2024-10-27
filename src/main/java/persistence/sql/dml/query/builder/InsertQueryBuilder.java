@@ -2,7 +2,6 @@ package persistence.sql.dml.query.builder;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.query.ColumnNameValue;
 import persistence.sql.metadata.ColumnName;
 import persistence.sql.metadata.TableName;
@@ -13,16 +12,14 @@ public class InsertQueryBuilder {
     private static final String INSERT_INTO = "insert into";
     private static final String VALUES = "values";
 
-    private final Dialect dialect;
     private final StringBuilder queryString;
 
-    private InsertQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
+    private InsertQueryBuilder() {
         this.queryString = new StringBuilder();
     }
 
-    public static InsertQueryBuilder builder(Dialect dialect) {
-        return new InsertQueryBuilder(dialect);
+    public static InsertQueryBuilder builder() {
+        return new InsertQueryBuilder();
     }
 
     public String build() {

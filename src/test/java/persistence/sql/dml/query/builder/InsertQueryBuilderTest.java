@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import sample.domain.Person;
-import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.query.InsertQuery;
+import sample.domain.Person;
 
 public class InsertQueryBuilderTest {
 
@@ -15,7 +14,7 @@ public class InsertQueryBuilderTest {
     void insertQuery() {
         Person person = new Person("person name", 20, "person@email.com");
         InsertQuery query = new InsertQuery(person);
-        InsertQueryBuilder queryBuilder = InsertQueryBuilder.builder(new H2Dialect())
+        InsertQueryBuilder queryBuilder = InsertQueryBuilder.builder()
                 .insert(
                         query.tableName(),
                         query.columns()

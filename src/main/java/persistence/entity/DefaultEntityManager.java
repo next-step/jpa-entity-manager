@@ -31,7 +31,7 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         SelectQuery query = new SelectQuery(clazz);
-        String queryString = SelectQueryBuilder.builder(dialect)
+        String queryString = SelectQueryBuilder.builder()
                 .select(query.columnNames())
                 .from(query.tableName())
                 .where(List.of(new WhereCondition("id", "=", id)))

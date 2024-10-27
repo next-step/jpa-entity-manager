@@ -4,7 +4,6 @@ import static persistence.sql.query.QueryClauseGenerator.whereClause;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.query.ColumnNameValue;
 import persistence.sql.dml.query.WhereCondition;
 import persistence.sql.metadata.TableName;
@@ -14,16 +13,14 @@ public class UpdateQueryBuilder {
     private static final String UPDATE = "update";
     private static final String SET = "set";
 
-    private final Dialect dialect;
     private final StringBuilder queryString;
 
-    private UpdateQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
+    private UpdateQueryBuilder() {
         this.queryString = new StringBuilder();
     }
 
-    public static UpdateQueryBuilder builder(Dialect dialect) {
-        return new UpdateQueryBuilder(dialect);
+    public static UpdateQueryBuilder builder() {
+        return new UpdateQueryBuilder();
     }
 
     public String build() {
