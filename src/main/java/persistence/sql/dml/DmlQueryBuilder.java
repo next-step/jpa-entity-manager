@@ -3,84 +3,76 @@ package persistence.sql.dml;
 import persistence.model.EntityColumn;
 import persistence.model.EntityFactory;
 import persistence.model.EntityTable;
-import persistence.model.exception.ColumnInvalidException;
-import persistence.model.meta.Value;
-import persistence.sql.dialect.Dialect;
-import persistence.sql.dml.clause.Clause;
-import persistence.sql.dml.clause.EqualClause;
 import persistence.sql.dml.clause.FindOption;
 import persistence.sql.dml.clause.FindOptionBuilder;
+import persistence.sql.dialect.Dialect;
+import persistence.sql.dml.clause.EqualClause;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DmlQueryBuilder {
     private final Dialect dialect;
-    private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s);";
-    private static final String DELETE_FORMAT = "DELETE FROM %s";
+    private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s)";
+    private static final String DELETE_FORMAT = "DELETE FROM %s WHERE %s";
     private static final String SELECT_FORMAT = "SELECT %s FROM %s";
     private static final String SELECT_ALL = "*";
-    private static final String UPDATE_FORMAT = "UPDATE %s";
+    private static final String UPDATE_FORMAT = "UPDATE %s SET %s WHERE %s";
 
     public DmlQueryBuilder(Dialect dialect) {
         this.dialect = dialect;
     }
 
-    public String buildUpdateQuery(Object entityObject) {
-        EntityTable table = EntityFactory.createPopulatedSchema(entityObject);
-
-        if (!table.isPrimaryColumnsValueSet()) {
-            throw new ColumnInvalidException("Primary Column is Required to Find Updating Record.");
-        }
-
-        String query = String.format(UPDATE_FORMAT, dialect.getIdentifierQuoted(table.getName()));
-
-        String setQuery = "SET " + table.getColumns()
-                .stream()
-                .map(entityColumn -> String.format(
-                        "%s = %s",
-                        dialect.getIdentifierQuoted(entityColumn.getName()),
-                        dialect.getValueQuoted(entityColumn.getValue()))
-                )
-                .collect(Collectors.joining(", "));
-
-        FindOption findOption = getDefaultFindOptionWithPrimaryEqualClause(table);
-
-        return query + " " + setQuery + " " + findOption.joinWhereClauses(dialect) + ";";
+    public String appendSemicolon(String query) {
+        return query + ";";
     }
 
-    public String buildInsertQuery(Object entityObject) {
-        EntityTable table = EntityFactory.createPopulatedSchema(entityObject);
+    public String buildUpdateQuery(
+            String tableName,
+            List<Map.Entry<String, Object>> updatingColumns,
+            Map.Entry<String, Object> where
+    ) {
+        String setColumnSql = updatingColumns.stream()
+                .map(column -> new EqualClause(column.getKey(), column.getValue()).toSql(dialect))
+                .collect(Collectors.joining(", "));
 
-        List<EntityColumn> insertingColumns = table.getActiveColumns(table);
+        String whereSql = new EqualClause(where.getKey(), where.getValue()).toSql(dialect);
+
+        String sql = String.format(UPDATE_FORMAT,
+                dialect.getIdentifierQuoted(tableName),
+                setColumnSql,
+                whereSql
+        );
+        return appendSemicolon(sql);
+    }
+
+    public String buildInsertQuery(String tableName, List<Map.Entry<String, Object>> insertingColumns) {
         List<String> insertingColumnNames = insertingColumns.stream()
-                .map(EntityColumn::getName)
-                .toList();
-        List<Object> insertingValues = insertingColumns.stream()
-                .map(EntityColumn::getValue)
+                .map(Map.Entry::getKey)
                 .toList();
 
-        String tableName = table.getName();
+        List<Object> insertingColumnValues = insertingColumns.stream()
+                .map(Map.Entry::getValue)
+                .toList();
 
-        return String.format(
+        String sql =  String.format(
                 INSERT_FORMAT,
                 dialect.getIdentifierQuoted(tableName),
                 dialect.getIdentifiersQuoted(insertingColumnNames),
-                dialect.getValuesQuoted(insertingValues));
+                dialect.getValuesQuoted(insertingColumnValues)
+        );
+        return appendSemicolon(sql);
     }
 
-    public String buildDeleteQuery(Object entityObject) {
-        EntityTable table = EntityFactory.createPopulatedSchema(entityObject);
+    public String buildDeleteQuery(String tableName, Map.Entry<String, Object> where) {
+        String whereSql = new EqualClause(where.getKey(), where.getValue()).toSql(dialect);
 
-        if (!table.isPrimaryColumnsValueSet()) {
-            throw new ColumnInvalidException("column not initialized");
-        }
-
-        String deleteSql = String.format(DELETE_FORMAT, dialect.getIdentifierQuoted(table.getName()));
-
-        FindOption findOption = getDefaultFindOptionWithPrimaryEqualClause(table);
-
-        return deleteSql + " " + findOption.joinWhereClauses(dialect) + ";";
+        String deleteSql = String.format(
+                DELETE_FORMAT,
+                dialect.getIdentifierQuoted(tableName),
+                whereSql
+        );
+        return appendSemicolon(deleteSql);
     }
 
     public String buildSelectByIdQuery(Class<?> entityClass, Object id) {
@@ -88,7 +80,7 @@ public class DmlQueryBuilder {
 
         EntityColumn conditionColumn = table.getColumn("id");
         FindOption findOption = new FindOptionBuilder()
-                .where(new EqualClause(conditionColumn, id))
+                .where(new EqualClause(conditionColumn.getName(), id))
                 .build();
 
         return buildSelectQuery(entityClass, findOption);
@@ -113,13 +105,6 @@ public class DmlQueryBuilder {
         if (!findOption.getWhere().isEmpty()) {
             return query + " " + findOption.joinWhereClauses(dialect) + ";";
         }
-        return query + ";";
-    }
-
-    private FindOption getDefaultFindOptionWithPrimaryEqualClause(EntityTable table) {
-        EntityColumn conditionColumn = table.getColumn("id");
-        return new FindOptionBuilder()
-                .where(new EqualClause(conditionColumn, conditionColumn.getValue()))
-                .build();
+        return appendSemicolon(query);
     }
 }

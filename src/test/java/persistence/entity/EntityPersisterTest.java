@@ -4,11 +4,9 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import persistence.fixture.PersonWithTransientAnnotation;
+import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -18,31 +16,23 @@ import persistence.sql.dml.DmlQueryBuilder;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EntityPersisterTest {
     private DatabaseServer databaseServer;
-
     private EntityPersister entityPersister;
-
     private JdbcTemplate jdbcTemplate;
-
-    private DmlQueryBuilder dmlQueryBuilder;
-
     private DdlQueryBuilder ddlQueryBuilder;
-
     private String SELECT_QUERY;
-
     private PersonWithTransientAnnotation FIXTURE;
 
     @BeforeEach
     void setup() throws SQLException {
         databaseServer = new H2();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
+
         Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
-        dmlQueryBuilder = new DmlQueryBuilder(dialect);
-        ddlQueryBuilder = new DdlQueryBuilder(dialect);
+        DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder(dialect);
 
         entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
 
@@ -51,6 +41,7 @@ public class EntityPersisterTest {
                 1L, "홍길동", 20, "test@test.com", 1
         );
 
+        ddlQueryBuilder = new DdlQueryBuilder(dialect);
         jdbcTemplate.execute(ddlQueryBuilder.buildCreateTableQuery(PersonWithTransientAnnotation.class));
     }
 
@@ -60,22 +51,37 @@ public class EntityPersisterTest {
         databaseServer.stop();
     }
 
-    @Test
-    @DisplayName("객체를 디비에 UPDATE한다.")
-    void testUpdate() {
-        // given
-        entityPersister.insert(FIXTURE);
+    @Nested
+    class UpdateTest {
+        @Test
+        @DisplayName("객체를 디비에 UPDATE한다.")
+        void succeedToUpdate() {
+            // given
+            entityPersister.insert(FIXTURE);
 
-        // when
-        FIXTURE.setName("홍길동2");
-        entityPersister.update(FIXTURE);
+            // when
+            FIXTURE.setName("홍길동2");
+            entityPersister.update(FIXTURE);
 
-        // then
-        PersonWithTransientAnnotation updatedPerson = jdbcTemplate.queryForObject(SELECT_QUERY, resultSet ->
-                new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
-        );
+            // then
+            PersonWithTransientAnnotation updatedPerson = jdbcTemplate.queryForObject(SELECT_QUERY, resultSet ->
+                    new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
+            );
 
-        assertEquals("홍길동2", updatedPerson.getName());
+            assertEquals("홍길동2", updatedPerson.getName());
+        }
+
+        @Test
+        @DisplayName("PK 값이 없으면 UPATE에 실패한다.")
+        void failToUpdate() {
+            FIXTURE = new PersonWithTransientAnnotation(
+                    "홍길동", 20, "test@test.com", 1
+            );
+
+            assertThrows(ColumnInvalidException.class, () -> {
+                entityPersister.update(FIXTURE);
+            });
+        }
     }
 
     @Test
@@ -98,26 +104,41 @@ public class EntityPersisterTest {
         );
     }
 
-    @Test
-    @DisplayName("객체를 디비에서 DELETE한다.")
-    void testDelete() {
-        // given
-        entityPersister.insert(FIXTURE);
+    @Nested
+    class DeleteTest {
+        @Test
+        @DisplayName("객체를 디비에서 DELETE한다.")
+        void succeedToDelete() {
+            // given
+            entityPersister.insert(FIXTURE);
 
-        List<PersonWithTransientAnnotation> beforeDeleteSelectResult = jdbcTemplate.query(SELECT_QUERY, resultSet ->
-                new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
-        );
+            List<PersonWithTransientAnnotation> beforeDeleteSelectResult = jdbcTemplate.query(SELECT_QUERY, resultSet ->
+                    new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
+            );
 
-        // when
-        entityPersister.delete(FIXTURE);
+            // when
+            entityPersister.delete(FIXTURE);
 
-        // then
-        List<PersonWithTransientAnnotation> afterDeleteSelectResult = jdbcTemplate.query(SELECT_QUERY, resultSet ->
-                new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
-        );
-        assertAll(
-                () -> assertEquals(1, beforeDeleteSelectResult.size()),
-                () -> assertEquals(0, afterDeleteSelectResult.size())
-        );
+            // then
+            List<PersonWithTransientAnnotation> afterDeleteSelectResult = jdbcTemplate.query(SELECT_QUERY, resultSet ->
+                    new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
+            );
+            assertAll(
+                    () -> assertEquals(1, beforeDeleteSelectResult.size()),
+                    () -> assertEquals(0, afterDeleteSelectResult.size())
+            );
+        }
+
+        @Test
+        @DisplayName("객체에 PK 값이 없다면 삭제에 실패한다.")
+        void failToDelete() {
+            FIXTURE = new PersonWithTransientAnnotation(
+                    "홍길동", 20, "test@test.com", 1
+            );
+
+            assertThrows(ColumnInvalidException.class, () -> {
+                entityPersister.delete(FIXTURE);
+            });
+        }
     }
 }

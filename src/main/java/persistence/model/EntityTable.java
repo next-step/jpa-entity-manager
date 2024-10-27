@@ -34,6 +34,12 @@ public class EntityTable {
         return tableColumns.getPrimaryColumns();
     }
 
+    public EntityPrimaryKey getPrimaryKey() {
+        // XXX: 현재는 복합 PK는 고려하지 않는다.
+        EntityColumn column = getPrimaryColumns().stream().findFirst().orElseThrow();
+        return new EntityPrimaryKey(column.getName(), column.getValue(), name);
+    }
+
     public List<EntityColumn> getNonPrimaryColumns() {
         return tableColumns.getNonPrimaryColumns();
     }

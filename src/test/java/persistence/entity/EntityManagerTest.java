@@ -13,6 +13,10 @@ import persistence.sql.dml.DmlQueryBuilder;
 import persistence.fixture.PersonWithTransientAnnotation;
 
 import java.sql.SQLException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,7 +66,14 @@ public class EntityManagerTest {
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
             );
-            jdbcTemplate.execute(dmlQueryBuilder.buildInsertQuery(person));
+
+            List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("id", 1L));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동2"));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 30));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+
+            jdbcTemplate.execute(dmlQueryBuilder.buildInsertQuery("users", updatingColumns));
 
             // when
             PersonWithTransientAnnotation personFound = entityManager.find(PersonWithTransientAnnotation.class, 1L);

@@ -45,7 +45,7 @@ public class WhereClauseUnitTest {
     @DisplayName("하나의 Equal 조건만 가진 조건절의 SQL문을 생성한다.")
     void testToSqlWithSingleEqualClause() {
         // given
-        EqualClause equalClause = new EqualClause(emailColumn, "test@test.com");
+        EqualClause equalClause = new EqualClause(emailColumn.getName(), "test@test.com");
         WhereClause whereClause = new WhereClause(equalClause);
 
         // when
@@ -59,8 +59,8 @@ public class WhereClauseUnitTest {
     @DisplayName("여러 Equal 조건을 가진 조건절을 AND로 묶어 SQL문을 생성한다.")
     void testToSqlWithMultipleEqualClauses() {
         // given
-        EqualClause equalClause1 = new EqualClause(emailColumn, "test@test.com");
-        EqualClause equalClause2 = new EqualClause(nameColumn, "홍길동");
+        EqualClause equalClause1 = new EqualClause(emailColumn.getName(), "test@test.com");
+        EqualClause equalClause2 = new EqualClause(nameColumn.getName(), "홍길동");
         WhereClause whereClause = new WhereClause(Arrays.asList(equalClause1, equalClause2));
 
         // when

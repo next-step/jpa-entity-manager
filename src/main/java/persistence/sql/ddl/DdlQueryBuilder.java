@@ -15,6 +15,10 @@ public class DdlQueryBuilder {
         this.dialect = dialect;
     }
 
+    public String appendSemicolon(String query) {
+        return query + ";";
+    }
+
     public String buildDropTableQuery(Class<?> entityClass) {
         String DROP_TABLE_QUERY = "DROP TABLE";
 

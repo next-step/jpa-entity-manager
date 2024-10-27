@@ -5,9 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.dialect.DialectFactory;
 import persistence.fixture.PersonWithTransientAnnotation;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,26 +31,21 @@ public class DmlQueryBuilderTest {
         void succeedToCreateQuery() {
             String expectedQuery = "UPDATE \"users\" " +
                     "SET \"id\" = 1, \"nick_name\" = '홍길동2', \"old\" = 30, \"email\" = 'test@test.com' " +
-                    "WHERE (\"id\" = 1);";
+                    "WHERE \"id\" = 1;";
 
-            PersonWithTransientAnnotation user = new PersonWithTransientAnnotation(
-                    1L, "홍길동2", 30, "test@test.com", 1
+            List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("id", 1L));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동2"));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 30));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+
+            String resultQuery = queryBuilder.buildUpdateQuery(
+                    "users",
+                    updatingColumns,
+                    new AbstractMap.SimpleEntry<>("id", 1L)
             );
-            String resultQuery = queryBuilder.buildUpdateQuery(user);
 
             assertEquals(expectedQuery, resultQuery);
-        }
-
-        @Test
-        @DisplayName("엔티티 오브젝트에 PK가 없으면 실패한다.")
-        void failToCreateQuery() {
-            PersonWithTransientAnnotation user = new PersonWithTransientAnnotation(
-                    "홍길동2", 30, "test@test.com", 1
-            );
-
-            assertThrows(ColumnInvalidException.class, () -> {
-                queryBuilder.buildDeleteQuery(user);
-            });
         }
     }
 
@@ -60,10 +59,13 @@ public class DmlQueryBuilderTest {
                     "(\"id\", \"nick_name\", \"old\", \"email\") " +
                     "VALUES (1, '홍길동', 20, 'test@test.com');";
 
-            PersonWithTransientAnnotation user = new PersonWithTransientAnnotation(
-                    1L, "홍길동", 20, "test@test.com", 1
-            );
-            String resultQuery = queryBuilder.buildInsertQuery(user);
+            List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("id", 1L));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동"));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 20));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+
+            String resultQuery = queryBuilder.buildInsertQuery("users", updatingColumns);
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -75,10 +77,13 @@ public class DmlQueryBuilderTest {
                     "(\"nick_name\", \"old\", \"email\") " +
                     "VALUES ('홍길동', 20, 'test@test.com');";
 
-            PersonWithTransientAnnotation user = new PersonWithTransientAnnotation(
-                    "홍길동", 20, "test@test.com", 1
-            );
-            String resultQuery = queryBuilder.buildInsertQuery(user);
+
+            List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동"));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 20));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+
+            String resultQuery = queryBuilder.buildInsertQuery("users", updatingColumns);
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -90,8 +95,12 @@ public class DmlQueryBuilderTest {
                     "(\"nick_name\", \"old\", \"email\") " +
                     "VALUES (NULL, NULL, 'test@test.com');";
 
-            PersonWithTransientAnnotation user = new PersonWithTransientAnnotation("test@test.com");
-            String resultQuery = queryBuilder.buildInsertQuery(user);
+            List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", null));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", null));
+            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+
+            String resultQuery = queryBuilder.buildInsertQuery("users", updatingColumns);
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -119,24 +128,14 @@ public class DmlQueryBuilderTest {
         @Test
         @DisplayName("엔티티 객체가 주어지면 PK를 찾아 레코드를 삭제한다.")
         void succeedToDeleteByObject() {
-            String expectedQuery = "DELETE FROM \"users\" WHERE (\"id\" = 1);";
+            String expectedQuery = "DELETE FROM \"users\" WHERE \"id\" = 1;";
 
-            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
-                    1L, "홍길동", 20, "test@test.com", 1
+            String resultQuery = queryBuilder.buildDeleteQuery(
+                    "users",
+                    new AbstractMap.SimpleEntry<>("id", 1L)
             );
-            String resultQuery = queryBuilder.buildDeleteQuery(person);
 
             assertEquals(expectedQuery, resultQuery);
-        }
-
-        @Test
-        @DisplayName("PK가 없는 객체가 주어지면 에러를 내뱉는다.")
-        void failToDeleteForEmptyPK() {
-            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation("test@test.com");
-
-            assertThrows(ColumnInvalidException.class, () -> {
-                queryBuilder.buildDeleteQuery(person);
-            });
         }
     }
 }

@@ -31,7 +31,7 @@ public class EqualClauseUnitTest {
         Mockito.when(mockDialect.getValueQuoted(Mockito.anyString()))
                 .thenAnswer(invocation -> "'" + invocation.getArgument(0) + "'");
 
-        equalClause = new EqualClause(column, "foo");
+        equalClause = new EqualClause(column.getName(), "foo");
     }
 
     @Test

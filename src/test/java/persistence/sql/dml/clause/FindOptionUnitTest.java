@@ -33,8 +33,8 @@ public class FindOptionUnitTest {
                 Optional.empty()
         );
 
-        mockWhereClause1 = new WhereClause(new EqualClause(column1, "foo"));
-        mockWhereClause2 = new WhereClause(new EqualClause(column2, "test@test.com"));
+        mockWhereClause1 = new WhereClause(new EqualClause(column1.getName(), "foo"));
+        mockWhereClause2 = new WhereClause(new EqualClause(column2.getName(), "test@test.com"));
 
         findOption = new FindOption(
                 List.of(column1, column2),

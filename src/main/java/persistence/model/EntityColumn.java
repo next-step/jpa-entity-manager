@@ -8,6 +8,8 @@ import persistence.model.meta.Value;
 import persistence.model.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class EntityColumn {
@@ -116,5 +118,9 @@ public class EntityColumn {
 
     public Boolean isNullable() {
         return isNullable;
+    }
+
+    public Map.Entry<String, Object> toKeyValue() {
+        return new AbstractMap.SimpleEntry<>(name, getValue());
     }
 }
