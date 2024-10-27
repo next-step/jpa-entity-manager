@@ -1,11 +1,13 @@
 package persistence.sql.entity;
 
+import jakarta.persistence.Id;
 import persistence.sql.EntityLoaderFactory;
 import persistence.sql.clause.Clause;
 import persistence.sql.context.EntityPersister;
 import persistence.sql.context.KeyHolder;
 import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.MetadataLoader;
+import persistence.sql.dml.impl.SimpleMetadataLoader;
 import persistence.sql.entity.data.Status;
 import persistence.sql.loader.EntityLoader;
 
@@ -42,6 +44,9 @@ public class EntityEntry {
         MetadataLoader<?> loader = entityLoader.getMetadataLoader();
 
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
+        if (id == null) {
+            throw new IllegalArgumentException("Primary key must not be null");
+        }
 
         KeyHolder key = new KeyHolder(entity.getClass(), id);
 
@@ -90,6 +95,13 @@ public class EntityEntry {
         if (status == Status.DELETED) {
             entityPersister.delete(entity);
             persistenceContext.deleteEntry(entity, key.key());
+            updateStatus(Status.GONE);
+            return;
+        }
+
+        if (status == Status.SAVING) {
+            entityPersister.insert(entity);
+            updateStatus(Status.MANAGED);
             return;
         }
 
@@ -98,6 +110,22 @@ public class EntityEntry {
         }
 
         entityPersister.update(entity, snapshot);
+        synchronizingSnapshot();
+    }
+
+    private void synchronizingSnapshot() {
+        loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class))
+                .forEach(field -> copyFieldValue(field, entity, snapshot));
+    }
+
+    private  void copyFieldValue(Field field, Object entity, Object origin) {
+        try {
+            field.setAccessible(true);
+            Object value = field.get(entity);
+            field.set(origin, value);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Illegal access to field: " + field.getName());
+        }
     }
 
     private boolean isManagedStatus() {

@@ -52,7 +52,6 @@ public class DefaultEntityManager implements EntityManager {
         EntityEntry entityEntry = persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
         if (!transaction.isActive()) {
             entityEntry.dirtyCheck();
-            entityEntry.updateStatus(Status.MANAGED);
         }
     }
 
