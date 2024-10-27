@@ -1,5 +1,6 @@
 package persistence.model;
 
+import jakarta.persistence.Table;
 import persistence.model.util.ReflectionUtil;
 
 import java.util.List;
@@ -13,9 +14,15 @@ public class EntityTable {
     }
 
     public static EntityTable build(Class<?> entityClass) {
-        String tableName = ReflectionUtil.getTableName(entityClass);
+        String tableName = getTableName(entityClass);
 
         return new EntityTable(tableName);
+    }
+
+    public static String getTableName(Class<?> clazz) {
+        return ReflectionUtil.getAnnotationIfPresent(clazz, Table.class)
+                .map(Table::name)
+                .orElse(clazz.getSimpleName());
     }
 
     public String getName() {
@@ -32,12 +39,6 @@ public class EntityTable {
 
     public List<EntityColumn> getPrimaryColumns() {
         return tableColumns.getPrimaryColumns();
-    }
-
-    public EntityPrimaryKey getPrimaryKey() {
-        // XXX: 현재는 복합 PK는 고려하지 않는다.
-        EntityColumn column = getPrimaryColumns().stream().findFirst().orElseThrow();
-        return new EntityPrimaryKey(column.getName(), column.getValue(), name);
     }
 
     public List<EntityColumn> getNonPrimaryColumns() {

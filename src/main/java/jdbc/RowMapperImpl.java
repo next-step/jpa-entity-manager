@@ -1,5 +1,6 @@
 package jdbc;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 import persistence.model.util.ReflectionUtil;
 
@@ -33,7 +34,7 @@ public class RowMapperImpl<T> implements RowMapper {
         if (!field.isAnnotationPresent(Transient.class)) {
             field.setAccessible(true);
             try {
-                Object value = resultSet.getObject(ReflectionUtil.getColumnName(field));
+                Object value = resultSet.getObject(ReflectionUtil.getFieldName(field, Column.class));
                 field.set(entityObject, value);
             } catch (IllegalAccessException | SQLException e) {
                 throw new RuntimeException(e);
