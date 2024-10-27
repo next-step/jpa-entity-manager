@@ -2,8 +2,10 @@ package persistence.entity;
 
 import persistence.sql.dml.query.DeleteQuery;
 import persistence.sql.dml.query.InsertQuery;
+import persistence.sql.dml.query.UpdateQuery;
 import persistence.sql.dml.query.builder.DeleteQueryBuilder;
 import persistence.sql.dml.query.builder.InsertQueryBuilder;
+import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 
 public class DefaultEntityPersister implements EntityPersister {
 
@@ -19,7 +21,12 @@ public class DefaultEntityPersister implements EntityPersister {
 
     @Override
     public <T> void update(T entity, EntityManager entityManager) {
-
+        UpdateQuery query = new UpdateQuery(entity);
+        String queryString = UpdateQueryBuilder.builder(entityManager.getDialect())
+                        .update(query.tableName())
+                        .set(query.columns())
+                        .build();
+        entityManager.execute(queryString);
     }
 
     @Override
