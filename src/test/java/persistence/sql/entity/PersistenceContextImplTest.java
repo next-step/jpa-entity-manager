@@ -70,7 +70,12 @@ class PersistenceContextImplTest {
 
         Person databaseSnapshot = (Person) persistenceContext.getDatabaseSnapshot(person.getId(), person);
 
-        assertTrue(databaseSnapshot.equals(person));
+        assertAll(
+                () -> assertTrue(databaseSnapshot.getName().equals(person.getName())),
+                () -> assertTrue(databaseSnapshot.getAge().equals(person.getAge())),
+                () -> assertTrue(databaseSnapshot.getEmail().equals(person.getEmail()))
+        );
+
     }
 
     @Test

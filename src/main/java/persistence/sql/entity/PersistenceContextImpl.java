@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> managedEntities = new HashMap<>();
@@ -59,7 +60,28 @@ public class PersistenceContextImpl implements PersistenceContext {
     public boolean isDirty(Long id, Object currentEntity) {
         EntityKey entityKey = new EntityKey(id, currentEntity.getClass());
         Object entitySnapshot = entitySnapshots.get(entityKey);
-        return !currentEntity.equals(entitySnapshot);
+
+        if (entitySnapshot == null) {
+            return true;
+        }
+
+        for (Field field : currentEntity.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object currentValue;
+            Object snapshotValue;
+            try {
+                currentValue = field.get(currentEntity);
+                snapshotValue = field.get(entitySnapshot);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (!Objects.equals(currentValue, snapshotValue)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
     private Object copySnapshot(Object entity, Long id) {
