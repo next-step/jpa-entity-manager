@@ -15,8 +15,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T, ID> void addEntity(ID id, T entity) {
-        EntityKey key = new EntityKey(id, entity.getClass());
+    public <T> void addEntity(T entity) {
+        EntityKey key = new EntityKey(entity);
         if (context.containsKey(key)) {
             return;
         }
@@ -24,8 +24,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T, ID> void removeEntity(ID id, Class<T> entityType) {
-        EntityKey key = new EntityKey(id, entityType);
+    public <T> void removeEntity(T entity) {
+        EntityKey key = new EntityKey(entity);
         context.remove(key);
     }
 }
