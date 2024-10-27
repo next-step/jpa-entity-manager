@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dml.query.DeleteQuery;
 import persistence.sql.dml.query.InsertQuery;
 import persistence.sql.dml.query.builder.DeleteQueryBuilder;

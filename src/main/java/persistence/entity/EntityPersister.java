@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import jdbc.JdbcTemplate;
-
 public interface EntityPersister {
 
     <T> void insert(T entity, EntityManager entityManager);

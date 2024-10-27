@@ -13,7 +13,6 @@ public class UpdateQueryBuilder {
 
     private static final String UPDATE = "update";
     private static final String SET = "set";
-    private static final String WHERE = "where";
 
     private final Dialect dialect;
     private final StringBuilder queryString;
