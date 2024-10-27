@@ -2,41 +2,41 @@ package persistence.fakehibernate;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FakePersistenceContext implements PersistenceContext {
     private final Map<Class<?>, Map<Long, Object>> entityCache = new HashMap<>();
 
-    public Object add(Object object, Long id) {
-        Map<Long, Object> longObjectMap = entityCache.get(object.getClass());
-        Object o = longObjectMap.get(id);
-        ;
+    public void add(Object object, Long id) {
+        Class<?> clazz = object.getClass();
+        entityCache.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(id, object);
+    }
 
-        if (Objects.isNull(o)) {
-            longObjectMap.put(id, o);
+    public Object get(Class<?> clazz, Long id) {
+        Map<Long, Object> entityMap = entityCache.get(clazz);
+        if (entityMap == null || !entityMap.containsKey(id)) {
+            throw new IllegalArgumentException("Entity not found");
         }
-        return o;
+        return entityMap.get(id);
     }
 
-    public Object get(Object object, Long id) {
-        Map<Long, Object> longObjectMap = entityCache.get(object.getClass());
-        return longObjectMap.get(id);
-    }
 
     public void update(Object object, Long id) {
-        if (!isExist(object, id)) {
-            add(object, id);
+        Class<?> clazz = object.getClass();
+        entityCache.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>())
+                .put(id, object);
+    }
+
+    public void remove(Class<?> clazz, Long id) {
+        Map<Long, Object> entityMap = entityCache.get(clazz);
+        if (entityMap == null || !entityMap.containsKey(id)) {
+            throw new IllegalArgumentException("Entity not found");
         }
-        Map<Long, Object> longObjectMap = entityCache.get(object.getClass());
-        longObjectMap.put(id, object);
+        entityMap.remove(id);
     }
 
-    public void remove(Object object, Long id) {
-        Map<Long, Object> longObjectMap = entityCache.get(object.getClass());
-    }
-
-    public boolean isExist(Object object, Long id) {
-        Map<Long, Object> longObjectMap = entityCache.get(object.getClass());
-        return longObjectMap.containsKey(id);
+    public boolean isExist(Class<?> clazz, Long id) {
+        Map<Long, Object> entityMap = entityCache.get(clazz);
+        return entityMap != null && entityMap.containsKey(id);
     }
 }

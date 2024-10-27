@@ -12,15 +12,23 @@ import persistence.sql.dml.UpdateQueryBuilder;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * EntityPersister 주요 역활
+ * JPA의 핵심 인터페이스로, 데이터베이스와 상호작용하면서 애플리케이션에서 엔티티 객체의 생명주기를 관리하는 역활
+ * EntityMaanger는 개발자가 api를 통해서 엔티티 객체를 관리하는 인터페이스.
+ * 엔티티의 생명주기 관리 (Persist, Merge, Remove )
+ * 트랜잭션 관리
+ * 구현체(hibernate, .. etc) 에 대한 인터페이스 제공
+ */
+
+
 public class DefaultEntityManager implements EntityManager {
-
-//    private final Map<Class<?>, Map<Long, Object>> entityCache;
-
-    private FakePersistenceContext fakePersistenceContext;
-    private EntityPersister entityPersister;
+    private final FakePersistenceContext fakePersistenceContext;
+    private final EntityPersister entityPersister;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate) {
         this.fakePersistenceContext = new FakePersistenceContext();
@@ -29,47 +37,31 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-
         if (fakePersistenceContext.isExist(clazz, id)) {
-            return Optional.of(clazz.cast(fakePersistenceContext.get(clazz, id)));  // 캐시된 엔티티 반환
+            Object o = fakePersistenceContext.get(clazz, id);
+            return Optional.of(clazz.cast(o));
         }
-
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
-        List<T> query = jdbcTemplate.query(selectQuery, new EntityRowMapper<>(clazz));
-
-        if (query.isEmpty()) {
+        Object o = entityPersister.find(clazz, id);
+        if (Objects.isNull(o)) {
             return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
         }
-
         // 엔티티가 타입에 맞는지 확인하고 캐시
-        T entity = query.getFirst();
+        T entity = clazz.cast(o);
         fakePersistenceContext.add(entity, id);
+
         return Optional.of(entity);  // 조회된 엔티티 반환
     }
 
     @Override
     public Object persist(Object entity) {
-        Class<?> clazz = entity.getClass();
-        try {
-            Field idField = clazz.getDeclaredField("id");
-            idField.setAccessible(true);
-            InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(clazz);
-            String insertQuery = insertQueryBuilder.insert(entity);
-            Long id = jdbcTemplate.executeInsert(insertQuery);
-            fakePersistenceContext.add(entity, id);
-            return entity;
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Failed to persist entity", e);
-        }
+        Long id = entityPersister.insert(entity);
+        fakePersistenceContext.add(entity.getClass(), id);
+        return entity;
     }
 
     @Override
     public void remove(Class<?> clazz, Long id) {
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(clazz);
-        String deleteQuery = deleteQueryBuilder.deleteById(clazz, id);
-        jdbcTemplate.execute(deleteQuery);
-
+        entityPersister.remove(clazz, id);
         if (fakePersistenceContext.isExist(clazz, id)) {
             fakePersistenceContext.remove(clazz, id);
         }
@@ -82,10 +74,7 @@ public class DefaultEntityManager implements EntityManager {
             Field idField = clazz.getDeclaredField("id");
             idField.setAccessible(true);
             Long id = (Long) idField.get(entity);
-
-            UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(clazz);
-            String updateQuery = updateQueryBuilder.update(entity);
-            jdbcTemplate.execute(updateQuery);
+            entityPersister.update(entity);
             fakePersistenceContext.update(entity, id);
 
         } catch (NoSuchFieldException e) {
