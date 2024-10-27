@@ -50,6 +50,10 @@ public class Person {
         this.index = index;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return this.name;
     }
