@@ -27,10 +27,13 @@ public class PersistenceContextTest {
             persistenceContext.addEntity(entity);
 
             // when
-            Object foundEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, 1L);
+            PersonWithTransientAnnotation foundEntity = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class,
+                    1L
+            );
 
             // expect
-            assertNotNull(foundEntity);
+            assertEquals(entity.getId(), foundEntity.getId());
         }
 
         @Test
@@ -58,12 +61,16 @@ public class PersistenceContextTest {
             persistenceContext.addEntity(entity);
 
             // when
-            Object afterAddEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, 1L);
+            PersonWithTransientAnnotation afterAddEntity = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class,
+                    1L
+            );
 
             // expect
             assertAll(
                     () -> assertNull(beforeAddEntity),
-                    () -> assertNotNull(afterAddEntity)
+                    () -> assertNotNull(afterAddEntity),
+                    () -> assertEquals(entity.getId(), afterAddEntity.getId())
             );
         }
     }
