@@ -16,5 +16,5 @@ public interface PersistenceContext {
 
     void removeDatabaseSnapshot(Object entity);
 
-    boolean isDirty();
+    boolean isDirty(Object entity);
 }

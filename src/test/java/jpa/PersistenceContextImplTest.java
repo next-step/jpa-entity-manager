@@ -111,6 +111,6 @@ class PersistenceContextImplTest {
         String updateEmail = "test@test.com";
         person.setEmail(updateEmail);
 
-        assertThat(persistenceContext.isDirty()).isTrue();
+        assertThat(persistenceContext.isDirty(person)).isTrue();
     }
 }

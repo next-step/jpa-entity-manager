@@ -6,10 +6,10 @@ public interface EntityManager {
 
     <T> T persist(T entity);
 
-    void remove(Object Entity);
+    void remove(Object entity);
 
-    void update(Object Entity);
+    void update(Object entity);
 
-    boolean isDirty();
+    boolean isDirty(Object entity);
 
 }
