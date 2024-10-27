@@ -10,4 +10,6 @@ public interface EntityManager {
 
     void update(Object Entity);
 
+    boolean isDirty();
+
 }

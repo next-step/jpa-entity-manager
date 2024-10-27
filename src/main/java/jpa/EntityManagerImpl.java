@@ -20,6 +20,7 @@ public class EntityManagerImpl implements EntityManager {
 
         T entity = entityLoader.find(clazz, id);
         persistenceContext.add(entity);
+        persistenceContext.createDatabaseSnapshot(entity);
         return entity;
     }
 
@@ -27,6 +28,7 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T persist(T entity) {
         T insertedEntity = entityPersister.insert(entity);
         persistenceContext.add(entity);
+        persistenceContext.createDatabaseSnapshot(entity);
         return insertedEntity;
     }
 
@@ -34,6 +36,12 @@ public class EntityManagerImpl implements EntityManager {
     public void update(Object entity) {
         entityPersister.update(entity);
         persistenceContext.add(entity);
+        persistenceContext.createDatabaseSnapshot(entity);
+    }
+
+    @Override
+    public boolean isDirty() {
+        return persistenceContext.isDirty();
     }
 
 
@@ -41,6 +49,7 @@ public class EntityManagerImpl implements EntityManager {
     public void remove(Object entity) {
         entityPersister.delete(entity);
         persistenceContext.remove(entity);
+        persistenceContext.removeDatabaseSnapshot(entity);
     }
 
 

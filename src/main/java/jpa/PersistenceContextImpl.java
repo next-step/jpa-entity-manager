@@ -64,6 +64,28 @@ public class PersistenceContextImpl implements PersistenceContext {
         snapshotMap.put(entityInfo, snapshotEntity);
     }
 
+    @Override
+    public void removeDatabaseSnapshot(Object entity) {
+        EntityInfo<?> entityInfo = makeEntityInfo(entity);
+        snapshotMap.remove(entityInfo);
+    }
+
+    public boolean isDirty() {
+        for (EntityInfo<?> entityInfo : entityMap.keySet()) {
+            Object entity = entityMap.get(entityInfo);
+            Object snapshotEntity = snapshotMap.get(entityInfo);
+
+            if (entity == null || snapshotEntity == null) {
+                continue;
+            }
+
+            if (!Objects.equals(entity, snapshotEntity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private EntityInfo<?> makeEntityInfo(Object entity) {
         EntityId entityId = new EntityId(entity.getClass());
         Long idValue = entityId.getIdValue(entity);

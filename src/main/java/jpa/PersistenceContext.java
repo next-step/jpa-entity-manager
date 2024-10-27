@@ -13,4 +13,8 @@ public interface PersistenceContext {
     <T> T getDatabaseSnapshot(T entity);
 
     void createDatabaseSnapshot(Object entity);
+
+    void removeDatabaseSnapshot(Object entity);
+
+    boolean isDirty();
 }
