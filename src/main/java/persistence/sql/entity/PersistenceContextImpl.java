@@ -13,11 +13,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T getEntity(Class<T> clazz, Long id) {
         EntityKey entityKey = new EntityKey(id, clazz);
-        Object entity = managedEntities.get(entityKey);
 
         if (!containsEntity(entityKey)) {
             return null;
         }
+        Object entity = managedEntities.get(entityKey);
         return clazz.cast(entity);
     }
 
@@ -73,7 +73,7 @@ public class PersistenceContextImpl implements PersistenceContext {
                 field.set(snapshot, value);
             }
         } catch (Exception e) {
-            throw new RuntimeException("스냅샷 생성 실패");
+            throw new RuntimeException("스냅샷 생성 실패", e);
         }
 
         return snapshot;
@@ -88,7 +88,7 @@ public class PersistenceContextImpl implements PersistenceContext {
                 try {
                     return (Long) field.get(entity);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException("id값이 없음");
+                    throw new RuntimeException("id값이 없음", e);
                 }
             }
         }
