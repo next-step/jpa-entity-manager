@@ -6,8 +6,8 @@ public interface PersistenceContext {
 
     <T, ID> Optional<T> getEntity(ID id, Class<T> entityType);
 
-    <T> void addEntity(T entity);
+    void addEntity(Object entity);
 
-    <T> void removeEntity(T entity);
+    void removeEntity(Object entity);
 
 }
