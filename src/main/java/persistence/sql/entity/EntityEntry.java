@@ -14,4 +14,12 @@ public class EntityEntry {
     public void updateStatus(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
     }
+
+    public EntityStatus getEntityStatus() {
+        return entityStatus;
+    }
+
+    public Serializable getId() {
+        return id;
+    }
 }

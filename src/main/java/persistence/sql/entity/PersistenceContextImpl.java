@@ -1,7 +1,5 @@
 package persistence.sql.entity;
 
-import jakarta.persistence.Id;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +8,7 @@ import java.util.Objects;
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> managedEntities = new HashMap<>();
     private final Map<EntityKey, Object> entitySnapshots = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> managedEntries = new HashMap<>();
 
     @Override
     public <T> T getEntity(Class<T> clazz, Long id) {
@@ -52,7 +51,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     public void addSnapshot(Long id, Object entity) {
         EntityKey entityKey = new EntityKey(id, entity.getClass());
 
-        Object snapshot = copySnapshot(entity, id);
+        Object snapshot = copySnapshot(entity);
         entitySnapshots.put(entityKey, snapshot);
     }
 
@@ -84,7 +83,12 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     }
 
-    private Object copySnapshot(Object entity, Long id) {
+    @Override
+    public void addEntry(EntityKey entityKey, EntityEntry entityEntry) {
+        managedEntries.put(entityKey, entityEntry);
+    }
+
+    private Object copySnapshot(Object entity) {
         Class<?> clazz = entity.getClass();
         Object snapshot;
         try {
@@ -101,20 +105,4 @@ public class PersistenceContextImpl implements PersistenceContext {
         return snapshot;
     }
 
-    private Long getIdValue(Object entity) {
-        Class<?> clazz = entity.getClass();
-
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                field.setAccessible(true);
-                try {
-                    return (Long) field.get(entity);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("id값이 없음", e);
-                }
-            }
-        }
-
-        return null;
-    }
 }

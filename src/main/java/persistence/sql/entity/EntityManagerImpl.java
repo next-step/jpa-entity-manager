@@ -32,10 +32,12 @@ public class EntityManagerImpl implements EntityManager {
             entityPersister.setIdValue(entity, idValue);
 
             persistenceContext.addEntity(entity, idValue);
+            persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.MANAGED, idValue));
         }
 
         if (idValue != null && persistenceContext.isDirty(idValue, entity)) {
             entityPersister.update(entity);
+            persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.MANAGED, idValue));
             persistenceContext.addSnapshot(idValue, entity);
         }
         return entity;
@@ -50,6 +52,7 @@ public class EntityManagerImpl implements EntityManager {
 
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity.getClass(), idValue);
+        persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.DELETED, idValue));
 
     }
 
@@ -60,6 +63,7 @@ public class EntityManagerImpl implements EntityManager {
             entityPersister.update(entity);
             persistenceContext.addEntity(entity.getClass(), idValue);
             persistenceContext.addSnapshot(idValue, entity);
+            persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.MANAGED, idValue));
         }
 
         return entity;
