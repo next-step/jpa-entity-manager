@@ -48,7 +48,6 @@ public class DefaultEntityManager implements EntityManager {
             throw new EntityExistsException("Entity already exists");
         }
 
-        entityPersister.insert(entity);
         EntityEntry entityEntry = persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
         if (!transaction.isActive()) {
             entityEntry.dirtyCheck();
