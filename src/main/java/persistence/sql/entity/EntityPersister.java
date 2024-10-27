@@ -46,7 +46,7 @@ public class EntityPersister {
         String insertQuery = insertQueryBuilder.getInsertQuery(entityTable, entityColumns, entity);
         Long idValue = jdbcTemplate.insertAndReturnId(insertQuery);
 
-        setEntityIdValue(entity, idValue);
+        setIdValue(entity, idValue);
     }
 
     public void delete(Object entity) {
@@ -84,15 +84,4 @@ public class EntityPersister {
         }
     }
 
-    private void setEntityIdValue(Object entity, Long idValue) {
-        Class<?> clazz = entity.getClass();
-        Metadata metadata = new Metadata(clazz);
-        try {
-            Field declaredField = clazz.getDeclaredField(metadata.getIdFieldName());
-            declaredField.setAccessible(true);
-            declaredField.set(entity, idValue);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
