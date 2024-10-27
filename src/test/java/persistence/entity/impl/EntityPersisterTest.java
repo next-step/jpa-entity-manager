@@ -39,7 +39,6 @@ class EntityPersisterTest {
 
         QueryBuilder ddlQueryBuilder = new CreateTableQueryBuilder(TestEntity.class);
         String createTableQuery = ddlQueryBuilder.executeQuery();
-        System.out.println(createTableQuery);
         jdbcTemplate.execute(createTableQuery);
     }
 

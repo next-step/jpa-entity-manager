@@ -18,7 +18,6 @@ public class InsertQueryBuilder extends DMLQueryBuilder{
             String tableName = getTableName();
             String columns = columnsClause();
             String values = valueClause(entity);
-        System.out.println("InsertQueryBuilder: " + "INSERT INTO " + tableName + " (" + columns + ") VALUES (" + values + ");");
             return "INSERT INTO " + tableName + " (" + columns + ") VALUES (" + values + ");";
     }
 }

@@ -50,7 +50,6 @@ public abstract class DMLQueryBuilder {
                 .filter(this::isPersistentField)
                 .map(field -> getFieldValue(entity, field))
                 .collect(Collectors.joining(", "));
-        System.out.println("Value clause: " + collect);
         return collect;
     }
 
