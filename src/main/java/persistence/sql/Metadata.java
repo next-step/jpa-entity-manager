@@ -51,7 +51,7 @@ public class Metadata {
             }
             return getFormattedId(fieldValue);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("필드에 접근할 수 없음");
+            throw new RuntimeException("필드에 접근할 수 없음", e);
         }
     }
 

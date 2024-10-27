@@ -63,7 +63,7 @@ public class EntityPersister {
                 try {
                     return (Long) field.get(entity);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException("id값이 없음");
+                    throw new RuntimeException("id값이 없음", e);
                 }
             }
         }

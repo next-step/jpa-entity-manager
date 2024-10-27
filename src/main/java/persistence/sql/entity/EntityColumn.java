@@ -83,9 +83,10 @@ public class EntityColumn {
             }
             return getFormattedId(fieldValue);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("필드에 접근할 수 없음");
+            throw new RuntimeException("필드에 접근할 수 없음", e);
         }
     }
+
     private String getFormattedId(Object idValue) {
         if (idValue instanceof String) {
             return String.format(("'%s'"), idValue);
