@@ -64,11 +64,11 @@ public class PersistenceConfig {
         return new DefaultEntityManager(persistenceContext(), entityPersister());
     }
 
-    private EntityPersister entityPersister() throws SQLException {
+    public EntityPersister entityPersister() throws SQLException {
         return new DefaultEntityPersister(database(), nameConverter());
     }
 
-    private PersistenceContext persistenceContext() {
+    public PersistenceContext persistenceContext() {
         return new DefaultPersistenceContext();
     }
 
