@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import jdbc.JdbcTemplate;
 import persistence.sql.dml.query.DeleteQuery;
 import persistence.sql.dml.query.InsertQuery;
 import persistence.sql.dml.query.UpdateQuery;
@@ -10,32 +11,32 @@ import persistence.sql.dml.query.builder.UpdateQueryBuilder;
 public class DefaultEntityPersister implements EntityPersister {
 
     @Override
-    public <T> void insert(T entity, EntityManager entityManager) {
+    public <T> void insert(T entity, JdbcTemplate jdbcTemplate) {
         InsertQuery query = new InsertQuery(entity);
-        String queryString = InsertQueryBuilder.builder(entityManager.getDialect())
+        String queryString = InsertQueryBuilder.builder()
                 .insert(query.tableName(), query.columns())
                 .values(query.columns())
                 .build();
-        entityManager.execute(queryString);
+        jdbcTemplate.execute(queryString);
     }
 
     @Override
-    public <T> void update(T entity, EntityManager entityManager) {
+    public <T> void update(T entity, JdbcTemplate jdbcTemplate) {
         UpdateQuery query = new UpdateQuery(entity);
-        String queryString = UpdateQueryBuilder.builder(entityManager.getDialect())
+        String queryString = UpdateQueryBuilder.builder()
                         .update(query.tableName())
                         .set(query.columns())
                         .build();
-        entityManager.execute(queryString);
+        jdbcTemplate.execute(queryString);
     }
 
     @Override
-    public <T> void delete(T entity, EntityManager entityManager) {
+    public <T> void delete(T entity, JdbcTemplate jdbcTemplate) {
         DeleteQuery query = new DeleteQuery(entity.getClass());
-        String queryString = DeleteQueryBuilder.builder(entityManager.getDialect())
+        String queryString = DeleteQueryBuilder.builder()
                 .delete(query.tableName())
                 .build();
-        entityManager.execute(queryString);
+        jdbcTemplate.execute(queryString);
     }
 
 }

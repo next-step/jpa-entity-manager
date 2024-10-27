@@ -42,18 +42,13 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public void persist(Object entity) {
         context.addEntity(entity);
-        persister.insert(entity, this);
+        persister.insert(entity, jdbcTemplate);
     }
 
     @Override
     public void remove(Object entity) {
         context.removeEntity(entity);
-        persister.delete(entity, this);
-    }
-
-    @Override
-    public void execute(String query) {
-        jdbcTemplate.execute(query);
+        persister.delete(entity, jdbcTemplate);
     }
 
     @Override

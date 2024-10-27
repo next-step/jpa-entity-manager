@@ -10,8 +10,6 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    void execute(String query);
-
     Dialect getDialect();
 
 }
