@@ -39,6 +39,7 @@ public class TableColumn {
                 return column.name();
             }
         }
+        System.out.println("Column name: " + field.getName());
         return field.getName();
     }
 }

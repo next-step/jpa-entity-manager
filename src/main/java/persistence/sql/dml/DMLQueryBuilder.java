@@ -41,14 +41,17 @@ public abstract class DMLQueryBuilder {
 
     String columnsClause() {
         return tableMeta.tableColumn().stream()
+
                 .map(TableColumn::name).reduce((s1, s2) -> s1 + ", " + s2).orElseThrow();
     }
 
     String valueClause(Object entity) {
-        return Arrays.stream(clazz.getDeclaredFields())
+        String collect = Arrays.stream(clazz.getDeclaredFields())
                 .filter(this::isPersistentField)
                 .map(field -> getFieldValue(entity, field))
                 .collect(Collectors.joining(", "));
+        System.out.println("Value clause: " + collect);
+        return collect;
     }
 
     private String getFieldValue(Object entity, Field field) {
@@ -79,7 +82,7 @@ public abstract class DMLQueryBuilder {
     }
 
     private boolean isPersistentField(Field field) {
-        return !(field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(GeneratedValue.class))
+        return !field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(GeneratedValue.class)
                 && !field.isAnnotationPresent(Transient.class);
     }
 }

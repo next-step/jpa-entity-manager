@@ -60,7 +60,7 @@ public class TableMeta {
     }
 
     private boolean isPersistentField(Field field) {
-        return !(field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(GeneratedValue.class))
+        return !field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(GeneratedValue.class)
                 && !field.isAnnotationPresent(Transient.class);
     }
 }
