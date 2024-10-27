@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.sql.dialect.Dialect;
+
 public interface EntityManager {
 
     <T> T find(Class<T> clazz, Object id);
@@ -7,5 +9,9 @@ public interface EntityManager {
     void persist(Object entity);
 
     void remove(Object entity);
+
+    void execute(String query);
+
+    Dialect getDialect();
 
 }

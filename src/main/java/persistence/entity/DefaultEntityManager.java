@@ -2,28 +2,36 @@ package persistence.entity;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Optional;
 import jdbc.JdbcTemplate;
-import persistence.sql.dialect.H2Dialect;
-import persistence.sql.dml.query.DeleteQuery;
-import persistence.sql.dml.query.InsertQuery;
+import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.query.SelectQuery;
 import persistence.sql.dml.query.WhereCondition;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
 
 public class DefaultEntityManager implements EntityManager {
 
     private final JdbcTemplate jdbcTemplate;
+    private final Dialect dialect;
+    private final PersistenceContext context;
+    private final EntityPersister persister;
 
-    public DefaultEntityManager(Connection connection) {
+    public DefaultEntityManager(Connection connection, Dialect dialect) {
         this.jdbcTemplate = new JdbcTemplate(connection);
+        this.dialect = dialect;
+        this.context = new DefaultPersistenceContext();
+        this.persister = new DefaultEntityPersister();
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
+        Optional<T> entity = context.getEntity(id, clazz);
+        if (entity.isPresent()) {
+            return entity.get();
+        }
+
         SelectQuery query = new SelectQuery(clazz);
-        String queryString = SelectQueryBuilder.builder(new H2Dialect())
+        String queryString = SelectQueryBuilder.builder(dialect)
                 .select(query.columnNames())
                 .from(query.tableName())
                 .where(List.of(new WhereCondition("id", "=", id)))
@@ -33,21 +41,22 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        InsertQuery query = new InsertQuery(entity);
-        String queryString = InsertQueryBuilder.builder(new H2Dialect())
-                .insert(query.tableName(), query.columns())
-                .values(query.columns())
-                .build();
-       jdbcTemplate.execute(queryString);
+        persister.insert(entity, this);
     }
 
     @Override
     public void remove(Object entity) {
-        DeleteQuery query = new DeleteQuery(entity.getClass());
-        String queryString = DeleteQueryBuilder.builder(new H2Dialect())
-                .delete(query.tableName())
-                .build();
-        jdbcTemplate.execute(queryString);
+        persister.delete(entity, this);
+    }
+
+    @Override
+    public void execute(String query) {
+        jdbcTemplate.execute(query);
+    }
+
+    @Override
+    public Dialect getDialect() {
+        return this.dialect;
     }
 
 }
