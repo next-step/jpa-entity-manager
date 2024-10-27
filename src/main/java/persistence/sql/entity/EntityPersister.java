@@ -42,7 +42,7 @@ public class EntityPersister {
         }
     }
 
-    public void insert(Object entity) throws SQLException {
+    public void insert(Object entity) {
         String insertQuery = insertQueryBuilder.getInsertQuery(entityTable, entityColumns, entity);
         Long idValue = jdbcTemplate.insertAndReturnId(insertQuery);
 
