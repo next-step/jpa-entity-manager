@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FakePersistenceContext implements PersistenceContext {
+public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<Class<?>, Map<Long, Object>> entityCache = new HashMap<>();
 
     public void add(Object object, Long id) {
