@@ -49,9 +49,7 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         EntityEntry entityEntry = persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
-        if (!transaction.isActive()) {
-            entityEntry.dirtyCheck();
-        }
+        entityEntry.dirtyCheck();
     }
 
     private boolean isNew(Object entity) {
@@ -84,10 +82,7 @@ public class DefaultEntityManager implements EntityManager {
 
         EntityEntry entry = persistenceContext.getEntry(entity.getClass(), id);
         entry.updateEntity(entity);
-
-        if (!transaction.isActive()) {
-            entry.dirtyCheck();
-        }
+        entry.dirtyCheck();
 
         return entity;
     }
@@ -104,9 +99,7 @@ public class DefaultEntityManager implements EntityManager {
 
         EntityEntry entityEntry = persistenceContext.getEntry(entity.getClass(), id);
         entityEntry.updateStatus(Status.DELETED);
-        if (!transaction.isActive()) {
-            entityEntry.dirtyCheck();
-        }
+        entityEntry.dirtyCheck();
     }
 
     @Override
@@ -121,11 +114,13 @@ public class DefaultEntityManager implements EntityManager {
             return returnType.cast(entry.getEntity());
         }
 
+        entry = persistenceContext.addEntry(primaryKey, returnType, Status.LOADING, entityPersister);
         EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(returnType);
 
         T loadedEntity = entityLoader.load(primaryKey);
         if (loadedEntity != null) {
-            persistenceContext.addEntry(loadedEntity, Status.MANAGED, entityPersister);
+            entry.updateEntity(loadedEntity);
+            entry.updateStatus(Status.MANAGED);
         }
 
         return loadedEntity;

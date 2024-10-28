@@ -7,6 +7,8 @@ public interface PersistenceContext {
 
     <T> EntityEntry addEntry(T entity, Status status, EntityPersister entityPersister);
 
+    <T> EntityEntry addEntry(Object primaryKey, Class<T> returnType, Status status, EntityPersister entityPersister);
+
     <T, ID> EntityEntry getEntry(Class<T> entityType, ID id);
 
     <T, ID> void deleteEntry(T entity, ID id);

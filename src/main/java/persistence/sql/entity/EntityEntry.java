@@ -40,6 +40,22 @@ public class EntityEntry {
         this.loader = loader;
     }
 
+    public static EntityEntry newLoadingEntry(EntityPersister entityPersister,
+                                              PersistenceContext persistenceContext,
+                                              Object primaryKey,
+                                              Class<?> returnType) {
+        EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(returnType);
+        KeyHolder key = new KeyHolder(returnType, primaryKey);
+
+        return new EntityEntry(persistenceContext,
+                entityPersister,
+                entityLoader.getMetadataLoader(),
+                Status.LOADING,
+                null,
+                null,
+                key);
+    }
+
     public static EntityEntry newEntry(EntityPersister entityPersister, PersistenceContext persistenceContext, Object entity, Status status) {
         EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
         MetadataLoader<?> loader = entityLoader.getMetadataLoader();
@@ -99,6 +115,9 @@ public class EntityEntry {
 
     public void updateEntity(Object entity) {
         this.entity = entity;
+        if (snapshot == null) {
+            snapshot = createSnapshot(entity, loader);
+        }
     }
 
     public void dirtyCheck() {
