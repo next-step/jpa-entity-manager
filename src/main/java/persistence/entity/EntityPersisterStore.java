@@ -21,8 +21,4 @@ public class EntityPersisterStore {
         return entityPersisters.get(entityClass);
     }
 
-    private void addEntityPersister(Class<?> entityClass, EntityPersister entityPersister) {
-        entityPersisters.put(entityClass, entityPersister);
-    }
-
 }
