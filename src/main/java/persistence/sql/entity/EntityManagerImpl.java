@@ -16,10 +16,14 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         EntityKey entityKey = new EntityKey(id, clazz);
+        persistenceContext.goneEntry(entityKey);
         if (persistenceContext.containsEntity(entityKey)) {
             return persistenceContext.getEntity(clazz, id);
         }
-        return entityLoader.loadEntity(clazz, id);
+        persistenceContext.loadingEntry(entityKey);
+        T entity = entityLoader.loadEntity(clazz, id);
+        persistenceContext.managedEntry(entityKey);
+        return entity;
     }
 
     @Override
@@ -32,12 +36,12 @@ public class EntityManagerImpl implements EntityManager {
             entityPersister.setIdValue(entity, idValue);
 
             persistenceContext.addEntity(entity, idValue);
-            persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.MANAGED, idValue));
+            persistenceContext.managedEntry(new EntityKey(idValue, entity.getClass()));
         }
 
         if (idValue != null && persistenceContext.isDirty(idValue, entity)) {
             entityPersister.update(entity);
-            persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.MANAGED, idValue));
+            persistenceContext.managedEntry(new EntityKey(idValue, entity.getClass()));
             persistenceContext.addSnapshot(idValue, entity);
         }
         return entity;
@@ -49,21 +53,23 @@ public class EntityManagerImpl implements EntityManager {
         if (idValue == null) {
             return;
         }
-
+        EntityKey entityKey = new EntityKey(idValue, entity.getClass());
+        persistenceContext.deleteEntry(entityKey);
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity.getClass(), idValue);
-        persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.DELETED, idValue));
-
+        persistenceContext.goneEntry(entityKey);
     }
 
     @Override
     public Object update(Object entity) {
         Long idValue = entityPersister.getIdValue(entity);
+        EntityKey entityKey = new EntityKey(idValue, entity.getClass());
         if (persistenceContext.isDirty(idValue, entity)) {
+            persistenceContext.savingEntry(entityKey);
             entityPersister.update(entity);
             persistenceContext.addEntity(entity.getClass(), idValue);
             persistenceContext.addSnapshot(idValue, entity);
-            persistenceContext.addEntry(new EntityKey(idValue, entity.getClass()), new EntityEntry(EntityStatus.MANAGED, idValue));
+            persistenceContext.managedEntry(entityKey);
         }
 
         return entity;

@@ -16,4 +16,14 @@ public interface PersistenceContext {
     boolean isDirty(Long id, Object currentEntity);
 
     void addEntry(EntityKey entityKey, EntityEntry entityEntry);
+
+    void goneEntry(EntityKey entityKey);
+
+    void managedEntry(EntityKey entityKey);
+
+    void deleteEntry(EntityKey entityKey);
+
+    void savingEntry(EntityKey entityKey);
+
+    void loadingEntry(EntityKey entityKey);
 }

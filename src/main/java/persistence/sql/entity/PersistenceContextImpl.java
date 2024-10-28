@@ -88,6 +88,71 @@ public class PersistenceContextImpl implements PersistenceContext {
         managedEntries.put(entityKey, entityEntry);
     }
 
+    @Override
+    public void goneEntry(EntityKey entityKey) {
+        EntityEntry entry = managedEntries.get(entityKey);
+        if (entry != null) {
+            entry.updateStatus(EntityStatus.GONE);
+        }
+
+        if (entry == null) {
+            managedEntries.put(entityKey, new EntityEntry(EntityStatus.GONE, entry.getId()));
+        }
+
+        managedEntities.remove(entityKey);
+        entitySnapshots.remove(entityKey);
+        managedEntries.remove(entityKey);
+    }
+
+    @Override
+    public void loadingEntry(EntityKey entityKey) {
+        EntityEntry entry = managedEntries.get(entityKey);
+        if (entry != null) {
+            entry.updateStatus(EntityStatus.LOADING);
+        }
+
+        if (entry == null) {
+            managedEntries.put(entityKey, new EntityEntry(EntityStatus.LOADING, entry.getId()));
+        }
+    }
+
+    @Override
+    public void savingEntry(EntityKey entityKey) {
+        EntityEntry entry = managedEntries.get(entityKey);
+        if (entry != null) {
+            entry.updateStatus(EntityStatus.SAVING);
+        }
+
+        if (entry == null) {
+            managedEntries.put(entityKey, new EntityEntry(EntityStatus.SAVING, entry.getId()));
+        }
+    }
+
+    @Override
+    public void managedEntry(EntityKey entityKey) {
+        EntityEntry entry = managedEntries.get(entityKey);
+        if (entry != null) {
+            entry.updateStatus(EntityStatus.MANAGED);
+        }
+
+        if (entry == null) {
+            managedEntries.put(entityKey, new EntityEntry(EntityStatus.MANAGED, entry.getId()));
+        }
+    }
+
+    @Override
+    public void deleteEntry(EntityKey entityKey) {
+        EntityEntry entry = managedEntries.get(entityKey);
+        if (entry != null) {
+            entry.updateStatus(EntityStatus.DELETED);
+        }
+
+        if (entry == null) {
+            managedEntries.put(entityKey, new EntityEntry(EntityStatus.DELETED, entry.getId()));
+        }
+    }
+
+
     private Object copySnapshot(Object entity) {
         Class<?> clazz = entity.getClass();
         Object snapshot;
