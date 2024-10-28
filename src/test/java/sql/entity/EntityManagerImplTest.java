@@ -71,4 +71,24 @@ class EntityManagerImplTest {
 
         assertThat(emailColumnValue.getValue()).isEqualTo(updateEmail);
     }
+
+    @Test
+    void save후_더티체크() {
+        String name = "이름";
+        int age = 11;
+        String email = "jsss@test.co1m";
+        int index = 1;
+        Person person = new Person(name, age, email, index);
+        Person savedPerson = entityManager.persist(person);
+
+        String updatedEmail = "updateemail@test.com";
+        person.setEmail(updatedEmail);
+        entityManager.merge(person);
+        entityManager.flush();
+
+        EntityManager newEntityManager = new EntityManagerImpl(entityPersister, entityLoader);
+        Person dirtyCheckedPerson = newEntityManager.find(Person.class, savedPerson.getId());
+
+        assertThat(dirtyCheckedPerson.getEmail()).isEqualTo(updatedEmail);
+    }
 }
