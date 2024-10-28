@@ -7,12 +7,14 @@ import persistence.sql.model.EntityId;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
     private final Map<EntityInfo<?>, Object> entityMap = new HashMap<>();
-    private final Map<EntityInfo<?>, Object> snapshotMap = new HashMap<>();
+    private final Map<EntityInfo<?>, DatabaseSnapshot> snapshotMap = new HashMap<>();
 
     public PersistenceContextImpl() {
     }
@@ -20,7 +22,6 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void add(Object entity) {
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
-        snapshotMap.put(entityInfo, entity);
         if (entityMap.containsKey(entityInfo)) {
             return;
         }
@@ -31,7 +32,6 @@ public class PersistenceContextImpl implements PersistenceContext {
     public <T> T get(Class<T> clazz, Long id) {
         EntityInfo<?> entityInfo = new EntityInfo<>(clazz, id);
         Object entity = entityMap.get(entityInfo);
-        snapshotMap.put(entityInfo, entity);
         if (entity == null) {
             return null;
         }
@@ -61,7 +61,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         Object snapshotEntity = databaseSnapshot.getEntity();
 
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
-        snapshotMap.put(entityInfo, snapshotEntity);
+        snapshotMap.put(entityInfo, new DatabaseSnapshot(snapshotEntity));
     }
 
     @Override
@@ -70,20 +70,20 @@ public class PersistenceContextImpl implements PersistenceContext {
         snapshotMap.remove(entityInfo);
     }
 
+    @Override
     public boolean isDirty(Object entity) {
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
-        Object managedEntity = entityMap.get(entityInfo);
-        Object snapshotEntity = snapshotMap.get(entityInfo);
+        DatabaseSnapshot databaseSnapshot = snapshotMap.get(entityInfo);
+        return databaseSnapshot != null && databaseSnapshot.isDirty(entity);
+    }
 
-        if (managedEntity == null || snapshotEntity == null) {
-            return false;
-        }
 
-        if (isNotEqualFields(managedEntity, snapshotEntity)) {
-            return true;
-        }
-
-        return false;
+    @Override
+    public List<Object> getDirtyEntities() {
+        return snapshotMap.keySet().stream()
+                .filter(key -> snapshotMap.get(key).isDirty(entityMap.get(key)))
+                .map(entityMap::get)
+                .collect(Collectors.toList());
     }
 
     private EntityInfo<?> makeEntityInfo(Object entity) {
@@ -92,19 +92,5 @@ public class PersistenceContextImpl implements PersistenceContext {
         return new EntityInfo<>(entity.getClass(), idValue);
     }
 
-    private boolean isNotEqualFields(Object managedEntity, Object snapshotEntity) {
-        for (Field field : managedEntity.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Object managedValue = field.get(managedEntity);
-                Object snapshotValue = field.get(snapshotEntity);
-                if (!managedValue.equals(snapshotValue)) {
-                    return true;
-                }
-            } catch (IllegalAccessException e) {
-                throw new CouldNotAccessField(e, ExceptionMessage.COULD_NOT_ACCESS_FIELD);
-            }
-        }
-        return false;
-    }
+
 }

@@ -33,17 +33,17 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void update(Object entity) {
-        entityPersister.update(entity);
-        persistenceContext.add(entity);
-        persistenceContext.createDatabaseSnapshot(entity);
-
-
+    public void merge(Object entity) {
+        if (persistenceContext.isDirty(entity)) {
+            persistenceContext.add(entity);
+        }
     }
 
     @Override
-    public boolean isDirty(Object object) {
-        return persistenceContext.isDirty(object);
+    public void flush() {
+        for (Object entity : persistenceContext.getDirtyEntities()) {
+            entityPersister.update(entity);
+        }
     }
 
 
@@ -54,8 +54,5 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.removeDatabaseSnapshot(entity);
     }
 
-    public void dirtyCheck() {
-
-    }
 
 }

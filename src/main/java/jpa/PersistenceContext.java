@@ -1,5 +1,7 @@
 package jpa;
 
+import java.util.List;
+
 public interface PersistenceContext {
 
     void add(Object entity);
@@ -17,4 +19,6 @@ public interface PersistenceContext {
     void removeDatabaseSnapshot(Object entity);
 
     boolean isDirty(Object entity);
+
+    List<Object> getDirtyEntities();
 }

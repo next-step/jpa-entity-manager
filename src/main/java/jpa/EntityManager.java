@@ -8,8 +8,8 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    void update(Object entity);
+    void merge(Object entity);
 
-    boolean isDirty(Object entity);
+    void flush();
 
 }

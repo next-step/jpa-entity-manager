@@ -63,8 +63,6 @@ class EntityManagerImplTest {
         Person insertedPerson = entityManager.find(Person.class, 1L);
         String updateEmail = "test@naver.com";
         insertedPerson.setEmail(updateEmail);
-        entityManager.update(insertedPerson);
-
 
         Person updatedPerson = entityManager.find(Person.class, 1L);
 

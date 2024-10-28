@@ -1,6 +1,9 @@
 package persistence.sql.model;
 
+import jpa.EntityInfo;
 import org.jetbrains.annotations.NotNull;
+import persistence.sql.exception.CouldNotAccessField;
+import persistence.sql.exception.ExceptionMessage;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -38,5 +41,33 @@ public class DatabaseSnapshot {
             field.setAccessible(true);
             field.set(object, field.get(this.entity));
         }
+    }
+
+    public boolean isDirty(Object managedEntity) {
+        if (managedEntity == null || this.entity == null) {
+            return false;
+        }
+
+        if (isNotEqualFields(managedEntity, this.entity)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isNotEqualFields(Object managedEntity, Object snapshotEntity) {
+        for (Field field : managedEntity.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object managedValue = field.get(managedEntity);
+                Object snapshotValue = field.get(snapshotEntity);
+                if (!managedValue.equals(snapshotValue)) {
+                    return true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new CouldNotAccessField(e, ExceptionMessage.COULD_NOT_ACCESS_FIELD);
+            }
+        }
+        return false;
     }
 }
