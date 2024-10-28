@@ -94,8 +94,11 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
         // given
         EntityLoader<TestPerson> loader = EntityLoaderFactory.getInstance().getLoader(TestPerson.class);
         TestPerson catsbiEntity = new TestPerson(1L, "catsbi", 33, "catsbi@naver.com", 123);
-        EntityEntry entityEntry = new EntityEntry(context, entityPersister, loader.getMetadataLoader(), Status.SAVING,
-                catsbiEntity, null, new KeyHolder(TestPerson.class, catsbiEntity.getId()));
+        EntityEntry entityEntry = new EntityEntry(loader.getMetadataLoader(),
+                Status.SAVING,
+                catsbiEntity,
+                null,
+                new KeyHolder(TestPerson.class, catsbiEntity.getId()));
         Map<KeyHolder, EntityEntry> entryMap = ReflectionUtils.getFieldValue(context, "context");
         entryMap.put(entityEntry.getKey(), entityEntry);
 

@@ -28,7 +28,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public <T> EntityEntry addEntry(Object primaryKey, Class<T> returnType, Status status, EntityPersister entityPersister) {
-        EntityEntry entityEntry = EntityEntry.newLoadingEntry(entityPersister, this, primaryKey, returnType);
+        EntityEntry entityEntry = EntityEntry.newLoadingEntry(primaryKey, returnType);
         context.put(entityEntry.getKey(), entityEntry);
 
         return entityEntry;

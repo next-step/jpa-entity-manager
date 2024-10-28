@@ -17,39 +17,24 @@ import java.util.List;
 
 public class EntityEntry {
     private final MetadataLoader<?> loader;
-    private final EntityPersister entityPersister;
-    private final PersistenceContext persistenceContext;
     private Status status;
     private Object entity;
     private Object snapshot;
     private KeyHolder key;
 
-    public EntityEntry(PersistenceContext persistenceContext,
-                       EntityPersister entityPersister,
-                       MetadataLoader<?> loader,
-                       Status status,
-                       Object entity,
-                       Object snapshot,
-                       KeyHolder key) {
-        this.persistenceContext = persistenceContext;
+    public EntityEntry(MetadataLoader<?> loader, Status status, Object entity, Object snapshot, KeyHolder key) {
+        this.loader = loader;
         this.status = status;
         this.entity = entity;
         this.snapshot = snapshot;
         this.key = key;
-        this.entityPersister = entityPersister;
-        this.loader = loader;
     }
 
-    public static EntityEntry newLoadingEntry(EntityPersister entityPersister,
-                                              PersistenceContext persistenceContext,
-                                              Object primaryKey,
-                                              Class<?> returnType) {
+    public static EntityEntry newLoadingEntry(Object primaryKey, Class<?> returnType) {
         EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(returnType);
         KeyHolder key = new KeyHolder(returnType, primaryKey);
 
-        return new EntityEntry(persistenceContext,
-                entityPersister,
-                entityLoader.getMetadataLoader(),
+        return new EntityEntry(entityLoader.getMetadataLoader(),
                 Status.LOADING,
                 null,
                 null,
@@ -74,7 +59,7 @@ public class EntityEntry {
 
         KeyHolder key = new KeyHolder(entity.getClass(), id);
 
-        return new EntityEntry(persistenceContext, entityPersister, loader, status, entity, createSnapshot(entity, loader), key);
+        return new EntityEntry(loader, status, entity, createSnapshot(entity, loader), key);
 
     }
 
