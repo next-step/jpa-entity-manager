@@ -68,8 +68,8 @@ public class PersistenceConfig {
         return new DefaultEntityPersister(database(), nameConverter());
     }
 
-    public PersistenceContext persistenceContext() {
-        return new DefaultPersistenceContext();
+    public PersistenceContext persistenceContext() throws SQLException {
+        return new DefaultPersistenceContext(entityPersister());
     }
 
     public Database database() throws SQLException {

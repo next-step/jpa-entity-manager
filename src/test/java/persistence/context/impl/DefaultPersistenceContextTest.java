@@ -3,15 +3,20 @@ package persistence.context.impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.sql.EntityLoaderFactory;
 import persistence.sql.config.PersistenceConfig;
 import persistence.sql.context.EntityPersister;
+import persistence.sql.context.KeyHolder;
 import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.TestEntityInitialize;
 import persistence.sql.entity.EntityEntry;
 import persistence.sql.entity.data.Status;
 import persistence.sql.fixture.TestPerson;
+import persistence.sql.loader.EntityLoader;
+import persistence.util.ReflectionUtils;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +34,20 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
     }
 
     @Test
-    @DisplayName("get 함수는 저장된 엔티티를 반환한다.")
+    @DisplayName("addEntry 함수는 Status가 Saving이면 Entity를 insert하고 EntityEntry를 생성한다.")
+    void testAddEntry() {
+        // given
+        TestPerson catsbiEntity = new TestPerson("catsbi", 33, "catsbi@naver.com", 123);
+        context.addEntry(catsbiEntity, Status.SAVING, entityPersister);
+
+        TestPerson actual = EntityLoaderFactory.getInstance().getLoader(TestPerson.class).load(catsbiEntity.getId());
+
+        assertThat(context.getEntry(TestPerson.class, catsbiEntity.getId())).isNotNull();
+        assertThat(actual.getName()).isEqualTo("catsbi");
+    }
+
+    @Test
+    @DisplayName("getEntry 함수는 저장된 엔티티를 반환한다.")
     void testGetEntryWithEntity() {
         // given
         TestPerson entity = new TestPerson(1L, "catsbi", 33, "catsbi@naver.com", 123);
@@ -45,7 +63,7 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
 
 
     @Test
-    @DisplayName("get 함수는 유효하지 않은 식별자를 전달하면 null을 반환한다.")
+    @DisplayName("getEntry 함수는 유효하지 않은 식별자를 전달하면 null을 반환한다.")
     void testGetEntryWithInvalidId() {
         // when
         EntityEntry actual = context.getEntry(TestPerson.class, 1L);
@@ -68,5 +86,59 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
         //then
         assertThat(catsbiEntry.isDirty()).isTrue();
         assertThat(crongEntry.isDirty()).isFalse();
+    }
+
+    @Test
+    @DisplayName("dirtyCheck 함수는 저장이 필요한 엔티티를 동기화한다.")
+    void testDirtyCheckWithValidEntries() {
+        // given
+        EntityLoader<TestPerson> loader = EntityLoaderFactory.getInstance().getLoader(TestPerson.class);
+        TestPerson catsbiEntity = new TestPerson(1L, "catsbi", 33, "catsbi@naver.com", 123);
+        EntityEntry entityEntry = new EntityEntry(context, entityPersister, loader.getMetadataLoader(), Status.SAVING,
+                catsbiEntity, null, new KeyHolder(TestPerson.class, catsbiEntity.getId()));
+        Map<KeyHolder, EntityEntry> entryMap = ReflectionUtils.getFieldValue(context, "context");
+        entryMap.put(entityEntry.getKey(), entityEntry);
+
+        //when
+        context.dirtyCheck();
+        TestPerson actual = EntityLoaderFactory.getInstance().getLoader(TestPerson.class).load(catsbiEntity.getId());
+
+        assertThat(context.getEntry(TestPerson.class, catsbiEntity.getId())).isNotNull();
+        assertThat(actual.getName()).isEqualTo("catsbi");
+    }
+
+    @Test
+    @DisplayName("dirtyCheck 함수는 변경이 필요한 엔티티를 동기화한다.")
+    void testDirtyCheckWithDirtyEntity() {
+        // given
+        EntityLoader<TestPerson> loader = EntityLoaderFactory.getInstance().getLoader(TestPerson.class);
+        TestPerson catsbiEntity = new TestPerson(1L, "catsbi", 33, "catsbi@naver.com", 123);
+        context.addEntry(catsbiEntity, Status.SAVING, entityPersister);
+
+        // when
+        catsbiEntity.setName("newCatsbi");
+        context.dirtyCheck();
+
+        // then
+        TestPerson actual = loader.load(catsbiEntity.getId());
+        assertThat(actual.getName()).isEqualTo("newCatsbi");
+    }
+
+    @Test
+    @DisplayName("deleteEntry 함수는 저장된 엔티티를 삭제한다.")
+    void testDeleteEntry() {
+        // given
+        EntityLoader<TestPerson> loader = EntityLoaderFactory.getInstance().getLoader(TestPerson.class);
+        TestPerson catsbiEntity = new TestPerson( "catsbi", 33, "catsbi@naver.com", 123);
+        EntityEntry entityEntry = context.addEntry(catsbiEntity, Status.SAVING, entityPersister);
+
+        // when
+        entityEntry.updateStatus(Status.DELETED);
+        context.dirtyCheck();
+        TestPerson actual = loader.load(catsbiEntity.getId());
+
+        // then
+        assertThat(actual).isNull();
+
     }
 }

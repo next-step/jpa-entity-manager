@@ -48,8 +48,7 @@ public class DefaultEntityManager implements EntityManager {
             throw new EntityExistsException("Entity already exists");
         }
 
-        EntityEntry entityEntry = persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
-        entityEntry.dirtyCheck();
+        persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
     }
 
     private boolean isNew(Object entity) {
@@ -81,8 +80,15 @@ public class DefaultEntityManager implements EntityManager {
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
         EntityEntry entry = persistenceContext.getEntry(entity.getClass(), id);
+        if (entry == null) {
+            throw new IllegalStateException("Entity not found. ");
+        }
+
         entry.updateEntity(entity);
-        entry.dirtyCheck();
+        if (!transaction.isActive()) {
+            entityPersister.update(entity, entry.getSnapshot());
+            entry.synchronizingSnapshot();
+        }
 
         return entity;
     }
@@ -98,8 +104,15 @@ public class DefaultEntityManager implements EntityManager {
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
 
         EntityEntry entityEntry = persistenceContext.getEntry(entity.getClass(), id);
+        if (entityEntry == null) {
+            throw new IllegalStateException("Entity not found. ");
+        }
+
         entityEntry.updateStatus(Status.DELETED);
-        entityEntry.dirtyCheck();
+        if (!transaction.isActive()) {
+            entityPersister.delete(entity);
+            persistenceContext.deleteEntry(entity, id);
+        }
     }
 
     @Override

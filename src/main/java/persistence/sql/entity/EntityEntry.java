@@ -62,7 +62,11 @@ public class EntityEntry {
         GeneratedValue anno = loader.getPrimaryKeyField().getAnnotation(GeneratedValue.class);
 
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
-        if (id == null) {
+        if (id == null && status != Status.SAVING) {
+            throw new IllegalStateException("Primary key must not be null");
+        }
+
+        if (status == Status.SAVING) {
             createEntityIdOrThrow(entityPersister, entity, anno);
             status = Status.MANAGED;
             id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
@@ -120,33 +124,12 @@ public class EntityEntry {
         }
     }
 
-    public void dirtyCheck() {
-        if (isNotManagedStatus()) {
+    public void synchronizingSnapshot() {
+        if (snapshot == null) {
+            snapshot = createSnapshot(entity, loader);
             return;
         }
 
-        if (status == Status.DELETED) {
-            entityPersister.delete(entity);
-            persistenceContext.deleteEntry(entity, key.key());
-            updateStatus(Status.GONE);
-            return;
-        }
-
-        if (status == Status.SAVING) {
-            entityPersister.insert(entity);
-            updateStatus(Status.MANAGED);
-            return;
-        }
-
-        if (!isDirty()) {
-            return;
-        }
-
-        entityPersister.update(entity, snapshot);
-        synchronizingSnapshot();
-    }
-
-    private void synchronizingSnapshot() {
         loader.getFieldAllByPredicate(field -> !field.isAnnotationPresent(Id.class))
                 .forEach(field -> copyFieldValue(field, entity, snapshot));
     }
@@ -190,5 +173,13 @@ public class EntityEntry {
 
     private boolean isNotManagedStatus() {
         return !Status.isManaged(status);
+    }
+
+    public Object getSnapshot() {
+        return snapshot;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 }

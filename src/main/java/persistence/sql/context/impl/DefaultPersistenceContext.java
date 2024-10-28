@@ -12,6 +12,12 @@ import java.util.Map;
 public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<KeyHolder, EntityEntry> context = new HashMap<>();
 
+    private final EntityPersister persister;
+
+    public DefaultPersistenceContext(EntityPersister persister) {
+        this.persister = persister;
+    }
+
     @Override
     public <T> EntityEntry addEntry(T entity, Status status, EntityPersister entityPersister) {
         EntityEntry entityEntry = EntityEntry.newEntry(entityPersister, this, entity, status);
@@ -48,8 +54,42 @@ public class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public void dirtyCheck() {
         for (EntityEntry entry : context.values()) {
-            entry.dirtyCheck();
+            handleEntry(entry);
         }
+    }
+
+    private void handleEntry(EntityEntry entry) {
+        switch (entry.getStatus()) {
+            case SAVING:
+                handleSavingEntry(entry);
+                break;
+            case MANAGED:
+                handleUpdateEntry(entry);
+                break;
+            case DELETED:
+                handleDeleteEntry(entry);
+                break;
+        }
+    }
+
+    private void handleSavingEntry(EntityEntry entry) {
+        persister.insert(entry.getEntity());
+        entry.updateStatus(Status.MANAGED);
+        entry.synchronizingSnapshot();
+    }
+
+    private void handleUpdateEntry(EntityEntry entry) {
+        if (!entry.isDirty()) {
+            return;
+        }
+        persister.update(entry.getEntity(), entry.getSnapshot());
+        entry.synchronizingSnapshot();
+    }
+
+    private void handleDeleteEntry(EntityEntry entry) {
+        persister.delete(entry.getEntity());
+        entry.updateStatus(Status.GONE);
+        context.remove(entry.getKey());
     }
 
     @Override
