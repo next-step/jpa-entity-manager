@@ -1,12 +1,14 @@
 package jdbc;
 
 import java.sql.Connection;
+import persistence.entity.EntityManager;
 
 public class TransactionalJdbcTemplate extends JdbcTemplate{
 
+    private EntityManager entityManager;
+
     public TransactionalJdbcTemplate(Connection connection) {
-        super(connection);
-    }
+        super(connection);}
 
     public void beginTransaction() {
         try {
@@ -18,6 +20,7 @@ public class TransactionalJdbcTemplate extends JdbcTemplate{
 
     public void commit() {
         try {
+            entityManager.flush();
             getConnection().commit();
         } catch (Exception e) {
             throw new RuntimeException("Failed to commit transaction", e);
@@ -34,6 +37,10 @@ public class TransactionalJdbcTemplate extends JdbcTemplate{
         } finally {
             setAutoCommitTrue();
         }
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     private void setAutoCommitTrue() {
