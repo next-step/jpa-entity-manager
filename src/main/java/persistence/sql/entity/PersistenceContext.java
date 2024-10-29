@@ -17,5 +17,5 @@ public interface PersistenceContext {
 
     void addEntry(EntityKey entityKey, EntityEntry entityEntry);
 
-    void goneEntry(EntityKey entityKey);
+    void removePersistenceContext(EntityKey entityKey);
 }

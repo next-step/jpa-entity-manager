@@ -96,16 +96,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void goneEntry(EntityKey entityKey) {
-        EntityEntry entry = managedEntries.get(entityKey);
-        if (entry != null) {
-            entry.updateStatus(EntityStatus.GONE);
-        }
-
-        if (entry == null) {
-            managedEntries.put(entityKey, new EntityEntry(EntityStatus.GONE, entry.getId()));
-        }
-
+    public void removePersistenceContext(EntityKey entityKey) {
         managedEntities.remove(entityKey);
         entitySnapshots.remove(entityKey);
         managedEntries.remove(entityKey);

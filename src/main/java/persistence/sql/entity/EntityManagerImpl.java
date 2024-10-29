@@ -16,7 +16,6 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         EntityKey entityKey = new EntityKey(id, clazz);
-        persistenceContext.goneEntry(entityKey);
         if (persistenceContext.containsEntity(entityKey)) {
             return persistenceContext.getEntity(clazz, id);
         }
@@ -57,7 +56,8 @@ public class EntityManagerImpl implements EntityManager {
         persistenceContext.addEntry(entityKey, new EntityEntry(EntityStatus.DELETED, idValue));
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity.getClass(), idValue);
-        persistenceContext.goneEntry(entityKey);
+        persistenceContext.addEntry(entityKey, new EntityEntry(EntityStatus.GONE, idValue));
+        persistenceContext.removePersistenceContext(entityKey);
     }
 
     @Override
