@@ -176,13 +176,13 @@ public class EntityManagerTest {
         @Test
         @DisplayName("저장된 엔티티가 아니라면 새로 저장한다.")
         void succeedToAddNew() {
-            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
+            PersonWithTransientAnnotation entity = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
             );
 
-            entityManager.merge(person);
-
-            assertNotNull(entityManager.find(PersonWithTransientAnnotation.class, 1L));
+            PersonWithTransientAnnotation mergeResult = entityManager.merge(entity);
+            PersonWithTransientAnnotation foundPerson = entityManager.find(PersonWithTransientAnnotation.class, 1L);
+            assertSame(foundPerson, mergeResult);
         }
     }
 }

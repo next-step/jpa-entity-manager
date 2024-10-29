@@ -48,11 +48,12 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void merge(Object entity) {
+    public <T> T merge(T entity) {
         if (persistenceContext.isEntityExists(entity)) {
             entityPersister.update(entity);
-        } else {
-            persist(entity);
+            return entity;
         }
+        persist(entity);
+        return entity;
     }
 }
