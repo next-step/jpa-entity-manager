@@ -19,6 +19,7 @@ public class PersistenceContextTest {
     }
 
     @Nested
+    @DisplayName("getEntity 테스트")
     class GetEntityTest {
         @Test
         @DisplayName("PK를 통해 영속 상태의 엔티티를 조회할 수 있다.")
@@ -51,6 +52,7 @@ public class PersistenceContextTest {
     }
 
     @Nested
+    @DisplayName("addEntity 테스트")
     class AddEntityTest {
         @Test
         @DisplayName("엔티티를 영속 상태로 저장한다.")
@@ -76,6 +78,7 @@ public class PersistenceContextTest {
     }
 
     @Nested
+    @DisplayName("removeEntity 테스트")
     class RemoveEntityTest {
         @Test
         @DisplayName("영속상태에 있는 엔티티를 제거한다.")
@@ -108,6 +111,33 @@ public class PersistenceContextTest {
 
             // then
             assertNotNull(beforeRemoveEntity);
+        }
+    }
+
+    @Nested
+    @DisplayName("isEntityExists 테스트")
+    class IsEntityExistsTest {
+        @Test
+        @DisplayName("영속 객체가 있다면 true를 반환한다.")
+        void testExistingEntity() {
+            // given
+            persistenceContext.addEntity(entity);
+
+            // when
+            boolean isExists = persistenceContext.isEntityExists(entity);
+
+            // then
+            assertTrue(isExists);
+        }
+
+        @Test
+        @DisplayName("일치하는 영속 객체가 없다면 false를 반환한다.")
+        void testNonExistingEntity() {
+            // when
+            boolean isExists = persistenceContext.isEntityExists(entity);
+
+            // then
+            assertFalse(isExists);
         }
     }
 }

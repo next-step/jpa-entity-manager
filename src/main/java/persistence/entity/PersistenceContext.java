@@ -6,4 +6,6 @@ public interface PersistenceContext {
     void addEntity(Object entityObject);
 
     void removeEntity(Object entityObject);
+
+    boolean isEntityExists(Object entityObject);
 }

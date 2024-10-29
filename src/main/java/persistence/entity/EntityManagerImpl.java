@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jakarta.persistence.EntityExistsException;
-import persistence.model.EntityPrimaryKey;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
@@ -35,7 +34,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        if (isEntityExists(entity)) {
+        if (persistenceContext.isEntityExists(entity)) {
             throw new EntityExistsException("ENTITY ALREADY EXISTS!");
         }
         entityPersister.insert(entity);
@@ -50,18 +49,10 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void merge(Object entity) {
-        if (isEntityExists(entity)) {
+        if (persistenceContext.isEntityExists(entity)) {
             entityPersister.update(entity);
         } else {
             persist(entity);
         }
-    }
-
-    private Boolean isEntityExists(Object entity) {
-        Class<?> entityClass = entity.getClass();
-        Object entityId = EntityPrimaryKey.build(entity).keyValue();
-        Object existingEntity = persistenceContext.getEntity(entityClass, entityId);
-
-        return existingEntity != null;
     }
 }
