@@ -3,6 +3,8 @@ package persistence.entity.impl;
 import java.util.Collection;
 import java.util.Set;
 import jdbc.JdbcTemplate;
+import persistence.entity.DatabaseSnapshots;
+import persistence.entity.DirtyCheck;
 import persistence.entity.EntityKey;
 import persistence.entity.EntityPersister;
 import persistence.entity.LongTypeId;
@@ -15,15 +17,17 @@ public class PersistenceContextImpl implements PersistenceContext {
     private final JdbcTemplate jdbcTemplate;
     private final PersistedEntities persistedEntities;
     private final PendingEntities pendingEntities;
+    private final DatabaseSnapshots databaseSnapshots;
 
     public PersistenceContextImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         persistedEntities = new PersistedEntities();
         pendingEntities = new PendingEntities();
+        databaseSnapshots = new DatabaseSnapshots();
     }
 
     @Override
-    public <T> T find(Class<T> entityClass, Object primaryKey) {
+    public <T> T getEntity(Class<T> entityClass, Object primaryKey) {
         EntityKey entityKey = new EntityKey((Long) primaryKey, entityClass.getName());
         T entity = entityClass.cast(persistedEntities.findEntity(entityKey));
 
@@ -32,22 +36,23 @@ public class PersistenceContextImpl implements PersistenceContext {
         }
 
         entity = new EntityPersister<>(entityClass, jdbcTemplate).findById(primaryKey);
-        persist(entity);
+        addEntity(entity);
 
         return entity;
     }
 
     @Override
-    public void persist(Object entity)  {
+    public void addEntity(Object entity)  {
         if (new LongTypeId(entity).isEntityIdNull()) {
             pendingEntities.persistEntity(entity);
             return;
         }
         persistedEntities.persistEntity(getEntityKey(entity), entity);
+        databaseSnapshots.addDatabaseSnapshot(entity);
     }
 
     @Override
-    public void remove(Object entity) {
+    public void removeEntity(Object entity) {
         pendingEntities.removeEntity(entity);
         persistedEntities.removeEntity(getEntityKey(entity));
     }
@@ -65,6 +70,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public Collection<Object> getPersistedEntities() {
         return persistedEntities.getEntities();
+    }
+
+    @Override
+    public int getDatabaseSnapshot(Object entity) {
+        return databaseSnapshots.getDatabaseSnapshot(entity);
     }
 
     private EntityKey getEntityKey(Object entity) {
