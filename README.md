@@ -20,4 +20,4 @@ step3
    - 추후 더티 체킹하여 필요한 Entity Update 해야
 
 step4
- - [] EntityEntry 및 EntityStatus 구현  
+ - [x] EntityEntry 및 EntityStatus 구현  
