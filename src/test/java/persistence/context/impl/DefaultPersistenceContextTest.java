@@ -38,6 +38,7 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
     void testAddEntry() {
         // given
         TestPerson catsbiEntity = new TestPerson("catsbi", 33, "catsbi@naver.com", 123);
+        entityPersister.insert(catsbiEntity);
         context.addEntry(catsbiEntity, Status.SAVING, entityPersister);
 
         TestPerson actual = EntityLoaderFactory.getInstance().getLoader(TestPerson.class).load(catsbiEntity.getId());
@@ -103,7 +104,7 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
         entryMap.put(entityEntry.getKey(), entityEntry);
 
         //when
-        context.dirtyCheck();
+        context.dirtyCheck(entityPersister);
         TestPerson actual = EntityLoaderFactory.getInstance().getLoader(TestPerson.class).load(catsbiEntity.getId());
 
         assertThat(context.getEntry(TestPerson.class, catsbiEntity.getId())).isNotNull();
@@ -120,7 +121,7 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
 
         // when
         catsbiEntity.setName("newCatsbi");
-        context.dirtyCheck();
+        context.dirtyCheck(entityPersister);
 
         // then
         TestPerson actual = loader.load(catsbiEntity.getId());
@@ -133,11 +134,12 @@ class DefaultPersistenceContextTest extends TestEntityInitialize {
         // given
         EntityLoader<TestPerson> loader = EntityLoaderFactory.getInstance().getLoader(TestPerson.class);
         TestPerson catsbiEntity = new TestPerson( "catsbi", 33, "catsbi@naver.com", 123);
-        EntityEntry entityEntry = context.addEntry(catsbiEntity, Status.SAVING, entityPersister);
+        entityPersister.insert(catsbiEntity);
+        EntityEntry entityEntry = context.addEntry(catsbiEntity, Status.MANAGED, entityPersister);
 
         // when
         entityEntry.updateStatus(Status.DELETED);
-        context.dirtyCheck();
+        context.dirtyCheck(entityPersister);
         TestPerson actual = loader.load(catsbiEntity.getId());
 
         // then

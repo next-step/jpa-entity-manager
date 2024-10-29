@@ -1,13 +1,9 @@
 package persistence.sql.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import persistence.sql.EntityLoaderFactory;
 import persistence.sql.clause.Clause;
-import persistence.sql.context.EntityPersister;
 import persistence.sql.context.KeyHolder;
-import persistence.sql.context.PersistenceContext;
 import persistence.sql.dml.MetadataLoader;
 import persistence.sql.entity.data.Status;
 import persistence.sql.loader.EntityLoader;
@@ -41,36 +37,19 @@ public class EntityEntry {
                 key);
     }
 
-    public static EntityEntry newEntry(EntityPersister entityPersister, PersistenceContext persistenceContext, Object entity, Status status) {
+    public static EntityEntry newEntry(Object entity, Status status) {
         EntityLoader<?> entityLoader = EntityLoaderFactory.getInstance().getLoader(entity.getClass());
         MetadataLoader<?> loader = entityLoader.getMetadataLoader();
-        GeneratedValue anno = loader.getPrimaryKeyField().getAnnotation(GeneratedValue.class);
 
         Object id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
         if (id == null && status != Status.SAVING) {
             throw new IllegalStateException("Primary key must not be null");
         }
 
-        if (status == Status.SAVING) {
-            createEntityIdOrThrow(entityPersister, entity, anno);
-            status = Status.MANAGED;
-            id = Clause.extractValue(loader.getPrimaryKeyField(), entity);
-        }
-
         KeyHolder key = new KeyHolder(entity.getClass(), id);
 
         return new EntityEntry(loader, status, entity, createSnapshot(entity, loader), key);
 
-    }
-
-    private static void createEntityIdOrThrow(EntityPersister entityPersister, Object entity, GeneratedValue anno) {
-        // TODO 현재는 IDENTIY만 지원한다.
-        if (anno != null && anno.strategy() == GenerationType.IDENTITY) {
-            entityPersister.insert(entity);
-            return;
-        }
-
-        throw new IllegalStateException("Primary key must not be null");
     }
 
     @SuppressWarnings("unchecked")

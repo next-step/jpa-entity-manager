@@ -47,8 +47,11 @@ public class DefaultEntityManager implements EntityManager {
         if (!isNew(entity)) {
             throw new EntityExistsException("Entity already exists");
         }
-
-        persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
+        entityPersister.insert(entity);
+        EntityEntry entityEntry = persistenceContext.addEntry(entity, Status.SAVING, entityPersister);
+        if (!transaction.isActive()) {
+            entityEntry.updateStatus(Status.MANAGED);
+        }
     }
 
     private boolean isNew(Object entity) {
@@ -127,7 +130,7 @@ public class DefaultEntityManager implements EntityManager {
             return returnType.cast(entry.getEntity());
         }
 
-        entry = persistenceContext.addEntry(primaryKey, returnType, Status.LOADING, entityPersister);
+        entry = persistenceContext.addLoadingEntry(primaryKey, returnType);
         EntityLoader<T> entityLoader = entityLoaderFactory.getLoader(returnType);
 
         T loadedEntity = entityLoader.load(primaryKey);
@@ -153,7 +156,7 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public void onFlush() {
-        persistenceContext.dirtyCheck();
+        persistenceContext.dirtyCheck(entityPersister);
         persistenceContext.cleanup();
     }
 }

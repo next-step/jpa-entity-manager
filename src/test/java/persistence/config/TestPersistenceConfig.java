@@ -72,7 +72,7 @@ public class TestPersistenceConfig {
     }
 
     public PersistenceContext persistenceContext() throws SQLException {
-        return new DefaultPersistenceContext(entityPersister());
+        return new DefaultPersistenceContext();
     }
 
     public Database database() throws SQLException {

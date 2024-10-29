@@ -12,22 +12,16 @@ import java.util.Map;
 public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<KeyHolder, EntityEntry> context = new HashMap<>();
 
-    private final EntityPersister persister;
-
-    public DefaultPersistenceContext(EntityPersister persister) {
-        this.persister = persister;
-    }
-
     @Override
     public <T> EntityEntry addEntry(T entity, Status status, EntityPersister entityPersister) {
-        EntityEntry entityEntry = EntityEntry.newEntry(entityPersister, this, entity, status);
+        EntityEntry entityEntry = EntityEntry.newEntry(entity, status);
         context.put(entityEntry.getKey(), entityEntry);
 
         return entityEntry;
     }
 
     @Override
-    public <T> EntityEntry addEntry(Object primaryKey, Class<T> returnType, Status status, EntityPersister entityPersister) {
+    public <T> EntityEntry addLoadingEntry(Object primaryKey, Class<T> returnType) {
         EntityEntry entityEntry = EntityEntry.newLoadingEntry(primaryKey, returnType);
         context.put(entityEntry.getKey(), entityEntry);
 
@@ -52,33 +46,33 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void dirtyCheck() {
+    public void dirtyCheck(EntityPersister persister) {
         for (EntityEntry entry : context.values()) {
-            handleEntry(entry);
+            handleEntry(persister, entry);
         }
     }
 
-    private void handleEntry(EntityEntry entry) {
+    private void handleEntry(EntityPersister persister, EntityEntry entry) {
         switch (entry.getStatus()) {
             case SAVING:
-                handleSavingEntry(entry);
+                handleSavingEntry(persister, entry);
                 break;
             case MANAGED:
-                handleUpdateEntry(entry);
+                handleUpdateEntry(persister, entry);
                 break;
             case DELETED:
-                handleDeleteEntry(entry);
+                handleDeleteEntry(persister, entry);
                 break;
         }
     }
 
-    private void handleSavingEntry(EntityEntry entry) {
+    private void handleSavingEntry(EntityPersister persister, EntityEntry entry) {
         persister.insert(entry.getEntity());
         entry.updateStatus(Status.MANAGED);
         entry.synchronizingSnapshot();
     }
 
-    private void handleUpdateEntry(EntityEntry entry) {
+    private void handleUpdateEntry(EntityPersister persister, EntityEntry entry) {
         if (!entry.isDirty()) {
             return;
         }
@@ -86,7 +80,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         entry.synchronizingSnapshot();
     }
 
-    private void handleDeleteEntry(EntityEntry entry) {
+    private void handleDeleteEntry(EntityPersister persister, EntityEntry entry) {
         persister.delete(entry.getEntity());
         entry.updateStatus(Status.GONE);
         context.remove(entry.getKey());

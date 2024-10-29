@@ -7,7 +7,7 @@ public interface PersistenceContext {
 
     <T> EntityEntry addEntry(T entity, Status status, EntityPersister entityPersister);
 
-    <T> EntityEntry addEntry(Object primaryKey, Class<T> returnType, Status status, EntityPersister entityPersister);
+    <T> EntityEntry addLoadingEntry(Object primaryKey, Class<T> returnType);
 
     <T, ID> EntityEntry getEntry(Class<T> entityType, ID id);
 
@@ -15,5 +15,5 @@ public interface PersistenceContext {
 
     void cleanup();
 
-    void dirtyCheck();
+    void dirtyCheck(EntityPersister persister);
 }
