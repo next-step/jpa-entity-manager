@@ -20,6 +20,8 @@ public interface PersistenceContext {
 
     List<Object> getDirtyEntities();
 
-    void addEntityEntry(Object object, EntityEntry entityEntry);
+    void addEntityEntry(Object entity, EntityEntry entityEntry);
+
+    EntityEntry getEntityEntry(Object entity);
 
 }

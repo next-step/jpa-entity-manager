@@ -93,4 +93,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         return new EntityInfo<>(entity.getClass(), idValue);
     }
 
+    public EntityEntry getEntityEntry(Object object) {
+        return entityEntryMap.get(object);
+    }
 }

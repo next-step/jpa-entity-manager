@@ -113,4 +113,38 @@ class PersistenceContextImplTest {
 
         assertThat(persistenceContext.isDirty(person)).isTrue();
     }
+
+    @Test
+    void 컨텍스트_추가_후_상태_확인() {
+        Long id = 10L;
+        String name = "이름";
+        String email = "email@gmail.com";
+        int age = 10;
+
+        Person person = new Person(id, name, age, email);
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        persistenceContext.add(person);
+        persistenceContext.createDatabaseSnapshot(person);
+
+        assertThat(persistenceContext.getEntityEntry(person)).extracting("entityStatus").isEqualTo(EntityStatus.MANAGED);
+    }
+
+    @Test
+    void 삭제_후_상태_확인() {
+        Long id = 10L;
+        String name = "이름";
+        String email = "email@gmail.com";
+        int age = 10;
+
+        Person person = new Person(id, name, age, email);
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        persistenceContext.add(person);
+        persistenceContext.createDatabaseSnapshot(person);
+
+        persistenceContext.remove(person);
+
+        assertThat(persistenceContext.getEntityEntry(person)).extracting("entityStatus").isEqualTo(EntityStatus.GONE);
+    }
+
+
 }

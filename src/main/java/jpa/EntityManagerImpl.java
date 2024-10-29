@@ -49,13 +49,11 @@ public class EntityManagerImpl implements EntityManager {
         }
     }
 
-
     @Override
     public void remove(Object entity) {
         entityPersister.delete(entity);
         persistenceContext.remove(entity);
         persistenceContext.removeDatabaseSnapshot(entity);
     }
-
 
 }
