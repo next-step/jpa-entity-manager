@@ -8,7 +8,7 @@ import java.util.Objects;
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> managedEntities = new HashMap<>();
     private final Map<EntityKey, Object> entitySnapshots = new HashMap<>();
-    private final Map<EntityKey, EntityEntry> managedEntries = new HashMap<>();
+    private final Map<Object, EntityEntry> managedEntries = new HashMap<>();
 
     @Override
     public <T> T getEntity(Class<T> clazz, Long id) {
@@ -84,7 +84,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void addEntry(EntityKey entityKey, EntityEntry entityEntry) {
+    public void addEntry(Object entityKey, EntityEntry entityEntry) {
         EntityEntry entry = managedEntries.get(entityKey);
         if (entry != null) {
             entry.updateStatus(entityEntry.getEntityStatus());
@@ -96,10 +96,10 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void removePersistenceContext(EntityKey entityKey) {
+    public void removePersistenceContext(EntityKey entityKey, Object entity) {
         managedEntities.remove(entityKey);
         entitySnapshots.remove(entityKey);
-        managedEntries.remove(entityKey);
+        managedEntries.remove(entity);
     }
 
 

@@ -57,7 +57,7 @@ public class EntityManagerImpl implements EntityManager {
         entityPersister.delete(entity);
         persistenceContext.removeEntity(entity.getClass(), idValue);
         persistenceContext.addEntry(entityKey, new EntityEntry(EntityStatus.GONE, idValue));
-        persistenceContext.removePersistenceContext(entityKey);
+        persistenceContext.removePersistenceContext(entityKey, entity);
     }
 
     @Override
