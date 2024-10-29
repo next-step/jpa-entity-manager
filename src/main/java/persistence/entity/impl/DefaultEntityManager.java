@@ -2,7 +2,7 @@ package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
 import persistence.entity.EntityManager;
-import persistence.fakehibernate.DefaultPersistenceContext;
+import persistence.defaulthibernate.DefaultPersistenceContext;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -20,20 +20,25 @@ import java.util.Optional;
 
 public class DefaultEntityManager implements EntityManager {
     private final DefaultPersistenceContext defaultPersistenceContext;
+    private final EntityLoaderImpl entityLoader;
     private final EntityPersister entityPersister;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate) {
         this.defaultPersistenceContext = new DefaultPersistenceContext();
+        this.entityLoader = new EntityLoaderImpl(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
+
         if (defaultPersistenceContext.isExist(clazz, id)) {
             Object o = defaultPersistenceContext.get(clazz, id);
             return Optional.of(clazz.cast(o));
         }
-        Object o = entityPersister.find(clazz, id);
+
+        Object o = entityLoader.load(clazz, id);
+
         if (Objects.isNull(o)) {
             return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
         }

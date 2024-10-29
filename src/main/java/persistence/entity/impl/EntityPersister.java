@@ -25,16 +25,6 @@ public class EntityPersister {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Object find(Class<?> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
-        List<?> query = jdbcTemplate.query(selectQuery, new EntityRowMapper<>(clazz));
-        if (query.isEmpty()) {
-            return null;
-        }
-        return query.getFirst();
-    }
-
     public void update(Object entity) {
         UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(entity.getClass());
         String updateQuery = updateQueryBuilder.update(entity);
