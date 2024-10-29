@@ -23,7 +23,7 @@
   ```
 
 ## step 2
-- [ ] 요구 사항 1 - RowMapper Reflection API 사용해 구현
+- [x] 요구 사항 1 - RowMapper Reflection API 사용해 구현
   - EntityLoader라는 클래스를 만들어 구현
   - EntityLoader 는 엔터티를 데이터베이스에서 로드하고 로드된 엔터티 상태를 영속성 컨텍스트 내에서 추적 및 관리
 - [ ] 요구 사항 2 - EntityManager, Persistence Context 책임 전가

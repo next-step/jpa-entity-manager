@@ -16,23 +16,20 @@ import persistence.sql.dml.DmlQueryBuilder;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EntityLoaderTest {
-    private DatabaseServer databaseServer;
-    private JdbcTemplate jdbcTemplate;
-    private DdlQueryBuilder ddlQueryBuilder;
-    private DmlQueryBuilder dmlQueryBuilder;
+    private static DatabaseServer databaseServer;
+    private static JdbcTemplate jdbcTemplate;
+    private static final Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
+    private static final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(dialect);
+    private static final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder(dialect);
 
     @BeforeEach
     void setup() throws SQLException {
         databaseServer = new H2();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
 
-        Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
-
-        ddlQueryBuilder = new DdlQueryBuilder(dialect);
-        dmlQueryBuilder = new DmlQueryBuilder(dialect);
         jdbcTemplate.execute(ddlQueryBuilder.buildCreateTableQuery(PersonWithTransientAnnotation.class));
     }
 
@@ -45,16 +42,18 @@ public class EntityLoaderTest {
     @Test
     @DisplayName("객체를 데이터베이스에서 찾아오는 데 성공한다.")
     void testFind() {
-        // when
+        // given
         PersonWithTransientAnnotation insertingUser = new PersonWithTransientAnnotation(
                 1L, "홍길동", 20, "test@test.com", 1
         );
         EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
         entityPersister.insert(insertingUser);
 
-        EntityLoader entityLoader = new EntityLoaderImpl();
+        // when
+        EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
         PersonWithTransientAnnotation foundUser = entityLoader.find(PersonWithTransientAnnotation.class, 1L);
 
-        assertSame(insertingUser, foundUser);
+        // then
+        assertEquals(insertingUser.getId(), foundUser.getId());
     }
 }
