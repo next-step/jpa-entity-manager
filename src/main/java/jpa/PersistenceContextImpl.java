@@ -15,6 +15,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     private final Map<EntityInfo<?>, Object> entityMap = new HashMap<>();
     private final Map<EntityInfo<?>, DatabaseSnapshot> snapshotMap = new HashMap<>();
+    private final Map<Object, EntityEntry> entityEntryMap = new HashMap<>();
 
     public PersistenceContextImpl() {
     }
@@ -22,9 +23,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void add(Object entity) {
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
-        if (entityMap.containsKey(entityInfo)) {
-            return;
-        }
+        entityEntryMap.put(entity, new EntityEntry(EntityStatus.MANAGED));
         entityMap.put(entityInfo, entity);
     }
 
@@ -40,19 +39,16 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void remove(Object entity) {
+        EntityEntry entityEntry = entityEntryMap.get(entity);
+        entityEntry.updateStatus(EntityStatus.DELETED);
         entityMap.remove(makeEntityInfo(entity));
-    }
-
-    @Override
-    public void update(Object entity) {
-        EntityInfo<?> entityInfo = makeEntityInfo(entity);
-        entityMap.put(entityInfo, entity);
+        entityEntry.updateStatus(EntityStatus.GONE);
     }
 
     @Override
     public <T> T getDatabaseSnapshot(T entity) {
         EntityInfo<?> entityInfo = makeEntityInfo(entity);
-        return (T) snapshotMap.get(entityInfo);
+        return (T) snapshotMap.get(entityInfo).getEntity();
     }
 
     @Override
@@ -86,11 +82,15 @@ public class PersistenceContextImpl implements PersistenceContext {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void addEntityEntry(Object object, EntityEntry entityEntry) {
+        entityEntryMap.put(object, entityEntry);
+    }
+
     private EntityInfo<?> makeEntityInfo(Object entity) {
         EntityId entityId = new EntityId(entity.getClass());
         Long idValue = entityId.getIdValue(entity);
         return new EntityInfo<>(entity.getClass(), idValue);
     }
-
 
 }

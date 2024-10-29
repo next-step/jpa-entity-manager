@@ -10,8 +10,6 @@ public interface PersistenceContext {
 
     void remove(Object entity);
 
-    void update(Object entity);
-
     <T> T getDatabaseSnapshot(T entity);
 
     void createDatabaseSnapshot(Object entity);
@@ -21,4 +19,7 @@ public interface PersistenceContext {
     boolean isDirty(Object entity);
 
     List<Object> getDirtyEntities();
+
+    void addEntityEntry(Object object, EntityEntry entityEntry);
+
 }

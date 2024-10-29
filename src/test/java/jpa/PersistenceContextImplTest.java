@@ -43,7 +43,7 @@ class PersistenceContextImplTest {
 
     @Test
     void 데이터_1차캐시_생성_및_제거() {
-        Long id = 1L;
+        Long id = 11L;
         String name = "이름";
         String email = "email@gmail.com";
         int age = 10;
@@ -71,7 +71,7 @@ class PersistenceContextImplTest {
 
         String updateEmail = "update@gmail.com";
         person.setEmail(updateEmail);
-        persistenceContext.update(person);
+        persistenceContext.add(person);
         Person updatedPerson = persistenceContext.get(Person.class, id);
 
         assertThat(updatedPerson.getEmail()).isEqualTo(updateEmail);

@@ -58,9 +58,9 @@ class EntityManagerImplTest {
         String email = "jsss@test.co1m";
         int index = 1;
         Person person = new Person(name, age, email, index);
-        entityManager.persist(person);
+        Person savedPerson = entityManager.persist(person);
 
-        Person insertedPerson = entityManager.find(Person.class, 1L);
+        Person insertedPerson = entityManager.find(Person.class, savedPerson.getId());
         String updateEmail = "test@naver.com";
         insertedPerson.setEmail(updateEmail);
 
