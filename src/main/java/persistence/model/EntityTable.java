@@ -4,6 +4,7 @@ import jakarta.persistence.Table;
 import persistence.model.util.ReflectionUtil;
 
 import java.util.List;
+import java.util.Map;
 
 public class EntityTable {
     private final String name;
@@ -37,8 +38,8 @@ public class EntityTable {
         return tableColumns.findByName(name);
     }
 
-    public List<EntityColumn> getPrimaryColumns() {
-        return tableColumns.getPrimaryColumns();
+    public EntityColumn getPrimaryColumn() {
+        return tableColumns.getPrimaryColumn();
     }
 
     public List<EntityColumn> getNonPrimaryColumns() {
@@ -49,13 +50,21 @@ public class EntityTable {
         tableColumns.setColumns(columns);
     }
 
-    public List<EntityColumn> getActiveColumns(EntityTable table) {
-        return table.isPrimaryColumnsValueSet()
-                ? table.getColumns()
-                : table.getNonPrimaryColumns();
+    public List<EntityColumn> getActiveColumns() {
+        return isPrimaryColumnsValueSet()
+                ? getColumns()
+                : getNonPrimaryColumns();
     }
 
-    public Boolean isPrimaryColumnsValueSet() {
-        return getPrimaryColumns().stream().allMatch(EntityColumn::isValueNotNull);
+    public Map.Entry<String, Object> getPrimaryColumnKeyValue() {
+        return getPrimaryColumn().toKeyValue();
+    }
+
+    public boolean isPrimaryColumnsValueSet() {
+        return getPrimaryColumn().isValueNotNull();
+    }
+
+    public void setPrimaryValue(Object value) {
+        getPrimaryColumn().setValue(value);
     }
 }

@@ -1,16 +1,15 @@
 package persistence.sql.dml.clause;
 
-import persistence.model.EntityColumn;
 import persistence.sql.dialect.Dialect;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class FindOption {
-    private final List<EntityColumn> selectingColumns;
+    private final List<String> selectingColumns;
     private final List<Clause> whereClauses;
 
-    public FindOption(List<EntityColumn> selectingColumns, List<Clause> whereClauses) {
+    public FindOption(List<String> selectingColumns, List<Clause> whereClauses) {
         this.selectingColumns = selectingColumns;
         this.whereClauses = whereClauses;
     }
@@ -19,7 +18,7 @@ public class FindOption {
         return whereClauses;
     }
 
-    public List<EntityColumn> getSelectingColumns() {
+    public List<String> getSelectingColumns() {
         return selectingColumns;
     }
 

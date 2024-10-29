@@ -51,15 +51,15 @@ public class EntityTableColumnsUnitTest {
 
     @Test
     @DisplayName("primary 컬럼을 조회할 수 있다.")
-    void testGetPrimaryColumns() throws NoSuchFieldException {
+    void testGetPrimaryColumns() {
         entityTableColumns.setColumns(List.of(idColumn));
 
-        assertEquals(1, entityTableColumns.getPrimaryColumns().size());
+        assertEquals(idColumn, entityTableColumns.findByName("id"));
     }
 
     @Test
     @DisplayName("컬럼 이름으로 컬럼을 조회할 수 있다.")
-    void testGetColumn() throws NoSuchFieldException {
+    void testGetColumn() {
         entityTableColumns.setColumns(List.of(idColumn));
 
         assertEquals(idColumn, entityTableColumns.findByName("id"));

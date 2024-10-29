@@ -14,6 +14,7 @@ import persistence.sql.dialect.type.H2DataTypeRegistry;
 import persistence.sql.dml.DmlQueryBuilder;
 
 import java.sql.SQLException;
+import java.util.AbstractMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +37,7 @@ public class EntityPersisterTest {
 
         entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
 
-        SELECT_QUERY = dmlQueryBuilder.buildSelectByIdQuery(PersonWithTransientAnnotation.class, 1L);
+        SELECT_QUERY = dmlQueryBuilder.buildSelectByIdQuery("users", new AbstractMap.SimpleEntry<>("id", 1L));
         FIXTURE = new PersonWithTransientAnnotation(
                 1L, "홍길동", 20, "test@test.com", 1
         );

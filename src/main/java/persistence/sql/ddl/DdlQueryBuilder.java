@@ -43,22 +43,13 @@ public class DdlQueryBuilder {
     }
 
     private String getPrimaryDdl(EntityTable table) {
-        List<String> columnNames = table.getPrimaryColumns().stream()
-                .map(EntityColumn::getName)
-                .collect(Collectors.toList());
+        String primaryColumnName = table.getPrimaryColumn().getName();
 
-        if (columnNames.isEmpty()) {
+        if (primaryColumnName.isEmpty()) {
             throw new IllegalArgumentException("CANNOT QUERY TABLE WITHOUT PK. name = " + table.getName());
         }
-        return getPrimaryKeyPhrase(columnNames);
-    }
 
-    private String getPrimaryKeyPhrase(List<String> columnNames) {
-        String quotedColumnNames = columnNames.stream()
-                .map(dialect::getIdentifierQuoted)
-                .collect(Collectors.joining(", "));
-
-        return String.format("PRIMARY KEY (%s)", quotedColumnNames);
+        return String.format("PRIMARY KEY (%s)", dialect.getIdentifierQuoted(primaryColumnName));
     }
 
     private String getColumnsDdl(EntityTable table) {

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.DialectFactory;
-import persistence.fixture.PersonWithTransientAnnotation;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -16,7 +15,12 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DmlQueryBuilderTest {
-    DmlQueryBuilder queryBuilder;
+    private static DmlQueryBuilder queryBuilder;
+    private static final String testTableName = "users";
+    private static final Map.Entry<String, Object> idColumnKeyValue = new AbstractMap.SimpleEntry<>("id", 1L);
+    private static final Map.Entry<String, Object> nameKeyValue = new AbstractMap.SimpleEntry<>("nick_name", "홍길동");
+    private static final Map.Entry<String, Object> ageKeyValue = new AbstractMap.SimpleEntry<>("old", 20);
+    private static final Map.Entry<String, Object> emailKeyValue = new AbstractMap.SimpleEntry<>("email", "test@test.com");
 
     @BeforeEach
     void setup() {
@@ -30,19 +34,19 @@ public class DmlQueryBuilderTest {
         @DisplayName("엔티티 오브젝트의 PK를 기준으로 업데이트 쿼리를 생성한다.")
         void succeedToCreateQuery() {
             String expectedQuery = "UPDATE \"users\" " +
-                    "SET \"id\" = 1, \"nick_name\" = '홍길동2', \"old\" = 30, \"email\" = 'test@test.com' " +
+                    "SET \"id\" = 1, \"nick_name\" = '홍길동', \"old\" = 20, \"email\" = 'test@test.com' " +
                     "WHERE \"id\" = 1;";
 
             List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("id", 1L));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동2"));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 30));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+            updatingColumns.add(idColumnKeyValue);
+            updatingColumns.add(nameKeyValue);
+            updatingColumns.add(ageKeyValue);
+            updatingColumns.add(emailKeyValue);
 
             String resultQuery = queryBuilder.buildUpdateQuery(
-                    "users",
+                    testTableName,
                     updatingColumns,
-                    new AbstractMap.SimpleEntry<>("id", 1L)
+                    idColumnKeyValue
             );
 
             assertEquals(expectedQuery, resultQuery);
@@ -60,12 +64,12 @@ public class DmlQueryBuilderTest {
                     "VALUES (1, '홍길동', 20, 'test@test.com');";
 
             List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("id", 1L));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동"));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 20));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+            updatingColumns.add(idColumnKeyValue);
+            updatingColumns.add(nameKeyValue);
+            updatingColumns.add(ageKeyValue);
+            updatingColumns.add(emailKeyValue);
 
-            String resultQuery = queryBuilder.buildInsertQuery("users", updatingColumns);
+            String resultQuery = queryBuilder.buildInsertQuery(testTableName, updatingColumns);
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -79,11 +83,11 @@ public class DmlQueryBuilderTest {
 
 
             List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", "홍길동"));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("old", 20));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+            updatingColumns.add(nameKeyValue);
+            updatingColumns.add(ageKeyValue);
+            updatingColumns.add(emailKeyValue);
 
-            String resultQuery = queryBuilder.buildInsertQuery("users", updatingColumns);
+            String resultQuery = queryBuilder.buildInsertQuery(testTableName, updatingColumns);
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -98,9 +102,9 @@ public class DmlQueryBuilderTest {
             List<Map.Entry<String, Object>> updatingColumns = new ArrayList<>();
             updatingColumns.add(new AbstractMap.SimpleEntry<>("nick_name", null));
             updatingColumns.add(new AbstractMap.SimpleEntry<>("old", null));
-            updatingColumns.add(new AbstractMap.SimpleEntry<>("email", "test@test.com"));
+            updatingColumns.add(emailKeyValue);
 
-            String resultQuery = queryBuilder.buildInsertQuery("users", updatingColumns);
+            String resultQuery = queryBuilder.buildInsertQuery(testTableName, updatingColumns);
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -115,7 +119,10 @@ public class DmlQueryBuilderTest {
             String expectedQuery = "SELECT * FROM \"users\" " +
                     "WHERE (\"id\" = 1);";
 
-            String resultQuery = queryBuilder.buildSelectByIdQuery(PersonWithTransientAnnotation.class, 1L);
+            String resultQuery = queryBuilder.buildSelectByIdQuery(
+                    testTableName,
+                    idColumnKeyValue
+            );
 
             assertEquals(expectedQuery, resultQuery);
         }
@@ -131,8 +138,8 @@ public class DmlQueryBuilderTest {
             String expectedQuery = "DELETE FROM \"users\" WHERE \"id\" = 1;";
 
             String resultQuery = queryBuilder.buildDeleteQuery(
-                    "users",
-                    new AbstractMap.SimpleEntry<>("id", 1L)
+                    testTableName,
+                    idColumnKeyValue
             );
 
             assertEquals(expectedQuery, resultQuery);

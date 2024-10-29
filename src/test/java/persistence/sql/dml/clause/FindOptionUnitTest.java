@@ -37,7 +37,7 @@ public class FindOptionUnitTest {
         mockWhereClause2 = new WhereClause(new EqualClause(column2.getName(), "test@test.com"));
 
         findOption = new FindOption(
-                List.of(column1, column2),
+                List.of(column1.getName(), column2.getName()),
                 List.of(mockWhereClause1, mockWhereClause2));
     }
 
@@ -57,7 +57,7 @@ public class FindOptionUnitTest {
     @Test
     @DisplayName("joinWhereClauses 시 조건절이 없다면 빈 문자열을 반환한다.")
     void testJoinWhereClausesWithEmptyClauses() {
-        FindOption emptyFindOption = new FindOption(List.of(column1, column2), List.of());
+        FindOption emptyFindOption = new FindOption(List.of(column1.getName(), column2.getName()), List.of());
 
         String result = emptyFindOption.joinWhereClauses(mockDialect);
 

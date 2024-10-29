@@ -5,11 +5,11 @@ import java.lang.reflect.Field;
 public class Value {
     private Object value = null;
 
-    private Value(Object value) {
-        this.value = value;
+    private Value() {
     }
 
-    private Value() {
+    public Value(Object value) {
+        this.value = value;
     }
 
     public static Value create(Object entityObject, Field field) {

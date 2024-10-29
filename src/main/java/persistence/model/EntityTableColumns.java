@@ -24,10 +24,12 @@ public class EntityTableColumns {
         return columns;
     }
 
-    public List<EntityColumn> getPrimaryColumns() {
+    public EntityColumn getPrimaryColumn() {
+        // XXX: 복합키 고려 X
         return columns.stream()
                 .filter(EntityColumn::isPrimary)
-                .collect(Collectors.toList());
+                .findFirst()
+                .orElseThrow(() -> new ColumnNotFoundException("PRIMARY KEY NOT FOUND!"));
     }
 
     public List<EntityColumn> getNonPrimaryColumns() {

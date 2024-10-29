@@ -57,7 +57,7 @@ public class EntityTableUnitTest {
         // given
         entityTable.setColumns(List.of(idColumn, nameColumn, emailColumn, ageColumn));
 
-        assertEquals(1, entityTable.getPrimaryColumns().size());
+        assertEquals(idColumn, entityTable.getPrimaryColumn());
     }
 
     @Test

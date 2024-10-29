@@ -1,8 +1,5 @@
 package persistence.sql.dml;
 
-import persistence.model.EntityColumn;
-import persistence.model.EntityFactory;
-import persistence.model.EntityTable;
 import persistence.sql.dml.clause.FindOption;
 import persistence.sql.dml.clause.FindOptionBuilder;
 import persistence.sql.dialect.Dialect;
@@ -75,23 +72,16 @@ public class DmlQueryBuilder {
         return appendSemicolon(deleteSql);
     }
 
-    public String buildSelectByIdQuery(Class<?> entityClass, Object id) {
-        EntityTable table = EntityFactory.createEmptySchema(entityClass);
-
-        EntityColumn conditionColumn = table.getColumn("id");
+    public String buildSelectByIdQuery(String tableName, Map.Entry<String, Object> idKeyValue) {
         FindOption findOption = new FindOptionBuilder()
-                .where(new EqualClause(conditionColumn.getName(), id))
+                .where(new EqualClause(idKeyValue.getKey(), idKeyValue.getValue()))
                 .build();
 
-        return buildSelectQuery(entityClass, findOption);
+        return buildSelectQuery(tableName, findOption);
     }
 
-    private String buildSelectQuery(Class<?> entityClass, FindOption findOption) {
-        EntityTable table = EntityFactory.createEmptySchema(entityClass);
-
-        List<String> selectingColumnNames = findOption.getSelectingColumns().stream()
-                .map(EntityColumn::getName)
-                .toList();
+    private String buildSelectQuery(String tableName, FindOption findOption) {
+        List<String> selectingColumnNames = findOption.getSelectingColumns();
 
         String selectingColumnNamesJoined = selectingColumnNames.isEmpty()
                 ? SELECT_ALL
@@ -100,7 +90,7 @@ public class DmlQueryBuilder {
         String query = String.format(
                 SELECT_FORMAT,
                 selectingColumnNamesJoined,
-                dialect.getIdentifierQuoted(table.getName()));
+                dialect.getIdentifierQuoted(tableName));
 
         if (!findOption.getWhere().isEmpty()) {
             return query + " " + findOption.joinWhereClauses(dialect) + ";";

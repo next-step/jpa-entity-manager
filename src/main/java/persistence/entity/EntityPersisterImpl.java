@@ -5,7 +5,6 @@ import persistence.model.EntityColumn;
 import persistence.model.EntityFactory;
 import persistence.model.EntityTable;
 import persistence.model.exception.ColumnInvalidException;
-import persistence.model.exception.ColumnNotFoundException;
 import persistence.sql.dml.DmlQueryBuilder;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class EntityPersisterImpl implements EntityPersister {
         String sql = dmlQueryBuilder.buildUpdateQuery(
                 tableName,
                 updatingKeyValues,
-                getDefaultPrimaryColumnKeyValue(table)
+                table.getPrimaryColumnKeyValue()
         );
         jdbcTemplate.execute(sql);
     }
@@ -48,7 +47,7 @@ public class EntityPersisterImpl implements EntityPersister {
 
         String tableName = table.getName();
 
-        List<Map.Entry<String, Object>> insertingColumns = table.getActiveColumns(table).stream()
+        List<Map.Entry<String, Object>> insertingColumns = table.getActiveColumns().stream()
                 .map(EntityColumn::toKeyValue)
                 .toList();
 
@@ -65,15 +64,7 @@ public class EntityPersisterImpl implements EntityPersister {
         }
 
         String tableName = table.getName();
-        String sql = dmlQueryBuilder.buildDeleteQuery(tableName, getDefaultPrimaryColumnKeyValue(table));
+        String sql = dmlQueryBuilder.buildDeleteQuery(tableName, table.getPrimaryColumnKeyValue());
         jdbcTemplate.execute(sql);
-    }
-
-    private Map.Entry<String, Object> getDefaultPrimaryColumnKeyValue(EntityTable table) {
-        // as-is 복합키는 고려 X
-        return table.getPrimaryColumns().stream()
-                .map(EntityColumn::toKeyValue)
-                .findFirst()
-                .orElseThrow(() -> new ColumnNotFoundException("Primary Column Not Found"));
     }
 }
