@@ -8,7 +8,8 @@ import org.junit.jupiter.api.*;
 import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.dialect.Dialect;
-import persistence.sql.dialect.DialectFactory;
+import persistence.sql.dialect.H2Dialect;
+import persistence.sql.dialect.type.H2DataTypeRegistry;
 import persistence.sql.dml.DmlQueryBuilder;
 import persistence.fixture.PersonWithTransientAnnotation;
 
@@ -21,31 +22,23 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EntityManagerTest {
-    DatabaseServer databaseServer;
-
-    Dialect dialect;
-
-    DmlQueryBuilder dmlQueryBuilder;
-
-    DdlQueryBuilder ddlQueryBuilder;
-
-    JdbcTemplate jdbcTemplate;
-
-    EntityPersister entityPersister;
-
-    EntityManager entityManager;
+    private static DatabaseServer databaseServer;
+    private static JdbcTemplate jdbcTemplate;
+    private static final Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
+    private static final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder(dialect);
+    private static final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(dialect);
+    private static EntityManager entityManager;
 
     @BeforeEach
     void setup() throws SQLException {
         databaseServer = new H2();
-        dialect = DialectFactory.create(databaseServer.getClass());
-        dmlQueryBuilder = new DmlQueryBuilder(dialect);
-        ddlQueryBuilder = new DdlQueryBuilder(dialect);
-        PersistenceContext persistenceContext = new PersistenceContextImpl();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
 
-        entityManager = new EntityManagerImpl(entityPersister, dmlQueryBuilder, jdbcTemplate, persistenceContext);
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
+        EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
+
+        entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
 
         jdbcTemplate.execute(ddlQueryBuilder.buildCreateTableQuery(PersonWithTransientAnnotation.class));
     }
@@ -83,11 +76,9 @@ public class EntityManagerTest {
         }
 
         @Test
-        @DisplayName("해당하는 엔티티가 없다면 에러를 내뱉는다.")
+        @DisplayName("해당하는 엔티티가 없다면 null을 반환한다.")
         void failToFindById() {
-            assertThrows(IllegalArgumentException.class, () -> {
-                entityManager.find(PersonWithTransientAnnotation.class, 1L);
-            });
+            assertNull(entityManager.find(PersonWithTransientAnnotation.class, 1L));
         }
     }
 
@@ -145,9 +136,7 @@ public class EntityManagerTest {
             entityManager.remove(person);
 
             // then
-            assertThrows(RuntimeException.class, () -> {
-                entityManager.find(PersonWithTransientAnnotation.class, 1L);
-            });
+            assertNull(entityManager.find(PersonWithTransientAnnotation.class, 1L));
         }
 
         @Test
