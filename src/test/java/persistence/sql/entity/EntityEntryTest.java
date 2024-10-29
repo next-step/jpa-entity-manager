@@ -15,7 +15,6 @@ import persistence.sql.fixture.TestPersonNoGenerateValue;
 import persistence.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +50,23 @@ class EntityEntryTest extends TestEntityInitialize {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Primary key must not be null");
     }
+
+    @Test
+    @DisplayName("newLoadingEntry 함수는 상태가 LOADING 상태인 EntityEntry를 생성한다.")
+    void testNewLoadingEntry() {
+        // given
+        Long primaryKey = 1L;
+
+        EntityEntry actual = EntityEntry.newLoadingEntry(primaryKey, TestPerson.class);
+
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.getStatus()).isEqualTo(Status.LOADING),
+                () -> assertThat(actual.getEntity()).isNull(),
+                () -> assertThat(actual.getSnapshot()).isNull()
+        );
+    }
+
 
     @Test
     @DisplayName("synchrnoizingSnapshot 함수는 Entity의 스냅샷을 업데이트한다.")
@@ -94,6 +110,24 @@ class EntityEntryTest extends TestEntityInitialize {
     }
 
     @Test
+    @DisplayName("updateEntity 함수는 Entity를 업데이트하고 snapshot이 null일경우 생성한다.")
+    void testUpdateEntityAndSnapshotIsNull() {
+        // given
+        TestPerson person = new TestPerson(1L, "catsbi", 55, "casbi@naver.com", 123);
+        EntityEntry entry = EntityEntry.newLoadingEntry(1L, TestPerson.class);
+
+        //when
+        entry.updateEntity(person);
+
+        //then
+        assertAll(
+                () -> assertThat(entry.getEntity()).isEqualTo(person),
+                () -> assertThat(entry.getSnapshot()).isNotNull()
+        );
+    }
+
+
+    @Test
     @DisplayName("isDirty 함수는 변경이 필요한 엔티티가 있을 경우 true를 반환한다.")
     void testIsDirtyWithDirtyEntity() {
         // given
@@ -116,6 +150,21 @@ class EntityEntryTest extends TestEntityInitialize {
 
         // when
         person.setIndex(456);
+
+        // then
+        assertThat(entry.isDirty()).isFalse();
+    }
+
+    @Test
+    @DisplayName("isDirty 함수는 관리되지 않는 상태일 경우 false를 반환한다.")
+    void testIsDirtyWithNotManagedStatus() {
+        // given
+        TestPerson person = new TestPerson(1L, "catsbi", 55, "casbi@naver.com", 123);
+        EntityEntry entry = EntityEntry.newEntry(person, Status.MANAGED);
+
+        // when
+        person.setName("newCatsbi");
+        entry.updateStatus(Status.GONE);
 
         // then
         assertThat(entry.isDirty()).isFalse();
