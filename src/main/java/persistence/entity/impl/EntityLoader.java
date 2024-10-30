@@ -19,21 +19,29 @@ import java.util.List;
  * 조건 기반 엔티티 검색
  * 관계된 엔티티들의 로드
  * 캐시 관리
- * */
-public class EntityLoaderImpl<T>  {
+ */
+public class EntityLoader<T> {
     private final JdbcTemplate jdbcTemplate;
 
-    public EntityLoaderImpl(JdbcTemplate jdbcTemplate) {
+    public EntityLoader(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public T load(Class<T> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new EntityRowMapper<>(clazz));
+        try {
+            SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
+            return jdbcTemplate.queryForObject(selectQueryBuilder.findById(clazz, id), new EntityRowMapper<>(clazz));
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     public List<T> loadAll(Class<T> clazz) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        return jdbcTemplate.query(selectQueryBuilder.findAll(clazz), new EntityRowMapper<>(clazz));
+        try {
+            SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
+            return jdbcTemplate.query(selectQueryBuilder.findAll(clazz), new EntityRowMapper<>(clazz));
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 }

@@ -9,6 +9,7 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityRowMapper;
 import persistence.sql.ddl.CreateTableQueryBuilder;
 import persistence.sql.ddl.DropTableQueryBuilder;
 import persistence.sql.ddl.QueryBuilder;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
     private EntityPersister entityPersister;
-    private EntityLoaderImpl<TestEntity> entityLoader;
+    private EntityLoader<TestEntity> entityLoader;
     private final Long testId = 1L;
     private final TestEntity testEntity = new TestEntity(testId, "Test Entity");
 
@@ -34,7 +35,7 @@ class EntityPersisterTest {
         // JdbcTemplate을 실제로 구현한 클래스를 사용하거나 간단한 구현을 작성
         jdbcTemplate = new JdbcTemplate(connection);
         entityPersister = new EntityPersister(jdbcTemplate);
-        entityLoader = new EntityLoaderImpl<>(jdbcTemplate);
+        entityLoader = new EntityLoader<>(jdbcTemplate);
         QueryBuilder ddlQueryBuilder = new CreateTableQueryBuilder(TestEntity.class);
         String createTableQuery = ddlQueryBuilder.executeQuery();
         jdbcTemplate.execute(createTableQuery);
@@ -72,11 +73,10 @@ class EntityPersisterTest {
         jdbcTemplate.executeInsert("INSERT INTO TestEntity (id, name) VALUES (1, 'Test Entity')");
 
         entityPersister.remove(TestEntity.class, testId);
-        assertThrows(RuntimeException.class,
-                () -> entityLoader.load(TestEntity.class, testId),
-                "Expected 1 result, got 0");
-    }
+       assertThrows(RuntimeException.class, ()->
+               jdbcTemplate.queryForObject("SELECT * FROM TestEntity WHERE id = 1", new EntityRowMapper<>(TestEntity.class)));
 
+    }
 
     // TestEntity: 단순한 엔티티 클래스
     @Entity

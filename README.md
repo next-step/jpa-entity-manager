@@ -14,7 +14,7 @@
 + [x] Persister 구현체를 구현한다.
 
 ### step 2. EntityLoader 구현
-+ [ ] EntityLoader 구현체를 구현한다. 
++ [x] EntityLoader 구현체를 구현한다. 
   + ResultSet의 메타데이터를 잘 이용하자
   + 데이터베이스 쿼리를 실행하여 엔티티 객체를 로드하는 역할을 수행한다.
-+ [ ] EntityManager, Persistence Context 책임 전가
++ [x] EntityManager, Persistence Context 책임 전가

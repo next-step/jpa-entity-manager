@@ -20,30 +20,27 @@ import java.util.Optional;
 
 public class DefaultEntityManager implements EntityManager {
     private final DefaultPersistenceContext defaultPersistenceContext;
-    private final EntityLoaderImpl entityLoader;
     private final EntityPersister entityPersister;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate) {
         this.defaultPersistenceContext = new DefaultPersistenceContext();
-        this.entityLoader = new EntityLoaderImpl(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-
         if (defaultPersistenceContext.isExist(clazz, id)) {
             Object o = defaultPersistenceContext.get(clazz, id);
             return Optional.of(clazz.cast(o));
         }
+        Optional<T> t = entityPersister.find(clazz, id);
 
-        Object o = entityLoader.load(clazz, id);
-
-        if (Objects.isNull(o)) {
+        if (t.isEmpty()) {
             return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
         }
+
         // 엔티티가 타입에 맞는지 확인하고 캐시
-        T entity = clazz.cast(o);
+        T entity = clazz.cast(t.get());
         defaultPersistenceContext.add(entity, id);
 
         return Optional.of(entity);  // 조회된 엔티티 반환

@@ -16,14 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EntityLoaderTest {
     private JdbcTemplate jdbcTemplate;
-    private SelectQueryBuilder selectQueryBuilder;
-    private EntityLoaderImpl<Person> entityLoader;
+    private EntityLoader<Person> entityLoader;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = new StubJdbcTemplate();
-        selectQueryBuilder = new StubSelectQueryBuilder(Person.class);
-        entityLoader = new EntityLoaderImpl<>(jdbcTemplate);
+        entityLoader = new EntityLoader<>(jdbcTemplate);
     }
 
     @Test
