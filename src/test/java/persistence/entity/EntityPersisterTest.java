@@ -93,13 +93,14 @@ public class EntityPersisterTest {
         );
 
         // when
-        entityPersister.insert(FIXTURE);
+        Object id = entityPersister.insert(FIXTURE);
 
         // then
         List<PersonWithTransientAnnotation> afterInsertSelectResult = jdbcTemplate.query(SELECT_QUERY, resultSet ->
                 new RowMapperImpl<>(PersonWithTransientAnnotation.class).mapRow(resultSet)
         );
         assertAll(
+                () -> assertEquals(1L, id),
                 () -> assertEquals(0, beforeInsertSelectResult.size()),
                 () -> assertEquals(1, afterInsertSelectResult.size())
         );

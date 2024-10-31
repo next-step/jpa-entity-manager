@@ -1,7 +1,4 @@
-package persistence.model.util;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
+package persistence.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -11,6 +8,16 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ReflectionUtil {
+    public static void setFieldValue(Object entity, String fieldName, Object value) {
+        try {
+            Field field = entity.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(entity, value);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("FAILED TO SET FIELD VALUE! : ", e);
+        }
+    }
+
     public static <T extends Annotation> Optional<T> getAnnotationIfPresent(Field field, Class<T> annotationClass) {
         if (field.isAnnotationPresent(annotationClass)) {
             return Optional.ofNullable(field.getAnnotation(annotationClass));

@@ -2,7 +2,7 @@ package jdbc;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
-import persistence.model.util.ReflectionUtil;
+import persistence.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;

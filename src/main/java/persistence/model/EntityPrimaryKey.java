@@ -2,7 +2,7 @@ package persistence.model;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import persistence.model.util.ReflectionUtil;
+import persistence.util.ReflectionUtil;
 
 import java.util.Map;
 

@@ -1,6 +1,7 @@
 package jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -16,6 +17,23 @@ public class JdbcTemplate {
     public void execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object executeAndGetGeneratedId(String sql, String generatedColumnName) {
+        try (PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        return resultSet.getObject(generatedColumnName);
+                    }
+                }
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

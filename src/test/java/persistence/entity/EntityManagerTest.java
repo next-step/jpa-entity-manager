@@ -3,8 +3,10 @@ package persistence.entity;
 import database.DatabaseServer;
 import database.H2;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
+import persistence.model.EntityPrimaryKey;
 import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.ddl.DdlQueryBuilder;
 import persistence.sql.dialect.Dialect;
@@ -12,6 +14,7 @@ import persistence.sql.dialect.H2Dialect;
 import persistence.sql.dialect.type.H2DataTypeRegistry;
 import persistence.sql.dml.DmlQueryBuilder;
 import persistence.fixture.PersonWithTransientAnnotation;
+import persistence.util.ReflectionUtil;
 
 import java.sql.SQLException;
 import java.util.AbstractMap;
@@ -27,6 +30,7 @@ public class EntityManagerTest {
     private static final Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
     private static final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder(dialect);
     private static final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(dialect);
+    private static PersistenceContext persistenceContext;
     private static EntityPersister entityPersister;
     private static EntityLoader entityLoader;
     private static EntityManager entityManager;
@@ -36,7 +40,7 @@ public class EntityManagerTest {
         databaseServer = new H2();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
 
-        PersistenceContext persistenceContext = new PersistenceContextImpl();
+        persistenceContext = new PersistenceContextImpl();
         entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
 
@@ -134,6 +138,23 @@ public class EntityManagerTest {
             assertThrows(EntityExistsException.class, () -> {
                 entityManager.persist(person);
             });
+        }
+
+        @Test
+        @DisplayName("Id가 없는 엔티티는, 데이터베이스에 생성 후 생성된 Id를 영속성 컨텍스트에 저장한다.")
+        void succeedToPersistEntityWithoutId() {
+            // given
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation("test@test.com");
+
+            // when
+            entityManager.persist(person);
+
+            // then
+            EntityPrimaryKey pk = EntityPrimaryKey.build(person);
+            Object foundEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, pk.keyValue());
+            Object foundEntityId = ReflectionUtil.getFieldNameAndValue(foundEntity, Id.class).getValue();
+
+            assertEquals(1L, foundEntityId);
         }
     }
 

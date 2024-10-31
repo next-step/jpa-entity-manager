@@ -42,7 +42,7 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public void insert(Object entity) {
+    public Object insert(Object entity) {
         EntityTable table = EntityFactory.createPopulatedSchema(entity);
 
         String tableName = table.getName();
@@ -52,7 +52,7 @@ public class EntityPersisterImpl implements EntityPersister {
                 .toList();
 
         String sql = dmlQueryBuilder.buildInsertQuery(tableName, insertingColumns);
-        jdbcTemplate.execute(sql);
+        return jdbcTemplate.executeAndGetGeneratedId(sql, table.getPrimaryColumnKeyValue().getKey());
     }
 
     @Override

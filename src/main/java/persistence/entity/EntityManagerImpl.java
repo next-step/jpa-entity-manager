@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jakarta.persistence.EntityExistsException;
 import persistence.model.EntityPrimaryKey;
+import persistence.util.ReflectionUtil;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
@@ -43,7 +44,8 @@ public class EntityManagerImpl implements EntityManager {
         if (existsInContext || existsInDatabase) {
             throw new EntityExistsException("ENTITY ALREADY EXISTS!");
         }
-        entityPersister.insert(entity);
+        Object generatedId = entityPersister.insert(entity);
+        ReflectionUtil.setFieldValue(entity, pk.keyName(), generatedId);
         persistenceContext.addEntity(entity);
     }
 

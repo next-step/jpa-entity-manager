@@ -11,7 +11,7 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static persistence.model.util.ReflectionUtil.getAnnotationIfPresent;
+import static persistence.util.ReflectionUtil.getAnnotationIfPresent;
 
 public class EntityColumn {
     private final String name;
