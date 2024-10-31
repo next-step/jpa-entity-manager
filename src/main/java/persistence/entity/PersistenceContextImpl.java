@@ -30,9 +30,8 @@ public class PersistenceContextImpl implements PersistenceContext {
     public boolean isEntityExists(Object entityObject) {
         Class<?> entityClass = entityObject.getClass();
         Object entityId = EntityPrimaryKey.build(entityObject).keyValue();
-        Object existingEntity = getEntity(entityClass, entityId);
-
-        return existingEntity != null;
+        final EntityKey entityKey = createEntityKey(entityClass, entityId);
+        return entityCache.containsKey(entityKey);
     }
 
     private EntityKey createEntityKey(Class<?> entityClass, Object id) {

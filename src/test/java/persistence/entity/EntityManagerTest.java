@@ -98,16 +98,21 @@ public class EntityManagerTest {
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
             );
-            entityManager.persist(person);
 
             // when
-            PersonWithTransientAnnotation foundPerson = entityManager.find(
-                    PersonWithTransientAnnotation.class,
-                    1L
-            );
+            entityManager.persist(person);
 
             // then
-            assertEquals(foundPerson.getName(), person.getName());
+            PersonWithTransientAnnotation contextFound = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            PersonWithTransientAnnotation databaseFound = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            assertAll(
+                    () -> assertSame(contextFound, person),
+                    () -> assertEquals(databaseFound.getName(), person.getName())
+            );
         }
 
         @Test
@@ -174,7 +179,18 @@ public class EntityManagerTest {
             entityManager.remove(person);
 
             // then
-            assertNull(entityManager.find(PersonWithTransientAnnotation.class, 1L));
+            PersonWithTransientAnnotation contextFound = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            boolean isFoundInDatabase = entityLoader.exists(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+
+            assertAll(
+                    () -> assertNull(contextFound),
+                    () -> assertFalse(isFoundInDatabase)
+            );
+
         }
 
         @Test
@@ -207,8 +223,17 @@ public class EntityManagerTest {
             entityManager.merge(person);
 
             // then
-            PersonWithTransientAnnotation foundPerson = entityManager.find(PersonWithTransientAnnotation.class, 1L);
-            assertEquals(30, foundPerson.getAge());
+            PersonWithTransientAnnotation contextFound = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            PersonWithTransientAnnotation databaseFound = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+
+            assertAll(
+                    () -> assertEquals(30, contextFound.getAge()),
+                    () -> assertEquals(30, databaseFound.getAge())
+            );
         }
 
         @Test
@@ -219,8 +244,18 @@ public class EntityManagerTest {
             );
 
             PersonWithTransientAnnotation mergeResult = entityManager.merge(entity);
-            PersonWithTransientAnnotation foundPerson = entityManager.find(PersonWithTransientAnnotation.class, 1L);
-            assertSame(foundPerson, mergeResult);
+            PersonWithTransientAnnotation contextFound = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            PersonWithTransientAnnotation databaseFound = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+
+            assertAll(
+                    () -> assertSame(contextFound, mergeResult),
+                    () -> assertEquals(databaseFound.getId(), mergeResult.getId())
+            );
+
         }
     }
 }
