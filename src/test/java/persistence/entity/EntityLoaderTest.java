@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EntityLoaderTest {
     private static DatabaseServer databaseServer;
     private static JdbcTemplate jdbcTemplate;
+    private static EntityPersister entityPersister;
+    private static EntityLoader entityLoader;
     private static final Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
     private static final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(dialect);
     private static final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder(dialect);
@@ -29,6 +31,8 @@ public class EntityLoaderTest {
     void setup() throws SQLException {
         databaseServer = new H2();
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
+        entityPersister =  new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
+        entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
 
         jdbcTemplate.execute(ddlQueryBuilder.buildCreateTableQuery(PersonWithTransientAnnotation.class));
     }
@@ -46,14 +50,28 @@ public class EntityLoaderTest {
         PersonWithTransientAnnotation insertingUser = new PersonWithTransientAnnotation(
                 1L, "홍길동", 20, "test@test.com", 1
         );
-        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
         entityPersister.insert(insertingUser);
 
         // when
-        EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
         PersonWithTransientAnnotation foundUser = entityLoader.find(PersonWithTransientAnnotation.class, 1L);
 
         // then
         assertEquals(insertingUser.getId(), foundUser.getId());
+    }
+
+    @Test
+    @DisplayName("객체가 데이터베이스에 있는지 확인한다.")
+    void testExists() {
+        // given
+        PersonWithTransientAnnotation insertingUser = new PersonWithTransientAnnotation(
+                1L, "홍길동", 20, "test@test.com", 1
+        );
+        entityPersister.insert(insertingUser);
+
+        // when
+        boolean exists = entityLoader.exists(PersonWithTransientAnnotation.class, 1L);
+
+        // then
+        assertTrue(exists);
     }
 }

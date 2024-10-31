@@ -22,4 +22,8 @@ public record EntityPrimaryKey(String keyName, Object keyValue, String entityTab
 
         return new EntityPrimaryKey(pkName, pkValue, entityTableName);
     }
+
+    public boolean isValid() {
+        return keyValue != null;
+    }
 }

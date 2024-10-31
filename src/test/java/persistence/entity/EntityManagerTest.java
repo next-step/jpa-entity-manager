@@ -27,6 +27,8 @@ public class EntityManagerTest {
     private static final Dialect dialect = new H2Dialect(new H2DataTypeRegistry());
     private static final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder(dialect);
     private static final DdlQueryBuilder ddlQueryBuilder = new DdlQueryBuilder(dialect);
+    private static EntityPersister entityPersister;
+    private static EntityLoader entityLoader;
     private static EntityManager entityManager;
 
     @BeforeEach
@@ -35,8 +37,8 @@ public class EntityManagerTest {
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
 
         PersistenceContext persistenceContext = new PersistenceContextImpl();
-        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
-        EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
+        entityPersister = new EntityPersisterImpl(jdbcTemplate, dmlQueryBuilder);
+        entityLoader = new EntityLoaderImpl(jdbcTemplate, dmlQueryBuilder);
 
         entityManager = new EntityManagerImpl(entityPersister, entityLoader, persistenceContext);
 
@@ -105,13 +107,28 @@ public class EntityManagerTest {
         }
 
         @Test
-        @DisplayName("이미 존재하는 엔티티라면 에러를 뱉는다.")
+        @DisplayName("영속성 컨텍스트에 이미 존재하는 엔티티라면 에러를 뱉는다.")
         void failToPersistForAlreadyExistingEntity() {
             // given
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
             );
             entityManager.persist(person);
+
+            // when, then
+            assertThrows(EntityExistsException.class, () -> {
+                entityManager.persist(person);
+            });
+        }
+
+        @Test
+        @DisplayName("영속성 컨텍스트에 없더라도 데이터베이스에 있다면 에러를 뱉는다.")
+        void failToPersistForAlreadyExistingDatabase() {
+            // given
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
+                    1L, "홍길동", 20, "test@test.com", 1
+            );
+            entityPersister.insert(person);
 
             // when, then
             assertThrows(EntityExistsException.class, () -> {

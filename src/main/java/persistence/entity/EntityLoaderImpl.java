@@ -6,9 +6,11 @@ import persistence.model.EntityFactory;
 import persistence.model.EntityTable;
 import persistence.sql.dml.DmlQueryBuilder;
 
+import java.util.List;
+
 public class EntityLoaderImpl implements EntityLoader {
-    JdbcTemplate jdbcTemplate;
-    DmlQueryBuilder dmlQueryBuilder;
+    private final JdbcTemplate jdbcTemplate;
+    private final DmlQueryBuilder dmlQueryBuilder;
 
     public EntityLoaderImpl(JdbcTemplate jdbcTemplate, DmlQueryBuilder dmlQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
@@ -17,14 +19,29 @@ public class EntityLoaderImpl implements EntityLoader {
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        EntityTable table = EntityFactory.createEmptySchema(clazz);
-        table.setPrimaryValue(id);
-        String tableName = table.getName();
+        String selectQuery = buildDefaultSelectQuery(clazz, id);
 
-        String selectQuery = dmlQueryBuilder.buildSelectByIdQuery(tableName, table.getPrimaryColumnKeyValue());
         return jdbcTemplate.queryForObject(
                 selectQuery,
                 resultSet -> new RowMapperImpl<>(clazz).mapRow(resultSet)
         );
+    }
+
+    @Override
+    public <T> boolean exists(Class<T> clazz, Object id) {
+        String selectQuery = buildDefaultSelectQuery(clazz, id);
+
+        List<T> queryResult = jdbcTemplate.query(
+                selectQuery,
+                resultSet -> new RowMapperImpl<>(clazz).mapRow(resultSet)
+        );
+        return !queryResult.isEmpty();
+    }
+
+    private <T> String buildDefaultSelectQuery(Class<T> clazz, Object id) {
+        EntityTable table = EntityFactory.createEmptySchema(clazz);
+        table.setPrimaryValue(id);
+
+        return dmlQueryBuilder.buildSelectByIdQuery(table.getName(), table.getPrimaryColumnKeyValue());
     }
 }
