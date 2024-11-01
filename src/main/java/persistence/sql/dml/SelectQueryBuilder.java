@@ -21,7 +21,6 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         if (!entityClass.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("This Class is not an Entity ");
         }
-
         String tableName = getTableName();
         return "SELECT * FROM " + tableName + " WHERE id = " + id + ";";
     }

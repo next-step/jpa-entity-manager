@@ -2,19 +2,11 @@ package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
 import persistence.entity.EntityManager;
-import persistence.entity.EntityRowMapper;
-import persistence.fakehibernate.FakePersistenceContext;
-import persistence.sql.dml.DeleteQueryBuilder;
-import persistence.sql.dml.InsertQueryBuilder;
-import persistence.sql.dml.SelectQueryBuilder;
-import persistence.sql.dml.UpdateQueryBuilder;
+import persistence.defaulthibernate.DefaultPersistenceContext;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * EntityPersister 주요 역활
@@ -27,27 +19,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class DefaultEntityManager implements EntityManager {
-    private final FakePersistenceContext fakePersistenceContext;
+    private final DefaultPersistenceContext defaultPersistenceContext;
     private final EntityPersister entityPersister;
 
     public DefaultEntityManager(JdbcTemplate jdbcTemplate) {
-        this.fakePersistenceContext = new FakePersistenceContext();
+        this.defaultPersistenceContext = new DefaultPersistenceContext();
         this.entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-        if (fakePersistenceContext.isExist(clazz, id)) {
-            Object o = fakePersistenceContext.get(clazz, id);
+        if (defaultPersistenceContext.isExist(clazz, id)) {
+            Object o = defaultPersistenceContext.get(clazz, id);
             return Optional.of(clazz.cast(o));
         }
-        Object o = entityPersister.find(clazz, id);
-        if (Objects.isNull(o)) {
+        Optional<T> t = entityPersister.find(clazz, id);
+
+        if (t.isEmpty()) {
             return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
         }
+
         // 엔티티가 타입에 맞는지 확인하고 캐시
-        T entity = clazz.cast(o);
-        fakePersistenceContext.add(entity, id);
+        T entity = clazz.cast(t.get());
+        defaultPersistenceContext.add(entity, id);
 
         return Optional.of(entity);  // 조회된 엔티티 반환
     }
@@ -55,15 +49,15 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public Object persist(Object entity) {
         Long id = entityPersister.insert(entity);
-        fakePersistenceContext.add(entity.getClass(), id);
+        defaultPersistenceContext.add(entity.getClass(), id);
         return entity;
     }
 
     @Override
     public void remove(Class<?> clazz, Long id) {
         entityPersister.remove(clazz, id);
-        if (fakePersistenceContext.isExist(clazz, id)) {
-            fakePersistenceContext.remove(clazz, id);
+        if (defaultPersistenceContext.isExist(clazz, id)) {
+            defaultPersistenceContext.remove(clazz, id);
         }
     }
 
@@ -75,7 +69,7 @@ public class DefaultEntityManager implements EntityManager {
             idField.setAccessible(true);
             Long id = (Long) idField.get(entity);
             entityPersister.update(entity);
-            fakePersistenceContext.update(entity, id);
+            defaultPersistenceContext.update(entity, id);
 
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Failed to update entity", e);

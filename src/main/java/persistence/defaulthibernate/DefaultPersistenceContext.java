@@ -1,17 +1,19 @@
-package persistence.fakehibernate;
+package persistence.defaulthibernate;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FakePersistenceContext implements PersistenceContext {
+public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<Class<?>, Map<Long, Object>> entityCache = new HashMap<>();
 
+    @Override
     public void add(Object object, Long id) {
         Class<?> clazz = object.getClass();
         entityCache.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(id, object);
     }
 
+    @Override
     public Object get(Class<?> clazz, Long id) {
         Map<Long, Object> entityMap = entityCache.get(clazz);
         if (entityMap == null || !entityMap.containsKey(id)) {
@@ -20,13 +22,14 @@ public class FakePersistenceContext implements PersistenceContext {
         return entityMap.get(id);
     }
 
-
+    @Override
     public void update(Object object, Long id) {
         Class<?> clazz = object.getClass();
         entityCache.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>())
                 .put(id, object);
     }
 
+    @Override
     public void remove(Class<?> clazz, Long id) {
         Map<Long, Object> entityMap = entityCache.get(clazz);
         if (entityMap == null || !entityMap.containsKey(id)) {

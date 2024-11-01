@@ -1,7 +1,6 @@
 package persistence.entity.impl;
 
 import database.H2;
-import domain.Person;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,14 +9,13 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityRowMapper;
 import persistence.sql.ddl.CreateTableQueryBuilder;
 import persistence.sql.ddl.DropTableQueryBuilder;
 import persistence.sql.ddl.QueryBuilder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EntityPersisterTest {
     private JdbcTemplate jdbcTemplate;
     private EntityPersister entityPersister;
+    private EntityLoader<TestEntity> entityLoader;
     private final Long testId = 1L;
     private final TestEntity testEntity = new TestEntity(testId, "Test Entity");
 
@@ -36,7 +35,7 @@ class EntityPersisterTest {
         // JdbcTemplate을 실제로 구현한 클래스를 사용하거나 간단한 구현을 작성
         jdbcTemplate = new JdbcTemplate(connection);
         entityPersister = new EntityPersister(jdbcTemplate);
-
+        entityLoader = new EntityLoader<>(jdbcTemplate);
         QueryBuilder ddlQueryBuilder = new CreateTableQueryBuilder(TestEntity.class);
         String createTableQuery = ddlQueryBuilder.executeQuery();
         jdbcTemplate.execute(createTableQuery);
@@ -47,23 +46,6 @@ class EntityPersisterTest {
         QueryBuilder ddlQueryBuilder = new DropTableQueryBuilder(TestEntity.class);
         String dropTableQuery = ddlQueryBuilder.executeQuery();
         jdbcTemplate.execute(dropTableQuery);
-    }
-
-    @Test
-    void testFindEntity() {
-        jdbcTemplate.executeInsert("INSERT INTO TestEntity (id, name) VALUES (1, 'Test Entity')");
-
-        Object foundEntity = entityPersister.find(TestEntity.class, testId);
-
-        assertNotNull(foundEntity);
-        assertEquals(testEntity, foundEntity);
-    }
-
-    @Test
-    void testFindEntity_NotFound() {
-        Object foundEntity = entityPersister.find(TestEntity.class, testId);
-
-        assertNull(foundEntity);
     }
 
     @Test
@@ -80,10 +62,10 @@ class EntityPersisterTest {
 
         testEntity.setName("Updated Entity");
         entityPersister.update(testEntity);
+        TestEntity updatedEntity = entityLoader.load(TestEntity.class, testId);
 
-        Object updatedEntity = entityPersister.find(TestEntity.class, testId);
         assertNotNull(updatedEntity);
-        assertEquals("Updated Entity", ((TestEntity) updatedEntity).getName());
+        assertEquals("Updated Entity", updatedEntity.getName());
     }
 
     @Test
@@ -91,11 +73,10 @@ class EntityPersisterTest {
         jdbcTemplate.executeInsert("INSERT INTO TestEntity (id, name) VALUES (1, 'Test Entity')");
 
         entityPersister.remove(TestEntity.class, testId);
+       assertThrows(RuntimeException.class, ()->
+               jdbcTemplate.queryForObject("SELECT * FROM TestEntity WHERE id = 1", new EntityRowMapper<>(TestEntity.class)));
 
-        Object foundEntity = entityPersister.find(TestEntity.class, testId);
-        assertNull(foundEntity);
     }
-
 
     // TestEntity: 단순한 엔티티 클래스
     @Entity

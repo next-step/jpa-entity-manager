@@ -1,21 +1,20 @@
-package persistence.fakehibernate;
+package persistence.defaulthibernate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import persistence.fakehibernate.FakePersistenceContext;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FakePersistenceContextTest {
-    private FakePersistenceContext persistenceContext;
+class DefaultPersistenceContextTest {
+    private DefaultPersistenceContext persistenceContext;
     private Long testId;
     private TestEntity testEntity;
 
     @BeforeEach
     void setUp() {
-        persistenceContext = new FakePersistenceContext();
+        persistenceContext = new DefaultPersistenceContext();
         testId = 1L;
         testEntity = new TestEntity(testId, "Test Name");
     }

@@ -27,7 +27,7 @@ public class JdbcTemplate {
         if (results.size() != 1) {
             throw new RuntimeException("Expected 1 result, got " + results.size());
         }
-        return results.get(0);
+        return results.getFirst();
     }
 
     public <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
@@ -41,6 +41,7 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
     public Long executeInsert(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql, Statement.RETURN_GENERATED_KEYS);

@@ -9,6 +9,8 @@ import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * EntityPersister 주요 역활
@@ -20,19 +22,16 @@ import java.util.List;
 
 public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
+    private final EntityLoader entityLoader;
+
 
     public EntityPersister(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityLoader = new EntityLoader<>(jdbcTemplate);
     }
 
-    public Object find(Class<?> clazz, Long id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(clazz);
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
-        List<?> query = jdbcTemplate.query(selectQuery, new EntityRowMapper<>(clazz));
-        if (query.isEmpty()) {
-            return null;
-        }
-        return query.getFirst();
+    public <T> Optional<T> find(Class<T> clazz, Long id) {
+        return Optional.ofNullable(clazz.cast(entityLoader.load(clazz, id)));
     }
 
     public void update(Object entity) {
