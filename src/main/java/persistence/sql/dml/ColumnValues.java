@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class ColumnValues<T> {
 
@@ -17,6 +19,21 @@ public class ColumnValues<T> {
 
     public List<ColumnValue> getValues() {
         return new ArrayList<>(columnValues);
+    }
+
+    public boolean hasSameSizeAs(ColumnValues<T> columnValues) {
+        return this.columnValues.size() == columnValues.getValues().size();
+    }
+
+    public boolean areEqualTo(ColumnValues<T> columnValues) {
+        List<ColumnValue> o1 = this.columnValues;
+        List<ColumnValue> o2 = columnValues.getValues();
+        return IntStream.range(0, o1.size())
+            .allMatch(i -> isEqual(o1.get(i), o2.get(i)));
+    }
+
+    private boolean isEqual(ColumnValue o1, ColumnValue o2) {
+        return Objects.equals(o1.toStringValue(), o2.toStringValue());
     }
 
     private List<ColumnValue> getColumnValues(T entity) throws IllegalAccessException {
