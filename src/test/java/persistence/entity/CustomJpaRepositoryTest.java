@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import database.DatabaseServer;
 import database.H2;
@@ -67,6 +68,30 @@ public class CustomJpaRepositoryTest {
         assertEquals("Jane", updatedPerson.getName());
     }
 
+    @Test
+    @DisplayName("dirty checking 시 null column 테스트")
+    void saveWithDirtyWithNullColumn() throws SQLException, IllegalAccessException {
+        EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        em.getTransaction().beginTransaction();
+
+        Person person = Person.builder()
+            .name("John")
+            .age(20)
+            .email("john@naver.com")
+            .build();
+        em.persist(person);
+        em.flush();
+
+        Person personOne = em.find(Person.class, 1L);
+        personOne.setAge(null);
+
+        em.getTransaction().commit();
+
+        Person updatedPerson = em.find(Person.class, 1L);
+        assertNull(updatedPerson.getAge());
+    }
 
     @AfterEach
     void dropTable() {

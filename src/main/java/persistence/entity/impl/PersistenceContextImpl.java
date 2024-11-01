@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Set;
 import jdbc.JdbcTemplate;
 import persistence.entity.DatabaseSnapshots;
-import persistence.entity.DirtyCheck;
 import persistence.entity.EntityKey;
 import persistence.entity.EntityPersister;
 import persistence.entity.LongTypeId;
@@ -73,7 +72,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public int getDatabaseSnapshot(Object entity) {
+    public Object getDatabaseSnapshot(Object entity) {
         return databaseSnapshots.getDatabaseSnapshot(entity);
     }
 

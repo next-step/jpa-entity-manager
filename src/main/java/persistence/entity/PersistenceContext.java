@@ -17,6 +17,6 @@ public interface PersistenceContext {
 
     Collection<Object> getPersistedEntities();
 
-    int getDatabaseSnapshot(Object entity);
+    Object getDatabaseSnapshot(Object entity);
 
 }

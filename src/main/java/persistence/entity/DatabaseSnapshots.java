@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class DatabaseSnapshots {
 
-    private final Map<EntityKey, Integer> databaseSnapshots;
+    private final Map<EntityKey, Object> databaseSnapshots;
 
     public DatabaseSnapshots() {
         this.databaseSnapshots = new HashMap<>();
@@ -14,10 +14,10 @@ public class DatabaseSnapshots {
     public void addDatabaseSnapshot(Object entity) {
         long id = new LongTypeId(entity).getId();
         EntityKey entityKey = new EntityKey(id, entity.getClass().getName());
-        databaseSnapshots.put(entityKey, entity.hashCode());
+        databaseSnapshots.put(entityKey, entity);
     }
 
-    public int getDatabaseSnapshot(Object entity) {
+    public Object getDatabaseSnapshot(Object entity) {
         long id = new LongTypeId(entity).getId();
         EntityKey entityKey = new EntityKey(id, entity.getClass().getName());
         return databaseSnapshots.get(entityKey);

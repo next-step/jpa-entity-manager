@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class ColumnValue {
 
@@ -13,6 +14,10 @@ public class ColumnValue {
 
     public String toSqlValue() {
         return (value != null) ? "'" + value + "'" : "NULL";
+    }
+
+    public String toStringValue() {
+        return Objects.toString(value, "");
     }
 
 }

@@ -47,7 +47,7 @@ public class EntityManagerImpl implements EntityManager {
             entityPersisterStore.getEntityPersister(entity.getClass()).insert(entity);
         }
         for (Object entity : persistenceContext.getPersistedEntities()) {
-            if (dirtyCheck.check(entity)) {
+            if (dirtyCheck.isDirty(entity)) {
                 entityPersisterStore.getEntityPersister(entity.getClass()).update(entity);
             }
         }
