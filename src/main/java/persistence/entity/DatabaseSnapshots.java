@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import static persistence.util.ReflectionCopy.copy;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +16,9 @@ public class DatabaseSnapshots {
     public void addDatabaseSnapshot(Object entity) {
         long id = new LongTypeId(entity).getId();
         EntityKey entityKey = new EntityKey(id, entity.getClass().getName());
-        databaseSnapshots.put(entityKey, entity);
+        Object copyEntity = copy(entity);
+
+        databaseSnapshots.put(entityKey, copyEntity);
     }
 
     public Object getDatabaseSnapshot(Object entity) {
