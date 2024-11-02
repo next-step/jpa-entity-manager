@@ -9,4 +9,6 @@ public interface EntityManager {
     void remove(Class<?> clazz, Long Id);
 
     void update(Object entity);
+
+    void flush() throws NoSuchFieldException;
 }

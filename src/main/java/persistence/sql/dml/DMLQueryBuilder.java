@@ -41,7 +41,6 @@ public abstract class DMLQueryBuilder {
 
     String columnsClause() {
         return tableMeta.tableColumn().stream()
-
                 .map(TableColumn::name).reduce((s1, s2) -> s1 + ", " + s2).orElseThrow();
     }
 

@@ -4,7 +4,10 @@ import jdbc.JdbcTemplate;
 import persistence.entity.EntityManager;
 import persistence.defaulthibernate.DefaultPersistenceContext;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,6 +32,7 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
+        // 스냅샷 저장
         if (defaultPersistenceContext.isExist(clazz, id)) {
             Object o = defaultPersistenceContext.get(clazz, id);
             return Optional.of(clazz.cast(o));
@@ -48,8 +52,9 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public Object persist(Object entity) {
+        // 스냅샷 저장
         Long id = entityPersister.insert(entity);
-        defaultPersistenceContext.add(entity.getClass(), id);
+        defaultPersistenceContext.add(entity, id);
         return entity;
     }
 
@@ -68,13 +73,17 @@ public class DefaultEntityManager implements EntityManager {
             Field idField = clazz.getDeclaredField("id");
             idField.setAccessible(true);
             Long id = (Long) idField.get(entity);
-            entityPersister.update(entity);
             defaultPersistenceContext.update(entity, id);
-
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Failed to update entity", e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void flush() {
+        defaultPersistenceContext.getDirtyObjects().forEach(entityPersister::update);
+        defaultPersistenceContext.clearSnapshots();
     }
 }

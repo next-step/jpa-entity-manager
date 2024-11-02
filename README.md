@@ -20,5 +20,5 @@
 + [x] EntityManager, Persistence Context 책임 전가
 
 ### step 3. Persistence Context와 Dirty Checking 구현
-+ [ ] Persistence Context에서 효율적인 메모리 관리를 위한 기능 구현
-+ [ ] Dirty Checking 기능 구현
++ [x] Persistence Context에서 효율적인 메모리 관리를 위한 기능 구현
++ [x] Dirty Checking 기능 구현
