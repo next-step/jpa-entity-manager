@@ -1,6 +1,7 @@
 package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
+import persistence.defaulthibernate.EntryStatus;
 import persistence.entity.EntityManager;
 import persistence.defaulthibernate.DefaultPersistenceContext;
 
@@ -84,6 +85,7 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public void flush() {
         defaultPersistenceContext.getDirtyObjects().forEach(entityPersister::update);
+        defaultPersistenceContext.getDirtyObjects().forEach(o->{defaultPersistenceContext.setEntityEntryStatus(o, EntryStatus.GONE);});
         defaultPersistenceContext.clearSnapshots();
     }
 }

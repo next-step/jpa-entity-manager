@@ -1,7 +1,5 @@
 package persistence.defaulthibernate;
 
-import domain.Person;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<Class<?>, Map<Long, Object>> entitiesByKey = new HashMap<>();
     private final Map<Class<?>, Map<Long, Object>> entitySnapshotsByKey = new HashMap<>();
+    private final Map<Class<?>, Map<Object, EntityEntry>> entityEntry = new HashMap<>();
 
     @Override
     public void add(Object object, Long id) {
@@ -25,6 +24,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         entitiesByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>())
                 .put(id, object);
         entitySnapshotsByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(id, object);
+        entityEntry.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(object, EntityEntry.status(EntryStatus.MANAGED));
     }
 
     @Override
@@ -49,13 +49,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
         if (entityMap == null || !entityMap.containsKey(id)) {
             throw new IllegalArgumentException("Entity not found");
         }
+        entityEntry.get(clazz).get(entityMap.get(id)).updateStatus(EntryStatus.DELETED);
         entityMap.remove(id);
         removeSnapshots(clazz, id);
-    }
-
-    @Override
-    public Object getDatabaseSnapShot(Object object, Long id) {
-        return null;
     }
 
     public List<Object> getDirtyObjects() {
@@ -70,10 +66,16 @@ public class DefaultPersistenceContext implements PersistenceContext {
         entitySnapshotsByKey.clear();
     }
 
+    public void setEntityEntryStatus(Object o, EntryStatus status) {
+        entityEntry.get(o.getClass()).get(o).updateStatus(status);
+    }
+
     private boolean isDirty(Object object, Long id) {
         Class<?> clazz = object.getClass();
         boolean equals = clazz.equals(entitiesByKey.get(clazz).get(id));
-        return !equals;
+        boolean isManaged = entityEntry.get(clazz).get(object).status() == EntryStatus.MANAGED
+                || entityEntry.get(clazz).get(object).status() == EntryStatus.DELETED;
+        return !equals && isManaged;
     }
 
     private void removeSnapshots(Class<?> clazz, Long id) {

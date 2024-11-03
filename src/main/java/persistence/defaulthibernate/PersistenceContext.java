@@ -10,6 +10,4 @@ public interface PersistenceContext {
 
     void remove(Class<?> clazz, Long id);
 
-    Object getDatabaseSnapShot(Object object, Long id);
-
 }

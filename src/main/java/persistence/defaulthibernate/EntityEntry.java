@@ -1,16 +1,31 @@
-package persistence.entity;
+package persistence.defaulthibernate;
 
 public class EntityEntry {
     EntryStatus status;
 
-    public EntityEntry(EntryStatus status) {
-        this.status = status;
+    public static EntityEntry status(EntryStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("status must not be null");
+        }
+        return new EntityEntry(status);
     }
-    EntryStatus updateStatus(EntryStatus status) {
-        this.status = status;
+
+    EntryStatus status() {
         return status;
     }
-    EntryStatus getStatus() {
-        return status;
+
+    public void updateStatus(EntryStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("status must not be null");
+        }
+        this.status = status;
     }
+
+    private EntityEntry(EntryStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("status must not be null");
+        }
+        this.status = status;
+    }
+
 }
