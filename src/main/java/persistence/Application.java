@@ -33,7 +33,7 @@ public class Application {
             entityManager.find(Person.class, 1L);
 
             entityManager.update(Person.of(1L,"John", 25,null,null));
-
+            entityManager.flush();
             entityManager.remove(Person.class, 1L);
 
             ddlQueryBuilder = new DropTableQueryBuilder(Person.class);

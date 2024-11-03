@@ -6,6 +6,7 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityRowMapper;
 import persistence.sql.ddl.CreateTableQueryBuilder;
 import persistence.sql.ddl.DropTableQueryBuilder;
 import persistence.sql.ddl.QueryBuilder;
@@ -13,8 +14,7 @@ import persistence.sql.ddl.QueryBuilder;
 import java.sql.Connection;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class DefaultEntityManagerTest {
@@ -66,6 +66,8 @@ public class DefaultEntityManagerTest {
         entityManager.persist(person);
         entityManager.remove(Person.class, 1L);
         Optional<Person> foundedPerson = entityManager.find(Person.class, 1L);
+
+
         assertTrue(foundedPerson.isEmpty());
     }
 
@@ -77,5 +79,25 @@ public class DefaultEntityManagerTest {
         entityManager.update(updatedPerson);
         Optional<Person> foundedPerson = entityManager.find(Person.class, 1L);
         assertTrue(foundedPerson.isPresent());
+
+        Person person2 = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id = 1", new EntityRowMapper<>(Person.class));
+        Person person1 = foundedPerson.get();
+        assertNotEquals(person1, person2);
+        assertNotEquals(person1.toString(), person2.toString());
+    }
+
+    @Test
+    public void testFlush() throws NoSuchFieldException {
+        Person person = Person.of(null, "John", 25, "john@example.com", 1);
+        entityManager.persist(person);
+        Person updatedPerson = Person.of(1L, "John Updated", 26, "john.updated@example.com", 1);
+        entityManager.update(updatedPerson);
+
+        Optional<Person> foundedPerson = entityManager.find(Person.class, 1L);
+        assertTrue(foundedPerson.isPresent());
+        entityManager.flush();
+        Person person2 = jdbcTemplate.queryForObject("SELECT * FROM users WHERE id = 1", new EntityRowMapper<>(Person.class));
+        Person person1 = foundedPerson.get();
+        assertNotEquals(person1, person2);
     }
 }

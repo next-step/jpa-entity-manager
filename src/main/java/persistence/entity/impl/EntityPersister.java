@@ -1,5 +1,6 @@
 package persistence.entity.impl;
 
+import domain.Person;
 import jdbc.JdbcTemplate;
 import persistence.entity.EntityRowMapper;
 
@@ -8,6 +9,7 @@ import persistence.sql.dml.InsertQueryBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

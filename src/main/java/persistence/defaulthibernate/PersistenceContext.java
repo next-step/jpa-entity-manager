@@ -9,4 +9,7 @@ public interface PersistenceContext {
     void update(Object object, Long id);
 
     void remove(Class<?> clazz, Long id);
+
+    Object getDatabaseSnapShot(Object object, Long id);
+
 }
