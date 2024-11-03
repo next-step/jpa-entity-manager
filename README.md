@@ -20,5 +20,8 @@
 + [x] EntityManager, Persistence Context 책임 전가
 
 ### step 3. Persistence Context와 Dirty Checking 구현
-+ [x] Persistence Context에서 효율적인 메모리 관리를 위한 기능 구현
-+ [x] Dirty Checking 기능 구현
++ [x] Persistence Context에서 효율적인 메모리 관리를 위한 기능 구현한다.
++ [x] Dirty Checking 기능 구현한다.
+
+### step 4. EntityEntry 구현
++ [x] Entity 의 라이프 사이클 관리 작업 수행 시 엔터티의 상태를 추가할수 있도록 EntityEntry 기능을 구현한다.
