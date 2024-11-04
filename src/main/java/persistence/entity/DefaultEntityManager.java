@@ -20,7 +20,7 @@ public class DefaultEntityManager implements EntityManager {
         this.jdbcTemplate = new JdbcTemplate(connection);
         this.dialect = dialect;
         this.context = new DefaultPersistenceContext();
-        this.persister = new DefaultEntityPersister();
+        this.persister = new DefaultEntityPersister(jdbcTemplate);
     }
 
     @Override
@@ -42,13 +42,13 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public void persist(Object entity) {
         context.addEntity(entity);
-        persister.insert(entity, jdbcTemplate);
+        persister.insert(entity);
     }
 
     @Override
     public void remove(Object entity) {
         context.removeEntity(entity);
-        persister.delete(entity, jdbcTemplate);
+        persister.delete(entity);
     }
 
     @Override
