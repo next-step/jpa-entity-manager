@@ -4,7 +4,6 @@ import java.sql.Connection;
 import jdbc.TransactionalJdbcTemplate;
 import persistence.entity.DirtyCheck;
 import persistence.entity.EntityManager;
-import persistence.entity.EntityPersister;
 import persistence.entity.EntityPersisterStore;
 import persistence.entity.PersistenceContext;
 
