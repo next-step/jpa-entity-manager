@@ -37,11 +37,6 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void update(Object entity) throws IllegalAccessException {
-        persistenceContext.update(entity);
-    }
-
-    @Override
     public void flush() throws IllegalAccessException {
         for (Object entity : persistenceContext.getPendingEntities()) {
             entityPersisterStore.getEntityPersister(entity.getClass()).insert(entity);

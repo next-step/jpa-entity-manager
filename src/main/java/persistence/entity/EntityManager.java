@@ -10,8 +10,6 @@ public interface EntityManager {
 
     void remove(Object entity);
 
-    void update(Object entity) throws IllegalAccessException;
-
     void flush() throws IllegalAccessException;
 
     TransactionalJdbcTemplate getTransaction();

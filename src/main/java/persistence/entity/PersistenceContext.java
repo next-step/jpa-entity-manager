@@ -11,8 +11,6 @@ public interface PersistenceContext {
 
     void removeEntity(Object entity);
 
-    void update(Object entity) throws IllegalAccessException;
-
     Set<Object> getPendingEntities();
 
     Collection<Object> getPersistedEntities();

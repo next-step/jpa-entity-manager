@@ -115,7 +115,6 @@ class EntityManagerImplTest {
 
         Person personOne = em.find(Person.class, 1L);
         personOne.setName("Jane");
-        em.update(personOne);
         em.flush();
 
         em.getTransaction().commit();

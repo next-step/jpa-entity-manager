@@ -57,11 +57,6 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void update(Object entity) throws IllegalAccessException {
-       persistedEntities.persistEntity(getEntityKey(entity), entity);
-    }
-
-    @Override
     public Set<Object> getPendingEntities() {
         return pendingEntities.getEntities();
     }
