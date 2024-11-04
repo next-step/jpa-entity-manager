@@ -27,6 +27,6 @@
 ## EntityLoader
 - EntityLoader 는 엔터티를 데이터베이스에서 로드하고 로드된 엔터티 상태를 영속성 컨텍스트 내에서 추적 및 관리
 - EntityLoader vs EntityPersister
-  - EntityPersister 는 '변경'에 초점이 맞춰져 있다. 엔티티가 변경되면 데이터페이스에 동기화한다.
+  - EntityPersister 는 '변경'에 초점이 맞춰져 있다. 엔티티가 변경되면 데이터베이스에 동기화한다.
   - EntityLoader 는 '조회(로드)'에 초점이 맞춰져 있다. 
     - 조회를 위해서는 데이터베이스 뿐만 아니라, 영속성 컨텍스트에서의 조회도 포함되기 때문에 영속성 컨텍스트와의 연관관계가 필요하다.
