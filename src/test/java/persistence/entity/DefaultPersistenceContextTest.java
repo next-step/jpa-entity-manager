@@ -1,6 +1,5 @@
 package persistence.entity;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,16 +15,14 @@ class DefaultPersistenceContextTest {
     @DisplayName("[성공] 영속성 컨텍스트에서 Person Entity 조회")
     void getEntity() {
         PersistenceContext context = new DefaultPersistenceContext();
-        context.addEntity(person());
+        Person person = person(1L);
+        context.addEntity(person);
 
         context.getEntity(1L, Person.class)
-                .ifPresentOrElse(personEntity -> assertAll("Person Entity 조회",
-                        () -> assertEquals(personEntity.getId(), 1L),
-                        () -> assertEquals(personEntity.getAge(), 20),
-                        () -> assertEquals(personEntity.getEmail(), "person@email.com")
-                ),
-                () -> fail("Person entity not found in the persistence context.")
-        );
+                .ifPresentOrElse(
+                        personEntity -> assertEquals(personEntity, person),
+                        () -> fail("Person entity not found in the persistence context.")
+                );
     }
 
     @Test
@@ -39,7 +36,7 @@ class DefaultPersistenceContextTest {
     @DisplayName("[성공] 영속성 컨텍스트에 존재하는 Person Entity 제거")
     void removeEntity() {
         PersistenceContext context = new DefaultPersistenceContext();
-        Person person = person();
+        Person person = person(1L);
         context.addEntity(person);
 
         context.removeEntity(person);
@@ -48,7 +45,11 @@ class DefaultPersistenceContextTest {
     }
 
     private Person person() {
-        return new Person(1L, "person name", 20, "person@email.com");
+        return person(1L);
+    }
+
+    private Person person(Long id) {
+        return new Person(id, "person name", 20, "person@email.com");
     }
 
 }
