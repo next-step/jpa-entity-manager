@@ -11,19 +11,16 @@ public record EntitySnapshot(Object entity) {
         this.entity = entity;
     }
 
-    public Object compare(Object entity) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Class<?> snapshotEntityType = this.entity.getClass();
-
-        if (notSameClass(snapshotEntityType)) {
-            throw new NotSameException(
-                    MessageFormat.format("EntitySnapshot class: {0}, Entity class: {1}",
+    public Object compare(Object entity) {
+        Class<?> entityType = this.entity.getClass();
+        if (notSameClass(entityType)) {
+            throw new NotSameException(MessageFormat.format("EntitySnapshot class: {0}, Entity class: {1}",
                             this.entity.getClass(),
-                            entity.getClass())
-            );
+                            entity.getClass()));
         }
 
-        Object diffObject = snapshotEntityType.getDeclaredConstructor().newInstance();
-        Field[] fields = snapshotEntityType.getDeclaredFields();
+        Object diffObject = getNewInstance();
+        Field[] fields = entityType.getDeclaredFields();
         for (Field field : fields) {
             setDifferentField(field, entity, diffObject);
         }
@@ -31,23 +28,50 @@ public record EntitySnapshot(Object entity) {
         return diffObject;
     }
 
-    private void setDifferentField(Field field, Object entity, Object diffObject) throws IllegalAccessException {
-        field.setAccessible(true);
-
-        Object value1 = field.get(this.entity);
-        Object value2 = field.get(entity);
-
-        if (isNull(value1) || !value1.equals(value2)) {
-            field.set(diffObject, value2);
+    private Object getNewInstance() {
+        try {
+            Class<?> entityType = this.entity.getClass();
+            return entityType.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private boolean isNull(Object entity) {
-        return entity == null;
+    private void setDifferentField(Field field, Object entity, Object diffObject) {
+        field.setAccessible(true);
+
+        Object value1 = getFieldValue(field, this.entity);
+        Object value2 = getFieldValue(field, entity);
+
+        setFieldValue(field, diffObject, value1, value2);
+    }
+
+    private void setFieldValue(Field field, Object diffObject, Object value1, Object value2) {
+        if (isSame(value1, value2)) {
+            return;
+        }
+
+        try {
+            field.set(diffObject, value2);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object getFieldValue(Field field, Object entity) {
+        try {
+            return field.get(entity);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean notSameClass(Class<?> entityType) {
-        return !this.entity.getClass().equals(entityType);
+        return !isSame(this.entity.getClass(), entityType);
+    }
+
+    private boolean isSame(Object obj1, Object obj2) {
+        return !obj1.equals(obj2);
     }
 
 }
