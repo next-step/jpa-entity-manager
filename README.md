@@ -11,6 +11,9 @@
     - [ ] Entity 삭제
     - [ ] Snapshot 생성
     - [ ] Snapshot 조회
+- [ ] Snapshot
+  - [ ] Entity 변경 상태
+  - [ ] Snapshot 비교
 - [ ] EntityPersister
     - [ ] update
     - [ ] insert
