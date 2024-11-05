@@ -21,7 +21,15 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public <T> T find(Class<T> clazz, Object id) {
         Optional<T> entity = context.getEntity(id, clazz);
-        return entity.orElseGet(() -> loader.load(clazz, id));
+        return entity.orElseGet(() -> loadEntity(clazz, id));
+
+    }
+
+    private <T> T loadEntity(Class<T> clazz, Object id) {
+        T loadEntity = loader.load(clazz, id);
+        context.addEntity(loadEntity);
+        context.addDatabaseSnapshot(id, loadEntity);
+        return loadEntity;
     }
 
     @Override
