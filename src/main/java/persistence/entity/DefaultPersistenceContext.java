@@ -7,6 +7,7 @@ import java.util.Optional;
 public class DefaultPersistenceContext implements PersistenceContext {
 
     private final Map<EntityKey, Object> context = new HashMap<>();
+    private final Map<EntityKey, EntitySnapshot> snapshots = new HashMap<>();
 
     @Override
     public <T, ID> Optional<T> getEntity(ID id, Class<T> entityType) {
@@ -28,4 +29,17 @@ public class DefaultPersistenceContext implements PersistenceContext {
         EntityKey key = new EntityKey(entity);
         context.remove(key);
     }
+
+    @Override
+    public <ID> void addDatabaseSnapshot(ID id, Object snapshot) {
+        EntityKey key = new EntityKey(id, snapshot.getClass());
+        snapshots.put(key, new EntitySnapshot(snapshot));
+    }
+
+    @Override
+    public <T, ID> EntitySnapshot getDatabaseSnapshot(ID id, Class<T> entityType) {
+        EntityKey key = new EntityKey(id, entityType);
+        return snapshots.get(key);
+    }
+
 }
