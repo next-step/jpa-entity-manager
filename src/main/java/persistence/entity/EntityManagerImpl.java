@@ -39,11 +39,7 @@ public class EntityManagerImpl implements EntityManager {
         if (persistenceContext.isEntityExists(entity) || existsInDatabase(entity)) {
             throw new EntityExistsException("ENTITY ALREADY EXISTS!");
         }
-
-        Object generatedId = entityPersister.insert(entity);
-        EntityPrimaryKey pk = EntityPrimaryKey.build(entity);
-        ReflectionUtil.setFieldValue(entity, pk.keyName(), generatedId);
-
+        entityPersister.insert(entity);
         persistenceContext.addEntity(entity);
     }
 

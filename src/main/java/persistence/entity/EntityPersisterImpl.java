@@ -3,9 +3,11 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import persistence.model.EntityColumn;
 import persistence.model.EntityFactory;
+import persistence.model.EntityPrimaryKey;
 import persistence.model.EntityTable;
 import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.dml.DmlQueryBuilder;
+import persistence.util.ReflectionUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,7 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     @Override
-    public Object insert(Object entity) {
+    public void insert(Object entity) {
         EntityTable table = EntityFactory.createPopulatedSchema(entity);
 
         String tableName = table.getName();
@@ -52,7 +54,12 @@ public class EntityPersisterImpl implements EntityPersister {
                 .toList();
 
         String sql = dmlQueryBuilder.buildInsertQuery(tableName, insertingColumns);
-        return jdbcTemplate.executeAndGetGeneratedId(sql, table.getPrimaryColumnKeyValue().getKey());
+        Object generatedId = jdbcTemplate.executeAndGetGeneratedId(
+                sql,
+                table.getPrimaryColumnKeyValue().getKey()
+        );
+        EntityPrimaryKey pk = EntityPrimaryKey.build(entity);
+        ReflectionUtil.setFieldValue(entity, pk.keyName(), generatedId);
     }
 
     @Override
