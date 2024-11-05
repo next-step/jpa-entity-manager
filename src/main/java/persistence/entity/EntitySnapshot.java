@@ -5,7 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import persistence.exception.NotSameException;
 
-public record EntitySnapshot(Object entity) {
+public class EntitySnapshot {
+
+    private final Object entity;
 
     public EntitySnapshot(Object entity) {
         this.entity = entity;
