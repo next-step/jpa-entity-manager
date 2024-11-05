@@ -36,16 +36,14 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        EntityPrimaryKey pk = EntityPrimaryKey.build(entity);
-
-        boolean existsInContext = persistenceContext.isEntityExists(entity);
-        boolean existsInDatabase = pk.isValid() && entityLoader.exists(entity.getClass(), pk.keyValue());
-
-        if (existsInContext || existsInDatabase) {
+        if (persistenceContext.isEntityExists(entity) || existsInDatabase(entity)) {
             throw new EntityExistsException("ENTITY ALREADY EXISTS!");
         }
+
         Object generatedId = entityPersister.insert(entity);
+        EntityPrimaryKey pk = EntityPrimaryKey.build(entity);
         ReflectionUtil.setFieldValue(entity, pk.keyName(), generatedId);
+
         persistenceContext.addEntity(entity);
     }
 
@@ -58,10 +56,31 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> T merge(T entity) {
         if (persistenceContext.isEntityExists(entity)) {
-            entityPersister.update(entity);
+            persistenceContext.updateEntity(entity);
             return entity;
+        }
+        if (existsInDatabase(entity)) {
+            persistenceContext.addEntity(entity);
+            EntitySnapshot snapshot = persistenceContext.getSnapshot(entity);
+            snapshot.setDirty(true);
+            return merge(entity);
         }
         persist(entity);
         return entity;
+    }
+
+    // XXX: 세부 구현은 X. 우선 update 동작하도록만 메소드 추가.
+    @Override
+    public void flush() {
+        persistenceContext.getDirtySnapshots()
+                .forEach(snapshot -> {
+                    entityPersister.update(snapshot.getOriginalEntity());
+                    snapshot.setDirty(false);
+                });
+    }
+
+    private boolean existsInDatabase(Object entity) {
+        EntityPrimaryKey pk = EntityPrimaryKey.build(entity);
+        return pk.isValid() && entityLoader.exists(entity.getClass(), pk.keyValue());
     }
 }

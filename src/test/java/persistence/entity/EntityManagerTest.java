@@ -210,8 +210,8 @@ public class EntityManagerTest {
     @DisplayName("merge 테스트")
     class MergeTest {
         @Test
-        @DisplayName("저장된 엔티티라면 디비에서 업데이트한다.")
-        void succeedToUpdate() {
+        @DisplayName("영속컨텍스트에 포함된 객체에 대해 변경이 감지되면 데이터베이스 작업 없이 더티체크 처리한다.")
+        void succeedToUpdateByContext() {
             // given
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
@@ -223,39 +223,118 @@ public class EntityManagerTest {
             entityManager.merge(person);
 
             // then
-            PersonWithTransientAnnotation contextFound = persistenceContext.getEntity(
+            PersonWithTransientAnnotation contextResult = persistenceContext.getEntity(
                     PersonWithTransientAnnotation.class, 1L
             );
-            PersonWithTransientAnnotation databaseFound = entityLoader.find(
+            PersonWithTransientAnnotation databaseResult = entityLoader.find(
                     PersonWithTransientAnnotation.class, 1L
             );
 
             assertAll(
-                    () -> assertEquals(30, contextFound.getAge()),
-                    () -> assertEquals(30, databaseFound.getAge())
+                    () -> assertNotEquals(contextResult.getAge(), databaseResult.getAge()),
+                    () -> assertTrue(persistenceContext.getSnapshot(person).isDirty())
             );
         }
 
         @Test
-        @DisplayName("저장된 엔티티가 아니라면 새로 저장한다.")
-        void succeedToAddNew() {
-            PersonWithTransientAnnotation entity = new PersonWithTransientAnnotation(
+        @DisplayName("영속컨텍스트에는 없지만 데이터베이스에 존재하는 객체에 대해서는 새로 영속컨텍스트에 추가하고, 더티체크 처리한다.")
+        void succeedToUpdateByDatabase() {
+            // given
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
             );
+            entityPersister.insert(person);
 
-            PersonWithTransientAnnotation mergeResult = entityManager.merge(entity);
-            PersonWithTransientAnnotation contextFound = persistenceContext.getEntity(
+            // when
+            person.setName("둘리");
+            PersonWithTransientAnnotation mergeResult = entityManager.merge(person);
+
+            // then
+            PersonWithTransientAnnotation contextResult = persistenceContext.getEntity(
                     PersonWithTransientAnnotation.class, 1L
             );
-            PersonWithTransientAnnotation databaseFound = entityLoader.find(
+            PersonWithTransientAnnotation databaseResult = entityLoader.find(
                     PersonWithTransientAnnotation.class, 1L
             );
 
             assertAll(
-                    () -> assertSame(contextFound, mergeResult),
-                    () -> assertEquals(databaseFound.getId(), mergeResult.getId())
+                    () -> assertSame(contextResult, mergeResult),
+                    () -> assertNotEquals(person.getName(), databaseResult.getName()),
+                    () -> assertTrue(persistenceContext.getSnapshot(person).isDirty())
             );
 
+        }
+
+        @Test
+        @DisplayName("영속컨텍스트에 포함된 객체가 아니라면 새로 추가한다.")
+        void succeedToAddNew() {
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
+                    1L, "홍길동", 20, "test@test.com", 1
+            );
+
+            // when
+            PersonWithTransientAnnotation mergeResult = entityManager.merge(person);
+
+            // then
+            PersonWithTransientAnnotation contextResult = persistenceContext.getEntity(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            PersonWithTransientAnnotation databaseResult = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+
+            assertAll(
+                    () -> assertSame(contextResult, mergeResult),
+                    () -> assertEquals(databaseResult.getId(), mergeResult.getId()),
+                    () -> assertFalse(persistenceContext.getSnapshot(person).isDirty())
+            );
+
+        }
+    }
+
+    @Nested
+    @DisplayName("flush 테스트")
+    class FlushTest {
+        @Test
+        @DisplayName("더티체크 처리된 엔티티에 대해 일괄 데이터베이이스 업데이트 처리한다.")
+        void succeedToFlush() {
+            // given
+            PersonWithTransientAnnotation toBeDirty1 = new PersonWithTransientAnnotation(
+                    1L, "홍길동", 20, "test1@test.com", 1
+            );
+            PersonWithTransientAnnotation toBeDirty2 = new PersonWithTransientAnnotation(
+                    2L, "둘리", 21, "test2@test.com", 2
+            );
+            PersonWithTransientAnnotation notToBeDirty = new PersonWithTransientAnnotation(
+                    3L, "마이콜", 22, "test3@test.com", 3
+            );
+            entityManager.persist(toBeDirty1);
+            entityPersister.insert(toBeDirty2);
+            toBeDirty1.setAge(30);
+            toBeDirty2.setAge(30);
+            entityManager.merge(toBeDirty1);
+            entityManager.merge(toBeDirty2);
+            entityManager.merge(notToBeDirty);
+
+            // when
+            entityManager.flush();
+
+            // then
+            PersonWithTransientAnnotation toBeDirty1Result = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 1L
+            );
+            PersonWithTransientAnnotation toBeDirty2Result = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 2L
+            );
+            PersonWithTransientAnnotation notToBeDirtyResult = entityLoader.find(
+                    PersonWithTransientAnnotation.class, 3L
+            );
+
+            assertAll(
+                    () -> assertEquals(30, toBeDirty1Result.getAge()),
+                    () -> assertEquals(30, toBeDirty2Result.getAge()),
+                    () -> assertEquals(22, notToBeDirtyResult.getAge())
+            );
         }
     }
 }

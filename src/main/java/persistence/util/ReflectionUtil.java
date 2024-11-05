@@ -2,10 +2,7 @@ package persistence.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ReflectionUtil {
     public static void setFieldValue(Object entity, String fieldName, Object value) {
@@ -69,6 +66,36 @@ public class ReflectionUtil {
         Object fieldValue = getFieldValue(entityObject, targetField);
 
         return new AbstractMap.SimpleEntry<>(fieldName, fieldValue);
+    }
+
+    public static Map<String, Object> getAllFieldNameAndValue(Object entityObject) {
+        Map<String, Object> keyValues = new HashMap<>();
+
+        Class<?> entityClass = entityObject.getClass();
+        Field[] fields = entityClass.getDeclaredFields();
+
+        Arrays.stream(fields).forEach(field -> {
+            field.setAccessible(true);
+            try {
+                String fieldName = field.getName();
+                Object fieldValue = field.get(entityObject);
+                keyValues.put(fieldName, fieldValue);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("FAILED TO ACCESS FIELD" + field.getName(), e);
+            }
+        });
+
+        return keyValues;
+    }
+
+    public static Object getFieldValue(Object entity, String fieldName) {
+        try {
+            Field field = entity.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(entity);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to access field value", e);
+        }
     }
 
     private static <T extends Annotation> Optional<String> getAnnotationNameOrEmpty(

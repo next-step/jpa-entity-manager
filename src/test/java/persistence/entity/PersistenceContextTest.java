@@ -75,6 +75,19 @@ public class PersistenceContextTest {
                     () -> assertEquals(entity.getId(), afterAddEntity.getId())
             );
         }
+
+        @Test
+        @DisplayName("엔티티를 스냅샷으로 저장한다.")
+        void testAddEntityAsSnapshot() {
+            // given
+            persistenceContext.addEntity(entity);
+
+            // when
+            EntitySnapshot snapshot = persistenceContext.getSnapshot(entity);
+
+            // expect
+            assertEquals(entity, snapshot.getOriginalEntity());
+        }
     }
 
     @Nested
@@ -111,6 +124,60 @@ public class PersistenceContextTest {
 
             // then
             assertNotNull(beforeRemoveEntity);
+        }
+
+        @Test
+        @DisplayName("스냅샷도 제거한다.")
+        void testRemoveSnapshot() {
+            // given
+            persistenceContext.addEntity(entity);
+
+            // when
+            persistenceContext.removeEntity(new PersonWithTransientAnnotation("person2@test.com"));
+
+            // then
+            assertNotNull(persistenceContext.getSnapshot(entity));
+        }
+    }
+
+    @Nested
+    @DisplayName("updateEntity 테스트")
+    class UpdateEntityTest {
+        @Test
+        @DisplayName("기존 영속 객체가 값이 변경되었다면 스냅샷을 더티체크한다.")
+        void succeedToUpdateEntity() {
+            // given
+            persistenceContext.addEntity(entity);
+
+            // when
+            entity.setAge(100);
+            persistenceContext.updateEntity(entity);
+
+            // then
+            EntitySnapshot afterUpdateSnapshot = persistenceContext.getSnapshot(entity);
+
+            assertTrue(afterUpdateSnapshot.isDirty());
+        }
+
+        @Test
+        @DisplayName("기존 영속 객체가 값이 변경된 사항이 없다면 아무 일도 일어나지 않는다.")
+        void succeedToUpdateNothing() {
+            // given
+            persistenceContext.addEntity(entity);
+
+            // when
+            persistenceContext.updateEntity(entity);
+
+            // then
+            EntitySnapshot afterUpdateSnapshot = persistenceContext.getSnapshot(entity);
+
+            assertFalse(afterUpdateSnapshot.isDirty());
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 영속 객체가 주어지면 에러가 발생한다.")
+        void failToUpdate() {
+            assertThrows(IllegalArgumentException.class, () -> persistenceContext.updateEntity(entity));
         }
     }
 

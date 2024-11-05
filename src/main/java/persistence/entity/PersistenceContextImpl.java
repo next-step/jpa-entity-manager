@@ -2,11 +2,11 @@ package persistence.entity;
 
 import persistence.model.EntityPrimaryKey;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> entityCache = new HashMap<>();
+    private final Map<EntityKey, EntitySnapshot> entitySnapshots = new HashMap<>();
 
     @Override
     public <T> T getEntity(Class<T> entityClass, Object id) {
@@ -16,14 +16,46 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void addEntity(Object entityObject) {
-        EntityKey cacheKey = createEntityKey(entityObject);
-        entityCache.put(cacheKey, entityObject);
+        EntityKey entityKey = createEntityKey(entityObject);
+        EntitySnapshot snapshot = new EntitySnapshot(entityObject);
+
+        entityCache.put(entityKey, entityObject);
+        entitySnapshots.put(entityKey, snapshot);
     }
 
     @Override
     public void removeEntity(Object entityObject) {
         EntityKey cacheKey = createEntityKey(entityObject);
         entityCache.remove(cacheKey);
+        entitySnapshots.remove(cacheKey);
+    }
+
+    @Override
+    public void updateEntity(Object entityObject) {
+        EntityKey entityKey = createEntityKey(entityObject);
+
+        if (!entityCache.containsKey(entityKey)) {
+            throw new IllegalArgumentException("ENTITY NOT EXISTS");
+        }
+
+        EntitySnapshot snapshot = entitySnapshots.get(entityKey);
+        if (snapshot.shouldBeDirty(entityObject)) {
+            entityCache.put(entityKey, entityObject);
+            snapshot.update(entityObject);
+        }
+    }
+
+    @Override
+    public EntitySnapshot getSnapshot(Object entityObject) {
+        EntityKey entityKey = createEntityKey(entityObject);
+        return entitySnapshots.get(entityKey);
+    }
+
+    @Override
+    public List<EntitySnapshot> getDirtySnapshots() {
+        return entitySnapshots.values().stream()
+                .filter(EntitySnapshot::isDirty)
+                .toList();
     }
 
     @Override
