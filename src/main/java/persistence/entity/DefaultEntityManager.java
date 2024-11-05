@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import java.sql.Connection;
+import java.util.Optional;
 import jdbc.JdbcTemplate;
 
 public class DefaultEntityManager implements EntityManager {
@@ -14,12 +15,13 @@ public class DefaultEntityManager implements EntityManager {
         this.jdbcTemplate = new JdbcTemplate(connection);
         this.context = new DefaultPersistenceContext();
         this.persister = new DefaultEntityPersister(jdbcTemplate);
-        this.loader = new DefaultEntityLoader(jdbcTemplate, context);
+        this.loader = new DefaultEntityLoader(jdbcTemplate);
     }
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        return loader.load(clazz, id);
+        Optional<T> entity = context.getEntity(id, clazz);
+        return entity.orElseGet(() -> loader.load(clazz, id));
     }
 
     @Override
