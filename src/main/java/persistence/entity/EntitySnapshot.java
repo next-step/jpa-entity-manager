@@ -73,7 +73,15 @@ public class EntitySnapshot {
     }
 
     private boolean isSame(Object obj1, Object obj2) {
-        return !obj1.equals(obj2);
+        return isNotNull(obj1) && obj1.equals(obj2);
+    }
+
+    private boolean isNotNull(Object obj) {
+        return !isNull(obj);
+    }
+
+    private boolean isNull(Object obj) {
+        return obj == null;
     }
 
 }
