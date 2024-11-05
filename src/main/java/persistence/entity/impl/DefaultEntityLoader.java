@@ -1,7 +1,8 @@
-package persistence.entity;
+package persistence.entity.impl;
 
 import java.util.List;
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityLoader;
 import persistence.sql.dml.query.SelectQuery;
 import persistence.sql.dml.query.WhereCondition;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;

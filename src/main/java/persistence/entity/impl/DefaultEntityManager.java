@@ -1,8 +1,12 @@
-package persistence.entity;
+package persistence.entity.impl;
 
 import java.sql.Connection;
 import java.util.Optional;
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityLoader;
+import persistence.entity.EntityManager;
+import persistence.entity.EntityPersister;
+import persistence.entity.PersistenceContext;
 
 public class DefaultEntityManager implements EntityManager {
 

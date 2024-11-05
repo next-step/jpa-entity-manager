@@ -1,6 +1,7 @@
-package persistence.entity;
+package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityPersister;
 import persistence.sql.dml.query.DeleteQuery;
 import persistence.sql.dml.query.InsertQuery;
 import persistence.sql.dml.query.UpdateQuery;

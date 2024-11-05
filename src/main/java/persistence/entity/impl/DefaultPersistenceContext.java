@@ -1,8 +1,11 @@
-package persistence.entity;
+package persistence.entity.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import persistence.entity.EntityKey;
+import persistence.entity.EntitySnapshot;
+import persistence.entity.PersistenceContext;
 
 public class DefaultPersistenceContext implements PersistenceContext {
 
