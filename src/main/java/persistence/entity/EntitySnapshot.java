@@ -10,7 +10,7 @@ public class EntitySnapshot {
     private final Object entity;
 
     public EntitySnapshot(Object entity) {
-        this.entity = entity;
+        this.entity = EntityCopyUtils.deepCopy(entity);
     }
 
     public Object compare(Object entity) {
