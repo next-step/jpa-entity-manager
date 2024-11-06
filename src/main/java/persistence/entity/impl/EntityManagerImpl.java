@@ -17,7 +17,7 @@ public class EntityManagerImpl implements EntityManager {
 
     public EntityManagerImpl(Connection connection) {
         this.transactionalJdbcTemplate = new TransactionalJdbcTemplate(connection);
-        this.persistenceContext = new PersistenceContextImpl(transactionalJdbcTemplate);
+        this.persistenceContext = new PersistenceContextImpl();
         this.entityPersister = new EntityPersister(transactionalJdbcTemplate);
         this.dirtyCheck = new DirtyCheck(persistenceContext);
     }

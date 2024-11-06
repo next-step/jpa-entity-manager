@@ -5,7 +5,6 @@ import java.util.Set;
 import jdbc.JdbcTemplate;
 import persistence.entity.DatabaseSnapshots;
 import persistence.entity.EntityKey;
-import persistence.entity.EntityQueryHandler;
 import persistence.entity.LongTypeId;
 import persistence.entity.PendingEntities;
 import persistence.entity.PersistedEntities;
@@ -13,13 +12,11 @@ import persistence.entity.PersistenceContext;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
-    private final JdbcTemplate jdbcTemplate;
     private final PersistedEntities persistedEntities;
     private final PendingEntities pendingEntities;
     private final DatabaseSnapshots databaseSnapshots;
 
-    public PersistenceContextImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public PersistenceContextImpl() {
         persistedEntities = new PersistedEntities();
         pendingEntities = new PendingEntities();
         databaseSnapshots = new DatabaseSnapshots();
