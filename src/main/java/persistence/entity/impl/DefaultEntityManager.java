@@ -13,15 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * EntityPersister 주요 역활
- * JPA의 핵심 인터페이스로, 데이터베이스와 상호작용하면서 애플리케이션에서 엔티티 객체의 생명주기를 관리하는 역활
- * EntityMaanger는 개발자가 api를 통해서 엔티티 객체를 관리하는 인터페이스.
- * 엔티티의 생명주기 관리 (Persist, Merge, Remove )
- * 트랜잭션 관리
- * 구현체(hibernate, .. etc) 에 대한 인터페이스 제공
- */
-
 
 public class DefaultEntityManager implements EntityManager {
     private final DefaultPersistenceContext defaultPersistenceContext;
@@ -71,6 +62,7 @@ public class DefaultEntityManager implements EntityManager {
         entityKey = new EntityKey(id, clazz);
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
         defaultPersistenceContext.add(entity, id);
+        
         return entity;
     }
 

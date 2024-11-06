@@ -5,7 +5,7 @@ import java.util.Objects;
 
 
 public class EntityKey {
-    private Object id;
+    private final Object id;
     private final Class<?> entityClass;
 
     public EntityKey(Object id, Class<?> entityClass) {
