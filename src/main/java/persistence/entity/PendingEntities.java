@@ -19,4 +19,8 @@ public class PendingEntities {
         pendingEntities.remove(entity);
     }
 
+    public void clear() {
+        pendingEntities.clear();
+    }
+
 }

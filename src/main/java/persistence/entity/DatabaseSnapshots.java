@@ -27,4 +27,8 @@ public class DatabaseSnapshots {
         return databaseSnapshots.get(entityKey);
     }
 
+    public void clear() {
+        databaseSnapshots.clear();
+    }
+
 }

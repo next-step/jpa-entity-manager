@@ -24,4 +24,8 @@ public class PersistedEntities {
         return persistedEntities.values();
     }
 
+    public void clear() {
+        persistedEntities.clear();
+    }
+
 }

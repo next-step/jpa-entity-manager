@@ -17,4 +17,6 @@ public interface PersistenceContext {
 
     Object getDatabaseSnapshot(Object entity);
 
+    void reset();
+
 }
