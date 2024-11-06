@@ -22,7 +22,11 @@ public class ColumnValues<T> {
     }
 
     public boolean hasSameSizeAs(ColumnValues<T> columnValues) {
-        return this.columnValues.size() == columnValues.getValues().size();
+        return this.size() == columnValues.size();
+    }
+
+    private int size() {
+        return columnValues.size();
     }
 
     public boolean areEqualTo(ColumnValues<T> columnValues) {
