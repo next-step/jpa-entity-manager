@@ -1,13 +1,16 @@
 package persistence.defaulthibernate;
 
+import persistence.entity.EntityData;
+import persistence.entity.EntityKey;
+
 public interface PersistenceContext {
 
     void add(Object object, Long id);
 
-    Object get(Class<?> clazz, Long id);
+    Object get(EntityKey entityKey);
 
-    void update(Object object, Long id);
+    void update(EntityData eneityData, EntityKey entityKey);
 
-    void remove(Class<?> clazz, Long id);
+    void remove(EntityKey entityKey) ;
 
 }

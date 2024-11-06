@@ -13,11 +13,6 @@ public class EntityKey {
         this.entityClass = entityClass;
     }
 
-    public EntityKey(Object id, EntityKey entityKey) {
-        this.id = id;
-        this.entityClass = entityKey.getEntityClass();
-    }
-
     public Object getId() {
         return id;
     }

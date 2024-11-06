@@ -1,5 +1,6 @@
 package persistence.defaulthibernate;
 
+import persistence.entity.EntityData;
 import persistence.entity.EntityKey;
 
 import java.util.*;
@@ -16,48 +17,44 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class DefaultPersistenceContext implements PersistenceContext {
-    private final Map<Class<?>, Map<Long, Object>> entitiesByKey = new HashMap<>();
-    private final Map<Class<?>, Map<Long, Object>> entitySnapshotsByKey = new HashMap<>();
+    private final Map<EntityKey, EntityData> entitiesByKey = new HashMap<>();
+    private final Map<EntityKey, EntityData>  entitySnapshotsByKey = new HashMap<>();
     private final Map<EntityKey, EntityEntry> entityEntry = new HashMap<>();
 
     @Override
-    public void add(Object object, Long id) {
-        Class<?> clazz = object.getClass();
-        entitiesByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>())
-                .put(id, object);
-        entitySnapshotsByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(id, object);
+    public void add(EntityData entityData, EntityKey entityKey) {
+
+        entitiesByKey.computeIfAbsent(entityKey, k -> entityData);
+        entitySnapshotsByKey.computeIfAbsent(entityKey, k -> entityData);
     }
 
     @Override
-    public Object get(Class<?> clazz, Long id) {
-        Map<Long, Object> entityMap = entitiesByKey.get(clazz);
-        if (entityMap == null || !entityMap.containsKey(id)) {
+    public Object get(EntityKey entityKey) {
+        Object o = entitiesByKey.get(entityKey);
+        if (o == null) {
             throw new IllegalArgumentException("Entity not found");
         }
-        return entityMap.get(id);
+        return o;
     }
 
     @Override
-    public void update(Object object, Long id) {
-        Class<?> clazz = object.getClass();
-        entitiesByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>())
-                .put(id, object);
+    public void update(EntityData entityData, EntityKey entityKey) {
+        entitiesByKey.computeIfAbsent(entityKey, k -> entityData);
     }
 
     @Override
-    public void remove(Class<?> clazz, Long id) {
-        Map<Long, Object> entityMap = entitiesByKey.get(clazz);
-        if (entityMap == null || !entityMap.containsKey(id)) {
+    public void remove(EntityKey entityKey) {
+        Object o = entitiesByKey.get(entityKey);
+        if ( o == null ) {
             throw new IllegalArgumentException("Entity not found");
         }
-        entityMap.remove(id);
-        removeSnapshots(clazz, id);
+        entitiesByKey.remove(entityKey);
+        removeSnapshots(entityKey);
     }
 
     public List<Object> getDirtyObjects() {
         return entitySnapshotsByKey.entrySet().stream()
-                .flatMap(entry -> entry.getValue().entrySet().stream())
-                .filter(entry -> isDirty(entry.getValue(), entry.getKey()))
+                .filter(e -> isDirty(new EntityKey()))
                 .map(Map.Entry::getValue)
                 .toList();
     }
@@ -72,18 +69,20 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     private boolean isDirty(Object object, Long id) {
         Class<?> clazz = object.getClass();
-        boolean equals = clazz.equals(entitiesByKey.get(clazz).get(id));
+        boolean equals = entitySnapshotsByKey.entrySet().stream().allMatch(e -> {
+            if (e.getKey().getId().equals(id) && e.getKey().getEntityClass().equals(clazz)) {
+                return e.getValue().equals(object);
+            }
+            return false;
+        });
         return !equals;
     }
 
-    private void removeSnapshots(Class<?> clazz, Long id) {
-        entitySnapshotsByKey.computeIfPresent(clazz, (k, v) -> {
-            v.remove(id);
-            return v;
-        });
+    private void removeSnapshots(EntityKey entityKey) {
+        entitySnapshotsByKey.remove(entityKey);
     }
 
-    public boolean isExist(Class<?> clazz, Long id) {
+    public boolean isExist(EntityKey entityKey) {
         Map<Long, Object> entityMap = entitiesByKey.get(clazz);
         return entityMap != null && entityMap.containsKey(id);
     }

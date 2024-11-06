@@ -2,9 +2,12 @@ package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
 import persistence.defaulthibernate.EntryStatus;
+import persistence.entity.EntityData;
 import persistence.entity.EntityKey;
 import persistence.entity.EntityManager;
 import persistence.defaulthibernate.DefaultPersistenceContext;
+import persistence.sql.TableId;
+import persistence.sql.TableMeta;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -26,11 +29,11 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
         // 스냅샷 저장
-        if (defaultPersistenceContext.isExist(clazz, id)) {
-            Object o = defaultPersistenceContext.get(clazz, id);
+        EntityKey entityKey = new EntityKey(id, clazz);
+        if (defaultPersistenceContext.isExist(entityKey)) {
+            Object o = defaultPersistenceContext.get(entityKey);
             return Optional.of(clazz.cast(o));
         }
-        EntityKey entityKey = new EntityKey(id, clazz);
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.LOADING);
         Optional<T> t = entityPersister.find(clazz, id);
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
@@ -49,20 +52,16 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public Object persist(Object entity) throws NoSuchFieldException, IllegalAccessException {
         // 스냅샷 저장
-
-        Class<?> clazz = entity.getClass();
-        Field idField = clazz.getDeclaredField("id");
-        idField.setAccessible(true);
-        Long id = (Long) idField.get(entity);
-        EntityKey entityKey = new EntityKey(id, clazz);
+        EntityData entityData = new EntityData(entity);
+        EntityKey entityKey = new EntityKey(entityData.getId(), entity.getClass());
 
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.SAVING);
-        id = entityPersister.insert(entity);
+        Long id = entityPersister.insert(entity);
 
-        entityKey = new EntityKey(id, clazz);
+        entityKey = new EntityKey(id, entity.getClass());
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
-        defaultPersistenceContext.add(entity, id);
-        
+        defaultPersistenceContext.add(entityData, entityKey);
+
         return entity;
     }
 
@@ -72,8 +71,8 @@ public class DefaultEntityManager implements EntityManager {
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.DELETED);
         entityPersister.remove(clazz, id);
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.GONE);
-        if (defaultPersistenceContext.isExist(clazz, id)) {
-            defaultPersistenceContext.remove(clazz, id);
+        if (defaultPersistenceContext.isExist(entityKey)) {
+            defaultPersistenceContext.remove(entityKey);
         }
     }
 
@@ -85,7 +84,8 @@ public class DefaultEntityManager implements EntityManager {
             idField.setAccessible(true);
             Long id = (Long) idField.get(entity);
             EntityKey entityKey = new EntityKey(id, clazz);
-            defaultPersistenceContext.update(entity, id);
+            EntityData entityData = new EntityData(entity);
+            defaultPersistenceContext.update(entityData, entityKey);
             defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Failed to update entity", e);
