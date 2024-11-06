@@ -1,6 +1,7 @@
 package persistence.entity.impl;
 
 import java.sql.Connection;
+import java.util.List;
 import jdbc.TransactionalJdbcTemplate;
 import persistence.entity.DirtyCheck;
 import persistence.entity.EntityManager;
@@ -50,8 +51,9 @@ public class EntityManagerImpl implements EntityManager {
             entityPersister.insert(entity);
         }
         for (Object entity : persistenceContext.getPersistedEntities()) {
-            if (dirtyCheck.isDirty(entity)) {
-                entityPersister.update(entity);
+            List<String> changedColumns = dirtyCheck.findDirtyColumns(entity);
+            if (!changedColumns.isEmpty()) {
+                entityPersister.update(entity, changedColumns);
             }
         }
         persistenceContext.reset();

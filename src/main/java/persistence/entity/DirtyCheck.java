@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.util.List;
 import persistence.sql.dml.ColumnValues;
 
 public class DirtyCheck {
@@ -10,16 +11,9 @@ public class DirtyCheck {
         this.persistenceContext = persistenceContext;
     }
 
-    public boolean isDirty(Object entity) throws IllegalAccessException {
+    public List<String> findDirtyColumns(Object entity) throws IllegalAccessException {
         Object snapshot = persistenceContext.getDatabaseSnapshot(entity);
-        return findDirty(new ColumnValues<>(snapshot), new ColumnValues<>(entity));
+        return new ColumnValues<>(snapshot).findDifferentColumns(new ColumnValues<>(entity));
     }
 
-    private <T> boolean findDirty(ColumnValues<T> previousColumnValues, ColumnValues<T> currentColumnValues) {
-        if (!previousColumnValues.hasSameSizeAs(currentColumnValues)) {
-            return true;
-        }
-
-        return !previousColumnValues.areEqualTo(currentColumnValues);
-    }
 }

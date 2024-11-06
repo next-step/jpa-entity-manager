@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import jdbc.JdbcTemplate;
 
@@ -19,9 +20,9 @@ public class EntityPersister {
             .findById(primaryKey);
     }
 
-    public void update(Object entity) throws IllegalAccessException {
+    public void update(Object entity, List<String> changedColumns) throws IllegalAccessException {
         getEntityQueryHandler(entity.getClass())
-            .update(entity);
+            .update(entity, changedColumns);
     }
 
     public void insert(Object entity) throws IllegalAccessException {
@@ -35,6 +36,5 @@ public class EntityPersister {
         }
         return entityQueryHandlerMap.get(entityClass);
     }
-
 
 }

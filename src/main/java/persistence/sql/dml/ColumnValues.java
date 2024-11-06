@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ColumnValues<T> {
@@ -21,19 +22,20 @@ public class ColumnValues<T> {
         return new ArrayList<>(columnValues);
     }
 
-    public boolean hasSameSizeAs(ColumnValues<T> columnValues) {
-        return this.size() == columnValues.size();
+    public List<ColumnValue> getValuesByColumns(List<String> columns) {
+        return columnValues.stream()
+            .filter(columnValue -> columns.contains(columnValue.getColumnNameForValue()))
+            .collect(Collectors.toList());
     }
 
-    private int size() {
-        return columnValues.size();
-    }
-
-    public boolean areEqualTo(ColumnValues<T> columnValues) {
+    public List<String> findDifferentColumns(ColumnValues<T> columnValues) {
         List<ColumnValue> o1 = this.columnValues;
         List<ColumnValue> o2 = columnValues.getValues();
+
         return IntStream.range(0, o1.size())
-            .allMatch(i -> isEqual(o1.get(i), o2.get(i)));
+            .filter(i -> !isEqual(o1.get(i), o2.get(i)))
+            .mapToObj(i -> o1.get(i).getColumnNameForValue())
+            .collect(Collectors.toList());
     }
 
     private boolean isEqual(ColumnValue o1, ColumnValue o2) {

@@ -7,6 +7,7 @@ import static persistence.sql.dml.querybuilder.QueryOperation.SELECT;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import persistence.sql.dml.ColumnValue;
 
 @Getter
 public class QueryBuilder {
@@ -52,6 +53,13 @@ public class QueryBuilder {
     public QueryBuilder set(String column, String value) {
         this.columns.add(column);
         this.values.add(value);
+        return this;
+    }
+    public QueryBuilder setValues(List<ColumnValue> columnValues) {
+        for (ColumnValue columnValue : columnValues) {
+            this.columns.add(columnValue.getColumnNameForValue());
+            this.values.add(columnValue.toSqlValue());
+        }
         return this;
     }
 

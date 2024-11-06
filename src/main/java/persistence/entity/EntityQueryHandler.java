@@ -5,6 +5,7 @@ import static persistence.sql.dml.QueryTypes.FIND_BY_ID;
 import static persistence.sql.dml.QueryTypes.INSERT;
 import static persistence.sql.dml.QueryTypes.UPDATE;
 
+import java.util.List;
 import jdbc.EntityLoader;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
@@ -34,9 +35,9 @@ public class EntityQueryHandler<T> {
         return jdbcTemplate.queryForObject(sql, entityLoader);
     }
 
-    public void update(Object entity) throws IllegalAccessException {
+    public void update(Object entity, List<String> changedColumns) throws IllegalAccessException {
         UpdateQuery updateQuery = sqlQueries.getSqlQuery(UPDATE);
-        String sql = updateQuery.generateQuery(entity);
+        String sql = updateQuery.generateQuery(entity, changedColumns);
         jdbcTemplate.execute(sql);
     }
 

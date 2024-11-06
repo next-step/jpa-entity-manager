@@ -1,5 +1,6 @@
 package persistence.sql.simpleEntity;
 
+import java.util.List;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DeleteQuery;
 import persistence.sql.dml.FindByIdQuery;
@@ -44,8 +45,8 @@ public class SimpleEntityManagerImpl<T, ID> implements SimpleEntityManager<T, ID
     }
 
     @Override
-    public void update(T entity) throws IllegalAccessException {
-        String sql = updateQuery.generateQuery(entity);
+    public void update(T entity, List<String> changedColumns) throws IllegalAccessException {
+        String sql = updateQuery.generateQuery(entity, changedColumns);
         jdbcTemplate.execute(sql);
     }
 

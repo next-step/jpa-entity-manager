@@ -1,5 +1,7 @@
 package persistence.sql.simpleEntity;
 
+import java.util.List;
+
 public interface SimpleEntityManager<T, ID> {
 
     T findById(ID id);
@@ -8,6 +10,6 @@ public interface SimpleEntityManager<T, ID> {
 
     void remove(T entity);
 
-    void update(T entity) throws IllegalAccessException;
+    void update(T entity, List<String> changedColumns) throws IllegalAccessException;
 
 }

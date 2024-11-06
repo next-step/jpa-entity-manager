@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import database.DatabaseServer;
 import database.H2;
+import java.util.List;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -95,7 +96,7 @@ class SimpleEntityManagerImplTest {
         Person personOne = entityManager.findById(1L);
 
         personOne.setName("Jane");
-        entityManager.update(personOne);
+        entityManager.update(personOne, List.of("nick_name"));
 
         Person updatedPerson = entityManager.findById(1L);
         assertThat(updatedPerson.getName()).isEqualTo("Jane");
