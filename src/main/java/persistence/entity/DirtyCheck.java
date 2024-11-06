@@ -15,7 +15,7 @@ public class DirtyCheck {
         return findDirty(new ColumnValues<>(snapshot), new ColumnValues<>(entity));
     }
 
-    private boolean findDirty(ColumnValues previousColumnValues, ColumnValues currentColumnValues) {
+    private <T> boolean findDirty(ColumnValues<T> previousColumnValues, ColumnValues<T> currentColumnValues) {
         if (!previousColumnValues.hasSameSizeAs(currentColumnValues)) {
             return true;
         }
