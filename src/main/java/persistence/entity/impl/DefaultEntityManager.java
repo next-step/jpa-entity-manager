@@ -40,9 +40,9 @@ public class DefaultEntityManager implements EntityManager {
             return Optional.of(clazz.cast(o));
         }
         EntityKey entityKey = new EntityKey(id, clazz);
-        defaultPersistenceContext.setEntityEntryStatus( entityKey, EntryStatus.LOADING);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.LOADING);
         Optional<T> t = entityPersister.find(clazz, id);
-        defaultPersistenceContext.setEntityEntryStatus( entityKey, EntryStatus.MANAGED);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
 
         if (t.isEmpty()) {
             return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
@@ -64,10 +64,12 @@ public class DefaultEntityManager implements EntityManager {
         idField.setAccessible(true);
         Long id = (Long) idField.get(entity);
         EntityKey entityKey = new EntityKey(id, clazz);
+
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.SAVING);
         id = entityPersister.insert(entity);
-        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
 
+        entityKey = new EntityKey(id, clazz);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
         defaultPersistenceContext.add(entity, id);
         return entity;
     }
@@ -77,7 +79,6 @@ public class DefaultEntityManager implements EntityManager {
         EntityKey entityKey = new EntityKey(id, clazz);
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.DELETED);
         entityPersister.remove(clazz, id);
-
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.GONE);
         if (defaultPersistenceContext.isExist(clazz, id)) {
             defaultPersistenceContext.remove(clazz, id);
@@ -91,7 +92,9 @@ public class DefaultEntityManager implements EntityManager {
             Field idField = clazz.getDeclaredField("id");
             idField.setAccessible(true);
             Long id = (Long) idField.get(entity);
+            EntityKey entityKey = new EntityKey(id, clazz);
             defaultPersistenceContext.update(entity, id);
+            defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Failed to update entity", e);
         } catch (IllegalAccessException e) {

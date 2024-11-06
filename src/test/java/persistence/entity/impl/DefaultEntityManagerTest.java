@@ -46,14 +46,14 @@ public class DefaultEntityManagerTest {
     }
 
     @Test
-    public void testPersist() {
+    public void testPersist() throws NoSuchFieldException, IllegalAccessException {
         Person person = Person.of(null, "John", 25, "john@example.com", 1);
         Person persistedPerson = (Person) entityManager.persist(person);
         assertNotNull(persistedPerson);
     }
 
     @Test
-    public void testFind() {
+    public void testFind() throws NoSuchFieldException, IllegalAccessException {
         Person person = Person.of(null, "John", 25, "john@example.com", 1);
         entityManager.persist(person);
         Optional<Person> foundedPerson = entityManager.find(Person.class, 1L);
@@ -61,7 +61,7 @@ public class DefaultEntityManagerTest {
     }
 
     @Test
-    public void testRemove() {
+    public void testRemove() throws NoSuchFieldException, IllegalAccessException {
         Person person = Person.of(null, "John", 25, "john@example.com", 1);
         entityManager.persist(person);
         entityManager.remove(Person.class, 1L);
@@ -72,7 +72,7 @@ public class DefaultEntityManagerTest {
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() throws NoSuchFieldException, IllegalAccessException {
         Person person = Person.of(null, "John", 25, "john@example.com", 1);
         entityManager.persist(person);
         Person updatedPerson = Person.of(1L, "John Updated", 26, "john.updated@example.com", 1);
@@ -87,7 +87,7 @@ public class DefaultEntityManagerTest {
     }
 
     @Test
-    public void testFlush() throws NoSuchFieldException {
+    public void testFlush() throws NoSuchFieldException, IllegalAccessException {
         Person person = Person.of(null, "John", 25, "john@example.com", 1);
         entityManager.persist(person);
         Person updatedPerson = Person.of(1L, "John Updated", 26, "john.updated@example.com", 1);

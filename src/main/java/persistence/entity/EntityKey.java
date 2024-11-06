@@ -3,13 +3,27 @@ package persistence.entity;
 
 import java.util.Objects;
 
+
 public class EntityKey {
-    private final Object id;
+    private Object id;
     private final Class<?> entityClass;
 
     public EntityKey(Object id, Class<?> entityClass) {
         this.id = id;
         this.entityClass = entityClass;
+    }
+
+    public EntityKey(Object id, EntityKey entityKey) {
+        this.id = id;
+        this.entityClass = entityKey.getEntityClass();
+    }
+
+    public Object getId() {
+        return id;
+    }
+
+    public Class<?> getEntityClass() {
+        return entityClass;
     }
 
     @Override

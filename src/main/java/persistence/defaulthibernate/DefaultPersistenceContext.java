@@ -50,7 +50,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
         if (entityMap == null || !entityMap.containsKey(id)) {
             throw new IllegalArgumentException("Entity not found");
         }
-//        entityEntry.get(clazz).get(entityMap.get(id)).updateStatus(EntryStatus.DELETED);
         entityMap.remove(id);
         removeSnapshots(clazz, id);
     }
@@ -74,9 +73,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
     private boolean isDirty(Object object, Long id) {
         Class<?> clazz = object.getClass();
         boolean equals = clazz.equals(entitiesByKey.get(clazz).get(id));
-        boolean isManaged = entityEntry.get(clazz).status() == EntryStatus.MANAGED
-                || entityEntry.get(clazz).status() == EntryStatus.DELETED;
-        return !equals && isManaged;
+        return !equals;
     }
 
     private void removeSnapshots(Class<?> clazz, Long id) {
