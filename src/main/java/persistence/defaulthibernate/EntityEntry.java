@@ -21,7 +21,7 @@ public class EntityEntry {
         this.status = status;
     }
 
-    private EntityEntry(EntryStatus status) {
+    public EntityEntry(EntryStatus status) {
         if (status == null) {
             throw new IllegalArgumentException("status must not be null");
         }

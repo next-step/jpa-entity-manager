@@ -1,5 +1,7 @@
 package persistence.defaulthibernate;
 
+import persistence.entity.EntityKey;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<Class<?>, Map<Long, Object>> entitiesByKey = new HashMap<>();
     private final Map<Class<?>, Map<Long, Object>> entitySnapshotsByKey = new HashMap<>();
-    private final Map<Class<?>, Map<Object, EntityEntry>> entityEntry = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityEntry = new HashMap<>();
 
     @Override
     public void add(Object object, Long id) {
@@ -24,7 +26,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
         entitiesByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>())
                 .put(id, object);
         entitySnapshotsByKey.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(id, object);
-        entityEntry.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>()).put(object, EntityEntry.status(EntryStatus.MANAGED));
     }
 
     @Override
@@ -49,7 +50,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
         if (entityMap == null || !entityMap.containsKey(id)) {
             throw new IllegalArgumentException("Entity not found");
         }
-        entityEntry.get(clazz).get(entityMap.get(id)).updateStatus(EntryStatus.DELETED);
+//        entityEntry.get(clazz).get(entityMap.get(id)).updateStatus(EntryStatus.DELETED);
         entityMap.remove(id);
         removeSnapshots(clazz, id);
     }
@@ -66,15 +67,15 @@ public class DefaultPersistenceContext implements PersistenceContext {
         entitySnapshotsByKey.clear();
     }
 
-    public void setEntityEntryStatus(Object o, EntryStatus status) {
-        entityEntry.get(o.getClass()).get(o).updateStatus(status);
+    public void setEntityEntryStatus(EntityKey entityKey, EntryStatus status) {
+        entityEntry.put(entityKey, new EntityEntry(status));
     }
 
     private boolean isDirty(Object object, Long id) {
         Class<?> clazz = object.getClass();
         boolean equals = clazz.equals(entitiesByKey.get(clazz).get(id));
-        boolean isManaged = entityEntry.get(clazz).get(object).status() == EntryStatus.MANAGED
-                || entityEntry.get(clazz).get(object).status() == EntryStatus.DELETED;
+        boolean isManaged = entityEntry.get(clazz).status() == EntryStatus.MANAGED
+                || entityEntry.get(clazz).status() == EntryStatus.DELETED;
         return !equals && isManaged;
     }
 
@@ -89,4 +90,6 @@ public class DefaultPersistenceContext implements PersistenceContext {
         Map<Long, Object> entityMap = entitiesByKey.get(clazz);
         return entityMap != null && entityMap.containsKey(id);
     }
+
+
 }

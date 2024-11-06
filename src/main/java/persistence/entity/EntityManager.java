@@ -4,7 +4,7 @@ public interface EntityManager {
     // <T> T find(Class<T> clazz, Long Id); 제네릭을 사용해보셔도 됩니다.
     <T> Object find(Class<T> clazz, Long Id);
 
-    Object persist(Object entity);
+    Object persist(Object entity) throws NoSuchFieldException, IllegalAccessException;
 
     void remove(Class<?> clazz, Long Id);
 

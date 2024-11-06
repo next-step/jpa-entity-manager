@@ -2,6 +2,7 @@ package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
 import persistence.defaulthibernate.EntryStatus;
+import persistence.entity.EntityKey;
 import persistence.entity.EntityManager;
 import persistence.defaulthibernate.DefaultPersistenceContext;
 
@@ -38,7 +39,10 @@ public class DefaultEntityManager implements EntityManager {
             Object o = defaultPersistenceContext.get(clazz, id);
             return Optional.of(clazz.cast(o));
         }
+        EntityKey entityKey = new EntityKey(id, clazz);
+        defaultPersistenceContext.setEntityEntryStatus( entityKey, EntryStatus.LOADING);
         Optional<T> t = entityPersister.find(clazz, id);
+        defaultPersistenceContext.setEntityEntryStatus( entityKey, EntryStatus.MANAGED);
 
         if (t.isEmpty()) {
             return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
@@ -52,16 +56,29 @@ public class DefaultEntityManager implements EntityManager {
     }
 
     @Override
-    public Object persist(Object entity) {
+    public Object persist(Object entity) throws NoSuchFieldException, IllegalAccessException {
         // 스냅샷 저장
-        Long id = entityPersister.insert(entity);
+
+        Class<?> clazz = entity.getClass();
+        Field idField = clazz.getDeclaredField("id");
+        idField.setAccessible(true);
+        Long id = (Long) idField.get(entity);
+        EntityKey entityKey = new EntityKey(id, clazz);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.SAVING);
+        id = entityPersister.insert(entity);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
+
         defaultPersistenceContext.add(entity, id);
         return entity;
     }
 
     @Override
     public void remove(Class<?> clazz, Long id) {
+        EntityKey entityKey = new EntityKey(id, clazz);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.DELETED);
         entityPersister.remove(clazz, id);
+
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.GONE);
         if (defaultPersistenceContext.isExist(clazz, id)) {
             defaultPersistenceContext.remove(clazz, id);
         }
@@ -85,7 +102,18 @@ public class DefaultEntityManager implements EntityManager {
     @Override
     public void flush() {
         defaultPersistenceContext.getDirtyObjects().forEach(entityPersister::update);
-        defaultPersistenceContext.getDirtyObjects().forEach(o->{defaultPersistenceContext.setEntityEntryStatus(o, EntryStatus.GONE);});
+        defaultPersistenceContext.getDirtyObjects().forEach(o->{
+            try {
+                Class<?> clazz = o.getClass();
+                Field idField = clazz.getDeclaredField("id");
+                idField.setAccessible(true);
+                Long id = (Long) idField.get(o);
+                EntityKey entityKey = new EntityKey(id, clazz);
+                defaultPersistenceContext.setEntityEntryStatus( entityKey, EntryStatus.GONE);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
         defaultPersistenceContext.clearSnapshots();
     }
 }
