@@ -2,7 +2,6 @@ package persistence.entity.impl;
 
 import java.util.Collection;
 import java.util.Set;
-import jdbc.JdbcTemplate;
 import persistence.entity.DatabaseSnapshots;
 import persistence.entity.EntityKey;
 import persistence.entity.LongTypeId;
