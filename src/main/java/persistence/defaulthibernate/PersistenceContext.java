@@ -5,7 +5,7 @@ import persistence.entity.EntityKey;
 
 public interface PersistenceContext {
 
-    void add(Object object, Long id);
+    void add(EntityData entityData, EntityKey entityKey);
 
     Object get(EntityKey entityKey);
 

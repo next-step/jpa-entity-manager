@@ -31,8 +31,8 @@ public class DefaultEntityManager implements EntityManager {
         // 스냅샷 저장
         EntityKey entityKey = new EntityKey(id, clazz);
         if (defaultPersistenceContext.isExist(entityKey)) {
-            Object o = defaultPersistenceContext.get(entityKey);
-            return Optional.of(clazz.cast(o));
+            EntityData o = (EntityData) defaultPersistenceContext.get(entityKey);
+            return Optional.of(clazz.cast(o.entity()));
         }
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.LOADING);
         Optional<T> t = entityPersister.find(clazz, id);
@@ -44,7 +44,7 @@ public class DefaultEntityManager implements EntityManager {
 
         // 엔티티가 타입에 맞는지 확인하고 캐시
         T entity = clazz.cast(t.get());
-        defaultPersistenceContext.add(entity, id);
+        defaultPersistenceContext.add(new EntityData(t.get()), entityKey);
 
         return Optional.of(entity);  // 조회된 엔티티 반환
     }
@@ -59,6 +59,7 @@ public class DefaultEntityManager implements EntityManager {
         Long id = entityPersister.insert(entity);
 
         entityKey = new EntityKey(id, entity.getClass());
+
         defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
         defaultPersistenceContext.add(entityData, entityKey);
 

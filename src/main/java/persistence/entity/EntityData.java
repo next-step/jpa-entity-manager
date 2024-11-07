@@ -24,18 +24,26 @@ public class EntityData {
     }
 
     private Object resolveId (Object entity){
+        Object id = null;
+        for (var field : entity.getClass().getDeclaredFields()) {
 
-        Arrays.stream(entity.getClass().getDeclaredFields()).map(field -> {
             if (field.isAnnotationPresent(Id.class)) {
-                field.setAccessible(true);
                 try {
-                    return field.get(entity);
+                    field.setAccessible(true);
+                    id = field.get(entity);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
-            throw new IllegalArgumentException("Entity must have a field annotated with @Id");
-        }).findFirst().orElseThrow(() -> new IllegalArgumentException("Entity must have a field annotated with @Id"));
+        }
+        return id;
+    }
+
+    public Class<?> entityClass() {
+        return entityClass;
+    }
+
+    public Object entity() {
         return entity;
     }
 
@@ -48,7 +56,7 @@ public class EntityData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EntityData that = (EntityData) o;
-        return Objects.equals(id, that.id) && Objects.equals(entityClass, that.entityClass) && Objects.equals(entity, that.entity);
+        return Objects.equals(id, that.id) && Objects.equals(entityClass, that.entityClass) ;
     }
 
     @Override

@@ -4,7 +4,6 @@ import persistence.entity.EntityData;
 import persistence.entity.EntityKey;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -19,22 +18,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultPersistenceContext implements PersistenceContext {
     private final Map<EntityKey, EntityData> entitiesByKey = new HashMap<>();
     private final Map<EntityKey, EntityData>  entitySnapshotsByKey = new HashMap<>();
-    private final Map<EntityKey, EntityEntry> entityEntry = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityEntryByKey = new HashMap<>();
 
     @Override
     public void add(EntityData entityData, EntityKey entityKey) {
-
         entitiesByKey.computeIfAbsent(entityKey, k -> entityData);
         entitySnapshotsByKey.computeIfAbsent(entityKey, k -> entityData);
     }
 
     @Override
-    public Object get(EntityKey entityKey) {
-        Object o = entitiesByKey.get(entityKey);
-        if (o == null) {
+    public EntityData get(EntityKey entityKey) {
+        if (entitiesByKey.get(entityKey) == null){
             throw new IllegalArgumentException("Entity not found");
         }
-        return o;
+        return entitiesByKey.get(entityKey);
     }
 
     @Override
@@ -52,9 +49,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
         removeSnapshots(entityKey);
     }
 
-    public List<Object> getDirtyObjects() {
+    public List<EntityData> getDirtyObjects() {
         return entitySnapshotsByKey.entrySet().stream()
-                .filter(e -> isDirty(new EntityKey()))
+                .filter(e -> isDirty(e.getKey()))
                 .map(Map.Entry::getValue)
                 .toList();
     }
@@ -64,18 +61,13 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     public void setEntityEntryStatus(EntityKey entityKey, EntryStatus status) {
-        entityEntry.put(entityKey, new EntityEntry(status));
+        entityEntryByKey.put(entityKey, new EntityEntry(status));
     }
 
-    private boolean isDirty(Object object, Long id) {
-        Class<?> clazz = object.getClass();
-        boolean equals = entitySnapshotsByKey.entrySet().stream().allMatch(e -> {
-            if (e.getKey().getId().equals(id) && e.getKey().getEntityClass().equals(clazz)) {
-                return e.getValue().equals(object);
-            }
-            return false;
-        });
-        return !equals;
+    private boolean isDirty(EntityKey entityKey) {
+        EntityData snapshot = entitySnapshotsByKey.get(entityKey);
+        EntityData current = entitiesByKey.get(entityKey);
+        return !Objects.equals(snapshot, current);
     }
 
     private void removeSnapshots(EntityKey entityKey) {
@@ -83,8 +75,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     public boolean isExist(EntityKey entityKey) {
-        Map<Long, Object> entityMap = entitiesByKey.get(clazz);
-        return entityMap != null && entityMap.containsKey(id);
+        return entitiesByKey.containsKey(entityKey);
     }
 
 
