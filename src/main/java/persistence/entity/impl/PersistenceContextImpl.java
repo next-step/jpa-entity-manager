@@ -29,17 +29,16 @@ public class PersistenceContextImpl implements PersistenceContext {
 
 
     @Override
-    public void addEntity(Object entity)  {
+    public void attachEntity(Object entity)  {
         if (new LongTypeId(entity).isEntityIdNull()) {
             pendingEntities.persistEntity(entity);
             return;
         }
         persistedEntities.persistEntity(getEntityKey(entity), entity);
-        databaseSnapshots.addDatabaseSnapshot(entity);
     }
 
     @Override
-    public void removeEntity(Object entity) {
+    public void detachEntity(Object entity) {
         pendingEntities.removeEntity(entity);
         persistedEntities.removeEntity(getEntityKey(entity));
     }
@@ -52,6 +51,11 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public Collection<Object> getPersistedEntities() {
         return persistedEntities.getEntities();
+    }
+
+    @Override
+    public void captureDatabaseSnapshot(Object entity) {
+        databaseSnapshots.addDatabaseSnapshot(entity);
     }
 
     @Override

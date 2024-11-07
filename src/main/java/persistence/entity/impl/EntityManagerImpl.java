@@ -29,7 +29,8 @@ public class EntityManagerImpl implements EntityManager {
             entity = entityClass.cast(
                 entityPersister.findById(entityClass, primaryKey)
             );
-            persistenceContext.addEntity(entity);
+            persistenceContext.captureDatabaseSnapshot(entity);
+            persistenceContext.attachEntity(entity);
         }
 
         return entity;
@@ -37,12 +38,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        persistenceContext.addEntity(entity);
+        persistenceContext.attachEntity(entity);
     }
 
     @Override
     public void remove(Object entity) {
-        persistenceContext.removeEntity(entity);
+        persistenceContext.detachEntity(entity);
     }
 
     @Override

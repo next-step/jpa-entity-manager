@@ -7,13 +7,15 @@ public interface PersistenceContext {
 
     <T> T getEntity(Class<T> entityClass, Object primaryKey);
 
-    void addEntity(Object entity);
+    void attachEntity(Object entity);
 
-    void removeEntity(Object entity);
+    void detachEntity(Object entity);
 
     Set<Object> getPendingEntities();
 
     Collection<Object> getPersistedEntities();
+
+    void captureDatabaseSnapshot(Object entity);
 
     Object getDatabaseSnapshot(Object entity);
 
