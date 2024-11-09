@@ -58,6 +58,8 @@ public class DefaultEntityManager implements EntityManager {
 
         if (snapshot.hasDifferenceWith(entity)) {
             persister.update(entity);
+            context.removeEntity(entity);
+            context.addEntity(entity);
         }
 
         return entity;
