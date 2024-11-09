@@ -129,9 +129,4 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public boolean isExist(EntityKey entityKey) {
         return entitiesByKey.containsKey(entityKey);
     }
-
-    public EntryStatus getEntityStatus(EntityKey entityKey) {
-        EntityEntry entry = entityEntries.get(entityKey);
-        return entry != null ? entry.getStatus() : null;
-    }
 }
