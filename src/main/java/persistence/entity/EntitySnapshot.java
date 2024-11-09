@@ -24,6 +24,10 @@ public record EntitySnapshot(Object entity) {
                         getFieldValue(field, entity)));
     }
 
+    /**
+     * '@DynamicUpdate' 기능에 사용되는 메서드 <br>
+     * Dirty Checking 후 엔티티의 변경내용 업데이트 시 기본적으로 모든 필드를 업데이트한다.
+     */
     public List<Field> getDifferenceFields(Object entity) {
         Class<?> entityType = this.entity.getClass();
         validateEntityType(entity, entityType);
