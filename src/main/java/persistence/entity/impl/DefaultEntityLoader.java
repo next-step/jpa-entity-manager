@@ -1,8 +1,8 @@
-package persistence.entity;
+package persistence.entity.impl;
 
 import java.util.List;
-import java.util.Optional;
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityLoader;
 import persistence.sql.dml.query.SelectQuery;
 import persistence.sql.dml.query.WhereCondition;
 import persistence.sql.dml.query.builder.SelectQueryBuilder;
@@ -10,20 +10,13 @@ import persistence.sql.dml.query.builder.SelectQueryBuilder;
 public class DefaultEntityLoader implements EntityLoader {
 
     private final JdbcTemplate jdbcTemplate;
-    private final PersistenceContext context;
 
-    public DefaultEntityLoader(JdbcTemplate jdbcTemplate, PersistenceContext context) {
+    public DefaultEntityLoader(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.context = context;
     }
 
     @Override
     public <T> T load(Class<T> clazz, Object id) {
-        Optional<T> entity = context.getEntity(id, clazz);
-        if (entity.isPresent()) {
-            return entity.get();
-        }
-
         SelectQuery query = new SelectQuery(clazz);
         String queryString = SelectQueryBuilder.builder()
                 .select(query.columnNames())

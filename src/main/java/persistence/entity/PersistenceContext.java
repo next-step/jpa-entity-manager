@@ -10,4 +10,8 @@ public interface PersistenceContext {
 
     void removeEntity(Object entity);
 
+    <ID> void addDatabaseSnapshot(ID id, Object snapshot);
+
+    <T, ID> EntitySnapshot getDatabaseSnapshot(ID id, Class<T> entityType);
+
 }

@@ -9,6 +9,11 @@
     - [ ] Entity 추가
       - 신규 Entity 를 관리 대상에 추가한다.
     - [ ] Entity 삭제
+    - [ ] Snapshot 생성
+    - [ ] Snapshot 조회
+- [ ] Snapshot
+  - [ ] Entity 변경 상태
+  - [ ] Snapshot 비교
 - [ ] EntityPersister
     - [ ] update
     - [ ] insert

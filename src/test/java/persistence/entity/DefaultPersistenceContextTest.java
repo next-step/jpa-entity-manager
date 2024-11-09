@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.impl.DefaultPersistenceContext;
 import sample.domain.Person;
 
 class DefaultPersistenceContextTest {
