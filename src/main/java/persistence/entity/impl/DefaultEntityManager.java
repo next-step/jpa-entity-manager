@@ -1,24 +1,15 @@
 package persistence.entity.impl;
 
 import jdbc.JdbcTemplate;
+import persistence.defaulthibernate.EntryStatus;
+import persistence.entity.EntityData;
+import persistence.entity.EntityKey;
 import persistence.entity.EntityManager;
 import persistence.defaulthibernate.DefaultPersistenceContext;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-
-/**
- * EntityPersister 주요 역활
- * JPA의 핵심 인터페이스로, 데이터베이스와 상호작용하면서 애플리케이션에서 엔티티 객체의 생명주기를 관리하는 역활
- * EntityMaanger는 개발자가 api를 통해서 엔티티 객체를 관리하는 인터페이스.
- * 엔티티의 생명주기 관리 (Persist, Merge, Remove )
- * 트랜잭션 관리
- * 구현체(hibernate, .. etc) 에 대한 인터페이스 제공
- */
 
 
 public class DefaultEntityManager implements EntityManager {
@@ -32,58 +23,112 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> Optional<T> find(Class<T> clazz, Long id) {
-        // 스냅샷 저장
-        if (defaultPersistenceContext.isExist(clazz, id)) {
-            Object o = defaultPersistenceContext.get(clazz, id);
-            return Optional.of(clazz.cast(o));
-        }
-        Optional<T> t = entityPersister.find(clazz, id);
+        EntityKey entityKey = new EntityKey(id, clazz);
 
-        if (t.isEmpty()) {
-            return Optional.empty();  // 엔티티가 없는 경우 빈 Optional 반환
+        // 1차 캐시 확인
+        if (defaultPersistenceContext.isExist(entityKey)) {
+            EntityData entityData = defaultPersistenceContext.get(entityKey);
+            return Optional.of(clazz.cast(entityData.entity()));
         }
 
-        // 엔티티가 타입에 맞는지 확인하고 캐시
-        T entity = clazz.cast(t.get());
-        defaultPersistenceContext.add(entity, id);
+        // DB 조회
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.LOADING);
+        Optional<T> entityOptional = entityPersister.find(clazz, id);
 
-        return Optional.of(entity);  // 조회된 엔티티 반환
+        if (entityOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // 엔티티 캐시에 저장
+        T entity = entityOptional.get();
+        EntityData entityData = new EntityData(entity);
+        defaultPersistenceContext.add(entityData, entityKey);
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
+
+        return Optional.of(entity);
     }
 
     @Override
-    public Object persist(Object entity) {
-        // 스냅샷 저장
+    public Object persist(Object entity) throws NoSuchFieldException, IllegalAccessException {
+        EntityData entityData = new EntityData(entity);
+        EntityKey entityKey = new EntityKey(entityData.getId(), entity.getClass());
+
+        // 저장 전 상태 설정
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.SAVING);
+
+        // DB 저장
         Long id = entityPersister.insert(entity);
-        defaultPersistenceContext.add(entity, id);
+
+        // 새로운 ID로 엔티티 키 생성
+        EntityKey newEntityKey = new EntityKey(id, entity.getClass());
+        EntityData newEntityData = new EntityData(id, entity.getClass(), entity);
+
+        // 영속성 컨텍스트에 저장
+        defaultPersistenceContext.add(newEntityData, newEntityKey);
+        defaultPersistenceContext.setEntityEntryStatus(newEntityKey, EntryStatus.MANAGED);
+
         return entity;
     }
 
     @Override
     public void remove(Class<?> clazz, Long id) {
+        EntityKey entityKey = new EntityKey(id, clazz);
+
+        // 삭제 처리
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.DELETED);
         entityPersister.remove(clazz, id);
-        if (defaultPersistenceContext.isExist(clazz, id)) {
-            defaultPersistenceContext.remove(clazz, id);
+
+        // 영속성 컨텍스트에서 제거
+        defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.GONE);
+        if (defaultPersistenceContext.isExist(entityKey)) {
+            defaultPersistenceContext.remove(entityKey);
         }
     }
 
     @Override
     public void update(Object entity) {
-        Class<?> clazz = entity.getClass();
         try {
+            Class<?> clazz = entity.getClass();
             Field idField = clazz.getDeclaredField("id");
             idField.setAccessible(true);
             Long id = (Long) idField.get(entity);
-            defaultPersistenceContext.update(entity, id);
-        } catch (NoSuchFieldException e) {
+
+            EntityKey entityKey = new EntityKey(id, clazz);
+            EntityData entityData = new EntityData(entity);
+
+            // 영속성 컨텍스트 업데이트
+            defaultPersistenceContext.update(entityData, entityKey);
+            defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Failed to update entity", e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void flush() {
-        defaultPersistenceContext.getDirtyObjects().forEach(entityPersister::update);
+        // 변경된 엔티티들 DB 업데이트
+        List<Object> dirtyObjects = defaultPersistenceContext.getDirtyObjects();
+
+        for (Object dirtyObject : dirtyObjects) {
+            try {
+                // DB 업데이트
+                entityPersister.update(dirtyObject);
+
+                // 상태 업데이트
+                Class<?> clazz = dirtyObject.getClass();
+                Field idField = clazz.getDeclaredField("id");
+                idField.setAccessible(true);
+                Long id = (Long) idField.get(dirtyObject);
+                EntityKey entityKey = new EntityKey(id, clazz);
+
+                defaultPersistenceContext.setEntityEntryStatus(entityKey, EntryStatus.MANAGED);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException("Failed to flush entity", e);
+            }
+        }
+
+        // 스냅샷 초기화
         defaultPersistenceContext.clearSnapshots();
     }
 }
