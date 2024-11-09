@@ -2,8 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 
-import java.util.Arrays;
 import java.util.Objects;
+
 
 public class EntityData {
 

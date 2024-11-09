@@ -1,6 +1,5 @@
 package persistence.entity;
 
-
 import java.util.Objects;
 
 
