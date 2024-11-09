@@ -12,7 +12,7 @@ public record EntityId(Object id) {
     }
 
     private static Object getIdField(Object entity, Class<?> entityType) {
-        Field[] fields = entityType.getFields();
+        Field[] fields = entityType.getDeclaredFields();
         Field idField = Arrays.stream(fields)
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
