@@ -19,6 +19,7 @@ public record EntitySnapshot(Object entity) {
 
         Field[] fields = entityType.getDeclaredFields();
         return Arrays.stream(fields)
+                .peek(field -> field.setAccessible(true))
                 .anyMatch(field -> isNotSame(
                         getFieldValue(field, this.entity),
                         getFieldValue(field, entity)));
@@ -34,7 +35,8 @@ public record EntitySnapshot(Object entity) {
 
         return Arrays.stream(entityType.getDeclaredFields())
                 .peek(field -> field.setAccessible(true))
-                .filter(field -> isNotSame(getFieldValue(field, this.entity),
+                .filter(field -> isNotSame(
+                        getFieldValue(field, this.entity),
                         getFieldValue(field, entity)))
                 .collect(Collectors.toList());
     }
