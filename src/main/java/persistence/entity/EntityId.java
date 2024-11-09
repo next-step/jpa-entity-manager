@@ -19,6 +19,7 @@ public record EntityId(Object id) {
                 .orElseThrow(() -> new NotExistException("identification."));
 
         try {
+            idField.setAccessible(true);
             return idField.get(entity);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
