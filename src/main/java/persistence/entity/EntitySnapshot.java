@@ -1,62 +1,46 @@
 package persistence.entity;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import persistence.exception.NotSameException;
 
-public class EntitySnapshot {
-
-    private final Object entity;
+public record EntitySnapshot(Object entity) {
 
     public EntitySnapshot(Object entity) {
         this.entity = EntityCopyUtils.deepCopy(entity);
     }
 
-    public Object compare(Object entity) {
+    public boolean hasDifferenceWith(Object entity) {
         Class<?> entityType = this.entity.getClass();
-        if (notSameClass(entityType)) {
-            throw new NotSameException(MessageFormat.format("EntitySnapshot class: {0}, Entity class: {1}",
+        validateEntityType(entity, entityType);
+
+        Field[] fields = entityType.getDeclaredFields();
+        return Arrays.stream(fields)
+                .anyMatch(field -> isNotSame(
+                        getFieldValue(field, this.entity),
+                        getFieldValue(field, entity)));
+    }
+
+    public List<Field> getDifferenceFields(Object entity) {
+        Class<?> entityType = this.entity.getClass();
+        validateEntityType(entity, entityType);
+
+        return Arrays.stream(entityType.getDeclaredFields())
+                .peek(field -> field.setAccessible(true))
+                .filter(field -> isNotSame(getFieldValue(field, this.entity),
+                        getFieldValue(field, entity)))
+                .collect(Collectors.toList());
+    }
+
+    private void validateEntityType(Object entity, Class<?> entityType) {
+        if (isNotSameClass(entityType)) {
+            throw new NotSameException(
+                    MessageFormat.format("EntitySnapshot class: {0}, Entity class: {1}",
                             this.entity.getClass(),
                             entity.getClass()));
-        }
-
-        Object diffObject = getNewInstance();
-        Field[] fields = entityType.getDeclaredFields();
-        for (Field field : fields) {
-            setDifferentField(field, entity, diffObject);
-        }
-
-        return diffObject;
-    }
-
-    private Object getNewInstance() {
-        try {
-            Class<?> entityType = this.entity.getClass();
-            return entityType.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void setDifferentField(Field field, Object entity, Object diffObject) {
-        field.setAccessible(true);
-
-        Object value1 = getFieldValue(field, this.entity);
-        Object value2 = getFieldValue(field, entity);
-
-        setFieldValue(field, diffObject, value1, value2);
-    }
-
-    private void setFieldValue(Field field, Object diffObject, Object value1, Object value2) {
-        if (isSame(value1, value2)) {
-            return;
-        }
-
-        try {
-            field.set(diffObject, value2);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -68,12 +52,16 @@ public class EntitySnapshot {
         }
     }
 
-    private boolean notSameClass(Class<?> entityType) {
+    private boolean isSame(Object obj1, Object obj2) {
+        return isNotNull(obj1) && obj1.equals(obj2);
+    }
+
+    private boolean isNotSameClass(Class<?> entityType) {
         return !isSame(this.entity.getClass(), entityType);
     }
 
-    private boolean isSame(Object obj1, Object obj2) {
-        return isNotNull(obj1) && obj1.equals(obj2);
+    private boolean isNotSame(Object obj1, Object obj2) {
+        return !isSame(obj1, obj2);
     }
 
     private boolean isNotNull(Object obj) {
