@@ -3,6 +3,7 @@ package persistence.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static persistence.query.QueryExecutor.create;
 import static persistence.query.QueryExecutor.drop;
 import static persistence.query.QueryExecutor.insert;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.impl.DefaultEntityManager;
+import persistence.fixture.SimpleEntityFixture;
 import sample.domain.Person;
 
 class DefaultEntityManagerTest {
@@ -27,11 +29,13 @@ class DefaultEntityManagerTest {
         server = new H2();
         server.start();
         create(Person.class, new JdbcTemplate(server.getConnection()));
+        create(SimpleEntityFixture.class, new JdbcTemplate(server.getConnection()));
     }
 
     @AfterEach
     void afterEach() throws SQLException {
         drop(Person.class, new JdbcTemplate(server.getConnection()));
+        drop(SimpleEntityFixture.class, new JdbcTemplate(server.getConnection()));
         server.stop();
     }
 
@@ -67,6 +71,25 @@ class DefaultEntityManagerTest {
 
         EntityManager entityManager = new DefaultEntityManager(server.getConnection());
         assertDoesNotThrow(() -> entityManager.remove(person));
+    }
+
+    @Test
+    @DisplayName("[성공] Entity 업데이트")
+    void merge() throws SQLException {
+        SimpleEntityFixture entity = new SimpleEntityFixture("hellonayeon", 0);
+        insert(entity, new JdbcTemplate(server.getConnection()));
+
+        Long ID = 1L;
+        EntityManager entityManager = new DefaultEntityManager(server.getConnection());
+        SimpleEntityFixture findEntity = entityManager.find(SimpleEntityFixture.class, ID);
+        findEntity.setName("Nayeon Kwon");
+
+        entityManager.merge(findEntity);
+
+        SimpleEntityFixture entityAfterMerge = entityManager.find(SimpleEntityFixture.class, ID);
+        assertAll("merge() 후 Entity 필드값 검증",
+                () -> assertEquals(entityAfterMerge.getName(), "Nayeon Kwon"),
+                () -> assertEquals(entityAfterMerge.getNumber(), 0));
     }
 
 }

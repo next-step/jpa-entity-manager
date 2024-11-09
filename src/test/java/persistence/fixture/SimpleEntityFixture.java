@@ -1,30 +1,51 @@
 package persistence.fixture;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class SimpleEntityFixture {
-    private int field1;
-    private long field2;
-    private String field3;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private Integer number;
 
     public SimpleEntityFixture() {
 
     }
 
-    public SimpleEntityFixture(int field1, long field2, String field3) {
-        this.field1 = field1;
-        this.field2 = field2;
-        this.field3 = field3;
+    public SimpleEntityFixture(long id, String name, int number) {
+        this.id = id;
+        this.name = name;
+        this.number = number;
     }
 
-    public void setField1(int field1) {
-        this.field1 = field1;
+    public SimpleEntityFixture(String name, int number) {
+        this.name = name;
+        this.number = number;
     }
 
-    public void setField2(long field2) {
-        this.field2 = field2;
+    public long getId() {
+        return id;
     }
 
-    public void setField3(String field3) {
-        this.field3 = field3;
+    public String getName() {
+        return name;
     }
 
+    public int getNumber() {
+        return number;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
 }

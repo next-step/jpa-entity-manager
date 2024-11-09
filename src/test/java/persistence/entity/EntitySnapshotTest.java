@@ -11,11 +11,11 @@ class EntitySnapshotTest {
     @Test
     @DisplayName("[성공] Snapshot 과 Entity 의 차이 여부를 확인한다.")
     void hasDifferenceWith() {
-        SimpleEntityFixture entity = new SimpleEntityFixture(100, 100L, null);
+        SimpleEntityFixture entity = new SimpleEntityFixture("hellonayeon", 0);
         EntitySnapshot snapshot = new EntitySnapshot(entity);
 
-        entity.setField1(9999);
-        entity.setField3("hellonayeon");
+        entity.setName("Nayeon Kwon");
+        entity.setNumber(9999);
 
         assertTrue(snapshot.hasDifferenceWith(entity));
     }
