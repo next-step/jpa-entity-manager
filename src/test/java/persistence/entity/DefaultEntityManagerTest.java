@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static persistence.query.QueryExecutor.create;
 import static persistence.query.QueryExecutor.drop;
-import static persistence.query.QueryExecutor.insert;
 
 import database.DatabaseServer;
 import database.H2;
@@ -42,10 +41,10 @@ class DefaultEntityManagerTest {
     @Test
     @DisplayName("[성공] Person Entity 조회")
     void find() throws SQLException {
-        Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
-        insert(person, new JdbcTemplate(server.getConnection()));
-
         EntityManager entityManager = new DefaultEntityManager(server.getConnection());
+        Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
+        entityManager.persist(person);
+
         Person findPerson = entityManager.find(Person.class, 1L);
 
         assertAll("조회한 Entity 필드값 검증",
@@ -66,21 +65,21 @@ class DefaultEntityManagerTest {
     @Test
     @DisplayName("[성공] Person Entity 삭제")
     void remove() throws SQLException {
-        Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
-        insert(person, new JdbcTemplate(server.getConnection()));
-
         EntityManager entityManager = new DefaultEntityManager(server.getConnection());
+        Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
+        entityManager.persist(person);
+
         assertDoesNotThrow(() -> entityManager.remove(person));
     }
 
     @Test
     @DisplayName("[성공] Entity 업데이트")
     void merge() throws SQLException {
+        EntityManager entityManager = new DefaultEntityManager(server.getConnection());
         SimpleEntityFixture entity = new SimpleEntityFixture("hellonayeon", 0);
-        insert(entity, new JdbcTemplate(server.getConnection()));
+        entityManager.persist(entity);
 
         Long ID = 1L;
-        EntityManager entityManager = new DefaultEntityManager(server.getConnection());
         SimpleEntityFixture findEntity = entityManager.find(SimpleEntityFixture.class, ID);
         findEntity.setName("Nayeon Kwon");
 

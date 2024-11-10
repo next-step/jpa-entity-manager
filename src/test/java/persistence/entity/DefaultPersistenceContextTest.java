@@ -2,9 +2,8 @@ package persistence.entity;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.impl.DefaultPersistenceContext;
@@ -17,20 +16,15 @@ class DefaultPersistenceContextTest {
     void getEntity() {
         PersistenceContext context = new DefaultPersistenceContext();
         Person person = person(1L);
-        context.addEntity(person);
-
-        context.getEntity(1L, Person.class)
-                .ifPresentOrElse(
-                        personEntity -> assertEquals(personEntity, person),
-                        () -> fail("Person entity not found in the persistence context.")
-                );
+        context.addEntity(person, EntityStatus.MANAGED);
+        assertEquals(context.getEntity(1L, Person.class).entity(), person);
     }
 
     @Test
     @DisplayName("[성공] 영속성 컨텍스트에 Person Entity 추가")
     void addEntity() {
         PersistenceContext context = new DefaultPersistenceContext();
-        assertDoesNotThrow(() -> context.addEntity(person()));
+        assertDoesNotThrow(() -> context.addEntity(person(), EntityStatus.MANAGED));
     }
 
     @Test
@@ -38,11 +32,12 @@ class DefaultPersistenceContextTest {
     void removeEntity() {
         PersistenceContext context = new DefaultPersistenceContext();
         Person person = person(1L);
-        context.addEntity(person);
+        context.addEntity(person, EntityStatus.MANAGED);
 
         context.removeEntity(person);
 
-        assertFalse(context.getEntity(1L, Person.class).isPresent());
+        Assertions.assertThatThrownBy(() -> context.getEntity(1L, Person.class))
+                .hasMessage("Not exist EntityEntry EntityKey: 1, EntityType: class sample.domain.Person");
     }
 
     private Person person() {
