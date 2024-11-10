@@ -332,31 +332,32 @@ public class EntityManagerTest {
         @DisplayName("더티체크 처리된 엔티티에 대해 일괄 데이터베이이스 업데이트 처리한다.")
         void succeedToFlush() {
             // given
-            PersonWithTransientAnnotation toBeDirty1 = new PersonWithTransientAnnotation(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByEntityManager = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test1@test.com", 1
             );
-            PersonWithTransientAnnotation toBeDirty2 = new PersonWithTransientAnnotation(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByDatabase = new PersonWithTransientAnnotation(
                     2L, "둘리", 21, "test2@test.com", 2
             );
             PersonWithTransientAnnotation notToBeDirty = new PersonWithTransientAnnotation(
                     3L, "마이콜", 22, "test3@test.com", 3
             );
-            entityManager.persist(toBeDirty1);
-            entityPersister.insert(toBeDirty2);
-            toBeDirty1.setAge(30);
-            toBeDirty2.setAge(30);
-            entityManager.merge(toBeDirty1);
-            entityManager.merge(toBeDirty2);
+            entityManager.persist(fixtureToBeDirtyCreatedByEntityManager);
+            entityPersister.insert(fixtureToBeDirtyCreatedByDatabase);
+            fixtureToBeDirtyCreatedByEntityManager.setAge(30);
+            fixtureToBeDirtyCreatedByDatabase.setAge(30);
+
+            entityManager.merge(fixtureToBeDirtyCreatedByEntityManager);
+            entityManager.merge(fixtureToBeDirtyCreatedByDatabase);
             entityManager.merge(notToBeDirty);
 
             // when
             entityManager.flush();
 
             // then
-            PersonWithTransientAnnotation toBeDirty1Result = entityLoader.find(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByEntityManagerResult = entityLoader.find(
                     PersonWithTransientAnnotation.class, 1L
             );
-            PersonWithTransientAnnotation toBeDirty2Result = entityLoader.find(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByDatabaseResult = entityLoader.find(
                     PersonWithTransientAnnotation.class, 2L
             );
             PersonWithTransientAnnotation notToBeDirtyResult = entityLoader.find(
@@ -364,8 +365,8 @@ public class EntityManagerTest {
             );
 
             assertAll(
-                    () -> assertEquals(30, toBeDirty1Result.getAge()),
-                    () -> assertEquals(30, toBeDirty2Result.getAge()),
+                    () -> assertEquals(30, fixtureToBeDirtyCreatedByEntityManagerResult.getAge()),
+                    () -> assertEquals(30, fixtureToBeDirtyCreatedByDatabaseResult.getAge()),
                     () -> assertEquals(22, notToBeDirtyResult.getAge())
             );
         }

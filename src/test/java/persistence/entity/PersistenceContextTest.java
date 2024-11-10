@@ -203,7 +203,7 @@ public class PersistenceContextTest {
         }
 
         @Test
-        @DisplayName("스냅샷도 제거한다.")
+        @DisplayName("스냅샷을 제거한다.")
         void testRemoveSnapshot() {
             // given
             persistenceContext.addEntity(entity);

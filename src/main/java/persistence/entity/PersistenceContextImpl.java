@@ -90,11 +90,9 @@ public class PersistenceContextImpl implements PersistenceContext {
             throw new IllegalStateException("UNABLE TO UPDATE ENTITY FOR ENTRY STATUS : " + entityEntry.getStatus());
         }
 
+        entityCache.put(entityKey, entityObject);
         EntitySnapshot snapshot = entitySnapshots.get(entityKey);
-        if (snapshot.shouldBeDirty(entityObject)) {
-            entityCache.put(entityKey, entityObject);
-            snapshot.update(entityObject);
-        }
+        snapshot.update(entityObject);
     }
 
     @Override

@@ -2,13 +2,12 @@ package persistence.entity;
 
 import persistence.util.ReflectionUtil;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class EntitySnapshot {
     private Object originalEntity;
-    private Map<String, Object> keyValues = new HashMap<>();
+    private Map<String, Object> keyValues;
     private boolean isDirty;
 
     public EntitySnapshot(Object entity) {
@@ -30,12 +29,14 @@ public class EntitySnapshot {
     }
 
     public void update(Object entity) {
-        this.originalEntity = entity;
-        this.keyValues = ReflectionUtil.getAllFieldNameAndValue(entity);
-        isDirty = true;
+        if (shouldBeDirty(entity)) {
+            this.originalEntity = entity;
+            this.keyValues = ReflectionUtil.getAllFieldNameAndValue(entity);
+            isDirty = true;
+        }
     }
 
-    public boolean shouldBeDirty(Object currentEntity) {
+    private boolean shouldBeDirty(Object currentEntity) {
         return keyValues
                 .entrySet()
                 .stream()
