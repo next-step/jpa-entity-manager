@@ -35,9 +35,9 @@ public class EntityQueryHandler<T> {
         return jdbcTemplate.queryForObject(sql, entityLoader);
     }
 
-    public void update(Object entity, List<String> changedColumns) throws IllegalAccessException {
+    public void update(Object entity, List<String> updateColumns) throws IllegalAccessException {
         UpdateQuery updateQuery = sqlQueries.getSqlQuery(UPDATE);
-        String sql = updateQuery.generateQuery(entity, changedColumns);
+        String sql = updateQuery.generateQuery(entity, updateColumns);
         jdbcTemplate.execute(sql);
     }
 
