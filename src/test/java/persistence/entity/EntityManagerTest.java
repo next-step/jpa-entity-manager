@@ -171,7 +171,7 @@ public class EntityManagerTest {
     class RemoveTest {
         @Test
         @DisplayName("주어진 엔티티를 디비에서 제거한다.")
-        void succeedToRemove() {
+        void succeedToRemoveFromDatabase() {
             // given
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
@@ -196,8 +196,8 @@ public class EntityManagerTest {
         }
 
         @Test
-        @DisplayName("주어진 엔티티를 영속컨텍스트에서 제거하고 기존 엔티티 PK 정보는 GONE 상태로 처리된다.")
-        void failToRemoveForInvalidStatus() {
+        @DisplayName("주어진 엔티티를 영속컨텍스트에서 제거하고 기존 엔티티 정보는 GONE 상태로 처리된다.")
+        void succeedToRemoveFromContext() {
             // given
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1

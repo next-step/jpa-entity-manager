@@ -23,11 +23,6 @@ public record EntityPrimaryKey(String keyName, Object keyValue, String entityTab
         return new EntityPrimaryKey(pkName, pkValue, entityTableName);
     }
 
-    public static boolean isBuildable(Object entityObject) {
-        Map.Entry<String, Object> keyInfo = ReflectionUtil.getFieldNameAndValue(entityObject, Id.class);
-        return keyInfo.getValue() != null;
-    }
-
     public boolean isValid() {
         return keyValue != null;
     }

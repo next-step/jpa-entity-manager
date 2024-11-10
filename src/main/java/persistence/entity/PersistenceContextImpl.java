@@ -116,10 +116,6 @@ public class PersistenceContextImpl implements PersistenceContext {
         return entityCache.containsKey(entityKey);
     }
 
-    private boolean canFind(Object entityObject) {
-        return EntityPrimaryKey.isBuildable(entityObject);
-    }
-
     private EntityKey createEntityKey(Class<?> entityClass, Object id) {
         EntityPrimaryKey primaryKey = EntityPrimaryKey.build(entityClass, id);
         return new EntityKey(entityClass, primaryKey);
