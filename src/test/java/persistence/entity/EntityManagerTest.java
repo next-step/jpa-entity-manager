@@ -6,6 +6,8 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
+import persistence.entity.entry.EntityEntry;
+import persistence.entity.entry.EntityEntryStatus;
 import persistence.model.EntityPrimaryKey;
 import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.ddl.DdlQueryBuilder;
@@ -16,6 +18,7 @@ import persistence.sql.dml.DmlQueryBuilder;
 import persistence.fixture.PersonWithTransientAnnotation;
 import persistence.util.ReflectionUtil;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -190,19 +193,49 @@ public class EntityManagerTest {
                     () -> assertNull(contextFound),
                     () -> assertFalse(isFoundInDatabase)
             );
+        }
 
+        @Test
+        @DisplayName("주어진 엔티티를 영속컨텍스트에서 제거하고 기존 엔티티 PK 정보는 GONE 상태로 처리된다.")
+        void failToRemoveForInvalidStatus() {
+            // given
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
+                    1L, "홍길동", 20, "test@test.com", 1
+            );
+            entityManager.persist(person);
+
+            // when
+            entityManager.remove(person);
+
+            // then
+            assertAll(
+                    () -> assertFalse(persistenceContext.isEntityExists(person)),
+                    () -> assertEquals(EntityEntryStatus.GONE, getEntityEntry(person).getStatus())
+            );
         }
 
         @Test
         @DisplayName("PK가 없는 객체를 제거하려 하면 에러가 발생한다.")
-        void failToRemove() {
+        void failToRemoveForIdNotExists() {
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     "홍길동", 20, "test@test.com", 1
             );
 
-            assertThrows(ColumnInvalidException.class, () -> {
+            assertThrows(IllegalArgumentException.class, () -> {
                 entityManager.remove(person);
             });
+        }
+
+        private EntityEntry getEntityEntry(Object entity) throws NoSuchFieldException, IllegalAccessException {
+            Field entityEntriesField = persistenceContext.getClass().getDeclaredField("entityEntries");
+            entityEntriesField.setAccessible(true);
+
+            @SuppressWarnings("unchecked")
+            Map<EntityKey, EntityEntry> entityEntries = (Map<EntityKey, EntityEntry>)
+                    entityEntriesField.get(persistenceContext);
+
+            EntityKey entityKey = new EntityKey(entity.getClass(), EntityPrimaryKey.build(entity));
+            return entityEntries.get(entityKey);
         }
     }
 

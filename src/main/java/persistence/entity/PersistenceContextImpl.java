@@ -62,6 +62,9 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public void removeEntity(Object entityObject) {
         EntityKey entityKey = createEntityKey(entityObject);
+        if (!entityKey.isValid()) {
+            throw new IllegalArgumentException("INVALID PK TO TRACK CONTEXT");
+        }
         if (!entityCache.containsKey(entityKey)) {
             throw new IllegalArgumentException("ENTITY NOT EXISTS");
         }
@@ -113,6 +116,10 @@ public class PersistenceContextImpl implements PersistenceContext {
         Object entityId = EntityPrimaryKey.build(entityObject).keyValue();
         final EntityKey entityKey = createEntityKey(entityClass, entityId);
         return entityCache.containsKey(entityKey);
+    }
+
+    private boolean canFind(Object entityObject) {
+        return EntityPrimaryKey.isBuildable(entityObject);
     }
 
     private EntityKey createEntityKey(Class<?> entityClass, Object id) {

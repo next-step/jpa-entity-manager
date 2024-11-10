@@ -203,15 +203,6 @@ public class PersistenceContextTest {
         }
 
         @Test
-        @DisplayName("제거하려는 엔티티가 저장되어 있지 않다면, 에러를 반환한다.")
-        void testRemoveEntityNoAffect() {
-            // when, then
-            assertThrows(IllegalArgumentException.class, () -> {
-                persistenceContext.removeEntity(new PersonWithTransientAnnotation("person2@test.com"));
-            });
-        }
-
-        @Test
         @DisplayName("스냅샷도 제거한다.")
         void testRemoveSnapshot() {
             // given
@@ -246,6 +237,32 @@ public class PersistenceContextTest {
 
             // when
             assertThrows(IllegalStateException.class, () -> persistenceContext.removeEntity(entity));
+        }
+
+        @Test
+        @DisplayName("제거하려는 엔티티가 저장되어 있지 않다면, 에러를 반환한다.")
+        void failToRemoveEntityForNotInContextYet() {
+            // when, then
+            assertThrows(IllegalArgumentException.class, () -> {
+                persistenceContext.removeEntity(new PersonWithTransientAnnotation(
+                        2L,
+                        "John Doe",
+                        20,
+                        "test2@test.com",
+                        2)
+                );
+            });
+        }
+
+        @Test
+        @DisplayName("제거하려는 엔티티의 id가 null이라면, 에러를 반환한다.")
+        void failToRemoveEntityForNullId() {
+            // given
+            entity = new PersonWithTransientAnnotation("John Doe", 20, "test@test.com", 1);
+            persistenceContext.addEntity(entity);
+
+            // when, then
+            assertThrows(IllegalArgumentException.class, () -> persistenceContext.removeEntity(entity));
         }
     }
 
