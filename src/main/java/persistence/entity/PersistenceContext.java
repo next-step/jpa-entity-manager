@@ -1,9 +1,15 @@
 package persistence.entity;
 
+import persistence.entity.entry.EntityEntryStatus;
+
 import java.util.List;
 
 public interface PersistenceContext {
     <T> T getEntity(Class<T> entityClass, Object id);
+
+    void addEntry(Object entityObject, EntityEntryStatus entryStatus);
+
+    void addEntry(Class<?> entityClass, Object id, EntityEntryStatus entryStatus);
 
     void addEntity(Object entityObject);
 

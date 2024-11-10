@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.entity.entry.EntityEntry;
+import persistence.entity.entry.EntityEntryStatus;
 import persistence.model.EntityPrimaryKey;
 
 import java.util.*;
@@ -7,6 +9,7 @@ import java.util.*;
 public class PersistenceContextImpl implements PersistenceContext {
     private final Map<EntityKey, Object> entityCache = new HashMap<>();
     private final Map<EntityKey, EntitySnapshot> entitySnapshots = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityEntries = new HashMap<>();
 
     @Override
     public <T> T getEntity(Class<T> entityClass, Object id) {
@@ -15,19 +18,28 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
+    public void addEntry(Class<?> entityClass, Object id, EntityEntryStatus entryStatus) {
+
+    }
+
+    @Override
+    public void addEntry(Object entityObject, EntityEntryStatus entryStatus) {
+
+    }
+
+    @Override
     public void addEntity(Object entityObject) {
         EntityKey entityKey = createEntityKey(entityObject);
-        EntitySnapshot snapshot = new EntitySnapshot(entityObject);
 
         entityCache.put(entityKey, entityObject);
-        entitySnapshots.put(entityKey, snapshot);
+        entitySnapshots.put(entityKey, new EntitySnapshot(entityObject));
     }
 
     @Override
     public void removeEntity(Object entityObject) {
-        EntityKey cacheKey = createEntityKey(entityObject);
-        entityCache.remove(cacheKey);
-        entitySnapshots.remove(cacheKey);
+        EntityKey entityKey = createEntityKey(entityObject);
+        entityCache.remove(entityKey);
+        entitySnapshots.remove(entityKey);
     }
 
     @Override
