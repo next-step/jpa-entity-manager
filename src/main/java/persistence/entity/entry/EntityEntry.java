@@ -23,6 +23,6 @@ public class EntityEntry {
     }
 
     public boolean isDeletable() {
-        return this.status == EntityEntryStatus.MANAGED || this.status == EntityEntryStatus.READ_ONLY;
+        return this.status == EntityEntryStatus.MANAGED;
     }
 }
