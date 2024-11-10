@@ -11,7 +11,18 @@ public class EntityEntry {
         return status;
     }
 
-    public void setStatus(EntityEntryStatus status) {
-        this.status = status;
+    public void setStatus(EntityEntryStatus newStatus) {
+        if (!status.isTransitiveTo(newStatus)) {
+            throw new IllegalStateException("INVALID STATUS TRANSITION FROM " + status + " TO " + newStatus);
+        }
+        status = newStatus;
+    }
+
+    public boolean isUpdatable() {
+        return this.status == EntityEntryStatus.MANAGED;
+    }
+
+    public boolean isDeletable() {
+        return this.status == EntityEntryStatus.MANAGED || this.status == EntityEntryStatus.READ_ONLY;
     }
 }

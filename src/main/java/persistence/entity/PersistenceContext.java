@@ -11,6 +11,8 @@ public interface PersistenceContext {
 
     void addEntry(Class<?> entityClass, Object id, EntityEntryStatus entryStatus);
 
+    void updateEntry(Object entityObject, EntityEntryStatus entryStatus);
+
     void addEntity(Object entityObject);
 
     void removeEntity(Object entityObject);

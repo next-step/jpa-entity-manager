@@ -38,16 +38,6 @@ public class PersistenceContextTest {
         }
 
         @Test
-        @DisplayName("엔티티의 클래스, id 객체가 주어졌는데 id가 null이라면 EntityEntry를 저장하지 않는다.")
-        void testAddNoEntryWithClassAndNullId() throws NoSuchFieldException, IllegalAccessException {
-            // when
-            persistenceContext.addEntry(PersonWithTransientAnnotation.class, null, EntityEntryStatus.LOADING);
-
-            // then
-            assertNull(getEntityEntry());
-        }
-
-        @Test
         @DisplayName("엔티티 객체를 통해 특정 상태의 EntityEntry를 저장한다.")
         void testAddEntryWithObject() throws NoSuchFieldException, IllegalAccessException {
             // when
@@ -71,16 +61,40 @@ public class PersistenceContextTest {
         }
 
         @Test
-        @DisplayName("이미 존재하는 entityEntry가 있으면 새로 덮어쓴다.")
-        void testUpdateEntryByAddEntry() throws NoSuchFieldException, IllegalAccessException {
+        @DisplayName("이미 존재하는 entityEntry가 있으면 에러를 내뱉는다.")
+        void testUpdateEntryByAddEntry() {
             // given
             persistenceContext.addEntry(entity, EntityEntryStatus.SAVING);
 
+            // when, then
+            assertThrows(IllegalArgumentException.class, () -> {
+                persistenceContext.addEntry(entity, EntityEntryStatus.MANAGED);
+            });
+        }
+    }
+
+    @Nested
+    @DisplayName("updateEntry 테스트")
+    class UpdateEntryTest {
+        @Test
+        @DisplayName("entry 상태를 업데이트한다.")
+        void succeedToUpdateEntry() throws NoSuchFieldException, IllegalAccessException {
+            // given
+            persistenceContext.addEntity(entity);
+
             // when
-            persistenceContext.addEntry(entity, EntityEntryStatus.MANAGED);
+            persistenceContext.updateEntry(entity, EntityEntryStatus.READ_ONLY);
 
             // then
-            assertEquals(EntityEntryStatus.MANAGED, getEntityEntry().getStatus());
+            assertEquals(EntityEntryStatus.READ_ONLY, getEntityEntry().getStatus());
+        }
+
+        @Test
+        @DisplayName("저장된 entry가 없다면 에러를 내뱉는다.")
+        void failToUpdateEntryNotExists() {
+            assertThrows(IllegalArgumentException.class, () -> {
+                persistenceContext.updateEntry(entity, EntityEntryStatus.MANAGED);
+            });
         }
     }
 
@@ -189,17 +203,12 @@ public class PersistenceContextTest {
         }
 
         @Test
-        @DisplayName("제거하려는 엔티티가 저장되어 있지 않다면, 제거를 시도해도 기존 영속 객체들엔 아무 영향도 끼치지 않는다.")
+        @DisplayName("제거하려는 엔티티가 저장되어 있지 않다면, 에러를 반환한다.")
         void testRemoveEntityNoAffect() {
-            // given
-            persistenceContext.addEntity(entity);
-            Object beforeRemoveEntity = persistenceContext.getEntity(PersonWithTransientAnnotation.class, 1L);
-
-            // when
-            persistenceContext.removeEntity(new PersonWithTransientAnnotation("person2@test.com"));
-
-            // then
-            assertNotNull(beforeRemoveEntity);
+            // when, then
+            assertThrows(IllegalArgumentException.class, () -> {
+                persistenceContext.removeEntity(new PersonWithTransientAnnotation("person2@test.com"));
+            });
         }
 
         @Test
@@ -226,6 +235,17 @@ public class PersistenceContextTest {
 
             // then
             assertEquals(EntityEntryStatus.DELETED, getEntityEntry().getStatus());
+        }
+
+        @Test
+        @DisplayName("삭제 가능한 상태의 엔티티가 아니라면 에러를 내뱉는다.")
+        void failToRemoveEntityForInvalidTransition() {
+            // given
+            persistenceContext.addEntity(entity);
+            persistenceContext.updateEntry(entity, EntityEntryStatus.READ_ONLY);
+
+            // when
+            assertThrows(IllegalStateException.class, () -> persistenceContext.removeEntity(entity));
         }
     }
 
@@ -270,11 +290,11 @@ public class PersistenceContextTest {
         }
 
         @Test
-        @DisplayName("엔티티 엔트리 상태가 READ_ONLY라면 에러가 발생한다.")
+        @DisplayName("엔티티 엔트리가 업데이트 불가한 상태라면 에러가 발생한다.")
         void failToUpdateForReadOnlyStatus() {
             // given
             persistenceContext.addEntity(entity);
-            persistenceContext.addEntry(entity, EntityEntryStatus.READ_ONLY);
+            persistenceContext.updateEntry(entity, EntityEntryStatus.READ_ONLY);
 
             // when, then
             assertThrows(IllegalStateException.class, () -> persistenceContext.updateEntity(entity));

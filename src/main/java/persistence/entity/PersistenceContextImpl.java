@@ -19,12 +19,31 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void addEntry(Class<?> entityClass, Object id, EntityEntryStatus entryStatus) {
-
+        EntityKey entityKey = createEntityKey(entityClass, id);
+        if (entityEntries.containsKey(entityKey)) {
+            throw new IllegalArgumentException("ENTITY_ENTRY ALREADY ADDED");
+        }
+        entityEntries.put(entityKey, new EntityEntry(entryStatus));
     }
 
     @Override
     public void addEntry(Object entityObject, EntityEntryStatus entryStatus) {
+        EntityKey entityKey = createEntityKey(entityObject);
+        if (entityEntries.containsKey(entityKey)) {
+            throw new IllegalArgumentException("ENTITY_ENTRY ALREADY ADDED");
+        }
+        if (entityKey.isValid()) { // XXX: entityKey inValid한 경우 로그로 info 처리하면 좋을 듯 하다
+            entityEntries.put(entityKey, new EntityEntry(entryStatus));
+        }
+    }
 
+    @Override
+    public void updateEntry(Object entityObject, EntityEntryStatus entryStatus) {
+        EntityKey entityKey = createEntityKey(entityObject);
+        if (!entityEntries.containsKey(entityKey)) {
+            throw new IllegalArgumentException("ENTITY_ENTRY NOT EXISTS");
+        }
+        entityEntries.get(entityKey).setStatus(entryStatus);
     }
 
     @Override
@@ -33,21 +52,39 @@ public class PersistenceContextImpl implements PersistenceContext {
 
         entityCache.put(entityKey, entityObject);
         entitySnapshots.put(entityKey, new EntitySnapshot(entityObject));
+        if (entityEntries.containsKey(entityKey)) {
+            updateEntry(entityObject, EntityEntryStatus.MANAGED);
+            return;
+        }
+        addEntry(entityObject, EntityEntryStatus.MANAGED);
     }
 
     @Override
     public void removeEntity(Object entityObject) {
         EntityKey entityKey = createEntityKey(entityObject);
+        if (!entityCache.containsKey(entityKey)) {
+            throw new IllegalArgumentException("ENTITY NOT EXISTS");
+        }
+
+        EntityEntry entityEntry = entityEntries.get(entityKey);
+        if (!entityEntry.isDeletable()) {
+            throw new IllegalStateException("UNABLE TO DELETE ENTITY FOR ENTRY STATUS : " + entityEntry.getStatus());
+        }
         entityCache.remove(entityKey);
         entitySnapshots.remove(entityKey);
+        updateEntry(entityObject, EntityEntryStatus.DELETED);
     }
 
     @Override
     public void updateEntity(Object entityObject) {
         EntityKey entityKey = createEntityKey(entityObject);
-
         if (!entityCache.containsKey(entityKey)) {
             throw new IllegalArgumentException("ENTITY NOT EXISTS");
+        }
+
+        EntityEntry entityEntry = entityEntries.get(entityKey);
+        if (!entityEntry.isUpdatable()) {
+            throw new IllegalStateException("UNABLE TO UPDATE ENTITY FOR ENTRY STATUS : " + entityEntry.getStatus());
         }
 
         EntitySnapshot snapshot = entitySnapshots.get(entityKey);
