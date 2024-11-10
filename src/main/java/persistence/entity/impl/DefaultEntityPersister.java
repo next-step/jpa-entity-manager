@@ -1,6 +1,8 @@
 package persistence.entity.impl;
 
+import java.lang.reflect.Field;
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityId;
 import persistence.entity.EntityPersister;
 import persistence.sql.dml.query.DeleteQuery;
 import persistence.sql.dml.query.InsertQuery;
@@ -18,13 +20,15 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> void insert(T entity) {
+    public <T> Object insert(T entity) {
         InsertQuery query = new InsertQuery(entity);
         String queryString = InsertQueryBuilder.builder()
                 .insert(query.tableName(), query.columns())
                 .values(query.columns())
                 .build();
-        jdbcTemplate.execute(queryString);
+        Long primaryKey = jdbcTemplate.insertAndGetPrimaryKey(queryString);
+        updateEntityId(entity, primaryKey);
+        return entity;
     }
 
     @Override
@@ -44,6 +48,16 @@ public class DefaultEntityPersister implements EntityPersister {
                 .delete(query.tableName())
                 .build();
         jdbcTemplate.execute(queryString);
+    }
+
+    private <T> void updateEntityId(T entity, Long id) {
+        Field idField = EntityId.getIdField(entity);
+        idField.setAccessible(true);
+        try {
+            idField.set(entity, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

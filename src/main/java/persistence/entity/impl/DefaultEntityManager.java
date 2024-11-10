@@ -53,14 +53,14 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        context.addEntity(entity, EntityStatus.MANAGED);
         persister.insert(entity);
+        context.addEntity(entity, EntityStatus.SAVING);
     }
 
     @Override
     public void remove(Object entity) {
-        context.removeEntity(entity);
         persister.delete(entity);
+        context.removeEntity(entity);
     }
 
     @Override
