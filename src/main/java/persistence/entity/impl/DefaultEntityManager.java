@@ -1,5 +1,6 @@
 package persistence.entity.impl;
 
+import static persistence.entity.EntityStatus.DELETED;
 import static persistence.entity.EntityStatus.LOADING;
 import static persistence.entity.EntityStatus.MANAGED;
 
@@ -38,7 +39,7 @@ public class DefaultEntityManager implements EntityManager {
     private <T> T loadEntity(Class<T> clazz, Object id) {
         T loadEntity = loader.load(clazz, id);
 
-        EntityEntry entry = context.addEntry(loadEntity, LOADING);
+        EntityEntry entry = context.addEntityEntry(loadEntity, LOADING);
         context.addEntity(loadEntity);
         context.addDatabaseSnapshot(loadEntity);
 
@@ -52,12 +53,12 @@ public class DefaultEntityManager implements EntityManager {
         context.addEntity(entity);
 
         Object saveEntity = persister.insert(entity);
-        context.addEntry(saveEntity, MANAGED);
+        context.addEntityEntry(saveEntity, MANAGED);
     }
 
     @Override
     public void remove(Object entity) {
-        context.removeEntity(entity);
+        context.updateEntityEntry(entity, DELETED);
         persister.delete(entity);
     }
 
