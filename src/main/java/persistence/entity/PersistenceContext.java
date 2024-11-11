@@ -19,6 +19,6 @@ public interface PersistenceContext {
 
     Object getDatabaseSnapshot(Object entity);
 
-    void reset();
+    void promotePendingToPersistent(Object entity) throws IllegalAccessException;
 
 }

@@ -64,10 +64,10 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void reset() {
-        pendingEntities.clear();
-        persistedEntities.clear();
-        databaseSnapshots.clear();
+    public void promotePendingToPersistent(Object entity) {
+        pendingEntities.removeEntity(entity);
+        long id = new LongTypeId(entity).getId();
+        persistedEntities.persistEntity(new EntityKey(id, entity.getClass().getName()), entity);
     }
 
     private EntityKey getEntityKey(Object entity) {
@@ -76,5 +76,7 @@ public class PersistenceContextImpl implements PersistenceContext {
             entity.getClass().getName()
         );
     }
+
+
 
 }

@@ -49,15 +49,17 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void flush() throws IllegalAccessException {
         for (Object entity : persistenceContext.getPendingEntities()) {
-            entityPersister.insert(entity);
+            Object entityWithId = entityPersister.insert(entity);
+            persistenceContext.captureDatabaseSnapshot(entityWithId);
+            persistenceContext.promotePendingToPersistent(entityWithId);
         }
         for (Object entity : persistenceContext.getPersistedEntities()) {
             List<String> changedColumns = dirtyCheck.findDirtyColumns(entity);
             if (!changedColumns.isEmpty()) {
                 entityPersister.update(entity, changedColumns);
+                persistenceContext.captureDatabaseSnapshot(entity);
             }
         }
-        persistenceContext.reset();
     }
 
     @Override
