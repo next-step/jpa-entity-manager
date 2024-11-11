@@ -53,18 +53,17 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public EntityEntry addEntityEntry(Object entity, EntityStatus status) {
+    public void addEntityEntry(Object entity, EntityStatus status) {
         EntityKey key = new EntityKey(entity);
 
         if (entries.containsKey(key)) {
             EntityEntry entry = entries.get(key);
             entry.updateStatus(status);
-            return entry;
+            return;
         }
 
         EntityEntry entry = new EntityEntry(key, status);
         entries.put(key, entry);
-        return entry;
     }
 
     @Override
