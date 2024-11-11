@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,10 @@ public class EntityPersister {
             .update(entity, changedColumns);
     }
 
-    public void insert(Object entity) throws IllegalAccessException {
-        getEntityQueryHandler(entity.getClass())
+    public Object insert(Object entity) throws IllegalAccessException {
+        long id = getEntityQueryHandler(entity.getClass())
             .insert(entity);
+        return setId(entity, id);
     }
 
     private EntityQueryHandler<?> getEntityQueryHandler(Class<?> entityClass) {
@@ -35,6 +37,17 @@ public class EntityPersister {
             entityQueryHandlerMap.put(entityClass, new EntityQueryHandler<>(entityClass, jdbcTemplate));
         }
         return entityQueryHandlerMap.get(entityClass);
+    }
+
+    private Object setId(Object entity, long id) throws IllegalAccessException {
+        try {
+            Field idField = entity.getClass().getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(entity, id);
+            return entity;
+        } catch (NoSuchFieldException e) {
+            throw new IllegalStateException("Entity does not have an 'id' field", e);
+        }
     }
 
 }

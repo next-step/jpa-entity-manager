@@ -41,10 +41,10 @@ public class EntityQueryHandler<T> {
         jdbcTemplate.execute(sql);
     }
 
-    public void insert(Object entity) throws IllegalAccessException {
+    public long insert(Object entity) throws IllegalAccessException {
         InsertQuery insertQuery = sqlQueries.getSqlQuery(INSERT);
         String sql = insertQuery.generateQuery(entity);
-        jdbcTemplate.execute(sql);
+        return jdbcTemplate.executeAndReturnGeneratedKey(sql);
     }
 
     public void delete(Object entity) {
