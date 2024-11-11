@@ -66,10 +66,10 @@ class DefaultEntityManagerTest {
     @Test
     @DisplayName("[성공] Person Entity 삭제")
     void remove() throws SQLException {
-        Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
-        insert(person, new JdbcTemplate(server.getConnection()));
-
         EntityManager entityManager = new DefaultEntityManager(server.getConnection());
+        Person person = new Person("hellonayeon", 20, "hellonayeon@abc.com");
+        entityManager.persist(person);
+
         assertDoesNotThrow(() -> entityManager.remove(person));
     }
 
