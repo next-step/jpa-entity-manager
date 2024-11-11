@@ -59,9 +59,7 @@ public class CustomJpaRepositoryTest {
         em.persist(person);
         em.flush();
 
-        Person personOne = em.find(Person.class, 1L);
-        personOne.setName("Jane");
-
+        person.setName("Jane");
         em.getTransaction().commit();
 
         Person updatedPerson = em.find(Person.class, 1L);
@@ -84,9 +82,7 @@ public class CustomJpaRepositoryTest {
         em.persist(person);
         em.flush();
 
-        Person personOne = em.find(Person.class, 1L);
-        personOne.setAge(null);
-
+        person.setAge(null);
         em.getTransaction().commit();
 
         Person updatedPerson = em.find(Person.class, 1L);

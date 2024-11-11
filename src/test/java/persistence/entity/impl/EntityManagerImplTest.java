@@ -2,6 +2,7 @@ package persistence.entity.impl;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import database.DatabaseServer;
 import database.H2;
@@ -47,7 +48,7 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("find 구현해보기")
-    void findTest() throws SQLException, IllegalAccessException {
+    void findTest() throws SQLException {
         EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
         EntityManager em = entityManagerFactory.createEntityManager();
 
@@ -58,9 +59,7 @@ class EntityManagerImplTest {
             .age(20)
             .email("john@naver.com")
             .build();
-
         em.persist(person);
-        em.flush();
 
         em.getTransaction().commit();
 
@@ -74,7 +73,7 @@ class EntityManagerImplTest {
 
     @Test
     @DisplayName("remove 구현해보기")
-    void removeTest() throws SQLException, IllegalAccessException {
+    void removeTest() throws SQLException {
         EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
         EntityManager em = entityManagerFactory.createEntityManager();
 
@@ -85,16 +84,35 @@ class EntityManagerImplTest {
             .age(20)
             .email("john@naver.com")
             .build();
-
         em.persist(person);
+
         em.remove(person);
-        em.flush();
 
         em.getTransaction().commit();
 
         assertThatThrownBy(() -> em.find(Person.class, 1L))
             .isInstanceOf(RuntimeException.class)
             .hasMessageContaining("Expected 1 result, got 0");
+    }
+
+    @Test
+    @DisplayName("flush 이후 entity id 조회 가능 여부 테스트")
+    void flushAndFindId() throws SQLException, IllegalAccessException {
+        EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        Person person = Person.builder()
+            .name("John")
+            .age(20)
+            .email("john@naver.com")
+            .build();
+
+        assertNull(person.getId());
+
+        em.persist(person);
+        em.flush();
+
+        assertEquals(1L, person.getId());
     }
 
     @Test
@@ -113,14 +131,13 @@ class EntityManagerImplTest {
         em.persist(person);
         em.flush();
 
-        Person personOne = em.find(Person.class, 1L);
-        personOne.setName("Jane");
-        em.flush();
-
+        person.setName("Jane");
+        person.setAge(30);
         em.getTransaction().commit();
 
         Person updatedPerson = em.find(Person.class, 1L);
         assertEquals("Jane", updatedPerson.getName());
+        assertEquals(30, updatedPerson.getAge());
     }
 
     @AfterEach
