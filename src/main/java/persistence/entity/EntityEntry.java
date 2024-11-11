@@ -4,12 +4,14 @@ public class EntityEntry {
 
     EntityKey key;
     EntityStatus status;
-    EntitySnapshot snapshot;
 
-    public EntityEntry(EntityKey key, EntityStatus status, EntitySnapshot snapshot) {
+    public EntityEntry(EntityKey key, EntityStatus status) {
         this.key = key;
         this.status = status;
-        this.snapshot = snapshot;
+    }
+
+    public void updateStatus(EntityStatus status) {
+        this.status = status;
     }
 
 }

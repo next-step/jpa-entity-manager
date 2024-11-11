@@ -1,8 +1,12 @@
 package persistence.entity.impl;
 
+import static persistence.entity.EntityStatus.LOADING;
+import static persistence.entity.EntityStatus.MANAGED;
+
 import java.sql.Connection;
 import java.util.Optional;
 import jdbc.JdbcTemplate;
+import persistence.entity.EntityEntry;
 import persistence.entity.EntityId;
 import persistence.entity.EntityLoader;
 import persistence.entity.EntityManager;
@@ -33,8 +37,13 @@ public class DefaultEntityManager implements EntityManager {
 
     private <T> T loadEntity(Class<T> clazz, Object id) {
         T loadEntity = loader.load(clazz, id);
+
+        EntityEntry entry = context.addEntry(loadEntity, LOADING);
         context.addEntity(loadEntity);
-        context.addDatabaseSnapshot(id, loadEntity);
+        context.addDatabaseSnapshot(loadEntity);
+
+        entry.updateStatus(MANAGED);
+
         return loadEntity;
     }
 
