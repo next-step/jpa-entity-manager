@@ -56,8 +56,8 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        context.updateEntityEntry(entity, DELETED);
         persister.delete(entity);
+        context.updateEntityEntry(entity, DELETED);
     }
 
     @Override
