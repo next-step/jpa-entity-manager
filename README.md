@@ -21,6 +21,9 @@
 - [ ] EntityLoader
   - [ ] load
 - [ ] EntityStatus
+  - Entity 조회: Query -> LOADING status -> 1차 캐싱 & 스냅샷 저장 -> MANAGED status
+  - Entity 저장: Query -> MANAGED status
+  - Entity 삭제: Query -> DELETE status
 - [ ] EntityEntry
   - [ ] Entity 상태 관리
   - [ ] EntitySnapshot 관리
