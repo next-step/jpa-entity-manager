@@ -1,16 +1,14 @@
 package persistence.entity.impl;
 
 import java.sql.Connection;
-import java.text.MessageFormat;
+import java.util.Optional;
 import jdbc.JdbcTemplate;
-import persistence.entity.EntityEntry;
 import persistence.entity.EntityId;
 import persistence.entity.EntityLoader;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityPersister;
-import persistence.entity.EntityStatus;
+import persistence.entity.EntitySnapshot;
 import persistence.entity.PersistenceContext;
-import persistence.exception.NotExistException;
 
 public class DefaultEntityManager implements EntityManager {
 
@@ -28,32 +26,21 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Object id) {
-        EntityEntry entry = context.getEntity(id, clazz);
-        if (entry == null) {
-            return loadEntity(clazz, id);
-        }
+        Optional<T> entity = context.getEntity(id, clazz);
+        return entity.orElseGet(() -> loadEntity(clazz, id));
 
-        Object entity = entry.entity();
-        if (entity == null) {
-            throw new NotExistException(MessageFormat.format("Entity id: {0}, type: {1}", id, clazz.getSimpleName()));
-        }
-        return clazz.cast(entity);
     }
 
     private <T> T loadEntity(Class<T> clazz, Object id) {
-        EntityEntry entry = context.addLoadingEntity(id, clazz);
-
         T loadEntity = loader.load(clazz, id);
-        entry.updateEntity(loadEntity);
-        entry.updateStatus(EntityStatus.MANAGED);
-        entry.createSnapshot(loadEntity);
-
+        context.addEntity(loadEntity);
+        context.addDatabaseSnapshot(id, loadEntity);
         return loadEntity;
     }
 
     @Override
     public void persist(Object entity) {
-        context.addEntity(entity, EntityStatus.MANAGED);
+        context.addEntity(entity);
         persister.insert(entity);
     }
 
@@ -67,12 +54,12 @@ public class DefaultEntityManager implements EntityManager {
     public <T> T merge(T entity) {
         Class<?> entityType = entity.getClass();
         EntityId entityId = new EntityId(entity, entityType);
-        EntityEntry entry = context.getEntity(entityId.id(), entityType);
+        EntitySnapshot snapshot = context.getDatabaseSnapshot(entityId.id(), entityType);
 
-        if (entry.isDirty(entity)) {
-            entry.updateEntity(entity);
+        if (snapshot.hasDifferenceWith(entity)) {
             persister.update(entity);
-            entry.updateSnapshot(entity);
+            context.removeEntity(entity);
+            context.addEntity(entity);
         }
 
         return entity;

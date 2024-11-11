@@ -1,61 +1,48 @@
 package persistence.entity.impl;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import persistence.entity.EntityEntry;
+import java.util.Optional;
 import persistence.entity.EntityKey;
-import persistence.entity.EntityStatus;
+import persistence.entity.EntitySnapshot;
 import persistence.entity.PersistenceContext;
-import persistence.exception.NotExistException;
 
 public class DefaultPersistenceContext implements PersistenceContext {
 
-    private final Map<EntityKey, EntityEntry> context = new HashMap<>();
+    private final Map<EntityKey, Object> context = new HashMap<>();
+    private final Map<EntityKey, EntitySnapshot> snapshots = new HashMap<>();
 
     @Override
-    public <T, ID> EntityEntry getEntity(ID id, Class<T> entityType) {
+    public <T, ID> Optional<T> getEntity(ID id, Class<T> entityType) {
         EntityKey key = new EntityKey(id, entityType);
-        EntityEntry entry = context.get(key);
-        validateEntryExist(key, entry);
-        return entry;
+        return Optional.ofNullable(entityType.cast(context.get(key)));
     }
 
     @Override
-    public <T> void addEntity(T entity, EntityStatus status) {
+    public void addEntity(Object entity) {
         EntityKey key = new EntityKey(entity);
         if (context.containsKey(key)) {
             return;
         }
-        context.put(key, new EntityEntry(key, status, entity));
-    }
-
-    @Override
-    public <T, ID> EntityEntry addLoadingEntity(ID id, Class<T> entityType) {
-        EntityKey key = new EntityKey(id, entityType);
-        if (context.containsKey(key)) {
-            return context.get(key);
-        }
-
-        EntityEntry entry = EntityEntry.newLoadingEntity(key);
-        context.put(key, entry);
-
-        return entry;
+        context.put(key, entity);
     }
 
     @Override
     public void removeEntity(Object entity) {
         EntityKey key = new EntityKey(entity);
-        EntityEntry entry = context.get(key);
-        validateEntryExist(key, entry);
-        entry.updateStatus(EntityStatus.DELETED);
         context.remove(key);
     }
 
-    private void validateEntryExist(EntityKey key, EntityEntry entry) {
-        if (entry == null) {
-            throw new NotExistException(MessageFormat.format("EntityEntry EntityKey: {0}, EntityType: {1}", key.key(), key.entityType()));
-        }
+    @Override
+    public <ID> void addDatabaseSnapshot(ID id, Object snapshot) {
+        EntityKey key = new EntityKey(id, snapshot.getClass());
+        snapshots.put(key, new EntitySnapshot(snapshot));
+    }
+
+    @Override
+    public <T, ID> EntitySnapshot getDatabaseSnapshot(ID id, Class<T> entityType) {
+        EntityKey key = new EntityKey(id, entityType);
+        return snapshots.get(key);
     }
 
 }
