@@ -3,7 +3,6 @@ package persistence.entity.impl;
 import static persistence.entity.EntityStatus.LOADING;
 import static persistence.entity.EntityStatus.MANAGED;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.Optional;
 import jdbc.JdbcTemplate;
@@ -52,9 +51,8 @@ public class DefaultEntityManager implements EntityManager {
     public void persist(Object entity) {
         context.addEntity(entity);
 
-        Object id = persister.insert(entity);
-        updateEntityId(entity, id);
-        context.addEntry(entity, MANAGED);
+        Object saveEntity = persister.insert(entity);
+        context.addEntry(saveEntity, MANAGED);
     }
 
     @Override
@@ -76,16 +74,6 @@ public class DefaultEntityManager implements EntityManager {
         }
 
         return entity;
-    }
-
-    private <T> void updateEntityId(T entity, Object id) {
-        Field idField = EntityId.getIdField(entity);
-        idField.setAccessible(true);
-        try {
-            idField.set(entity, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }
