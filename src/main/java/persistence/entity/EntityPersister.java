@@ -32,6 +32,11 @@ public class EntityPersister {
         return setId(entity, id);
     }
 
+    public void delete(Object entity) {
+        getEntityQueryHandler(entity.getClass())
+            .delete(entity);
+    }
+
     private EntityQueryHandler<?> getEntityQueryHandler(Class<?> entityClass) {
         if (!entityQueryHandlerMap.containsKey(entityClass)) {
             entityQueryHandlerMap.put(entityClass, new EntityQueryHandler<>(entityClass, jdbcTemplate));

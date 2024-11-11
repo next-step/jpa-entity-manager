@@ -1,8 +1,6 @@
 package persistence.entity.impl;
 
-import java.util.Collection;
-import java.util.Set;
-import persistence.entity.DatabaseSnapshots;
+import java.util.List;
 import persistence.entity.EntityKey;
 import persistence.entity.LongTypeId;
 import persistence.entity.PendingEntities;
@@ -13,12 +11,10 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     private final PersistedEntities persistedEntities;
     private final PendingEntities pendingEntities;
-    private final DatabaseSnapshots databaseSnapshots;
 
     public PersistenceContextImpl() {
         persistedEntities = new PersistedEntities();
         pendingEntities = new PendingEntities();
-        databaseSnapshots = new DatabaseSnapshots();
     }
 
     @Override
@@ -29,7 +25,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
 
     @Override
-    public void attachEntity(Object entity)  {
+    public void addEntity(Object entity)  {
         if (new LongTypeId(entity).isEntityIdNull()) {
             pendingEntities.persistEntity(entity);
             return;
@@ -38,34 +34,45 @@ public class PersistenceContextImpl implements PersistenceContext {
     }
 
     @Override
-    public void detachEntity(Object entity) {
-        pendingEntities.removeEntity(entity);
-        persistedEntities.removeEntity(getEntityKey(entity));
+    public void removeEntity(Object entity) {
+        pendingEntities.evict(entity);
+        persistedEntities.changeToDeleteState(getEntityKey(entity));
     }
 
     @Override
-    public Set<Object> getPendingEntities() {
+    public void detachEntity(Object entity) {
+        persistedEntities.evict(entity);
+    }
+
+    @Override
+    public List<Object> getSavingEntities() {
         return pendingEntities.getEntities();
     }
 
     @Override
-    public Collection<Object> getPersistedEntities() {
-        return persistedEntities.getEntities();
+    public List<Object> getDeletedEntities() {
+        return persistedEntities.getDeletedEntities();
     }
 
     @Override
-    public void captureDatabaseSnapshot(Object entity) {
-        databaseSnapshots.addDatabaseSnapshot(entity);
+    public List<Object> getManagedEntities() {
+        return persistedEntities.getManagedEntities();
     }
 
     @Override
-    public Object getDatabaseSnapshot(Object entity) {
-        return databaseSnapshots.getDatabaseSnapshot(entity);
+    public List<String> findDirtyColumns(Object entity) throws IllegalAccessException {
+        return persistedEntities.findDirtyColumns(entity);
     }
 
     @Override
-    public void promotePendingToPersistent(Object entity) {
-        pendingEntities.removeEntity(entity);
+    public void updateDatabaseSnapshot(Object entity) {
+        persistedEntities.updateDatabaseSnapshot(entity);
+    }
+
+
+    @Override
+    public void mangeEntity(Object entity) {
+        pendingEntities.evict(entity);
         long id = new LongTypeId(entity).getId();
         persistedEntities.persistEntity(new EntityKey(id, entity.getClass().getName()), entity);
     }
@@ -76,7 +83,6 @@ public class PersistenceContextImpl implements PersistenceContext {
             entity.getClass().getName()
         );
     }
-
 
 
 }

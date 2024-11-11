@@ -87,7 +87,32 @@ class EntityManagerImplTest {
         em.persist(person);
 
         em.remove(person);
+        em.getTransaction().commit();
 
+        assertThatThrownBy(() -> em.find(Person.class, 1L))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("Expected 1 result, got 0");
+    }
+
+    @Test
+    @DisplayName("managed entity 삭제 테스트")
+    void removeManagedEntityTest() throws SQLException {
+        EntityManagerFactory entityManagerFactory = new EntityManagerFactoryImpl(server);
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        em.getTransaction().beginTransaction();
+
+        Person person = Person.builder()
+            .name("John")
+            .age(20)
+            .email("john@naver.com")
+            .build();
+        em.persist(person);
+
+        em.getTransaction().commit();
+
+        em.getTransaction().beginTransaction();
+        em.remove(person);
         em.getTransaction().commit();
 
         assertThatThrownBy(() -> em.find(Person.class, 1L))

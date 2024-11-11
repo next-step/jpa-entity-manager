@@ -1,26 +1,27 @@
 package persistence.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PendingEntities {
 
-    private final Set<Object> pendingEntities = new HashSet<>();
+    private final Map<Integer, EntityEntry> entityEntries = new HashMap<>();
 
     public void persistEntity(Object entity) {
-        pendingEntities.add(entity);
+        entityEntries.put(getKey(entity), new EntityEntry(entity, Status.SAVING));
     }
 
-    public Set<Object> getEntities() {
-        return pendingEntities;
+    public List<Object> getEntities() {
+        return entityEntries.values().stream().map(EntityEntry::getEntity).toList();
     }
 
-    public void removeEntity(Object entity) {
-        pendingEntities.remove(entity);
+    public void evict(Object entity) {
+        entityEntries.remove(getKey(entity));
     }
 
-    public void clear() {
-        pendingEntities.clear();
+    private int getKey(Object entity) {
+        return System.identityHashCode(entity);
     }
 
 }

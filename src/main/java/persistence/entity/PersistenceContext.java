@@ -1,24 +1,27 @@
 package persistence.entity;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 public interface PersistenceContext {
 
     <T> T getEntity(Class<T> entityClass, Object primaryKey);
 
-    void attachEntity(Object entity);
+    void addEntity(Object entity);
+
+    void removeEntity(Object entity);
 
     void detachEntity(Object entity);
 
-    Set<Object> getPendingEntities();
+    List<Object> getSavingEntities();
 
-    Collection<Object> getPersistedEntities();
+    List<Object> getDeletedEntities();
 
-    void captureDatabaseSnapshot(Object entity);
+    List<Object> getManagedEntities();
 
-    Object getDatabaseSnapshot(Object entity);
+    List<String> findDirtyColumns(Object entity) throws IllegalAccessException;
 
-    void promotePendingToPersistent(Object entity) throws IllegalAccessException;
+    void updateDatabaseSnapshot(Object entity);
+
+    void mangeEntity(Object entity) throws IllegalAccessException;
 
 }
