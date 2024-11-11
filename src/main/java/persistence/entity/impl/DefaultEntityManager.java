@@ -8,11 +8,9 @@ import java.sql.Connection;
 import java.util.Optional;
 import jdbc.JdbcTemplate;
 import persistence.entity.EntityEntry;
-import persistence.entity.EntityId;
 import persistence.entity.EntityLoader;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityPersister;
-import persistence.entity.EntitySnapshot;
 import persistence.entity.PersistenceContext;
 
 public class DefaultEntityManager implements EntityManager {
@@ -64,16 +62,11 @@ public class DefaultEntityManager implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
-        Class<?> entityType = entity.getClass();
-        EntityId entityId = new EntityId(entity, entityType);
-        EntitySnapshot snapshot = context.getDatabaseSnapshot(entityId.id(), entityType);
-
-        if (snapshot.hasDifferenceWith(entity)) {
+        if (context.isDirty(entity)) {
             persister.update(entity);
             context.removeEntity(entity);
             context.addEntity(entity);
         }
-
         return entity;
     }
 

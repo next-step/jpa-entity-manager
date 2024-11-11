@@ -12,10 +12,12 @@ public interface PersistenceContext {
 
     void addDatabaseSnapshot(Object entity);
 
-    <T, ID> EntitySnapshot getDatabaseSnapshot(ID id, Class<T> entityType);
+    <T> EntitySnapshot getDatabaseSnapshot(T entity);
 
     EntityEntry addEntityEntry(Object entity, EntityStatus status);
 
     void updateEntityEntry(Object entity, EntityStatus status);
+
+    <T> boolean isDirty(T entity);
 
 }

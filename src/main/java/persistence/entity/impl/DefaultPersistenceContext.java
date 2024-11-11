@@ -45,19 +45,9 @@ public class DefaultPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public <T, ID> EntitySnapshot getDatabaseSnapshot(ID id, Class<T> entityType) {
-        EntityKey key = new EntityKey(id, entityType);
+    public <T> EntitySnapshot getDatabaseSnapshot(T entity) {
+        EntityKey key = new EntityKey(entity);
         return snapshots.get(key);
-    }
-
-    @Override
-    public <T, ID> EntityEntry getEntry(ID id, Class<T> entityType) {
-        EntityKey key = new EntityKey(id, entityType);
-        EntityEntry entry = entries.get(key);
-        if (entry == null) {
-            throw new NotExistException(MessageFormat.format("EntityEntry id: {0}, type: {1}", id, entityType.getSimpleName()));
-        }
-        return entry;
     }
 
     @Override
@@ -76,6 +66,12 @@ public class DefaultPersistenceContext implements PersistenceContext {
             throw new NotExistException(MessageFormat.format("EntityEntry id: {0}, type: {1}", key.key(), entity.getClass().getSimpleName()));
         }
         entry.updateStatus(status);
+    }
+
+    @Override
+    public <T> boolean isDirty(T entity) {
+        EntitySnapshot snapshot = getDatabaseSnapshot(entity);
+        return snapshot.hasDifferenceWith(entity);
     }
 
 }
