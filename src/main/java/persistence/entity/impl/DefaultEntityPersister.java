@@ -18,13 +18,13 @@ public class DefaultEntityPersister implements EntityPersister {
     }
 
     @Override
-    public <T> void insert(T entity) {
+    public <T> Object insert(T entity) {
         InsertQuery query = new InsertQuery(entity);
         String queryString = InsertQueryBuilder.builder()
                 .insert(query.tableName(), query.columns())
                 .values(query.columns())
                 .build();
-        jdbcTemplate.execute(queryString);
+        return jdbcTemplate.insertAndGetPrimaryKey(queryString);
     }
 
     @Override
