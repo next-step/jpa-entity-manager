@@ -31,7 +31,6 @@ public class DefaultEntityManager implements EntityManager {
     public <T> T find(Class<T> clazz, Object id) {
         Optional<T> entity = context.getEntity(id, clazz);
         return entity.orElseGet(() -> loadEntity(clazz, id));
-
     }
 
     private <T> T loadEntity(Class<T> clazz, Object id) {

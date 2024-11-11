@@ -27,6 +27,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
     public void addEntity(Object entity) {
         EntityKey key = new EntityKey(entity);
         if (context.containsKey(key)) {
+            context.remove(key);
+            context.put(key, entity);
             return;
         }
         context.put(key, entity);
@@ -53,6 +55,13 @@ public class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public EntityEntry addEntityEntry(Object entity, EntityStatus status) {
         EntityKey key = new EntityKey(entity);
+
+        if (entries.containsKey(key)) {
+            EntityEntry entry = entries.get(key);
+            entry.updateStatus(status);
+            return entry;
+        }
+
         EntityEntry entry = new EntityEntry(key, status);
         entries.put(key, entry);
         return entry;
