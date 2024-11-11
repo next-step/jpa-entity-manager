@@ -5,14 +5,14 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import persistence.exception.NotExistException;
 
-public record EntityId(Object id) {
+public class EntityId {
 
-    public EntityId(Object entity, Class<?> entityType) {
-        this(getIdValue(entity, entityType));
+    private EntityId() {
+
     }
 
-    private static Object getIdValue(Object entity, Class<?> entityType) {
-        Field[] fields = entityType.getDeclaredFields();
+    public static Object getIdValue(Object entity) {
+        Field[] fields = entity.getClass().getDeclaredFields();
         Field idField = Arrays.stream(fields)
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
