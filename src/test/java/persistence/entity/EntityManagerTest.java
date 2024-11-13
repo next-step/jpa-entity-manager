@@ -6,6 +6,8 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
+import persistence.entity.entry.EntityEntry;
+import persistence.entity.entry.EntityEntryStatus;
 import persistence.model.EntityPrimaryKey;
 import persistence.model.exception.ColumnInvalidException;
 import persistence.sql.ddl.DdlQueryBuilder;
@@ -16,6 +18,7 @@ import persistence.sql.dml.DmlQueryBuilder;
 import persistence.fixture.PersonWithTransientAnnotation;
 import persistence.util.ReflectionUtil;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -168,7 +171,7 @@ public class EntityManagerTest {
     class RemoveTest {
         @Test
         @DisplayName("주어진 엔티티를 디비에서 제거한다.")
-        void succeedToRemove() {
+        void succeedToRemoveFromDatabase() {
             // given
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test@test.com", 1
@@ -190,19 +193,49 @@ public class EntityManagerTest {
                     () -> assertNull(contextFound),
                     () -> assertFalse(isFoundInDatabase)
             );
+        }
 
+        @Test
+        @DisplayName("주어진 엔티티를 영속컨텍스트에서 제거하고 기존 엔티티 정보는 GONE 상태로 처리된다.")
+        void succeedToRemoveFromContext() {
+            // given
+            PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
+                    1L, "홍길동", 20, "test@test.com", 1
+            );
+            entityManager.persist(person);
+
+            // when
+            entityManager.remove(person);
+
+            // then
+            assertAll(
+                    () -> assertFalse(persistenceContext.isEntityExists(person)),
+                    () -> assertEquals(EntityEntryStatus.GONE, getEntityEntry(person).getStatus())
+            );
         }
 
         @Test
         @DisplayName("PK가 없는 객체를 제거하려 하면 에러가 발생한다.")
-        void failToRemove() {
+        void failToRemoveForIdNotExists() {
             PersonWithTransientAnnotation person = new PersonWithTransientAnnotation(
                     "홍길동", 20, "test@test.com", 1
             );
 
-            assertThrows(ColumnInvalidException.class, () -> {
+            assertThrows(IllegalArgumentException.class, () -> {
                 entityManager.remove(person);
             });
+        }
+
+        private EntityEntry getEntityEntry(Object entity) throws NoSuchFieldException, IllegalAccessException {
+            Field entityEntriesField = persistenceContext.getClass().getDeclaredField("entityEntries");
+            entityEntriesField.setAccessible(true);
+
+            @SuppressWarnings("unchecked")
+            Map<EntityKey, EntityEntry> entityEntries = (Map<EntityKey, EntityEntry>)
+                    entityEntriesField.get(persistenceContext);
+
+            EntityKey entityKey = new EntityKey(entity.getClass(), EntityPrimaryKey.build(entity));
+            return entityEntries.get(entityKey);
         }
     }
 
@@ -299,31 +332,32 @@ public class EntityManagerTest {
         @DisplayName("더티체크 처리된 엔티티에 대해 일괄 데이터베이이스 업데이트 처리한다.")
         void succeedToFlush() {
             // given
-            PersonWithTransientAnnotation toBeDirty1 = new PersonWithTransientAnnotation(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByEntityManager = new PersonWithTransientAnnotation(
                     1L, "홍길동", 20, "test1@test.com", 1
             );
-            PersonWithTransientAnnotation toBeDirty2 = new PersonWithTransientAnnotation(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByDatabase = new PersonWithTransientAnnotation(
                     2L, "둘리", 21, "test2@test.com", 2
             );
             PersonWithTransientAnnotation notToBeDirty = new PersonWithTransientAnnotation(
                     3L, "마이콜", 22, "test3@test.com", 3
             );
-            entityManager.persist(toBeDirty1);
-            entityPersister.insert(toBeDirty2);
-            toBeDirty1.setAge(30);
-            toBeDirty2.setAge(30);
-            entityManager.merge(toBeDirty1);
-            entityManager.merge(toBeDirty2);
+            entityManager.persist(fixtureToBeDirtyCreatedByEntityManager);
+            entityPersister.insert(fixtureToBeDirtyCreatedByDatabase);
+            fixtureToBeDirtyCreatedByEntityManager.setAge(30);
+            fixtureToBeDirtyCreatedByDatabase.setAge(30);
+
+            entityManager.merge(fixtureToBeDirtyCreatedByEntityManager);
+            entityManager.merge(fixtureToBeDirtyCreatedByDatabase);
             entityManager.merge(notToBeDirty);
 
             // when
             entityManager.flush();
 
             // then
-            PersonWithTransientAnnotation toBeDirty1Result = entityLoader.find(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByEntityManagerResult = entityLoader.find(
                     PersonWithTransientAnnotation.class, 1L
             );
-            PersonWithTransientAnnotation toBeDirty2Result = entityLoader.find(
+            PersonWithTransientAnnotation fixtureToBeDirtyCreatedByDatabaseResult = entityLoader.find(
                     PersonWithTransientAnnotation.class, 2L
             );
             PersonWithTransientAnnotation notToBeDirtyResult = entityLoader.find(
@@ -331,8 +365,8 @@ public class EntityManagerTest {
             );
 
             assertAll(
-                    () -> assertEquals(30, toBeDirty1Result.getAge()),
-                    () -> assertEquals(30, toBeDirty2Result.getAge()),
+                    () -> assertEquals(30, fixtureToBeDirtyCreatedByEntityManagerResult.getAge()),
+                    () -> assertEquals(30, fixtureToBeDirtyCreatedByDatabaseResult.getAge()),
                     () -> assertEquals(22, notToBeDirtyResult.getAge())
             );
         }

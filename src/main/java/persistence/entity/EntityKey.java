@@ -32,4 +32,8 @@ public class EntityKey {
     public int hashCode() {
         return Objects.hash(entityClass, pk);
     }
+
+    public boolean isValid() {
+        return pk.isValid();
+    }
 }
