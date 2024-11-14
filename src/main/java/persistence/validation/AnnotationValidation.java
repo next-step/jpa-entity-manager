@@ -1,4 +1,4 @@
-package common;
+package persistence.validation;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

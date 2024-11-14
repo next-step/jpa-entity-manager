@@ -13,6 +13,7 @@ public class H2QueryBuilderDML implements QueryBuilderDML {
     private final static String FIND_ALL_QUERY = "select %s from %s;";
     private final static String FIND_BY_ID_QUERY = "select %s from %s where %s;";
     private final static String DELETE_QUERY = "delete from %s where %s;";
+    private final static String AND_COMMA = ", ";
 
     @Override
     public String insert(Object object) {
@@ -57,7 +58,7 @@ public class H2QueryBuilderDML implements QueryBuilderDML {
         return this.getColumn(object.getClass(), object).stream()
                 .filter(tableColumnAttribute -> !tableColumnAttribute.isTransient())
                 .map(TableColumnAttribute::getColumnName)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(AND_COMMA));
     }
 
     private String generateInsertTableQuery(Object object) {
@@ -74,7 +75,7 @@ public class H2QueryBuilderDML implements QueryBuilderDML {
                 .filter(tableColumnAttribute -> !tableColumnAttribute.isTransient())
                 .filter(tableColumnAttribute -> !tableColumnAttribute.isAutoIncrement())
                 .map(TableColumnAttribute::getFieldValue)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(AND_COMMA));
     }
 
     private String columnsClause(Object object) {
@@ -83,7 +84,7 @@ public class H2QueryBuilderDML implements QueryBuilderDML {
                 .filter(tableColumnAttribute -> !tableColumnAttribute.isTransient())
                 .filter(tableColumnAttribute -> !tableColumnAttribute.isAutoIncrement())
                 .map(TableColumnAttribute::getColumnName)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(AND_COMMA));
     }
 
     private List<TableColumnAttribute> getColumn(Class<?> entityClass, Object object) {

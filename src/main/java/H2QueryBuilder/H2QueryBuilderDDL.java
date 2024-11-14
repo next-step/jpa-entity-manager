@@ -15,6 +15,7 @@ public class H2QueryBuilderDDL implements QueryBuilderDDL {
     private final static String PRIMARY_KEY = " PRIMARY KEY";
     private final static String NOT_NULL = " NOT NULL";
     private final static String AUTO_INCREMENT = " AUTO_INCREMENT";
+    private final static String AND_COMMA = ", ";
 
     @Override
     public String create(Class<?> entityClass) {
@@ -28,7 +29,7 @@ public class H2QueryBuilderDDL implements QueryBuilderDDL {
 
         String columnInfo = getColumn(entityClass).stream()
                 .map(this::generateColumnMeta)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(AND_COMMA));
 
         return String.format(CREATE_QUERY, new TableName(entityClass).getName(), columnInfo);
     }
