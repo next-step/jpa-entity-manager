@@ -50,7 +50,8 @@ public class DmlQueryBuilder {
     public String selectMaxId(final Class<?> clazz) {
         final String tableName = new TableName(clazz).value();
         final String idColumnName = new IdColumnName(clazz).getIdColumnName();
-        return SELECT_MAX_ID_TEMPLATE.formatted(idColumnName, tableName);
+        final String formatted = SELECT_MAX_ID_TEMPLATE.formatted(idColumnName, tableName);
+        return formatted;
     }
 
     public String select(final Class<?> clazz) {

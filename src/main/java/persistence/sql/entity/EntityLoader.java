@@ -12,8 +12,14 @@ class EntityLoader {
         this.dmlQueryBuilder = dmlQueryBuilder;
     }
 
-    <T> T select(Class<T> clazz, Long id) {
+    <T> T select(final Class<T> clazz, final Long id) {
         final String select = dmlQueryBuilder.select(clazz, id);
         return jdbcTemplate.queryForObject(select, new GenericRowMapper<>(clazz));
+    }
+
+    Object getMaxId(final Class<?> clazz) {
+        final String selectMaxId = dmlQueryBuilder.selectMaxId(clazz);
+        final Long id = (Long) jdbcTemplate.queryForObject(selectMaxId, new MaxIdMapper());
+        return id + 1;
     }
 }

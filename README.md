@@ -20,3 +20,6 @@
 - [x] PersistenceContext 생성
 - [x] 1차 캐싱
 - [x] Dirty Checking
+
+## Step4
+- [ ] EntityEntry를 구현한다.
