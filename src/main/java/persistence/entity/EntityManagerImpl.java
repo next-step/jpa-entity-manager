@@ -3,7 +3,6 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {

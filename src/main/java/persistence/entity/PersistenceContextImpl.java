@@ -5,29 +5,32 @@ import java.util.Map;
 
 public class PersistenceContextImpl implements PersistenceContext {
 
-    private final Map<EntityKey, Object> entityMap = new HashMap<>();
+    private final Map<EntityKey, Object> managedEntities = new HashMap<>();
     private final Map<EntityKey, EntitySnapshot> entitySnapshots = new HashMap<>();
+    private final Map<EntityKey, EntityEntry> entityEntries = new HashMap<>();
 
     @Override
     public void put(EntityKey entityKey, Object entity) {
-        entityMap.put(entityKey, entity);
+        managedEntities.put(entityKey, entity);
         entitySnapshots.put(entityKey, EntitySnapshot.from(entity));
+        entityEntries.put(entityKey, EntityEntry.createManaged());
     }
 
     @Override
     public boolean contains(EntityKey entityKey) {
-        return entityMap.containsKey(entityKey);
+        return managedEntities.containsKey(entityKey);
     }
 
     @Override
     public Object get(EntityKey entityKey) {
-        return entityMap.get(entityKey);
+        return managedEntities.get(entityKey);
     }
 
     @Override
     public void remove(EntityKey entityKey) {
-        entityMap.remove(entityKey);
+        managedEntities.remove(entityKey);
         entitySnapshots.remove(entityKey);
+        entityEntries.get(entityKey).setDeleted();
     }
 
     @Override

@@ -1,5 +1,11 @@
 # jpa-entity-manager
 
+## 4단계 - EntityEntry
+
+### 요구 사항
+
+- [X] 엔티티 관리 상태를 추가한다
+
 ## 3단계 - Persistence Context, Dirty Check
 
 ### 요구 사항
