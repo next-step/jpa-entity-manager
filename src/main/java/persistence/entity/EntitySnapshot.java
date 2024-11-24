@@ -24,25 +24,4 @@ public class EntitySnapshot {
 
         return entitySnapshot;
     }
-
-    public EntityState compareAndGetState(Object entity) {
-        Map<String, Object> originFields = this.fields;
-
-        if (entity == null) {
-            return EntityState.DELETED;
-        }
-
-        Map<String, Object> newFields = EntitySnapshot.of(entity).fields;
-
-        for (String fieldName : originFields.keySet()) {
-            Object originFieldValue = originFields.get(fieldName);
-            Object newFieldValue = newFields.get(fieldName);
-
-            if (!originFieldValue.equals(newFieldValue)) {
-                return EntityState.MODIFIED;
-            }
-        }
-
-        return EntityState.UNCHANGED;
-    }
 }

@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.util.List;
 import java.util.Map;
 
 public interface PersistenceContext {
@@ -31,5 +32,5 @@ public interface PersistenceContext {
      *
      * @return 수정/삭제 대상 엔티티 맵
      */
-    Map<Class<?>, Map<Long, Object>> getChangedEntities();
+    Map<Class<?>, List<EntityEntry>> getEntityEntries();
 }

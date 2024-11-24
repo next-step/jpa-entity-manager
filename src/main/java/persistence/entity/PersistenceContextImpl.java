@@ -1,35 +1,33 @@
 package persistence.entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PersistenceContextImpl implements PersistenceContext {
-    private final Map<Class<?>, Map<Long, Object>> cacheStorage;
-    private final Map<Class<?>, Map<Long, EntitySnapshot>> snapshotStorage;
+    private final Map<Class<?>, Map<Long, EntityEntry>> entryStorage;
 
     public PersistenceContextImpl() {
-        this.cacheStorage = new HashMap<>();
-        this.snapshotStorage = new HashMap<>();
+        this.entryStorage = new HashMap<>();
     }
 
-    private Map<Long, Object> getOrCreateEntityMap(Class<?> clazz) {
-        if (!this.cacheStorage.containsKey(clazz)) {
-            this.cacheStorage.put(clazz, new HashMap<>());
+    private Map<Long, EntityEntry> getOrCreateEntryMap(Class<?> clazz) {
+        if (!entryStorage.containsKey(clazz)) {
+            entryStorage.put(clazz, new HashMap<>());
         }
-        return this.cacheStorage.get(clazz);
-    }
-
-    private Map<Long, EntitySnapshot> getOrCreateSnapshotMap(Class<?> clazz) {
-        if (!this.snapshotStorage.containsKey(clazz)) {
-            this.snapshotStorage.put(clazz, new HashMap<>());
-        }
-        return this.snapshotStorage.get(clazz);
+        return entryStorage.get(clazz);
     }
 
     @Override
     public Object getEntity(Class<?> clazz, Long id) {
-        Map<Long, Object> entityMap = getOrCreateEntityMap(clazz);
-        return entityMap.get(id);
+        Map<Long, EntityEntry> entityMap = getOrCreateEntryMap(clazz);
+        EntityEntry entityEntry = entityMap.get(id);
+        if (entityEntry == null) {
+            return null;
+        }
+        return entityEntry.getEntity();
     }
 
     @Override
@@ -37,53 +35,27 @@ public class PersistenceContextImpl implements PersistenceContext {
         Class<?> clazz = entity.getClass();
         Long idValue = EntityUtils.getIdValue(entity);
 
-        Map<Long, Object> entityMap = getOrCreateEntityMap(clazz);
-        entityMap.put(idValue, entity);
+        Map<Long, EntityEntry> entryMap = getOrCreateEntryMap(clazz);
 
-        Map<Long, EntitySnapshot> snapshotMap = getOrCreateSnapshotMap(clazz);
-        snapshotMap.put(idValue, EntitySnapshot.of(entity));
+        EntityEntry entityEntry = EntityEntry.of(EntityStatus.MANAGED, entity);
+        entryMap.put(idValue, entityEntry);
     }
 
     @Override
     public void removeEntity(Object entity) {
         Class<?> clazz = entity.getClass();
-        Map<Long, Object> entityMap = getOrCreateEntityMap(clazz);
-        entityMap.remove(EntityUtils.getIdValue(entity));
+        Map<Long, EntityEntry> entryMap = getOrCreateEntryMap(clazz);
+        Long idValue = EntityUtils.getIdValue(entity);
+        EntityEntry entityEntry = entryMap.get(idValue);
+        entityEntry.updateStatus(EntityStatus.DELETED);
     }
 
     @Override
-    public Map<Class<?>, Map<Long, Object>> getChangedEntities() {
-        Map<Class<?>, Map<Long, Object>> cacheStates = new HashMap<>();
-
-        for (Map.Entry<Class<?>, Map<Long, EntitySnapshot>> snapshotMapEntry : this.snapshotStorage.entrySet()) {
-            Map<Long, Object> entityMap = getOrCreateEntityMap(snapshotMapEntry.getKey());
-            Map<Long, EntitySnapshot> snapshotMap = this.snapshotStorage.get(snapshotMapEntry.getKey());
-            cacheStates.put(snapshotMapEntry.getKey(), getChangedEntitiesInType(entityMap, snapshotMap));
-        }
-        return cacheStates;
-    }
-
-    private Map<Long, Object> getChangedEntitiesInType(Map<Long, Object> entityMap, Map<Long, EntitySnapshot> snapshotMap) {
-        Map<Long, Object> changedEntitiesInType = new HashMap<>();
-
-        for (Map.Entry<Long, EntitySnapshot> snapshotEntry : snapshotMap.entrySet()) {
-            Object cacheEntity = entityMap.get(snapshotEntry.getKey());
-            EntitySnapshot snapshot = snapshotEntry.getValue();
-            EntityState entityState = snapshot.compareAndGetState(cacheEntity);
-
-            switch (entityState) {
-                case MODIFIED:
-                    changedEntitiesInType.put(snapshotEntry.getKey(), cacheEntity);
-                    break;
-                case DELETED:
-                    changedEntitiesInType.put(snapshotEntry.getKey(), null);
-                    break;
-                case UNCHANGED:
-                default:
-                    break;
-            }
-        }
-
-        return changedEntitiesInType;
+    public Map<Class<?>, List<EntityEntry>> getEntityEntries() {
+        return entryStorage.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new ArrayList<>(entry.getValue().values())
+                ));
     }
 }

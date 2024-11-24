@@ -54,5 +54,10 @@
 
 ### 2-3. Persistence Context, Dirty Check
 
-- [ ] data snapshot 구현
-- [ ] dirty check 로 변경 사항 쿼리 생성 구현
+- [x] data snapshot 구현
+- [x] dirty check 로 변경 사항 쿼리 생성 구현
+
+### 2-4. EntityEntry
+
+- [ ] EntityEntry 도입 및 엔티티 관리 구조 변경
+- [ ] EntityStatus 변경 적용

@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 public class EntityManagerImpl implements EntityManager {
@@ -19,17 +20,25 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     public void commitTransaction() {
-        Map<Class<?>, Map<Long, Object>> changedEntities = this.persistenceContext.getChangedEntities();
-        for (Map.Entry<Class<?>, Map<Long, Object>> changedEntitiesEntry : changedEntities.entrySet()) {
-            Class<?> entityClass = changedEntitiesEntry.getKey();
-            Map<Long, Object> changedEntityMap = changedEntitiesEntry.getValue();
+        Map<Class<?>, List<EntityEntry>> entityEntries = this.persistenceContext.getEntityEntries();
+        entityEntries.values().forEach(this::executeEntityActions);
+    }
 
-            for (Map.Entry<Long, Object> changedEntity : changedEntityMap.entrySet()) {
-                if (changedEntity.getValue() == null) {
-                    entityPersister.delete(entityClass, changedEntity.getKey());
-                } else {
-                    entityPersister.update(changedEntity.getValue());
-                }
+    private void executeEntityActions(List<EntityEntry> entryList) {
+        for (EntityEntry entityEntry : entryList) {
+            switch (entityEntry.getStatus()) {
+                case MANAGED:
+                    this.entityPersister.update(entityEntry.getEntity());
+                    break;
+                case DELETED:
+                    this.entityPersister.delete(entityEntry.getEntityClass(), entityEntry.getId());
+                    break;
+                case READ_ONLY:
+                case GONE:
+                case LOADING:
+                case SAVING:
+                default:
+                    break;
             }
         }
     }
